@@ -1,0 +1,462 @@
+/* GTD Tasks Plugin Styles */
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+
+.gtd-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gtd-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+}
+
+.gtd-panel-header h3 {
+  margin: 0;
+  font-size: var(--font-ui-medium);
+  font-weight: 600;
+}
+
+.gtd-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.gtd-empty-state {
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+/* ── Bucket group ───────────────────────────────────────────────────────── */
+
+.gtd-bucket {
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.gtd-bucket:last-child {
+  border-bottom: none;
+}
+
+.gtd-bucket-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--background-secondary);
+}
+
+.gtd-bucket-header:hover {
+  background: var(--background-modifier-hover);
+}
+
+.gtd-bucket-header .gtd-collapse-icon {
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.gtd-bucket-header .gtd-bucket-name {
+  flex: 1;
+}
+
+.gtd-bucket-header .gtd-bucket-count {
+  background: var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.gtd-bucket-tasks {
+  padding: 0;
+}
+
+/* ── Task item ──────────────────────────────────────────────────────────── */
+
+.gtd-task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  min-height: 28px;
+  position: relative;
+}
+
+.gtd-task:hover {
+  background: var(--background-modifier-hover);
+}
+
+.gtd-task.is-completed {
+  opacity: 0.5;
+}
+
+.gtd-task.is-completed .gtd-task-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.gtd-task-checkbox {
+  flex-shrink: 0;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.gtd-task-text {
+  flex: 1;
+  font-size: var(--font-ui-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.gtd-task-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.gtd-task:hover .gtd-task-actions {
+  opacity: 1;
+}
+
+.gtd-task-move-btn {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.gtd-task-move-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* Drag-and-drop */
+.gtd-task.sortable-ghost {
+  opacity: 0.3;
+  background: var(--interactive-accent-hover);
+}
+
+.gtd-task.sortable-chosen {
+  background: var(--background-modifier-hover);
+}
+
+.gtd-bucket-tasks.drag-over {
+  background: var(--background-modifier-hover);
+  outline: 2px dashed var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+/* ── Settings tab ───────────────────────────────────────────────────────── */
+
+.gtd-section-separator {
+  border: none;
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 16px 0 8px;
+}
+
+.gtd-section-desc {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  margin: 0 0 12px;
+}
+
+.gtd-desc-list {
+  margin: 6px 0 0 16px;
+  padding: 0;
+  font-size: var(--font-ui-small);
+}
+
+.gtd-desc-list li {
+  margin-bottom: 3px;
+  color: var(--text-muted);
+}
+
+/* Scope path list */
+.gtd-scope-list {
+  padding: 4px 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gtd-scope-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gtd-scope-input {
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+}
+
+.gtd-scope-remove-btn {
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.gtd-scope-remove-btn:hover {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+}
+
+.gtd-scope-add-btn {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px dashed var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  margin-top: 2px;
+}
+
+.gtd-scope-add-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Buckets section */
+.gtd-settings-buckets {
+  margin-top: 8px;
+}
+
+.gtd-bucket-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.gtd-add-bucket-btn {
+  padding: 4px 14px;
+}
+
+.gtd-reset-btn {
+  padding: 4px 14px;
+}
+
+.gtd-bucket-setting-item {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.gtd-to-review-item .gtd-bucket-setting-header {
+  background: var(--background-secondary-alt, var(--background-secondary));
+}
+
+.gtd-bucket-setting-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  gap: 8px;
+  background: var(--background-secondary);
+}
+
+.gtd-bucket-setting-header:hover {
+  background: var(--background-modifier-hover);
+}
+
+.gtd-bucket-emoji-display {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.gtd-bucket-system-label {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-left: 4px;
+}
+
+.gtd-bucket-header-spacer {
+  flex: 1;
+}
+
+/* Order buttons — side by side, right-aligned, wider */
+.gtd-bucket-order-btns {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.gtd-bucket-order-btn {
+  padding: 2px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  min-width: 36px;
+  text-align: center;
+}
+
+.gtd-bucket-order-btn:hover:not(:disabled) {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.gtd-bucket-order-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.gtd-bucket-setting-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* Emoji trigger button */
+.gtd-emoji-btn-display {
+  font-size: 22px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+}
+
+.gtd-emoji-btn-display:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* Delete button — small, bottom-right */
+.gtd-bucket-delete-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.gtd-bucket-delete-btn {
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ── Emoji picker ───────────────────────────────────────────────────────── */
+
+.gtd-emoji-picker {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-l);
+  width: 316px;
+}
+
+/* Category icon tab bar */
+.gtd-emoji-tabs {
+  display: flex;
+  gap: 2px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.gtd-emoji-tab {
+  flex: 1;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  user-select: none;
+  opacity: 0.5;
+}
+
+.gtd-emoji-tab:hover {
+  background: var(--background-modifier-hover);
+  opacity: 1;
+}
+
+.gtd-emoji-tab.active {
+  background: var(--background-modifier-hover);
+  opacity: 1;
+}
+
+/* Emoji grid — 10 columns */
+.gtd-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 28px);
+  gap: 2px;
+}
+
+.gtd-emoji-item {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.gtd-emoji-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* ── Date range extra fields ─────────────────────────────────────────────── */
+
+.gtd-date-range-extra {
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 2px solid var(--background-modifier-border);
+}
