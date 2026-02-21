@@ -253,7 +253,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderGeneralSection() {
     const { containerEl } = this;
-    containerEl.createEl("h2", { text: "General Settings" });
+    containerEl.createEl("h2", { text: "Getting Things Done - Settings" });
 
     // Annotation Style (storage mode)
     const annotationSetting = new Setting(containerEl)
@@ -313,9 +313,6 @@ export class GtdSettingsTab extends PluginSettingTab {
           await this.plugin.refreshIndex();
         });
       });
-
-    // Separator before scope
-    containerEl.createEl("hr", { cls: "gtd-section-separator" });
 
     // Scope type selector
     new Setting(containerEl)
@@ -444,7 +441,6 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderBehaviourSection() {
     const { containerEl } = this;
-    containerEl.createEl("h2", { text: "Behaviour Settings" });
 
     new Setting(containerEl)
       .setName("Show completed tasks until midnight")
