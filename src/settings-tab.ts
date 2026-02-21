@@ -472,6 +472,19 @@ export class GtdSettingsTab extends PluginSettingTab {
           await this.plugin.refreshIndex();
         });
       });
+
+    new Setting(containerEl)
+      .setName("Compact view")
+      .setDesc(
+        "Reduce padding on bucket headers and task rows to fit more tasks on screen."
+      )
+      .addToggle((t) => {
+        t.setValue(this.plugin.settings.compactView);
+        t.onChange(async (val) => {
+          this.plugin.settings.compactView = val;
+          await this.plugin.saveSettings();
+        });
+      });
   }
 
   // ---------------------------------------------------------------------------

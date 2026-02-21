@@ -150,6 +150,9 @@
   cursor: pointer;
   line-height: 1.4;
   white-space: nowrap;
+  height: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .gtd-task-move-btn:hover {
@@ -172,6 +175,24 @@
   background: var(--background-modifier-hover);
   outline: 2px dashed var(--interactive-accent);
   outline-offset: -2px;
+}
+
+/* ── Compact view ───────────────────────────────────────────────────────── */
+
+.gtd-compact .gtd-bucket-header {
+  padding: 4px 10px;
+}
+
+.gtd-compact .gtd-task {
+  padding: 1px 10px;
+  min-height: auto;
+  gap: 3px;
+}
+
+.gtd-compact .gtd-task-actions .gtd-task-move-btn {
+  padding: 0 4px;
+  line-height: 1.2;
+  font-size: 9px;
 }
 
 /* ── Settings tab ───────────────────────────────────────────────────────── */

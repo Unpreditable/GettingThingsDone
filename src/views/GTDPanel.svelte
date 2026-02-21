@@ -106,7 +106,7 @@
   }
 </script>
 
-<div class="gtd-panel">
+<div class="gtd-panel" class:gtd-compact={settings.compactView}>
   <div class="gtd-panel-header">
     <h3>GTD Tasks</h3>
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->

@@ -68,6 +68,8 @@ export interface PluginSettings {
   toReviewQuickMoveTargets: [string?, string?];
   /** Show the To Review bucket's task count in Obsidian's status bar. */
   toReviewShowInStatusBar: boolean;
+  /** Reduce padding on headers and task rows for a more compact layout. */
+  compactView: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -129,4 +131,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewEmoji: "📥",
   toReviewQuickMoveTargets: ["today", "this-week"],
   toReviewShowInStatusBar: false,
+  compactView: false,
 };
