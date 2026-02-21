@@ -32,6 +32,8 @@ export interface BucketConfig {
   tag?: string;
   /** 1–2 bucket IDs shown as quick-move buttons on each task row. */
   quickMoveTargets: [string?, string?];
+  /** Show this bucket's task count in Obsidian's status bar. */
+  showInStatusBar: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -64,6 +66,8 @@ export interface PluginSettings {
   toReviewEmoji: string;
   /** Quick-move button targets for the To Review bucket. */
   toReviewQuickMoveTargets: [string?, string?];
+  /** Show the To Review bucket's task count in Obsidian's status bar. */
+  toReviewShowInStatusBar: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -77,6 +81,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     emoji: "⚡",
     dateRangeRule: { type: "today" },
     quickMoveTargets: ["this-week", "someday"],
+    showInStatusBar: true,
   },
   {
     id: "this-week",
@@ -84,6 +89,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     emoji: "📌",
     dateRangeRule: { type: "this-week" },
     quickMoveTargets: ["today", "next-week"],
+    showInStatusBar: false,
   },
   {
     id: "next-week",
@@ -91,6 +97,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     emoji: "🔭",
     dateRangeRule: { type: "next-week" },
     quickMoveTargets: ["this-week", "this-month"],
+    showInStatusBar: false,
   },
   {
     id: "this-month",
@@ -98,6 +105,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     emoji: "📅",
     dateRangeRule: { type: "this-month" },
     quickMoveTargets: ["next-week", "someday"],
+    showInStatusBar: false,
   },
   {
     id: "someday",
@@ -106,6 +114,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     dateRangeRule: null, // only assigned via explicit tag or user action
     tag: "someday",
     quickMoveTargets: ["today", "this-week"],
+    showInStatusBar: false,
   },
 ];
 
@@ -119,4 +128,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   staleIndicatorEnabled: true,
   toReviewEmoji: "📥",
   toReviewQuickMoveTargets: ["today", "this-week"],
+  toReviewShowInStatusBar: false,
 };

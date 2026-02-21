@@ -505,6 +505,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         emoji: "📌",
         dateRangeRule: null,
         quickMoveTargets: [],
+        showInStatusBar: false,
       });
       await this.plugin.saveSettings();
       this.display();
@@ -573,6 +574,18 @@ export class GtdSettingsTab extends PluginSettingTab {
         await this.plugin.saveSettings();
       }
     );
+
+    // Status bar
+    new Setting(bodyEl)
+      .setName("Show in status bar")
+      .setDesc("Display the To Review count in the status bar.")
+      .addToggle((t) => {
+        t.setValue(this.plugin.settings.toReviewShowInStatusBar ?? false);
+        t.onChange(async (val) => {
+          this.plugin.settings.toReviewShowInStatusBar = val;
+          await this.plugin.saveSettings();
+        });
+      });
   }
 
   private renderBucketList(container: HTMLElement) {
@@ -706,6 +719,18 @@ export class GtdSettingsTab extends PluginSettingTab {
       },
       bucket.id
     );
+
+    // Status bar
+    new Setting(container)
+      .setName("Show in status bar")
+      .setDesc("Display this bucket's task count in the status bar.")
+      .addToggle((t) => {
+        t.setValue(bucket.showInStatusBar ?? false);
+        t.onChange(async (val) => {
+          bucket.showInStatusBar = val;
+          await save();
+        });
+      });
 
     // Delete button — small, bottom-right, with confirmation
     const deleteRow = container.createEl("div", { cls: "gtd-bucket-delete-row" });

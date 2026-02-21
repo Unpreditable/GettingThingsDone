@@ -26,12 +26,15 @@ export default class GtdTasksPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
   taskIndex!: TaskIndex;
   private panelView?: GtdPanelView;
+  private statusBarItem?: HTMLElement;
 
   async onload() {
     await this.loadSettings();
 
     this.taskIndex = new TaskIndex(this.app, this, () => this.settings.taskScope);
 
+    this.statusBarItem = this.addStatusBarItem();
+    this.statusBarItem.style.order = "-1";
     this.addSettingTab(new GtdSettingsTab(this.app, this));
 
     this.registerView(VIEW_TYPE_GTD, (leaf) => {
@@ -61,12 +64,16 @@ export default class GtdTasksPlugin extends Plugin {
     await this.taskIndex.initialScan();
     this.taskIndex.registerVaultEvents();
 
-    // Keep the panel up-to-date as the index changes
-    this.taskIndex.onChange(() => this.panelView?.refresh());
+    // Keep the panel and status bar up-to-date as the index changes
+    this.taskIndex.onChange(() => {
+      this.panelView?.refresh();
+      this.updateStatusBar();
+    });
 
     // Auto-open panel on startup
     this.app.workspace.onLayoutReady(() => {
       this.activateView();
+      this.updateStatusBar();
     });
   }
 
@@ -90,12 +97,46 @@ export default class GtdTasksPlugin extends Plugin {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
         bucket.emoji = def?.emoji ?? "📌";
       }
+      if (bucket.showInStatusBar === undefined) {
+        bucket.showInStatusBar = false;
+      }
     }
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
     this.panelView?.refresh();
+    this.updateStatusBar();
+  }
+
+  private updateStatusBar(): void {
+    if (!this.statusBarItem) return;
+    const allTasks = this.taskIndex.getAllTasks();
+    const bucketGroups = groupTasksIntoBuckets(allTasks, this.settings);
+    const parts: string[] = [];
+
+    for (const group of bucketGroups) {
+      const showInBar = group.isSystem
+        ? this.settings.toReviewShowInStatusBar
+        : (this.settings.buckets.find((b) => b.id === group.bucketId)?.showInStatusBar ?? false);
+      if (!showInBar) continue;
+
+      const active = group.tasks.filter((t) => !t.isCompleted).length;
+      let total = active;
+      if (this.settings.completedVisibilityUntilMidnight) {
+        const midnight = new Date();
+        midnight.setHours(0, 0, 0, 0);
+        const visibleCompleted = group.tasks.filter(
+          (t) => t.isCompleted && (!t.completedAt || t.completedAt >= midnight)
+        ).length;
+        total = active + visibleCompleted;
+      }
+
+      const label = active < total ? `${active}/${total}${group.emoji}` : `${total}${group.emoji}`;
+      parts.push(label);
+    }
+
+    this.statusBarItem.setText(parts.join("  "));
   }
 
   /** Force a full re-index (e.g. after scope changes). */
