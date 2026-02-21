@@ -75,15 +75,13 @@
       <span class="gtd-bucket-emoji">{emoji}</span>
     {/if}
     <span class="gtd-bucket-name">{name}</span>
-    {#if totalCount > 0}
-      <span class="gtd-bucket-count">
-        {#if activeTasks.length < totalCount}
-          {activeTasks.length}/{totalCount}
-        {:else}
-          {totalCount}
-        {/if}
-      </span>
-    {/if}
+    <span class="gtd-bucket-count">
+      {#if activeTasks.length < totalCount}
+        {activeTasks.length}/{totalCount}
+      {:else}
+        {totalCount}
+      {/if}
+    </span>
   </div>
 
   {#if !collapsed}
