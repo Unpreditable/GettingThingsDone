@@ -3,3 +3,4 @@ main.js
 *.js.map
 .hotreload
 data.json
+.claude/settings.local.json
