@@ -136,14 +136,33 @@ function openEmojiPicker(
   renderGrid(0);
 
   const rect = anchor.getBoundingClientRect();
-  Object.assign(picker.style, {
-    position: "fixed",
-    top: `${rect.bottom + 4}px`,
-    left: `${rect.left}px`,
-    zIndex: "9999",
-  });
-
+  picker.style.position = "fixed";
+  picker.style.visibility = "hidden";
+  picker.style.zIndex = "9999";
   document.body.appendChild(picker);
+
+  // Measure picker dimensions
+  const pickerRect = picker.getBoundingClientRect();
+  const pickerWidth = pickerRect.width;
+  const pickerHeight = pickerRect.height;
+
+  // Calculate position with viewport constraints
+  let top = rect.bottom + 4;
+  let left = rect.left;
+
+  // Check if picker would overflow bottom; if so, position above
+  if (top + pickerHeight > window.innerHeight) {
+    top = rect.top - pickerHeight - 4;
+  }
+
+  // Check if picker would overflow right; if so, shift left
+  if (left + pickerWidth > window.innerWidth) {
+    left = Math.max(0, window.innerWidth - pickerWidth - 4);
+  }
+
+  picker.style.top = `${top}px`;
+  picker.style.left = `${left}px`;
+  picker.style.visibility = "visible";
 
   const removePicker = () => {
     picker.remove();
