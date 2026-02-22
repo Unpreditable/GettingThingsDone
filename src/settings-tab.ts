@@ -145,13 +145,26 @@ function openEmojiPicker(
 
   document.body.appendChild(picker);
 
-  const closeOnOutside = (e: MouseEvent) => {
-    if (!picker.contains(e.target as Node)) {
-      picker.remove();
-      document.removeEventListener("mousedown", closeOnOutside);
-    }
+  const removePicker = () => {
+    picker.remove();
+    document.removeEventListener("mousedown", closeOnOutside);
+    document.removeEventListener("scroll", closeOnScroll, true);
+    document.removeEventListener("keydown", closeOnEscape);
   };
-  setTimeout(() => document.addEventListener("mousedown", closeOnOutside), 100);
+
+  const closeOnOutside = (e: MouseEvent) => {
+    if (!picker.contains(e.target as Node)) removePicker();
+  };
+  const closeOnScroll = () => removePicker();
+  const closeOnEscape = (e: KeyboardEvent) => {
+    if (e.key === "Escape") removePicker();
+  };
+
+  setTimeout(() => {
+    document.addEventListener("mousedown", closeOnOutside);
+    document.addEventListener("scroll", closeOnScroll, true);
+    document.addEventListener("keydown", closeOnEscape);
+  }, 100);
 }
 
 function renderEmojiSetting(
