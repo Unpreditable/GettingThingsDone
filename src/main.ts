@@ -4,6 +4,7 @@ import {
   ItemView,
   Notice,
   TFile,
+  normalizePath,
 } from "obsidian";
 import type { SvelteComponent } from "svelte";
 
@@ -155,6 +156,7 @@ export default class GtdTasksPlugin extends Plugin {
 
 class GtdPanelView extends ItemView {
   private svelteComponent?: SvelteComponent;
+  private celebrationImageUrls: string[] = [];
 
   constructor(leaf: WorkspaceLeaf, private plugin: GtdTasksPlugin) {
     super(leaf);
@@ -172,10 +174,24 @@ class GtdPanelView extends ItemView {
     return "check-square";
   }
 
+  private async loadCelebrationImageUrls(): Promise<string[]> {
+    const assetDir = normalizePath(this.plugin.manifest.dir + '/assets/celebration');
+    try {
+      const listing = await this.app.vault.adapter.list(assetDir);
+      return listing.files
+        .filter((f) => f.toLowerCase().endsWith('.png'))
+        .map((f) => (this.app.vault.adapter as any).getResourcePath(f));
+    } catch {
+      return [];
+    }
+  }
+
   async onOpen() {
     this.contentEl.empty();
     this.contentEl.addClass("gtd-panel-root");
     this.mountSvelte();
+    this.celebrationImageUrls = await this.loadCelebrationImageUrls();
+    this.svelteComponent?.$set({ celebrationImageUrls: this.celebrationImageUrls });
   }
 
   async onClose() {
@@ -204,6 +220,7 @@ class GtdPanelView extends ItemView {
       props: {
         bucketGroups,
         settings: this.plugin.settings,
+        celebrationImageUrls: this.celebrationImageUrls,
         onMove: this.handleMove.bind(this),
         onToggle: this.handleToggle.bind(this),
         onNavigate: this.handleNavigate.bind(this),

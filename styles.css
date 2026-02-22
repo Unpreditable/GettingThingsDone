@@ -7,6 +7,7 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 .gtd-panel-header {
@@ -495,4 +496,50 @@ input.gtd-input-error {
   margin-left: 8px;
   padding-left: 8px;
   border-left: 2px solid var(--background-modifier-border);
+}
+
+/* ── Celebration animations ──────────────────────────────────────────── */
+
+.gtd-celebration-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+@keyframes gtd-confetti-fall {
+  0%   { transform: translateY(0) rotate(var(--rotation)); opacity: 1; }
+  60%  { opacity: 0.9; }
+  100% { transform: translateY(-320px) rotate(calc(var(--rotation) + 360deg)); opacity: 0; }
+}
+
+.gtd-confetti-particle {
+  position: absolute;
+  bottom: 10px;
+  border-radius: 2px;
+  animation-name: gtd-confetti-fall;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes gtd-creature-fly {
+  /* Start: off-screen left */
+  0%   { left: -250px; top: 50%; transform: translateX(-50%); }
+  /* Phase 1: Flight from left to center (0-43%) = 1s */
+  43%  { left: 50%; top: 32%; transform: translateX(-50%); }
+  /* Phase 2: Pause/stop in center (43-57%) = 0.32s */
+  57%  { left: 50%; top: 32%; transform: translateX(-50%); }
+  /* Phase 3: Flight from center to far right (57-100%) = 1s */
+  100% { left: calc(100% + 250px); top: 14%; transform: translateX(-50%); }
+}
+
+.gtd-creature-fly {
+  position: absolute;
+  width: 192px;
+  height: 192px;
+  object-fit: contain;
+  animation: gtd-creature-fly 2.32s ease-in-out forwards;
 }

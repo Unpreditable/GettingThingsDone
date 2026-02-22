@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { Menu } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
+  import Celebration from "./Celebration.svelte";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
   import type { BucketConfig, PluginSettings } from "../settings";
@@ -14,6 +15,7 @@
   export let onNavigate: (task: TaskRecord) => void;
   export let onConfirm: (task: TaskRecord, bucketId: string) => Promise<void>;
   export let onOpenSettings: () => void;
+  export let celebrationImageUrls: string[] = [];
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
@@ -90,6 +92,39 @@
     return () => document.removeEventListener("contextmenu", handler, true);
   });
 
+  type CelebrationState = "none" | "confetti" | "creature";
+  let celebration: CelebrationState = "none";
+  let celebrationTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function triggerCelebration(state: Exclude<CelebrationState, "none">, duration: number) {
+    if (celebrationTimer) {
+      clearTimeout(celebrationTimer);
+      celebration = "none";
+    }
+    // setTimeout 0 lets Svelte unmount the old Celebration before remounting
+    // (resets CSS animations cleanly for rapid successive completions)
+    setTimeout(() => {
+      celebration = state;
+      celebrationTimer = setTimeout(() => {
+        celebration = "none";
+        celebrationTimer = null;
+      }, duration);
+    }, 0);
+  }
+
+  async function handleToggle(task: TaskRecord) {
+    if (!task.isCompleted) {
+      const group = bucketGroups.find((g) => g.tasks.some((t) => t.id === task.id));
+      if (group?.bucketId === "today") {
+        const remaining = group.tasks.filter((t) => !t.isCompleted && t.id !== task.id).length;
+        triggerCelebration(remaining === 0 ? "creature" : "confetti", remaining === 0 ? 2520 : 2100);
+      } else {
+        triggerCelebration("confetti", 2100);
+      }
+    }
+    await onToggle(task);
+  }
+
   async function handleDrop(event: CustomEvent<{
     taskId: string;
     sourceBucketId: string;
@@ -129,7 +164,7 @@
         quickMoveTargets={getQuickMoveTargets(group.bucketId)}
         showCompletedUntilMidnight={settings.completedVisibilityUntilMidnight}
         on:move={(e) => handleMove(e.detail.task, e.detail.targetBucketId)}
-        on:toggle={(e) => onToggle(e.detail.task)}
+        on:toggle={(e) => handleToggle(e.detail.task)}
         on:navigate={(e) => onNavigate(e.detail.task)}
         on:confirm={(e) => onConfirm(e.detail.task, e.detail.bucketId)}
         on:drop={handleDrop}
@@ -140,4 +175,8 @@
       <div class="gtd-empty-state">No tasks found. Adjust the task scope in settings.</div>
     {/if}
   </div>
+
+  {#if celebration !== "none"}
+    <Celebration type={celebration} imagePaths={celebrationImageUrls} />
+  {/if}
 </div>
