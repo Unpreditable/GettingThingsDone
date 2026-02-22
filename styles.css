@@ -296,6 +296,20 @@
   padding: 4px 14px;
 }
 
+.gtd-field-error {
+  display: none;
+  margin: -4px 0 6px 0;
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--text-error);
+  text-align: right;
+}
+
+input.gtd-input-error {
+  border-color: var(--text-error) !important;
+  outline: 1px solid var(--text-error);
+}
+
 .gtd-bucket-setting-item {
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;

@@ -690,33 +690,54 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
     });
 
-    new Setting(container)
+    let idErrorEl: HTMLElement;
+    const idSetting = new Setting(container)
       .setName("ID / slug")
       .setDesc("Internal identifier used in tags/fields. No spaces.")
       .addText((t) => {
         t.setValue(bucket.id);
-        t.onChange(async (val) => {
-          bucket.id = val.replace(/\s+/g, "-").toLowerCase();
-          await save();
+        let savedId = bucket.id;
+
+        t.inputEl.addEventListener("focus", () => {
+          savedId = bucket.id;
+        });
+
+        t.onChange((val) => {
+          const normalized = val.replace(/\s+/g, "-").toLowerCase();
+          const duplicate = this.plugin.settings.buckets.find(
+            (b, i) => i !== idx && b.id === normalized
+          );
+          if (duplicate) {
+            idErrorEl.setText(`ID "${normalized}" is already used by "${duplicate.name}".`);
+            idErrorEl.style.display = "block";
+            t.inputEl.addClass("gtd-input-error");
+          } else {
+            idErrorEl.style.display = "none";
+            t.inputEl.removeClass("gtd-input-error");
+          }
+        });
+
+        t.inputEl.addEventListener("blur", async () => {
+          const normalized = t.getValue().replace(/\s+/g, "-").toLowerCase();
+          const duplicate = this.plugin.settings.buckets.find(
+            (b, i) => i !== idx && b.id === normalized
+          );
+          if (duplicate) {
+            t.setValue(savedId);
+            idErrorEl.style.display = "none";
+            t.inputEl.removeClass("gtd-input-error");
+          } else {
+            bucket.id = normalized;
+            await save();
+          }
         });
       });
+    idErrorEl = document.createElement("p");
+    idErrorEl.classList.add("gtd-field-error");
+    idSetting.settingEl.after(idErrorEl);
 
     // Date range rule
     this.renderDateRangeField(container, bucket, save);
-
-    // Optional tag (e.g. #someday)
-    new Setting(container)
-      .setName("Tag (optional)")
-      .setDesc("Tasks with this tag are assigned here (e.g. 'someday'). Written to/removed from task lines when moving.")
-      .addText((t) => {
-        t.setValue(bucket.tag ?? "");
-        t.setPlaceholder("e.g. someday");
-        t.onChange(async (val) => {
-          const clean = val.trim().replace(/^#/, "");
-          bucket.tag = clean || undefined;
-          await save();
-        });
-      });
 
     // Quick-move targets
     this.renderQuickMoveDropdowns(

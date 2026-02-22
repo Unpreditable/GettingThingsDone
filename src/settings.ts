@@ -27,9 +27,6 @@ export interface BucketConfig {
   emoji: string;
   /** Which tasks fall into this bucket (by date). null = no auto-assign. */
   dateRangeRule: DateRangeRule | null;
-  /** Optional tag: tasks with this tag are auto-assigned here; tag is
-   *  also written/removed when moving tasks (e.g. 'someday'). */
-  tag?: string;
   /** 1–2 bucket IDs shown as quick-move buttons on each task row. */
   quickMoveTargets: [string?, string?];
   /** Show this bucket's task count in Obsidian's status bar. */
@@ -113,8 +110,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     id: "someday",
     name: "Someday / Maybe",
     emoji: "💭",
-    dateRangeRule: null, // only assigned via explicit tag or user action
-    tag: "someday",
+    dateRangeRule: null,
     quickMoveTargets: ["today", "this-week"],
     showInStatusBar: false,
   },

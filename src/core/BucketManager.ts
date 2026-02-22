@@ -3,10 +3,9 @@
  *
  * Assignment priority (highest first):
  *   1. Storage-mode assignment (inline-tag or inline-field)
- *   2. bucket.tag match (e.g. #someday for the Someday bucket)
- *   3. Auto-assignment from 📅 due date matching a bucket's date range rule
+ *   2. Auto-assignment from 📅 due date matching a bucket's date range rule
  *      → task is marked as auto-placed (autoPlacedTaskIds)
- *   4. No assignment → "to-review" system bucket
+ *   3. No assignment → "to-review" system bucket
  *
  * Stale tasks remain in their original bucket; their IDs are collected in
  * staleTaskIds so the UI can show a ! indicator (when staleIndicatorEnabled).
@@ -130,11 +129,6 @@ function resolveManualAssignment(
   } else if (storageMode === "inline-field") {
     const val = getInlineFieldValue(task.rawLine, tagPrefix);
     if (val && buckets.some((b) => b.id === val)) return val;
-  }
-
-  // bucket.tag match (e.g. #someday → Someday bucket)
-  for (const b of buckets) {
-    if (b.tag && task.tags.includes(b.tag)) return b.id;
   }
 
   return null;
