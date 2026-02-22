@@ -92,7 +92,12 @@
     }
 
     const descendants = getDescendants(task);
-    const explicitChildren = descendants.filter((t) => hasExplicitAssignment(t));
+    const targetId = targetBucketId ?? TO_REVIEW_ID;
+    // Only ask about children that are in a *different* bucket than the target.
+    // Children already in the target bucket need no action and should not trigger a dialog.
+    const explicitChildren = descendants.filter(
+      (t) => hasExplicitAssignment(t) && taskBucketMap.get(t.id) !== targetId
+    );
 
     if (explicitChildren.length > 0) {
       pendingMoveConfirm = { task, targetBucketId, explicitChildren };
@@ -111,7 +116,10 @@
 
     if (moveChildren) {
       for (const child of explicitChildren) {
-        await onMove(child, targetBucketId);
+        // Re-look up from the live map — re-indexing after the parent write may have
+        // produced a fresh TaskRecord with an updated rawLine for this child.
+        const fresh = allTasksMap.get(child.id) ?? child;
+        await onMove(fresh, targetBucketId);
       }
     }
   }
@@ -200,10 +208,12 @@
     targetBucketId: string;
   }>) {
     const { taskId, targetBucketId } = event.detail;
+    const resolvedTarget = targetBucketId === TO_REVIEW_ID ? null : targetBucketId;
+
     for (const group of bucketGroups) {
       const task = group.tasks.find((t) => t.id === taskId);
       if (task) {
-        await handleMove(task, targetBucketId === TO_REVIEW_ID ? null : targetBucketId);
+        await handleMove(task, resolvedTarget);
         return;
       }
     }
