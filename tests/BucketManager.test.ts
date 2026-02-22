@@ -27,6 +27,9 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
     dueDate: null,
     tags: [],
     inlineField: null,
+    indentLevel: 0,
+    parentId: null,
+    childIds: [],
     ...overrides,
   };
 }
@@ -94,9 +97,17 @@ describe("groupTasksIntoBuckets", () => {
     expect(nextWeek.tasks).toHaveLength(1);
   });
 
-  it("puts task with #someday tag into Someday bucket", () => {
-    const task = makeTask({ tags: ["someday"] });
-    const groups = groupTasksIntoBuckets([task], settings);
+  it("puts task with #gtd/someday tag into Someday bucket", () => {
+    const taskSettingsWithTag = {
+      ...settings,
+      storageMode: "inline-tag" as const,
+      tagPrefix: "gtd",
+    };
+    const task = makeTask({
+      rawLine: "- [ ] Test task #gtd/someday",
+      tags: ["gtd/someday"],
+    });
+    const groups = groupTasksIntoBuckets([task], taskSettingsWithTag);
     const someday = groups.find((g) => g.bucketId === "someday")!;
     expect(someday.tasks).toHaveLength(1);
   });
@@ -156,5 +167,134 @@ describe("groupTasksIntoBuckets", () => {
     const groups = groupTasksIntoBuckets([task], settingsNoPlugin);
     const review = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
     expect(review.tasks).toHaveLength(1);
+  });
+});
+
+describe("subtask inheritance", () => {
+  const settings = {
+    ...DEFAULT_SETTINGS,
+    buckets: DEFAULT_BUCKETS,
+    storageMode: "inline-tag" as const,
+    tagPrefix: "gtd",
+  };
+
+  it("subtask without own assignment inherits parent's explicit bucket", () => {
+    const parent = makeTask({
+      id: "parent",
+      rawLine: "- [ ] Parent task #gtd/today",
+      tags: ["gtd/today"],
+      childIds: ["child"],
+      indentLevel: 0,
+      parentId: null,
+    });
+    const child = makeTask({
+      id: "child",
+      lineNumber: 1,
+      indentLevel: 1,
+      parentId: "parent",
+      childIds: [],
+    });
+    const groups = groupTasksIntoBuckets([parent, child], settings);
+    const todayGroup = groups.find((g) => g.bucketId === "today")!;
+    const reviewGroup = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(todayGroup.tasks.map((t) => t.id)).toContain("child");
+    expect(reviewGroup.tasks.map((t) => t.id)).not.toContain("child");
+  });
+
+  it("subtask inherits parent's auto-placed bucket", () => {
+    const parent = makeTask({
+      id: "parent",
+      dueDate: daysFromMonday(1), // tomorrow → this-week
+      childIds: ["child"],
+      indentLevel: 0,
+      parentId: null,
+    });
+    const child = makeTask({
+      id: "child",
+      lineNumber: 1,
+      indentLevel: 1,
+      parentId: "parent",
+      childIds: [],
+    });
+    const groups = groupTasksIntoBuckets([parent, child], settings);
+    const thisWeekGroup = groups.find((g) => g.bucketId === "this-week")!;
+    const reviewGroup = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(thisWeekGroup.tasks.map((t) => t.id)).toContain("child");
+    expect(reviewGroup.tasks.map((t) => t.id)).not.toContain("child");
+  });
+
+  it("subtask with its own explicit assignment stays in its own bucket", () => {
+    const parent = makeTask({
+      id: "parent",
+      rawLine: "- [ ] Parent #gtd/today",
+      tags: ["gtd/today"],
+      childIds: ["child"],
+      indentLevel: 0,
+      parentId: null,
+    });
+    const child = makeTask({
+      id: "child",
+      rawLine: "  - [ ] Child #gtd/this-week",
+      tags: ["gtd/this-week"],
+      lineNumber: 1,
+      indentLevel: 1,
+      parentId: "parent",
+      childIds: [],
+    });
+    const groups = groupTasksIntoBuckets([parent, child], settings);
+    const todayGroup = groups.find((g) => g.bucketId === "today")!;
+    const thisWeekGroup = groups.find((g) => g.bucketId === "this-week")!;
+    expect(todayGroup.tasks.map((t) => t.id)).toContain("parent");
+    expect(thisWeekGroup.tasks.map((t) => t.id)).toContain("child");
+  });
+
+  it("subtask with no parent assignment follows parent to To Review", () => {
+    const parent = makeTask({
+      id: "parent",
+      childIds: ["child"],
+      indentLevel: 0,
+      parentId: null,
+    });
+    const child = makeTask({
+      id: "child",
+      lineNumber: 1,
+      indentLevel: 1,
+      parentId: "parent",
+      childIds: [],
+    });
+    const groups = groupTasksIntoBuckets([parent, child], settings);
+    const reviewGroup = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(reviewGroup.tasks.map((t) => t.id)).toContain("parent");
+    expect(reviewGroup.tasks.map((t) => t.id)).toContain("child");
+  });
+
+  it("grandchild inherits through chain when neither child nor grandchild has own assignment", () => {
+    const root = makeTask({
+      id: "root",
+      rawLine: "- [ ] Root #gtd/someday",
+      tags: ["gtd/someday"],
+      childIds: ["mid"],
+      indentLevel: 0,
+      parentId: null,
+    });
+    const mid = makeTask({
+      id: "mid",
+      lineNumber: 1,
+      indentLevel: 1,
+      parentId: "root",
+      childIds: ["leaf"],
+    });
+    const leaf = makeTask({
+      id: "leaf",
+      lineNumber: 2,
+      indentLevel: 2,
+      parentId: "mid",
+      childIds: [],
+    });
+    const groups = groupTasksIntoBuckets([root, mid, leaf], settings);
+    const somedayGroup = groups.find((g) => g.bucketId === "someday")!;
+    expect(somedayGroup.tasks.map((t) => t.id)).toContain("root");
+    expect(somedayGroup.tasks.map((t) => t.id)).toContain("mid");
+    expect(somedayGroup.tasks.map((t) => t.id)).toContain("leaf");
   });
 });

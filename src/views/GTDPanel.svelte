@@ -5,6 +5,7 @@
   import Celebration from "./Celebration.svelte";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
+  import { getTagValue, getInlineFieldValue } from "../core/TaskParser";
   import type { BucketConfig, PluginSettings } from "../settings";
   import { TO_REVIEW_ID } from "../core/BucketManager";
 
@@ -19,6 +20,14 @@
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
+  );
+
+  // Maps for hierarchy look-ups used by TaskItem
+  $: allTasksMap = new Map<string, TaskRecord>(
+    bucketGroups.flatMap((g) => g.tasks).map((t) => [t.id, t])
+  );
+  $: taskBucketMap = new Map<string, string>(
+    bucketGroups.flatMap((g) => g.tasks.map((t) => [t.id, g.bucketId]))
   );
 
   function getQuickMoveTargets(bucketId: string): BucketConfig[] {
@@ -45,12 +54,60 @@
       .filter(Boolean) as BucketConfig[];
   }
 
+  /** Returns true if the task has an explicit storage-mode bucket marker. */
+  function hasExplicitAssignment(task: TaskRecord): boolean {
+    const { storageMode, tagPrefix, buckets } = settings;
+    if (storageMode === "inline-tag") {
+      const val = getTagValue(task.rawLine, tagPrefix);
+      return val !== null && buckets.some((b) => b.id === val);
+    } else if (storageMode === "inline-field") {
+      const val = getInlineFieldValue(task.rawLine, tagPrefix);
+      return val !== null && buckets.some((b) => b.id === val);
+    }
+    return false;
+  }
+
+  /** Recursively collect all descendant TaskRecords for a given task. */
+  function getDescendants(task: TaskRecord): TaskRecord[] {
+    const result: TaskRecord[] = [];
+    const queue = [...task.childIds];
+    while (queue.length > 0) {
+      const childId = queue.shift()!;
+      const child = allTasksMap.get(childId);
+      if (child) {
+        result.push(child);
+        queue.push(...child.childIds);
+      }
+    }
+    return result;
+  }
+
   async function handleMove(task: TaskRecord, targetBucketId: string | null) {
     if (targetBucketId === "__context_menu__") {
       showContextMenu(task);
       return;
     }
+
+    const descendants = getDescendants(task);
+    const explicitChildren = descendants.filter((t) => hasExplicitAssignment(t));
+
+    // If any descendants have their own explicit assignment, prompt before moving them
+    let moveExplicit = false;
+    if (explicitChildren.length > 0) {
+      moveExplicit = confirm(
+        `${explicitChildren.length} subtask(s) have their own bucket assigned. Move them too?`
+      );
+    }
+
+    // Move the parent (implicit children follow via inheritance on next re-index)
     await onMove(task, targetBucketId);
+
+    // Optionally move explicitly-assigned children
+    if (moveExplicit) {
+      for (const child of explicitChildren) {
+        await onMove(child, targetBucketId);
+      }
+    }
   }
 
   function showContextMenu(task: TaskRecord) {
@@ -134,7 +191,7 @@
     for (const group of bucketGroups) {
       const task = group.tasks.find((t) => t.id === taskId);
       if (task) {
-        await onMove(task, targetBucketId === TO_REVIEW_ID ? null : targetBucketId);
+        await handleMove(task, targetBucketId === TO_REVIEW_ID ? null : targetBucketId);
         return;
       }
     }
@@ -163,6 +220,9 @@
         autoPlacedTaskIds={group.autoPlacedTaskIds}
         quickMoveTargets={getQuickMoveTargets(group.bucketId)}
         showCompletedUntilMidnight={settings.completedVisibilityUntilMidnight}
+        {allTasksMap}
+        {taskBucketMap}
+        bucketGroups={bucketGroups}
         on:move={(e) => handleMove(e.detail.task, e.detail.targetBucketId)}
         on:toggle={(e) => handleToggle(e.detail.task)}
         on:navigate={(e) => onNavigate(e.detail.task)}

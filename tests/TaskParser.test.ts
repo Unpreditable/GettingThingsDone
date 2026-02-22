@@ -1,4 +1,4 @@
-import { parseFile, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag } from "../src/core/TaskParser";
+import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag } from "../src/core/TaskParser";
 
 describe("parseFile", () => {
   it("parses simple unchecked tasks", () => {
@@ -111,6 +111,92 @@ describe("getInlineFieldValue / setInlineFieldValue", () => {
   it("removes an inline field when value is null", () => {
     const result = setInlineFieldValue("- [ ] Task [horizon:: today]", "horizon", null);
     expect(result).not.toContain("[horizon::");
+  });
+});
+
+describe("indentLevel and buildTaskHierarchy", () => {
+  it("assigns indentLevel 0 to top-level tasks", () => {
+    const tasks = parseFile("test.md", "- [ ] Top level\n- [ ] Another top");
+    expect(tasks[0].indentLevel).toBe(0);
+    expect(tasks[1].indentLevel).toBe(0);
+  });
+
+  it("assigns indentLevel 1 to tasks indented with 2 spaces", () => {
+    const tasks = parseFile("test.md", "- [ ] Parent\n  - [ ] Child");
+    expect(tasks[0].indentLevel).toBe(0);
+    expect(tasks[1].indentLevel).toBe(1);
+  });
+
+  it("assigns indentLevel 1 to tasks indented with a tab", () => {
+    const tasks = parseFile("test.md", "- [ ] Parent\n\t- [ ] Child");
+    expect(tasks[1].indentLevel).toBe(1);
+  });
+
+  it("assigns indentLevel 2 to grandchild tasks", () => {
+    const tasks = parseFile("test.md", "- [ ] Root\n  - [ ] Child\n    - [ ] Grandchild");
+    expect(tasks[0].indentLevel).toBe(0);
+    expect(tasks[1].indentLevel).toBe(1);
+    expect(tasks[2].indentLevel).toBe(2);
+  });
+
+  it("links parent and child IDs for a single parent-child pair", () => {
+    const tasks = parseFile("test.md", "- [ ] Parent\n  - [ ] Child");
+    expect(tasks[0].parentId).toBeNull();
+    expect(tasks[0].childIds).toContain(tasks[1].id);
+    expect(tasks[1].parentId).toBe(tasks[0].id);
+    expect(tasks[1].childIds).toHaveLength(0);
+  });
+
+  it("links grandchild through the chain", () => {
+    const tasks = parseFile("test.md", "- [ ] Root\n  - [ ] Child\n    - [ ] Grandchild");
+    expect(tasks[1].parentId).toBe(tasks[0].id);
+    expect(tasks[2].parentId).toBe(tasks[1].id);
+    expect(tasks[0].childIds).toContain(tasks[1].id);
+    expect(tasks[1].childIds).toContain(tasks[2].id);
+  });
+
+  it("handles multiple top-level tasks each with their own child", () => {
+    const content = "- [ ] Parent A\n  - [ ] Child A\n- [ ] Parent B\n  - [ ] Child B";
+    const tasks = parseFile("test.md", content);
+    expect(tasks[0].childIds).toContain(tasks[1].id);
+    expect(tasks[1].parentId).toBe(tasks[0].id);
+    expect(tasks[2].childIds).toContain(tasks[3].id);
+    expect(tasks[3].parentId).toBe(tasks[2].id);
+    expect(tasks[0].parentId).toBeNull();
+    expect(tasks[2].parentId).toBeNull();
+  });
+
+  it("top-level tasks have no parentId even after a subtask block", () => {
+    const content = "- [ ] Parent\n  - [ ] Child\n- [ ] Sibling";
+    const tasks = parseFile("test.md", content);
+    // 'Sibling' is at depth 0, not a child of Parent
+    expect(tasks[2].parentId).toBeNull();
+    expect(tasks[0].childIds).not.toContain(tasks[2].id);
+  });
+
+  it("buildTaskHierarchy works across multiple files", () => {
+    const t1 = {
+      id: "a1", filePath: "a.md", lineNumber: 0, indentLevel: 0,
+      rawLine: "- [ ] A root", text: "A root", isCompleted: false,
+      completedAt: null, dueDate: null, tags: [], inlineField: null,
+      parentId: null, childIds: [],
+    };
+    const t2 = {
+      id: "a2", filePath: "a.md", lineNumber: 1, indentLevel: 1,
+      rawLine: "  - [ ] A child", text: "A child", isCompleted: false,
+      completedAt: null, dueDate: null, tags: [], inlineField: null,
+      parentId: null, childIds: [],
+    };
+    const t3 = {
+      id: "b1", filePath: "b.md", lineNumber: 0, indentLevel: 0,
+      rawLine: "- [ ] B root", text: "B root", isCompleted: false,
+      completedAt: null, dueDate: null, tags: [], inlineField: null,
+      parentId: null, childIds: [],
+    };
+    buildTaskHierarchy([t1, t2, t3]);
+    expect(t2.parentId).toBe("a1");
+    expect(t1.childIds).toContain("a2");
+    expect(t3.parentId).toBeNull();
   });
 });
 

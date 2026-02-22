@@ -61,16 +61,57 @@ export function groupTasksIntoBuckets(
     });
   }
 
-  for (const task of tasks) {
-    const assignedId = resolveManualAssignment(task, settings);
+  // Sort so parents (smaller lineNumber) are always processed before their children.
+  // This ensures parent's effective bucket is known when we process a child.
+  const sorted = [...tasks].sort((a, b) => {
+    if (a.filePath < b.filePath) return -1;
+    if (a.filePath > b.filePath) return 1;
+    return a.lineNumber - b.lineNumber;
+  });
 
-    if (assignedId) {
-      const group = bucketMap.get(assignedId);
+  // First pass: resolve each task's effective bucket via manual → auto → inherit → null.
+  const effectiveBucket = new Map<string, string | null>(); // taskId → bucketId | null
+  const autoPlacedIds = new Set<string>();
+
+  for (const task of sorted) {
+    const manualId = resolveManualAssignment(task, settings);
+    if (manualId) {
+      effectiveBucket.set(task.id, manualId);
+      continue;
+    }
+
+    if (task.dueDate && settings.readTasksPlugin) {
+      const autoId = autoAssign(task.dueDate, settings.buckets, now);
+      if (autoId) {
+        effectiveBucket.set(task.id, autoId);
+        autoPlacedIds.add(task.id);
+        continue;
+      }
+    }
+
+    // No own assignment: inherit from parent if available
+    if (task.parentId !== null) {
+      effectiveBucket.set(task.id, effectiveBucket.get(task.parentId) ?? null);
+    } else {
+      effectiveBucket.set(task.id, null);
+    }
+  }
+
+  // Second pass: assign tasks to bucket groups.
+  for (const task of tasks) {
+    const bucketId = effectiveBucket.get(task.id) ?? null;
+
+    if (bucketId !== null) {
+      const group = bucketMap.get(bucketId);
       if (group) {
         group.tasks.push(task);
-        // Stale detection for explicitly assigned tasks
+
+        if (autoPlacedIds.has(task.id)) {
+          group.autoPlacedTaskIds.push(task.id);
+        }
+
         if (settings.staleIndicatorEnabled && task.dueDate) {
-          const bucket = settings.buckets.find((b) => b.id === assignedId);
+          const bucket = settings.buckets.find((b) => b.id === bucketId);
           if (bucket && isStale(task.dueDate, bucket, now)) {
             group.staleTaskIds.push(task.id);
           }
@@ -79,27 +120,7 @@ export function groupTasksIntoBuckets(
       }
     }
 
-    // Auto-assign from due date
-    if (task.dueDate && settings.readTasksPlugin) {
-      const autoId = autoAssign(task.dueDate, settings.buckets, now);
-      if (autoId) {
-        const group = bucketMap.get(autoId);
-        if (group) {
-          group.tasks.push(task);
-          group.autoPlacedTaskIds.push(task.id);
-          // Mark stale if the date window has passed
-          if (settings.staleIndicatorEnabled) {
-            const bucket = settings.buckets.find((b) => b.id === autoId)!;
-            if (isStale(task.dueDate, bucket, now)) {
-              group.staleTaskIds.push(task.id);
-            }
-          }
-          continue;
-        }
-      }
-    }
-
-    // No assignment → To Review
+    // No effective bucket → To Review
     bucketMap.get(TO_REVIEW_ID)!.tasks.push(task);
   }
 

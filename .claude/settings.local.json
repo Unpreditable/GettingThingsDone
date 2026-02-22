@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(npm test:*)",
-      "Bash(node esbuild.config.mjs:*)"
+      "Bash(node esbuild.config.mjs:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git stash:*)"
     ]
   }
 }

@@ -4,6 +4,7 @@
   import TaskItem from "./TaskItem.svelte";
   import type { TaskRecord } from "../core/TaskParser";
   import type { BucketConfig } from "../settings";
+  import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
 
   export let bucketId: string;
   export let name: string;
@@ -13,6 +14,9 @@
   export let autoPlacedTaskIds: string[] = [];
   export let quickMoveTargets: BucketConfig[];
   export let showCompletedUntilMidnight: boolean = true;
+  export let allTasksMap: Map<string, TaskRecord> = new Map();
+  export let taskBucketMap: Map<string, string> = new Map();
+  export let bucketGroups: BucketGroupData[] = [];
 
   const dispatch = createEventDispatcher<{
     move: { task: TaskRecord; targetBucketId: string | null };
@@ -98,6 +102,10 @@
           isStale={staleSet.has(task.id)}
           isAutoPlaced={false}
           showCompleted={true}
+          {allTasksMap}
+          {taskBucketMap}
+          {bucketGroups}
+          currentBucketId={bucketId}
           on:move={(e) => dispatch("move", e.detail)}
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}
@@ -112,6 +120,10 @@
           {quickMoveTargets}
           isStale={staleSet.has(task.id)}
           isAutoPlaced={autoPlacedSet.has(task.id)}
+          {allTasksMap}
+          {taskBucketMap}
+          {bucketGroups}
+          currentBucketId={bucketId}
           on:move={(e) => dispatch("move", e.detail)}
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}

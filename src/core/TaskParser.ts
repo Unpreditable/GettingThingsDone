@@ -27,6 +27,12 @@ export interface TaskRecord {
   tags: string[];
   /** Value of inline field, e.g. 'today' for [horizon:: today]. Null if absent. */
   inlineField: string | null;
+  /** Indentation depth: 0 = top-level, 1 = child, 2 = grandchild, etc. */
+  indentLevel: number;
+  /** ID of the parent TaskRecord, or null if this is a top-level task. */
+  parentId: string | null;
+  /** IDs of direct child TaskRecords. */
+  childIds: string[];
 }
 
 // Matches: optional leading whitespace, list marker, checkbox
@@ -62,10 +68,13 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
       dueDate,
       tags,
       inlineField,
+      indentLevel: extractIndentLevel(line),
+      parentId: null,
+      childIds: [],
     });
   }
 
-  return records;
+  return buildTaskHierarchy(records);
 }
 
 // ---------------------------------------------------------------------------
@@ -104,6 +113,59 @@ function stripMetadata(text: string): string {
     .replace(/\[[\w-]+::\s*[^\]]*\]/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
+}
+
+/** Count indentation depth from leading whitespace: spaces ÷ 2, tabs = 1 level each. */
+function extractIndentLevel(rawLine: string): number {
+  let spaces = 0;
+  for (const ch of rawLine) {
+    if (ch === " ") spaces += 1;
+    else if (ch === "\t") spaces += 2;
+    else break;
+  }
+  return Math.floor(spaces / 2);
+}
+
+/**
+ * Link parent/child relationships across a set of TaskRecords.
+ * Groups by filePath, sorts by lineNumber, and uses a stack to assign
+ * parentId / childIds based on indentLevel changes.
+ *
+ * Mutates the tasks in place and returns the same array.
+ */
+export function buildTaskHierarchy(tasks: TaskRecord[]): TaskRecord[] {
+  const byFile = new Map<string, TaskRecord[]>();
+  for (const task of tasks) {
+    if (!byFile.has(task.filePath)) byFile.set(task.filePath, []);
+    byFile.get(task.filePath)!.push(task);
+  }
+
+  const taskLookup = new Map<string, TaskRecord>(tasks.map((t) => [t.id, t]));
+
+  for (const fileTasks of byFile.values()) {
+    fileTasks.sort((a, b) => a.lineNumber - b.lineNumber);
+
+    // Stack entries: tracks potential ancestors at each indent depth
+    const stack: Array<{ indentLevel: number; id: string }> = [];
+
+    for (const task of fileTasks) {
+      // Pop entries that are siblings or deeper — they cannot be the parent
+      while (stack.length > 0 && stack[stack.length - 1].indentLevel >= task.indentLevel) {
+        stack.pop();
+      }
+
+      if (stack.length > 0) {
+        const parentEntry = stack[stack.length - 1];
+        task.parentId = parentEntry.id;
+        const parent = taskLookup.get(parentEntry.id);
+        if (parent) parent.childIds.push(task.id);
+      }
+
+      stack.push({ indentLevel: task.indentLevel, id: task.id });
+    }
+  }
+
+  return tasks;
 }
 
 function makeId(filePath: string, lineNumber: number, text: string): string {
