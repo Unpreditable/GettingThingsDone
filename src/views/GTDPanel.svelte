@@ -155,7 +155,7 @@
     return () => document.removeEventListener("contextmenu", handler, true);
   });
 
-  type CelebrationState = "none" | "confetti" | "creature";
+  type CelebrationState = "none" | "confetti" | "creature" | "creature-and-confetti";
   let celebration: CelebrationState = "none";
   let celebrationTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -175,12 +175,20 @@
 
   async function handleToggle(task: TaskRecord) {
     if (!task.isCompleted) {
-      const group = bucketGroups.find((g) => g.tasks.some((t) => t.id === task.id));
-      if (group?.bucketId === "today") {
-        const remaining = group.tasks.filter((t) => !t.isCompleted && t.id !== task.id).length;
-        triggerCelebration(remaining === 0 ? "creature" : "confetti", remaining === 0 ? 2520 : 2100);
-      } else {
-        triggerCelebration("confetti", 2100);
+      const mode = settings.celebrationMode ?? "all";
+      if (mode !== "off") {
+        const group = bucketGroups.find((g) => g.tasks.some((t) => t.id === task.id));
+        const isLastInToday =
+          group?.bucketId === "today" &&
+          group.tasks.filter((t) => !t.isCompleted && t.id !== task.id).length === 0;
+
+        if (isLastInToday && mode === "all") {
+          triggerCelebration("creature-and-confetti", 2520);
+        } else if (isLastInToday && mode === "creature") {
+          triggerCelebration("creature", 2520);
+        } else if (mode === "confetti" || mode === "all") {
+          triggerCelebration("confetti", 2100);
+        }
       }
     }
     await onToggle(task);

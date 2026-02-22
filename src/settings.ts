@@ -25,6 +25,8 @@ export interface BucketConfig {
 
 export type StorageMode = "inline-tag" | "inline-field";
 
+export type CelebrationMode = "off" | "confetti" | "creature" | "all";
+
 export type TaskScope =
   | { type: "vault" }
   | { type: "folders"; paths: string[] }
@@ -53,6 +55,8 @@ export interface PluginSettings {
   toReviewShowInStatusBar: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
   compactView: boolean;
+  /** Controls which celebration animations play on task completion. */
+  celebrationMode: CelebrationMode;
 }
 
 
@@ -111,4 +115,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewQuickMoveTargets: ["today", "this-week"],
   toReviewShowInStatusBar: false,
   compactView: false,
+  celebrationMode: "all",
 };

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
-  export let type: "confetti" | "creature";
+  export let type: "confetti" | "creature" | "creature-and-confetti";
   export let imagePaths: string[] = [];
 
   // Pick a random creature image once per mount
@@ -25,14 +25,16 @@
 </script>
 
 <div class="gtd-celebration-overlay">
-  {#if type === "creature" && creatureUrl}
+  {#if (type === "creature" || type === "creature-and-confetti") && creatureUrl}
     <img class="gtd-creature-fly" src={creatureUrl} alt="" transition:fade={{ duration: 100 }} />
   {/if}
 
-  {#each particles as p}
-    <div
-      class="gtd-confetti-particle"
-      style="left:{p.left}%;animation-delay:{p.delay}ms;animation-duration:{p.duration}ms;background-color:{p.color};width:{p.size}px;height:{p.size}px;--rotation:{p.rotation}deg"
-    ></div>
-  {/each}
+  {#if type === "confetti" || type === "creature-and-confetti"}
+    {#each particles as p}
+      <div
+        class="gtd-confetti-particle"
+        style="left:{p.left}%;animation-delay:{p.delay}ms;animation-duration:{p.duration}ms;background-color:{p.color};width:{p.size}px;height:{p.size}px;--rotation:{p.rotation}deg"
+      ></div>
+    {/each}
+  {/if}
 </div>

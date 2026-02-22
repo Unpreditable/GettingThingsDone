@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, Notice, TFolder, Modal } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./settings";
+import { BucketConfig, CelebrationMode, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 
@@ -516,6 +516,21 @@ export class GtdSettingsTab extends PluginSettingTab {
         t.setValue(this.plugin.settings.compactView);
         t.onChange(async (val) => {
           this.plugin.settings.compactView = val;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName("Celebration animations")
+      .setDesc("Choose which animations play when you complete a task.")
+      .addDropdown((dd) => {
+        dd.addOption("off", "Off");
+        dd.addOption("confetti", "Confetti only");
+        dd.addOption("creature", "Celebration only");
+        dd.addOption("all", "Confetti and celebration");
+        dd.setValue(this.plugin.settings.celebrationMode ?? "all");
+        dd.onChange(async (val) => {
+          this.plugin.settings.celebrationMode = val as CelebrationMode;
           await this.plugin.saveSettings();
         });
       });
