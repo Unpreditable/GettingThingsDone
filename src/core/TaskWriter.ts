@@ -1,14 +1,3 @@
-/**
- * Writes bucket assignment changes back to source markdown files.
- *
- * Locates the task by exact rawLine match, applies the relevant changes
- * (tags or inline field), and writes via vault.modify().
- *
- * Safety: if the rawLine is not found in the current file content (because
- * the file was edited since the last index), the operation is aborted and
- * an error is returned. The caller should trigger a re-index.
- */
-
 import { App, TFile, Notice } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
@@ -18,6 +7,18 @@ import { formatDate } from "../integrations/TasksPluginParser";
 export interface MoveResult {
   success: boolean;
   error?: string;
+}
+
+/**
+ * Locate a task's line index in the file. Tries lineNumber first for O(1) lookup;
+ * falls back to scanning for rawLine if the file has shifted since last index.
+ * Returns -1 if not found.
+ */
+export function findTaskLine(lines: string[], task: TaskRecord): number {
+  if (task.lineNumber < lines.length && lines[task.lineNumber] === task.rawLine) {
+    return task.lineNumber;
+  }
+  return lines.findIndex((l) => l === task.rawLine);
 }
 
 export async function moveTaskToBucket(
@@ -39,7 +40,7 @@ export async function moveTaskToBucket(
   }
 
   const lines = content.split("\n");
-  const lineIdx = lines.findIndex((l) => l === task.rawLine);
+  const lineIdx = findTaskLine(lines, task);
 
   if (lineIdx === -1) {
     new Notice(
@@ -65,10 +66,6 @@ export async function moveTaskToBucket(
   }
 }
 
-/**
- * Confirm an auto-placed task by writing the explicit bucket marker,
- * without changing any dates or other task content.
- */
 export async function confirmTaskPlacement(
   app: App,
   task: TaskRecord,
@@ -79,9 +76,6 @@ export async function confirmTaskPlacement(
   return moveTaskToBucket(app, task, bucket, settings);
 }
 
-/**
- * Toggle the completion state of a task in its source file.
- */
 export async function toggleTaskCompletion(
   app: App,
   task: TaskRecord,
@@ -100,7 +94,7 @@ export async function toggleTaskCompletion(
   }
 
   const lines = content.split("\n");
-  const lineIdx = lines.findIndex((l) => l === task.rawLine);
+  const lineIdx = findTaskLine(lines, task);
 
   if (lineIdx === -1) {
     new Notice(`GTD Tasks: Could not locate task in ${file.basename}.`);
@@ -109,11 +103,9 @@ export async function toggleTaskCompletion(
 
   let line = lines[lineIdx];
   if (task.isCompleted) {
-    // Uncheck: replace [x] with [ ], remove ✅ date
     line = line.replace(/\[[ xX]\]/, "[ ]");
     line = line.replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "").trimEnd();
   } else {
-    // Check: replace [ ] with [x], add ✅ date if Tasks plugin is on
     line = line.replace(/\[ \]/, "[x]");
     if (settings.readTasksPlugin) {
       line = line.trimEnd() + ` ✅ ${formatDate(new Date())}`;
@@ -121,13 +113,14 @@ export async function toggleTaskCompletion(
   }
 
   lines[lineIdx] = line;
-  await app.vault.modify(file, lines.join("\n"));
-  return { success: true };
-}
 
-// ---------------------------------------------------------------------------
-// Internal: build the updated line
-// ---------------------------------------------------------------------------
+  try {
+    await app.vault.modify(file, lines.join("\n"));
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: String(e) };
+  }
+}
 
 function applyBucketChange(
   rawLine: string,

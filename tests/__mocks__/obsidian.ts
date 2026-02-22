@@ -1,8 +1,3 @@
-/**
- * Minimal mock of the obsidian module for use in Jest tests.
- * Only exports what our core modules actually import.
- */
-
 export class Notice {
   constructor(public message: string) {}
 }

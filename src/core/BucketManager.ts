@@ -1,16 +1,8 @@
 /**
- * Groups TaskRecords into GTD buckets and handles stale-task detection.
- *
  * Assignment priority (highest first):
  *   1. Storage-mode assignment (inline-tag or inline-field)
- *   2. Auto-assignment from 📅 due date matching a bucket's date range rule
- *      → task is marked as auto-placed (autoPlacedTaskIds)
+ *   2. Auto-assignment from 📅 due date matching a bucket's dateRangeRule
  *   3. No assignment → "to-review" system bucket
- *
- * Stale tasks remain in their original bucket; their IDs are collected in
- * staleTaskIds so the UI can show a ! indicator (when staleIndicatorEnabled).
- * Auto-placed tasks (not yet confirmed by the user) are collected in
- * autoPlacedTaskIds so the UI can show a 👁 indicator.
  */
 
 import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
@@ -24,9 +16,7 @@ export interface BucketGroup {
   name: string;
   emoji: string;
   tasks: TaskRecord[];
-  /** IDs of tasks in `tasks` that are past their bucket's scheduled window. */
   staleTaskIds: string[];
-  /** IDs of tasks placed here by date inference (not explicit user assignment). */
   autoPlacedTaskIds: string[];
   isSystem: boolean;
 }
@@ -61,16 +51,14 @@ export function groupTasksIntoBuckets(
     });
   }
 
-  // Sort so parents (smaller lineNumber) are always processed before their children.
-  // This ensures parent's effective bucket is known when we process a child.
+  // Sort parents before children so inheritance works in a single pass
   const sorted = [...tasks].sort((a, b) => {
     if (a.filePath < b.filePath) return -1;
     if (a.filePath > b.filePath) return 1;
     return a.lineNumber - b.lineNumber;
   });
 
-  // First pass: resolve each task's effective bucket via manual → auto → inherit → null.
-  const effectiveBucket = new Map<string, string | null>(); // taskId → bucketId | null
+  const effectiveBucket = new Map<string, string | null>();
   const autoPlacedIds = new Set<string>();
 
   for (const task of sorted) {
@@ -89,7 +77,6 @@ export function groupTasksIntoBuckets(
       }
     }
 
-    // No own assignment: inherit from parent if available
     if (task.parentId !== null) {
       effectiveBucket.set(task.id, effectiveBucket.get(task.parentId) ?? null);
     } else {
@@ -97,7 +84,6 @@ export function groupTasksIntoBuckets(
     }
   }
 
-  // Second pass: assign tasks to bucket groups.
   for (const task of tasks) {
     const bucketId = effectiveBucket.get(task.id) ?? null;
 
@@ -120,11 +106,9 @@ export function groupTasksIntoBuckets(
       }
     }
 
-    // No effective bucket → To Review
     bucketMap.get(TO_REVIEW_ID)!.tasks.push(task);
   }
 
-  // Return in order: To Review first, then user-defined buckets
   const result: BucketGroup[] = [bucketMap.get(TO_REVIEW_ID)!];
   for (const b of settings.buckets) {
     result.push(bucketMap.get(b.id)!);
@@ -133,17 +117,12 @@ export function groupTasksIntoBuckets(
   return result;
 }
 
-// ---------------------------------------------------------------------------
-// Manual assignment resolution
-// ---------------------------------------------------------------------------
-
 function resolveManualAssignment(
   task: TaskRecord,
   settings: PluginSettings
 ): string | null {
   const { storageMode, tagPrefix, buckets } = settings;
 
-  // Explicit storage-mode marker has highest priority
   if (storageMode === "inline-tag") {
     const val = getTagValue(task.rawLine, tagPrefix);
     if (val && buckets.some((b) => b.id === val)) return val;
@@ -155,17 +134,13 @@ function resolveManualAssignment(
   return null;
 }
 
-// ---------------------------------------------------------------------------
-// Auto-assignment from due date (calendar-aware)
-// ---------------------------------------------------------------------------
-
 function autoAssign(
   dueDate: Date,
   buckets: BucketConfig[],
   now: Date
 ): string | null {
   const diffDays = diffInDays(dueDate, now);
-  const day = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const day = now.getDay();
 
   for (const b of buckets) {
     if (!b.dateRangeRule) continue;
@@ -176,21 +151,18 @@ function autoAssign(
         break;
 
       case "this-week": {
-        // Tomorrow through end of current Sunday
         const daysToSunday = day === 0 ? 0 : 7 - day;
         if (diffDays >= 1 && diffDays <= daysToSunday) return b.id;
         break;
       }
 
       case "next-week": {
-        // Next Monday through following Sunday
         const daysToNextMonday = day === 0 ? 1 : 8 - day;
         if (diffDays >= daysToNextMonday && diffDays <= daysToNextMonday + 6) return b.id;
         break;
       }
 
       case "this-month": {
-        // 1 day out through end of current calendar month
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         const daysToEndOfMonth = diffInDays(endOfMonth, now);
         if (diffDays >= 1 && diffDays <= daysToEndOfMonth) return b.id;
@@ -198,7 +170,6 @@ function autoAssign(
       }
 
       case "next-month": {
-        // 1st of next month through last day of next month
         const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
         const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
         const daysToStart = diffInDays(startOfNextMonth, now);
@@ -225,10 +196,6 @@ function autoAssign(
   return null;
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 function diffInDays(date: Date, now: Date): number {
   const d = new Date(date);
   const n = new Date(now);
@@ -247,7 +214,6 @@ function isStale(dueDate: Date, bucket: BucketConfig, now: Date): boolean {
       return diff < 0;
 
     case "this-week":
-      // Stale if date is today or in the past (should have been in Today)
       return diff < 1;
 
     case "next-week": {

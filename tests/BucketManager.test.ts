@@ -298,3 +298,95 @@ describe("subtask inheritance", () => {
     expect(somedayGroup.tasks.map((t) => t.id)).toContain("leaf");
   });
 });
+
+describe("date range edge cases", () => {
+  it("within-days-range rule assigns tasks in range", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      buckets: [
+        {
+          id: "custom",
+          name: "Custom",
+          emoji: "🎯",
+          dateRangeRule: { type: "within-days-range" as const, from: 5, to: 10 },
+          quickMoveTargets: [] as [string?, string?],
+          showInStatusBar: false,
+        },
+      ],
+    };
+    const inRange = makeTask({ id: "in", dueDate: daysFromMonday(7) });
+    const outOfRange = makeTask({ id: "out", dueDate: daysFromMonday(3) });
+    const groups = groupTasksIntoBuckets([inRange, outOfRange], settings);
+    const custom = groups.find((g) => g.bucketId === "custom")!;
+    const review = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(custom.tasks.map((t) => t.id)).toContain("in");
+    expect(review.tasks.map((t) => t.id)).toContain("out");
+  });
+
+  it("beyond-days rule assigns tasks past threshold", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      buckets: [
+        {
+          id: "far",
+          name: "Far Future",
+          emoji: "🌌",
+          dateRangeRule: { type: "beyond-days" as const, days: 30 },
+          quickMoveTargets: [] as [string?, string?],
+          showInStatusBar: false,
+        },
+      ],
+    };
+    const far = makeTask({ id: "far", dueDate: daysFromMonday(60) });
+    const near = makeTask({ id: "near", dueDate: daysFromMonday(15) });
+    const groups = groupTasksIntoBuckets([far, near], settings);
+    expect(groups.find((g) => g.bucketId === "far")!.tasks.map((t) => t.id)).toContain("far");
+    expect(groups.find((g) => g.bucketId === TO_REVIEW_ID)!.tasks.map((t) => t.id)).toContain("near");
+  });
+
+  it("task with unknown bucket tag goes to To Review", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      storageMode: "inline-tag" as const,
+      tagPrefix: "gtd",
+    };
+    const task = makeTask({
+      rawLine: "- [ ] Task #gtd/nonexistent",
+      tags: ["gtd/nonexistent"],
+    });
+    const groups = groupTasksIntoBuckets([task], settings);
+    const review = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.tasks).toHaveLength(1);
+  });
+
+  it("this-month and this-week: first matching bucket wins", () => {
+    const settings = { ...DEFAULT_SETTINGS, buckets: DEFAULT_BUCKETS };
+    // daysFromMonday(3) = Thursday, diffDays=3 — matches this-week first (bucket order)
+    const task = makeTask({ dueDate: daysFromMonday(3) });
+    const groups = groupTasksIntoBuckets([task], settings);
+    const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
+    expect(thisWeek.tasks).toHaveLength(1);
+    const thisMonth = groups.find((g) => g.bucketId === "this-month")!;
+    expect(thisMonth.tasks).toHaveLength(0);
+  });
+
+  it("completed tasks are still bucketed", () => {
+    const settings = { ...DEFAULT_SETTINGS, storageMode: "inline-tag" as const, tagPrefix: "gtd" };
+    const task = makeTask({
+      rawLine: "- [x] Done #gtd/today",
+      tags: ["gtd/today"],
+      isCompleted: true,
+    });
+    const groups = groupTasksIntoBuckets([task], settings);
+    const todayGroup = groups.find((g) => g.bucketId === "today")!;
+    expect(todayGroup.tasks).toHaveLength(1);
+  });
+
+  it("empty task list returns all empty bucket groups", () => {
+    const groups = groupTasksIntoBuckets([], DEFAULT_SETTINGS);
+    expect(groups.length).toBe(DEFAULT_BUCKETS.length + 1);
+    for (const g of groups) {
+      expect(g.tasks).toHaveLength(0);
+    }
+  });
+});

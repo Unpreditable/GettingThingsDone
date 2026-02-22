@@ -22,10 +22,8 @@
     confirm: { task: TaskRecord; bucketId: string };
   }>();
 
-  // Parent indicator
   $: parentTask = task.parentId ? allTasksMap.get(task.parentId) ?? null : null;
   $: parentBucketId = task.parentId ? (taskBucketMap.get(task.parentId) ?? null) : null;
-  // Arrow shown only when the direct parent lives in a different bucket
   $: showParentArrow = task.parentId !== null && parentBucketId !== currentBucketId;
   $: parentBucketName = (() => {
     if (!parentBucketId) return null;
@@ -36,8 +34,6 @@
     ? `Subtask of: ${parentTask.text}${parentBucketName ? ` (in ${parentBucketName})` : ""}`
     : null;
 
-  // Visual indent: count how many ancestors are in the same bucket
-  // (so depth resets to 0 when the chain crosses a bucket boundary)
   $: visualIndentLevel = (() => {
     if (!task.parentId) return 0;
     let level = 0;
@@ -51,7 +47,6 @@
     return level;
   })();
 
-  // Subtask count badge: count active descendants
   $: activeDescendantCount = (() => {
     if (task.childIds.length === 0) return 0;
     let count = 0;

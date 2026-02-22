@@ -4,9 +4,6 @@ import { BucketConfig, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./set
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 
-// ---------------------------------------------------------------------------
-// Emoji picker helpers
-// ---------------------------------------------------------------------------
 
 const EMOJI_CATEGORIES: Array<{ icon: string; emojis: string[] }> = [
   {
@@ -179,9 +176,6 @@ function renderEmojiSetting(
   });
 }
 
-// ---------------------------------------------------------------------------
-// Confirm modal
-// ---------------------------------------------------------------------------
 
 class ConfirmModal extends Modal {
   constructor(
@@ -219,9 +213,6 @@ class ConfirmModal extends Modal {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ID generation
-// ---------------------------------------------------------------------------
 
 function generateBucketId(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -231,9 +222,6 @@ function generateBucketId(): string {
   ).join("");
 }
 
-// ---------------------------------------------------------------------------
-// Settings tab
-// ---------------------------------------------------------------------------
 
 export class GtdSettingsTab extends PluginSettingTab {
   constructor(app: App, private plugin: GtdTasksPlugin) {
@@ -248,10 +236,6 @@ export class GtdSettingsTab extends PluginSettingTab {
     this.renderBehaviourSection();
     this.renderBucketsSection();
   }
-
-  // ---------------------------------------------------------------------------
-  // General Settings
-  // ---------------------------------------------------------------------------
 
   private renderGeneralSection() {
     const { containerEl } = this;
@@ -302,7 +286,6 @@ export class GtdSettingsTab extends PluginSettingTab {
     annotationSetting.controlEl.style.flexDirection = "column";
     annotationSetting.controlEl.style.alignItems = "flex-end";
 
-    // Multi-line description
     annotationSetting.descEl.appendText(
       "Controls how the plugin stores which bucket each task belongs to:"
     );
@@ -371,7 +354,6 @@ export class GtdSettingsTab extends PluginSettingTab {
     }
   }
 
-  /** Render the per-entry path list with autocomplete and + button. */
   private renderScopePathList(
     container: HTMLElement,
     scopeType: "folders" | "files"
@@ -463,10 +445,6 @@ export class GtdSettingsTab extends PluginSettingTab {
       .sort();
   }
 
-  // ---------------------------------------------------------------------------
-  // Behaviour Settings
-  // ---------------------------------------------------------------------------
-
   private renderBehaviourSection() {
     const { containerEl } = this;
 
@@ -510,10 +488,6 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
   }
-
-  // ---------------------------------------------------------------------------
-  // Buckets
-  // ---------------------------------------------------------------------------
 
   private renderBucketsSection() {
     const { containerEl } = this;
@@ -796,7 +770,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       cls: "gtd-bucket-delete-btn mod-warning",
       attr: { title: "Delete this bucket" },
     });
-    deleteBtn.innerHTML = "🗑 Delete";
+    deleteBtn.textContent = "🗑 Delete";
     deleteBtn.onclick = () => {
       new ConfirmModal(
         this.app,
@@ -923,7 +897,6 @@ export class GtdSettingsTab extends PluginSettingTab {
     renderExtra(getCurrentType());
   }
 
-    /** Renders quick-move target dropdowns 1 and 2. */
   private renderQuickMoveDropdowns(
     container: HTMLElement,
     getTargets: () => [string?, string?],

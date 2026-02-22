@@ -36,11 +36,12 @@ User move action
 
 | File | Role |
 |---|---|
-| [src/settings.ts](src/settings.ts) | All types (`TaskRecord`, `BucketConfig`, `PluginSettings`) and defaults |
+| [src/settings.ts](src/settings.ts) | Types (`BucketConfig`, `PluginSettings`, `DateRangeRule`) and defaults |
 | [src/core/TaskParser.ts](src/core/TaskParser.ts) | Markdown checkbox parser; also exports `setTagValue`, `setInlineFieldValue`, `setSimpleTag` for write-back |
-| [src/core/BucketManager.ts](src/core/BucketManager.ts) | Assignment logic (manual → auto date → To Review); `computeTargetDate()` for date math |
+| [src/core/BucketManager.ts](src/core/BucketManager.ts) | Assignment logic (manual → auto date → To Review); date range matching |
 | [src/core/TaskIndex.ts](src/core/TaskIndex.ts) | Live index; vault event registration |
-| [src/core/TaskWriter.ts](src/core/TaskWriter.ts) | File write-back; locates task by `rawLine`, delegates to storage adapters |
+| [src/core/TaskWriter.ts](src/core/TaskWriter.ts) | File write-back; locates task by lineNumber/rawLine, delegates to storage adapters |
+| [src/core/StorageMigrator.ts](src/core/StorageMigrator.ts) | Rewrites bucket assignments when switching between storage modes |
 | [src/integrations/TasksPluginParser.ts](src/integrations/TasksPluginParser.ts) | Read/write `📅 YYYY-MM-DD` on task lines |
 | [src/views/GTDPanel.svelte](src/views/GTDPanel.svelte) | Root sidebar; handles context menu and drag-drop coordination |
 | [src/views/BucketGroup.svelte](src/views/BucketGroup.svelte) | Collapsible bucket section; SortableJS drag-and-drop |
@@ -50,12 +51,11 @@ User move action
 
 ### Storage modes
 
-Three modes (user-selectable in settings):
-- **`due-date`** (default) — moves update `📅 YYYY-MM-DD` directly on the task line; tag-based buckets (e.g. Someday) use `#someday`
-- **`inline-tag`** — appends `#<prefix>/<bucket-id>` (e.g. `#gtd/today`)
+Two modes (user-selectable in settings):
+- **`inline-tag`** (default) — appends `#<prefix>/<bucket-id>` (e.g. `#gtd/today`)
 - **`inline-field`** — appends `[<fieldname>:: <bucket-id>]` (Dataview-compatible)
 
-Migration between modes via command palette: "Migrate task assignments to current storage mode".
+Migration between modes via the settings tab.
 
 ### Bucket assignment priority
 
@@ -65,8 +65,8 @@ Migration between modes via command palette: "Migrate task assignments to curren
 
 ### Write-back safety
 
-`TaskWriter` locates a task by matching `rawLine` exactly. If the line isn't found (file edited since last index), it aborts with a notice and re-indexes rather than corrupting the file.
+`TaskWriter` locates a task by `lineNumber` first (O(1)), falling back to `rawLine` scan if the file has shifted. If neither matches, it aborts with a notice and re-indexes rather than corrupting the file.
 
 ### Tests
 
-Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, and `BucketManager` — pure logic with no Obsidian API dependency. The mock at `tests/__mocks__/obsidian.ts` stubs the `obsidian` module for Jest.
+Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, `BucketManager`, `TaskWriter`, and `StorageMigrator` — pure logic with no Obsidian API dependency. The mock at `tests/__mocks__/obsidian.ts` stubs the `obsidian` module for Jest.

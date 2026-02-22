@@ -1,14 +1,8 @@
-/**
- * Migrates bucket assignments when the user switches storage modes.
- *
- * Reads existing assignments in the old mode and rewrites them in the new mode.
- * Only inline-tag ↔ inline-field migration is supported.
- */
-
 import { App, TFile, Notice } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { PluginSettings, StorageMode } from "../settings";
 import { getTagValue, getInlineFieldValue, setTagValue, setInlineFieldValue } from "./TaskParser";
+import { findTaskLine } from "./TaskWriter";
 
 export async function migrateStorageMode(
   app: App,
@@ -41,7 +35,7 @@ export async function migrateStorageMode(
       if (!bucketId) continue;
       if (!buckets.some((b) => b.id === bucketId)) continue;
 
-      const lineIdx = lines.findIndex((l) => l === task.rawLine);
+      const lineIdx = findTaskLine(lines, task);
       if (lineIdx === -1) { failed++; continue; }
 
       lines[lineIdx] = writeBucketId(lines[lineIdx], bucketId, toMode, tagPrefix, fromMode);
@@ -56,10 +50,6 @@ export async function migrateStorageMode(
 
   new Notice(`GTD Tasks: Migration complete. ${migrated} tasks updated, ${failed} skipped.`);
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function readBucketId(
   task: TaskRecord,
@@ -83,7 +73,6 @@ function writeBucketId(
 ): string {
   let line = rawLine;
 
-  // Remove old format
   switch (fromMode) {
     case "inline-tag":
       line = setTagValue(line, tagPrefix, null);
@@ -93,7 +82,6 @@ function writeBucketId(
       break;
   }
 
-  // Write new format
   switch (toMode) {
     case "inline-tag":
       return setTagValue(line, tagPrefix, bucketId);

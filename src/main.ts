@@ -18,10 +18,6 @@ import GTDPanel from "./views/GTDPanel.svelte";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
-// ---------------------------------------------------------------------------
-// Plugin
-// ---------------------------------------------------------------------------
-
 export default class GtdTasksPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
   taskIndex!: TaskIndex;
@@ -42,24 +38,20 @@ export default class GtdTasksPlugin extends Plugin {
       return this.panelView;
     });
 
-    // Register commands
     this.addCommand({
       id: "open-gtd-panel",
       name: "Open GTD Tasks panel",
       callback: () => this.activateView(),
     });
 
-    // Initial scan then open view
     await this.taskIndex.initialScan();
     this.taskIndex.registerVaultEvents();
 
-    // Keep the panel and status bar up-to-date as the index changes
     this.taskIndex.onChange(() => {
       this.panelView?.refresh();
       this.updateStatusBar();
     });
 
-    // Auto-open panel on startup
     this.app.workspace.onLayoutReady(() => {
       this.activateView();
       this.updateStatusBar();
@@ -70,17 +62,11 @@ export default class GtdTasksPlugin extends Plugin {
     this.app.workspace.detachLeavesOfType(VIEW_TYPE_GTD);
   }
 
-  // ---------------------------------------------------------------------------
-  // Settings
-  // ---------------------------------------------------------------------------
-
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-    // Ensure buckets array is never empty after load
     if (!this.settings.buckets || this.settings.buckets.length === 0) {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }
-    // Backfill missing fields added in newer versions (e.g. emoji)
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -128,14 +114,9 @@ export default class GtdTasksPlugin extends Plugin {
     this.statusBarItem.setText(parts.join("  "));
   }
 
-  /** Force a full re-index (e.g. after scope changes). */
   async refreshIndex(): Promise<void> {
     await this.taskIndex.initialScan();
   }
-
-  // ---------------------------------------------------------------------------
-  // View management
-  // ---------------------------------------------------------------------------
 
   private async activateView() {
     const { workspace } = this.app;
@@ -149,10 +130,6 @@ export default class GtdTasksPlugin extends Plugin {
     workspace.revealLeaf(leaf);
   }
 }
-
-// ---------------------------------------------------------------------------
-// ItemView wrapper — bridges Obsidian lifecycle to Svelte component
-// ---------------------------------------------------------------------------
 
 class GtdPanelView extends ItemView {
   private svelteComponent?: SvelteComponent;
@@ -226,18 +203,13 @@ class GtdPanelView extends ItemView {
         onNavigate: this.handleNavigate.bind(this),
         onConfirm: this.handleConfirmPlacement.bind(this),
         onOpenSettings: () => {
-          // @ts-ignore — private API but stable
-          this.app.setting.open();
-          // @ts-ignore
-          this.app.setting.openTabById(this.plugin.manifest.id);
+          const appAny = this.app as any;
+          appAny.setting?.open();
+          appAny.setting?.openTabById(this.plugin.manifest.id);
         },
       },
     });
   }
-
-  // ---------------------------------------------------------------------------
-  // Action handlers
-  // ---------------------------------------------------------------------------
 
   private async handleMove(task: TaskRecord, targetBucketId: string | null) {
     const targetBucket =
@@ -254,10 +226,8 @@ class GtdPanelView extends ItemView {
 
     if (!result.success) {
       new Notice(`GTD Tasks: Move failed — ${result.error}`);
-      // Trigger re-index so the UI reflects actual file state
       await this.plugin.taskIndex.reindexFile(task.filePath);
     }
-    // On success, the vault modify event triggers re-index → refresh automatically
   }
 
   private async handleToggle(task: TaskRecord) {

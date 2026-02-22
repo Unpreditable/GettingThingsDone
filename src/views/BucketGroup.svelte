@@ -94,7 +94,6 @@
       bind:this={taskListEl}
       data-bucket-id={bucketId}
     >
-      <!-- Completed tasks (strikethrough) first -->
       {#each completedTasks as task (task.id)}
         <TaskItem
           {task}
@@ -113,7 +112,6 @@
         />
       {/each}
 
-      <!-- Active tasks (stale ones show ! indicator inline) -->
       {#each activeTasks as task (task.id)}
         <TaskItem
           {task}

@@ -1,14 +1,3 @@
-/**
- * Parses markdown checkbox tasks from a file's content.
- *
- * Supports:
- *   - [ ] Incomplete task
- *   - [x] Completed task  (x or X)
- *   - [ ] Task with inline field [horizon:: today]
- *   - [ ] Task with #gtd/today tag
- *   - [ ] Task with 📅 2026-02-18 due date
- */
-
 import { parseDueDate, parseCompletionDate } from "../integrations/TasksPluginParser";
 
 export interface TaskRecord {
@@ -35,8 +24,11 @@ export interface TaskRecord {
   childIds: string[];
 }
 
-// Matches: optional leading whitespace, list marker, checkbox
 const TASK_REGEX = /^(\s*[-*+]|\s*\d+[.)]) \[([ xX])\] (.*)$/;
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 export function parseFile(filePath: string, content: string): TaskRecord[] {
   const lines = content.split("\n");
@@ -77,32 +69,17 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
   return buildTaskHierarchy(records);
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Extract all #tag values from a string (without the #). */
 function extractTags(text: string): string[] {
   const matches = text.match(/#[\w/-]+/g) ?? [];
   return matches.map((t) => t.slice(1));
 }
 
-/**
- * Extract value from first inline field matching [key:: value].
- * The key to look for is whatever the caller passed; we return the first match.
- */
+/** Returns the value of the first [key:: value] field found, regardless of key name. */
 function extractInlineField(text: string): string | null {
   const match = text.match(/\[[\w-]+::\s*([^\]]+)\]/);
   return match ? match[1].trim() : null;
 }
 
-/**
- * Strip known metadata from task text to get the human-readable label:
- * - 📅 / ✅ dates
- * - #tags
- * - [key:: value] inline fields
- * - trailing whitespace
- */
 function stripMetadata(text: string): string {
   return text
     .replace(/📅\s*\d{4}-\d{2}-\d{2}/g, "")
@@ -115,7 +92,6 @@ function stripMetadata(text: string): string {
     .trim();
 }
 
-/** Count indentation depth from leading whitespace: spaces ÷ 2, tabs = 1 level each. */
 function extractIndentLevel(rawLine: string): number {
   let spaces = 0;
   for (const ch of rawLine) {
@@ -145,11 +121,9 @@ export function buildTaskHierarchy(tasks: TaskRecord[]): TaskRecord[] {
   for (const fileTasks of byFile.values()) {
     fileTasks.sort((a, b) => a.lineNumber - b.lineNumber);
 
-    // Stack entries: tracks potential ancestors at each indent depth
     const stack: Array<{ indentLevel: number; id: string }> = [];
 
     for (const task of fileTasks) {
-      // Pop entries that are siblings or deeper — they cannot be the parent
       while (stack.length > 0 && stack[stack.length - 1].indentLevel >= task.indentLevel) {
         stack.pop();
       }
@@ -169,8 +143,6 @@ export function buildTaskHierarchy(tasks: TaskRecord[]): TaskRecord[] {
 }
 
 function makeId(filePath: string, lineNumber: number, text: string): string {
-  // Simple non-cryptographic hash for stable IDs within a session.
-  // Collisions are extremely unlikely for normal usage.
   let h = 0;
   const s = `${filePath}:${lineNumber}:${text}`;
   for (let i = 0; i < s.length; i++) {
@@ -179,73 +151,56 @@ function makeId(filePath: string, lineNumber: number, text: string): string {
   return String(h >>> 0);
 }
 
-/**
- * Extract the inline field value for a specific key (case-insensitive).
- * E.g. getInlineFieldValue(line, 'horizon') returns 'today' from [horizon:: today].
- */
 export function getInlineFieldValue(rawLine: string, key: string): string | null {
-  const re = new RegExp(`\\[${key}::\\s*([^\\]]+)\\]`, "i");
+  const re = new RegExp(`\\[${escapeRegExp(key)}::\\s*([^\\]]+)\\]`, "i");
   const match = rawLine.match(re);
   return match ? match[1].trim() : null;
 }
 
-/**
- * Set or replace an inline field value on a raw line.
- * If value is null, removes the field entirely.
- */
 export function setInlineFieldValue(
   rawLine: string,
   key: string,
   value: string | null
 ): string {
-  const re = new RegExp(`\\s*\\[${key}::\\s*[^\\]]*\\]`, "gi");
+  const escaped = escapeRegExp(key);
+  const re = new RegExp(`\\s*\\[${escaped}::\\s*[^\\]]*\\]`, "gi");
   const hasField = re.test(rawLine);
 
   if (value === null) {
-    return rawLine.replace(new RegExp(`\\s*\\[${key}::\\s*[^\\]]*\\]`, "gi"), "").trimEnd();
+    return rawLine.replace(re, "").trimEnd();
   }
 
   const token = `[${key}:: ${value}]`;
   if (hasField) {
-    return rawLine.replace(new RegExp(`\\[${key}::\\s*[^\\]]*\\]`, "i"), token);
+    return rawLine.replace(new RegExp(`\\[${escaped}::\\s*[^\\]]*\\]`, "i"), token);
   }
   return rawLine.trimEnd() + " " + token;
 }
 
-/**
- * Get the GTD tag value (e.g. 'today' from '#gtd/today') for a given prefix.
- */
 export function getTagValue(rawLine: string, prefix: string): string | null {
-  const re = new RegExp(`#${prefix}/([\\w-]+)`, "i");
+  const re = new RegExp(`#${escapeRegExp(prefix)}/([\\w-]+)`, "i");
   const match = rawLine.match(re);
   return match ? match[1] : null;
 }
 
-/**
- * Set or remove a prefixed tag (#prefix/value) on a raw line.
- * If value is null, removes the tag.
- */
 export function setTagValue(
   rawLine: string,
   prefix: string,
   value: string | null
 ): string {
-  const re = new RegExp(`\\s*#${prefix}/[\\w-]+`, "gi");
+  const re = new RegExp(`\\s*#${escapeRegExp(prefix)}/[\\w-]+`, "gi");
   const cleaned = rawLine.replace(re, "").trimEnd();
 
   if (value === null) return cleaned;
   return cleaned + ` #${prefix}/${value}`;
 }
 
-/**
- * Add or remove a simple tag (#tag) on a raw line.
- */
 export function setSimpleTag(
   rawLine: string,
   tag: string,
   present: boolean
 ): string {
-  const re = new RegExp(`\\s*#${tag}(?=[\\s,]|$)`, "gi");
+  const re = new RegExp(`\\s*#${escapeRegExp(tag)}(?=[\\s,]|$)`, "gi");
   const cleaned = rawLine.replace(re, "").trimEnd();
   if (!present) return cleaned;
   return cleaned + ` #${tag}`;

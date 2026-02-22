@@ -1,11 +1,3 @@
-/**
- * Core types and default settings for the GTD Tasks plugin.
- */
-
-// ---------------------------------------------------------------------------
-// Date rule types
-// ---------------------------------------------------------------------------
-
 export type DateRangeRule =
   | { type: "today" }
   | { type: "this-week" }               // tomorrow → end of current Sunday
@@ -16,9 +8,6 @@ export type DateRangeRule =
   | { type: "within-days-range"; from: number; to: number }
   | { type: "beyond-days"; days: number }; // for catch-all buckets (e.g. Someday)
 
-// ---------------------------------------------------------------------------
-// Bucket configuration
-// ---------------------------------------------------------------------------
 
 export interface BucketConfig {
   id: string;
@@ -33,9 +22,6 @@ export interface BucketConfig {
   showInStatusBar: boolean;
 }
 
-// ---------------------------------------------------------------------------
-// Plugin settings
-// ---------------------------------------------------------------------------
 
 export type StorageMode = "inline-tag" | "inline-field";
 
@@ -69,9 +55,6 @@ export interface PluginSettings {
   compactView: boolean;
 }
 
-// ---------------------------------------------------------------------------
-// Defaults
-// ---------------------------------------------------------------------------
 
 export const DEFAULT_BUCKETS: BucketConfig[] = [
   {

@@ -22,7 +22,6 @@
     settings.buckets.map((b) => [b.id, b])
   );
 
-  // Maps for hierarchy look-ups used by TaskItem
   $: allTasksMap = new Map<string, TaskRecord>(
     bucketGroups.flatMap((g) => g.tasks).map((t) => [t.id, t])
   );
@@ -40,13 +39,13 @@
       .filter(Boolean)
       .map((id) => {
         if (id === TO_REVIEW_ID) {
-          // Synthesize a BucketConfig for the To Review system bucket
           return {
             id: TO_REVIEW_ID,
             name: "To Review",
             emoji: settings.toReviewEmoji,
             dateRangeRule: null,
             quickMoveTargets: [] as [string?, string?],
+            showInStatusBar: false,
           };
         }
         return bucketConfigMap.get(id!);
@@ -54,7 +53,6 @@
       .filter(Boolean) as BucketConfig[];
   }
 
-  /** Returns true if the task has an explicit storage-mode bucket marker. */
   function hasExplicitAssignment(task: TaskRecord): boolean {
     const { storageMode, tagPrefix, buckets } = settings;
     if (storageMode === "inline-tag") {
@@ -67,7 +65,6 @@
     return false;
   }
 
-  /** Recursively collect all descendant TaskRecords for a given task. */
   function getDescendants(task: TaskRecord): TaskRecord[] {
     const result: TaskRecord[] = [];
     const queue = [...task.childIds];
@@ -82,6 +79,12 @@
     return result;
   }
 
+  let pendingMoveConfirm: {
+    task: TaskRecord;
+    targetBucketId: string | null;
+    explicitChildren: TaskRecord[];
+  } | null = null;
+
   async function handleMove(task: TaskRecord, targetBucketId: string | null) {
     if (targetBucketId === "__context_menu__") {
       showContextMenu(task);
@@ -91,19 +94,22 @@
     const descendants = getDescendants(task);
     const explicitChildren = descendants.filter((t) => hasExplicitAssignment(t));
 
-    // If any descendants have their own explicit assignment, prompt before moving them
-    let moveExplicit = false;
     if (explicitChildren.length > 0) {
-      moveExplicit = confirm(
-        `${explicitChildren.length} subtask(s) have their own bucket assigned. Move them too?`
-      );
+      pendingMoveConfirm = { task, targetBucketId, explicitChildren };
+      return;
     }
 
-    // Move the parent (implicit children follow via inheritance on next re-index)
+    await onMove(task, targetBucketId);
+  }
+
+  async function confirmMoveChildren(moveChildren: boolean) {
+    if (!pendingMoveConfirm) return;
+    const { task, targetBucketId, explicitChildren } = pendingMoveConfirm;
+    pendingMoveConfirm = null;
+
     await onMove(task, targetBucketId);
 
-    // Optionally move explicitly-assigned children
-    if (moveExplicit) {
+    if (moveChildren) {
       for (const child of explicitChildren) {
         await onMove(child, targetBucketId);
       }
@@ -158,8 +164,6 @@
       clearTimeout(celebrationTimer);
       celebration = "none";
     }
-    // setTimeout 0 lets Svelte unmount the old Celebration before remounting
-    // (resets CSS animations cleanly for rapid successive completions)
     setTimeout(() => {
       celebration = state;
       celebrationTimer = setTimeout(() => {
@@ -235,6 +239,21 @@
       <div class="gtd-empty-state">No tasks found. Adjust the task scope in settings.</div>
     {/if}
   </div>
+
+  {#if pendingMoveConfirm}
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <div class="gtd-confirm-overlay" on:click={() => (pendingMoveConfirm = null)}>
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+      <div class="gtd-confirm-dialog" on:click|stopPropagation>
+        <p>{pendingMoveConfirm.explicitChildren.length} subtask(s) have their own bucket assigned. Move them too?</p>
+        <div class="gtd-confirm-buttons">
+          <button class="mod-cta" on:click={() => confirmMoveChildren(true)}>Move all</button>
+          <button on:click={() => confirmMoveChildren(false)}>Parent only</button>
+          <button on:click={() => (pendingMoveConfirm = null)}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  {/if}
 
   {#if celebration !== "none"}
     <Celebration type={celebration} imagePaths={celebrationImageUrls} />

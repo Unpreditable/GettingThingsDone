@@ -498,6 +498,46 @@ input.gtd-input-error {
   border-left: 2px solid var(--background-modifier-border);
 }
 
+/* ── Confirm dialog ────────────────────────────────────────────────── */
+
+.gtd-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+.gtd-confirm-dialog {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 320px;
+  box-shadow: var(--shadow-l);
+}
+
+.gtd-confirm-dialog p {
+  margin: 0 0 12px;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+.gtd-confirm-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.gtd-confirm-buttons button {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+}
+
 /* ── Celebration animations ──────────────────────────────────────────── */
 
 .gtd-celebration-overlay {

@@ -1,11 +1,3 @@
-/**
- * Maintains a live index of all task records from the configured scope.
- *
- * - Scans on plugin load
- * - Updates on vault modify / create / delete events
- * - Emits change notifications via a callback so the UI can re-render
- */
-
 import { App, TFile, Plugin } from "obsidian";
 import { parseFile, TaskRecord } from "./TaskParser";
 import { TaskScope } from "../settings";
@@ -13,7 +5,7 @@ import { TaskScope } from "../settings";
 type ChangeCallback = (allTasks: TaskRecord[]) => void;
 
 export class TaskIndex {
-  private index = new Map<string, TaskRecord[]>(); // filePath → tasks
+  private index = new Map<string, TaskRecord[]>();
   private listeners: ChangeCallback[] = [];
 
   constructor(
@@ -22,18 +14,12 @@ export class TaskIndex {
     private getScope: () => TaskScope
   ) {}
 
-  // ---------------------------------------------------------------------------
-  // Public API
-  // ---------------------------------------------------------------------------
-
-  /** Full vault scan — call once on plugin load. */
   async initialScan(): Promise<void> {
     const files = this.getScopedFiles();
     await Promise.all(files.map((f) => this.indexFile(f)));
     this.emit();
   }
 
-  /** Get all task records across all indexed files. */
   getAllTasks(): TaskRecord[] {
     const result: TaskRecord[] = [];
     for (const tasks of this.index.values()) {
@@ -42,12 +28,14 @@ export class TaskIndex {
     return result;
   }
 
-  /** Register a callback invoked whenever the index changes. */
-  onChange(cb: ChangeCallback): void {
+  onChange(cb: ChangeCallback): () => void {
     this.listeners.push(cb);
+    return () => {
+      const idx = this.listeners.indexOf(cb);
+      if (idx !== -1) this.listeners.splice(idx, 1);
+    };
   }
 
-  /** Register vault event listeners. Call once after plugin load. */
   registerVaultEvents(): void {
     this.plugin.registerEvent(
       this.app.vault.on("modify", (file) => {
@@ -76,10 +64,8 @@ export class TaskIndex {
     this.plugin.registerEvent(
       this.app.vault.on("rename", (file, oldPath) => {
         if (!(file instanceof TFile)) return;
-        // Always clean up the old path from the index.
         const wasIndexed = this.index.has(oldPath);
         if (wasIndexed) this.index.delete(oldPath);
-        // Re-index only if the new path is in scope; otherwise just emit the removal.
         if (this.isInScope(file)) {
           this.indexFile(file).then(() => this.emit());
         } else if (wasIndexed) {
@@ -89,7 +75,6 @@ export class TaskIndex {
     );
   }
 
-  /** Re-index a specific file path (e.g. after a write). */
   async reindexFile(filePath: string): Promise<void> {
     const file = this.app.vault.getAbstractFileByPath(filePath);
     if (file instanceof TFile) {
@@ -97,10 +82,6 @@ export class TaskIndex {
       this.emit();
     }
   }
-
-  // ---------------------------------------------------------------------------
-  // Internal
-  // ---------------------------------------------------------------------------
 
   private async indexFile(file: TFile): Promise<void> {
     if (file.extension !== "md") {
