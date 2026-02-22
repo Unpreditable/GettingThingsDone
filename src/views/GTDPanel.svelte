@@ -233,6 +233,7 @@
 
   <div class="gtd-panel-body">
     {#each bucketGroups as group (group.bucketId)}
+      {#if !group.isSystem || group.tasks.some((t) => !t.isCompleted)}
       <BucketGroup
         bucketId={group.bucketId}
         name={group.name}
@@ -251,6 +252,7 @@
         on:confirm={(e) => onConfirm(e.detail.task, e.detail.bucketId)}
         on:drop={handleDrop}
       />
+      {/if}
     {/each}
 
     {#if bucketGroups.length === 0}
