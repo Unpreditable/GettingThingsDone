@@ -12,7 +12,6 @@ import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import { moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "./core/TaskWriter";
-import { migrateStorageMode } from "./core/StorageMigrator";
 import type { TaskRecord } from "./core/TaskParser";
 import GTDPanel from "./views/GTDPanel.svelte";
 
@@ -47,17 +46,6 @@ export default class GtdTasksPlugin extends Plugin {
       id: "open-gtd-panel",
       name: "Open GTD Tasks panel",
       callback: () => this.activateView(),
-    });
-
-    this.addCommand({
-      id: "migrate-storage-mode",
-      name: "Migrate task assignments to current storage mode",
-      callback: async () => {
-        // Migrate FROM whichever mode is not currently active TO the current mode.
-        const fromMode = this.settings.storageMode === "inline-tag" ? "inline-field" : "inline-tag";
-        new Notice("GTD Tasks: Migration started…");
-        await migrateStorageMode(this.app, this.taskIndex.getAllTasks(), fromMode, this.settings);
-      },
     });
 
     // Initial scan then open view

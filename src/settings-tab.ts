@@ -1,6 +1,8 @@
 import { App, PluginSettingTab, Setting, Notice, TFolder, Modal } from "obsidian";
 import type GtdTasksPlugin from "./main";
 import { BucketConfig, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./settings";
+import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
+import { migrateStorageMode } from "./core/StorageMigrator";
 
 // ---------------------------------------------------------------------------
 // Emoji picker helpers
@@ -256,6 +258,15 @@ export class GtdSettingsTab extends PluginSettingTab {
     containerEl.createEl("h2", { text: "Getting Things Done - Settings" });
 
     // Annotation Style (storage mode)
+    const oppositeMode: StorageMode = this.plugin.settings.storageMode === "inline-tag" ? "inline-field" : "inline-tag";
+    const allTasks = this.plugin.taskIndex.getAllTasks();
+    const migrateCount = allTasks.filter((t) => {
+      const id = oppositeMode === "inline-tag"
+        ? getTagValue(t.rawLine, this.plugin.settings.tagPrefix)
+        : getInlineFieldValue(t.rawLine, this.plugin.settings.tagPrefix);
+      return id !== null && this.plugin.settings.buckets.some((b) => b.id === id);
+    }).length;
+
     const annotationSetting = new Setting(containerEl)
       .setName("Annotation Style")
       .addDropdown((dd) => {
@@ -263,16 +274,33 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.addOption("inline-field", "Inline field ([field:: value])");
         dd.setValue(this.plugin.settings.storageMode);
         dd.onChange(async (val) => {
-          const prev = this.plugin.settings.storageMode;
           this.plugin.settings.storageMode = val as StorageMode;
           await this.plugin.saveSettings();
-          if (prev !== val) {
-            new Notice(
-              `GTD Tasks: Annotation Style changed to "${val}". Run "Migrate task assignments" from the command palette if you have existing assignments.`
-            );
-          }
+          this.display();
+        });
+      })
+      .addButton((btn) => {
+        btn.setButtonText(
+          migrateCount > 0
+            ? `Migrate ${migrateCount} task${migrateCount === 1 ? "" : "s"}`
+            : "No tasks to migrate"
+        );
+        btn.setDisabled(migrateCount === 0);
+        btn.onClick(async () => {
+          btn.setDisabled(true);
+          btn.setButtonText("Migrating…");
+          await migrateStorageMode(
+            this.app,
+            this.plugin.taskIndex.getAllTasks(),
+            oppositeMode,
+            this.plugin.settings
+          );
+          this.display();
         });
       });
+
+    annotationSetting.controlEl.style.flexDirection = "column";
+    annotationSetting.controlEl.style.alignItems = "flex-end";
 
     // Multi-line description
     annotationSetting.descEl.appendText(
