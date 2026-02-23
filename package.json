@@ -9,8 +9,8 @@
     "test": "jest --passWithNoTests"
   },
   "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "author": "Vitaly Ditman",
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/sortablejs": "^1.15.7",
