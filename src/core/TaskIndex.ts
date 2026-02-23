@@ -38,16 +38,18 @@ export class TaskIndex {
 
   registerVaultEvents(): void {
     this.plugin.registerEvent(
-      this.app.vault.on("modify", (file) => {
+      this.app.vault.on("modify", async (file) => {
         if (file instanceof TFile && this.isInScope(file)) {
-          this.indexFile(file).then(() => this.emit());
+          await this.indexFile(file);
+          this.emit();
         }
       })
     );
     this.plugin.registerEvent(
-      this.app.vault.on("create", (file) => {
+      this.app.vault.on("create", async (file) => {
         if (file instanceof TFile && this.isInScope(file)) {
-          this.indexFile(file).then(() => this.emit());
+          await this.indexFile(file);
+          this.emit();
         }
       })
     );
@@ -62,12 +64,13 @@ export class TaskIndex {
       })
     );
     this.plugin.registerEvent(
-      this.app.vault.on("rename", (file, oldPath) => {
+      this.app.vault.on("rename", async (file, oldPath) => {
         if (!(file instanceof TFile)) return;
         const wasIndexed = this.index.has(oldPath);
         if (wasIndexed) this.index.delete(oldPath);
         if (this.isInScope(file)) {
-          this.indexFile(file).then(() => this.emit());
+          await this.indexFile(file);
+          this.emit();
         } else if (wasIndexed) {
           this.emit();
         }

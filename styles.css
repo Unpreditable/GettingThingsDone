@@ -495,6 +495,38 @@ input.gtd-input-error {
   background: var(--background-modifier-hover);
 }
 
+/* ── Utility classes ────────────────────────────────────────────────────── */
+
+.gtd-annotation-control {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.gtd-hidden {
+  display: none !important;
+}
+
+.gtd-field-error-visible {
+  display: block;
+}
+
+.gtd-emoji-picker-measuring {
+  position: fixed;
+  visibility: hidden;
+  z-index: 9999;
+}
+
+.gtd-emoji-picker-positioned {
+  position: fixed;
+  z-index: 9999;
+  top: var(--gtd-picker-top);
+  left: var(--gtd-picker-left);
+}
+
+.gtd-status-bar-item {
+  order: -1;
+}
+
 /* ── Date range extra fields ─────────────────────────────────────────────── */
 
 .gtd-date-range-extra {

@@ -136,9 +136,7 @@ function openEmojiPicker(
   renderGrid(0);
 
   const rect = anchor.getBoundingClientRect();
-  picker.style.position = "fixed";
-  picker.style.visibility = "hidden";
-  picker.style.zIndex = "9999";
+  picker.addClass("gtd-emoji-picker-measuring");
   document.body.appendChild(picker);
 
   // Measure picker dimensions
@@ -160,9 +158,10 @@ function openEmojiPicker(
     left = Math.max(0, window.innerWidth - pickerWidth - 4);
   }
 
-  picker.style.top = `${top}px`;
-  picker.style.left = `${left}px`;
-  picker.style.visibility = "visible";
+  picker.style.setProperty("--gtd-picker-top", `${top}px`);
+  picker.style.setProperty("--gtd-picker-left", `${left}px`);
+  picker.removeClass("gtd-emoji-picker-measuring");
+  picker.addClass("gtd-emoji-picker-positioned");
 
   const removePicker = () => {
     picker.remove();
@@ -271,7 +270,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderGeneralSection() {
     const { containerEl } = this;
-    containerEl.createEl("h2", { text: "Getting Things Done - Settings" });
+    new Setting(containerEl).setName("Getting Things Done").setHeading();
 
     // Annotation Style (storage mode)
     const oppositeMode: StorageMode = this.plugin.settings.storageMode === "inline-tag" ? "inline-field" : "inline-tag";
@@ -315,8 +314,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
 
-    annotationSetting.controlEl.style.flexDirection = "column";
-    annotationSetting.controlEl.style.alignItems = "flex-end";
+    annotationSetting.controlEl.addClass("gtd-annotation-control");
 
     annotationSetting.descEl.appendText(
       "Controls how the plugin stores which bucket each task belongs to:"
@@ -538,7 +536,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderBucketsSection() {
     const { containerEl } = this;
-    containerEl.createEl("h2", { text: "Buckets" });
+    new Setting(containerEl).setName("Buckets").setHeading();
 
     // To Review (expandable)
     this.renderToReviewConfig(containerEl);
@@ -608,12 +606,11 @@ export class GtdSettingsTab extends PluginSettingTab {
     });
 
     let expanded = false;
-    const bodyEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-body" });
-    bodyEl.style.display = "none";
+    const bodyEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-body gtd-hidden" });
 
     headerEl.onclick = () => {
       expanded = !expanded;
-      bodyEl.style.display = expanded ? "" : "none";
+      bodyEl.toggleClass("gtd-hidden", !expanded);
     };
 
     // Emoji
@@ -700,13 +697,12 @@ export class GtdSettingsTab extends PluginSettingTab {
 
       // Expand/collapse
       let expanded = false;
-      const bodyEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-body" });
-      bodyEl.style.display = "none";
+      const bodyEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-body gtd-hidden" });
 
       headerEl.onclick = (e) => {
         if ((e.target as HTMLElement).tagName === "BUTTON") return;
         expanded = !expanded;
-        bodyEl.style.display = expanded ? "" : "none";
+        bodyEl.toggleClass("gtd-hidden", !expanded);
       };
 
       this.renderBucketFields(bodyEl, bucket, idx, emojiSpan);
@@ -758,10 +754,10 @@ export class GtdSettingsTab extends PluginSettingTab {
           );
           if (duplicate) {
             idErrorEl.setText(`ID "${normalized}" is already used by "${duplicate.name}".`);
-            idErrorEl.style.display = "block";
+            idErrorEl.toggleClass("gtd-field-error-visible", true);
             t.inputEl.addClass("gtd-input-error");
           } else {
-            idErrorEl.style.display = "none";
+            idErrorEl.toggleClass("gtd-field-error-visible", false);
             t.inputEl.removeClass("gtd-input-error");
           }
         });
@@ -773,7 +769,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           );
           if (duplicate) {
             t.setValue(savedId);
-            idErrorEl.style.display = "none";
+            idErrorEl.toggleClass("gtd-field-error-visible", false);
             t.inputEl.removeClass("gtd-input-error");
           } else {
             bucket.id = normalized;

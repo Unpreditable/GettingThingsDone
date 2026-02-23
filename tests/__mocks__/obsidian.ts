@@ -43,6 +43,7 @@ export class Setting {
   constructor(public containerEl: HTMLElement) {}
   setName(n: string) { return this; }
   setDesc(d: string) { return this; }
+  setHeading() { return this; }
   addText(cb: (t: any) => void) {
     cb({
       setValue() { return this; },

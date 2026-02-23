@@ -32,35 +32,25 @@ export async function moveTaskToBucket(
     return { success: false, error: `File not found: ${task.filePath}` };
   }
 
-  let content: string;
-  try {
-    content = await app.vault.read(file);
-  } catch (e) {
-    return { success: false, error: String(e) };
-  }
-
-  const lines = content.split("\n");
-  const lineIdx = findTaskLine(lines, task);
-
-  if (lineIdx === -1) {
-    new Notice(
-      `GTD Tasks: Could not locate task in ${file.basename}. Re-indexing…`
-    );
-    return { success: false, error: "Task line not found in file (stale index)" };
-  }
-
-  const updatedLine = applyBucketChange(
-    lines[lineIdx],
-    targetBucket,
-    settings
-  );
-
-  lines[lineIdx] = updatedLine;
-  const newContent = lines.join("\n");
+  let result: MoveResult = { success: false, error: "Task line not found in file (stale index)" };
 
   try {
-    await app.vault.modify(file, newContent);
-    return { success: true };
+    await app.vault.process(file, (content) => {
+      const lines = content.split("\n");
+      const lineIdx = findTaskLine(lines, task);
+
+      if (lineIdx === -1) {
+        new Notice(
+          `GTD Tasks: Could not locate task in ${file.basename}. Re-indexing…`
+        );
+        return content;
+      }
+
+      lines[lineIdx] = applyBucketChange(lines[lineIdx], targetBucket, settings);
+      result = { success: true };
+      return lines.join("\n");
+    });
+    return result;
   } catch (e) {
     return { success: false, error: String(e) };
   }
@@ -86,37 +76,34 @@ export async function toggleTaskCompletion(
     return { success: false, error: `File not found: ${task.filePath}` };
   }
 
-  let content: string;
-  try {
-    content = await app.vault.read(file);
-  } catch (e) {
-    return { success: false, error: String(e) };
-  }
-
-  const lines = content.split("\n");
-  const lineIdx = findTaskLine(lines, task);
-
-  if (lineIdx === -1) {
-    new Notice(`GTD Tasks: Could not locate task in ${file.basename}.`);
-    return { success: false, error: "Task line not found in file (stale index)" };
-  }
-
-  let line = lines[lineIdx];
-  if (task.isCompleted) {
-    line = line.replace(/\[[ xX]\]/, "[ ]");
-    line = line.replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "").trimEnd();
-  } else {
-    line = line.replace(/\[ \]/, "[x]");
-    if (settings.readTasksPlugin) {
-      line = line.trimEnd() + ` ✅ ${formatDate(new Date())}`;
-    }
-  }
-
-  lines[lineIdx] = line;
+  let result: MoveResult = { success: false, error: "Task line not found in file (stale index)" };
 
   try {
-    await app.vault.modify(file, lines.join("\n"));
-    return { success: true };
+    await app.vault.process(file, (content) => {
+      const lines = content.split("\n");
+      const lineIdx = findTaskLine(lines, task);
+
+      if (lineIdx === -1) {
+        new Notice(`GTD Tasks: Could not locate task in ${file.basename}.`);
+        return content;
+      }
+
+      let line = lines[lineIdx];
+      if (task.isCompleted) {
+        line = line.replace(/\[[ xX]\]/, "[ ]");
+        line = line.replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "").trimEnd();
+      } else {
+        line = line.replace(/\[ \]/, "[x]");
+        if (settings.readTasksPlugin) {
+          line = line.trimEnd() + ` ✅ ${formatDate(new Date())}`;
+        }
+      }
+
+      lines[lineIdx] = line;
+      result = { success: true };
+      return lines.join("\n");
+    });
+    return result;
   } catch (e) {
     return { success: false, error: String(e) };
   }

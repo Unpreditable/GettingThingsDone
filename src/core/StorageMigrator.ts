@@ -26,26 +26,31 @@ export async function migrateStorageMode(
     const file = app.vault.getAbstractFileByPath(filePath);
     if (!(file instanceof TFile)) continue;
 
-    const content = await app.vault.read(file);
-    const lines = content.split("\n");
-    let changed = false;
+    let fileMigrated = 0;
+    let fileFailed = 0;
 
-    for (const task of tasks) {
-      const bucketId = readBucketId(task, fromMode, tagPrefix);
-      if (!bucketId) continue;
-      if (!buckets.some((b) => b.id === bucketId)) continue;
+    await app.vault.process(file, (content) => {
+      const lines = content.split("\n");
+      let changed = false;
 
-      const lineIdx = findTaskLine(lines, task);
-      if (lineIdx === -1) { failed++; continue; }
+      for (const task of tasks) {
+        const bucketId = readBucketId(task, fromMode, tagPrefix);
+        if (!bucketId) continue;
+        if (!buckets.some((b) => b.id === bucketId)) continue;
 
-      lines[lineIdx] = writeBucketId(lines[lineIdx], bucketId, toMode, tagPrefix, fromMode);
-      changed = true;
-      migrated++;
-    }
+        const lineIdx = findTaskLine(lines, task);
+        if (lineIdx === -1) { fileFailed++; continue; }
 
-    if (changed) {
-      await app.vault.modify(file, lines.join("\n"));
-    }
+        lines[lineIdx] = writeBucketId(lines[lineIdx], bucketId, toMode, tagPrefix, fromMode);
+        changed = true;
+        fileMigrated++;
+      }
+
+      return changed ? lines.join("\n") : content;
+    });
+
+    migrated += fileMigrated;
+    failed += fileFailed;
   }
 
   new Notice(`GTD Tasks: Migration complete. ${migrated} tasks updated, ${failed} skipped.`);

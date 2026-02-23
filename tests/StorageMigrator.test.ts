@@ -38,6 +38,9 @@ function makeMockApp(files: Record<string, string>) {
         modify: jest.fn(async (file: any, content: string) => {
           storage[file.path] = content;
         }),
+        process: jest.fn(async (file: any, cb: (content: string) => string) => {
+          storage[file.path] = cb(storage[file.path]);
+        }),
       },
     } as any,
     getContent: (path: string) => storage[path],
@@ -95,7 +98,7 @@ describe("migrateStorageMode", () => {
     await migrateStorageMode(app, [task], "inline-tag", toSettings);
 
     expect(getContent("test.md")).toBe(content);
-    expect(app.vault.modify).not.toHaveBeenCalled();
+    expect(app.vault.process).not.toHaveBeenCalled();
   });
 
   it("skips tasks with unrecognized bucket IDs", async () => {

@@ -48,6 +48,9 @@ function makeMockApp(fileContent: string, filePath = "test.md") {
         modify: jest.fn(async (_f: any, content: string) => {
           storedContent = content;
         }),
+        process: jest.fn(async (_f: any, cb: (content: string) => string) => {
+          storedContent = cb(storedContent);
+        }),
       },
     } as any,
     getContent: () => storedContent,

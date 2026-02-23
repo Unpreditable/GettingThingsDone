@@ -30,7 +30,7 @@ export default class GtdTasksPlugin extends Plugin {
     this.taskIndex = new TaskIndex(this.app, this, () => this.settings.taskScope);
 
     this.statusBarItem = this.addStatusBarItem();
-    this.statusBarItem.style.order = "-1";
+    this.statusBarItem.addClass("gtd-status-bar-item");
     this.addSettingTab(new GtdSettingsTab(this.app, this));
 
     this.registerView(VIEW_TYPE_GTD, (leaf) => {
@@ -58,9 +58,7 @@ export default class GtdTasksPlugin extends Plugin {
     });
   }
 
-  async onunload() {
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_GTD);
-  }
+  onunload() {}
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -151,13 +149,16 @@ class GtdPanelView extends ItemView {
     return "check-square";
   }
 
-  private async loadCelebrationImageUrls(): Promise<string[]> {
+  private loadCelebrationImageUrls(): string[] {
     const assetDir = normalizePath(this.plugin.manifest.dir + '/assets/celebration');
+    const filenames = [
+      'elephant.png', 'flamingo.png', 'iguana.png', 'penguin.png',
+      'red panda.png', 'sloth.png', 'stork.png',
+    ];
     try {
-      const listing = await this.app.vault.adapter.list(assetDir);
-      return listing.files
-        .filter((f) => f.toLowerCase().endsWith('.png'))
-        .map((f) => (this.app.vault.adapter as any).getResourcePath(f));
+      return filenames.map((name) =>
+        (this.app.vault.adapter as any).getResourcePath(normalizePath(assetDir + '/' + name))
+      );
     } catch {
       return [];
     }
@@ -167,7 +168,7 @@ class GtdPanelView extends ItemView {
     this.contentEl.empty();
     this.contentEl.addClass("gtd-panel-root");
     this.mountSvelte();
-    this.celebrationImageUrls = await this.loadCelebrationImageUrls();
+    this.celebrationImageUrls = this.loadCelebrationImageUrls();
     this.svelteComponent?.$set({ celebrationImageUrls: this.celebrationImageUrls });
   }
 
