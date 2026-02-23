@@ -178,6 +178,11 @@
   outline-offset: -2px;
 }
 
+.gtd-bucket-tasks.collapsed {
+  height: 0;
+  overflow: hidden;
+}
+
 /* ── Compact view ───────────────────────────────────────────────────────── */
 
 .gtd-compact .gtd-bucket-header {

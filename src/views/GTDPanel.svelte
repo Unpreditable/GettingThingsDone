@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { Menu } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
   import Celebration from "./Celebration.svelte";
@@ -163,6 +163,20 @@
     return () => document.removeEventListener("contextmenu", handler, true);
   });
 
+  // Capture-phase dragover on the panel root ensures "move" cursor everywhere
+  // inside the panel, before SortableJS can override dropEffect in bubble phase.
+  let panelEl: HTMLElement;
+  function panelDragOver(e: DragEvent) {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+  }
+  onMount(() => {
+    panelEl.addEventListener("dragover", panelDragOver, true);
+  });
+  onDestroy(() => {
+    panelEl?.removeEventListener("dragover", panelDragOver, true);
+  });
+
   type CelebrationState = "none" | "confetti" | "creature" | "creature-and-confetti";
   let celebration: CelebrationState = "none";
   let celebrationTimer: ReturnType<typeof setTimeout> | null = null;
@@ -220,7 +234,7 @@
   }
 </script>
 
-<div class="gtd-panel" class:gtd-compact={settings.compactView}>
+<div class="gtd-panel" class:gtd-compact={settings.compactView} bind:this={panelEl}>
   <div class="gtd-panel-header">
     <h3>GTD Tasks</h3>
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->

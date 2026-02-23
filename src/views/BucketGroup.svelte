@@ -28,6 +28,7 @@
   }>();
 
   let collapsed = false;
+  let headerDragOver = false;
   let taskListEl: HTMLElement;
   let sortable: Sortable;
 
@@ -47,6 +48,36 @@
 
   function toggleCollapsed() {
     collapsed = !collapsed;
+  }
+
+  function handleHeaderDragEnter(e: DragEvent) {
+    if (!collapsed || bucketId === TO_REVIEW_ID) return;
+    e.preventDefault();
+    headerDragOver = true;
+  }
+
+  function handleHeaderDragOver(e: DragEvent) {
+    if (!collapsed || bucketId === TO_REVIEW_ID) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+  }
+
+  function handleHeaderDragLeave(e: DragEvent) {
+    if (!collapsed || bucketId === TO_REVIEW_ID) return;
+    headerDragOver = false;
+  }
+
+  function handleHeaderDrop(e: DragEvent) {
+    if (!collapsed || bucketId === TO_REVIEW_ID) return;
+    e.preventDefault();
+    headerDragOver = false;
+    const dragged = Sortable.dragged;
+    if (!dragged) return;
+    const taskId = dragged.dataset.taskId ?? "";
+    const sourceBucketId =
+      (dragged.parentElement as HTMLElement)?.dataset?.bucketId ?? "";
+    if (!taskId || sourceBucketId === bucketId) return;
+    dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId });
   }
 
   /**
@@ -200,7 +231,12 @@
   <div
     class="gtd-bucket-header"
     class:collapsed
+    class:drag-over={headerDragOver}
     on:click={toggleCollapsed}
+    on:dragenter={handleHeaderDragEnter}
+    on:dragover={handleHeaderDragOver}
+    on:dragleave={handleHeaderDragLeave}
+    on:drop={handleHeaderDrop}
   >
     <span class="gtd-collapse-icon">{collapsed ? "▶" : "▼"}</span>
     {#if emoji}
@@ -216,12 +252,13 @@
     </span>
   </div>
 
-  {#if !collapsed}
-    <div
-      class="gtd-bucket-tasks"
-      bind:this={taskListEl}
-      data-bucket-id={bucketId}
-    >
+  <div
+    class="gtd-bucket-tasks"
+    class:collapsed
+    bind:this={taskListEl}
+    data-bucket-id={bucketId}
+  >
+    {#if !collapsed}
       {#each visibleTasks as task (task.id)}
         <TaskItem
           {task}
@@ -239,25 +276,34 @@
           on:confirm={(e) => dispatch("confirm", e.detail)}
         />
       {/each}
-
-      {#if totalCount === 0}
-        <div class="gtd-empty-bucket">—</div>
-      {/if}
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
 
 <style>
+  .gtd-collapse-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    text-align: center;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
   .gtd-bucket-emoji {
     font-size: 14px;
     line-height: 1;
     flex-shrink: 0;
   }
 
-  .gtd-empty-bucket {
-    padding: 4px 12px;
-    font-size: var(--font-ui-smaller);
-    color: var(--text-faint);
-    font-style: italic;
+  .gtd-bucket-header.collapsed > :global(*) {
+    pointer-events: none;
   }
+
+  .gtd-bucket-header.drag-over {
+    background: var(--background-modifier-hover);
+    outline: 2px dashed var(--interactive-accent);
+    outline-offset: -2px;
+  }
+
 </style>
