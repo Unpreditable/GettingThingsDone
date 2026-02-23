@@ -84,9 +84,9 @@ export default class GtdTasksPlugin extends Plugin {
 
   private updateStatusBar(): void {
     if (!this.statusBarItem) return;
+    this.statusBarItem.empty();
     const allTasks = this.taskIndex.getAllTasks();
     const bucketGroups = groupTasksIntoBuckets(allTasks, this.settings);
-    const parts: string[] = [];
 
     for (const group of bucketGroups) {
       const showInBar = group.isSystem
@@ -106,17 +106,20 @@ export default class GtdTasksPlugin extends Plugin {
       }
 
       const label = active < total ? `${active}/${total}${group.emoji}` : `${total}${group.emoji}`;
-      parts.push(label);
+      const bucketId = group.bucketId;
+      const span = this.statusBarItem.createEl("span", {
+        cls: "gtd-status-bucket",
+        text: label,
+      });
+      span.addEventListener("click", () => this.activateView(bucketId));
     }
-
-    this.statusBarItem.setText(parts.join("  "));
   }
 
   async refreshIndex(): Promise<void> {
     await this.taskIndex.initialScan();
   }
 
-  private async activateView() {
+  private async activateView(bucketId?: string) {
     const { workspace } = this.app;
 
     let leaf = workspace.getLeavesOfType(VIEW_TYPE_GTD)[0];
@@ -126,6 +129,10 @@ export default class GtdTasksPlugin extends Plugin {
     }
 
     workspace.revealLeaf(leaf);
+
+    if (bucketId) {
+      this.panelView?.scrollToBucket(bucketId);
+    }
   }
 }
 
@@ -255,6 +262,11 @@ class GtdPanelView extends ItemView {
       new Notice(`GTD Tasks: Confirm failed — ${result.error}`);
       await this.plugin.taskIndex.reindexFile(task.filePath);
     }
+  }
+
+  scrollToBucket(bucketId: string) {
+    const el = this.contentEl.querySelector<HTMLElement>(`.gtd-bucket[data-bucket-id="${bucketId}"]`);
+    el?.scrollIntoView({ behavior: "instant", block: "start" });
   }
 
   private handleNavigate(task: TaskRecord) {

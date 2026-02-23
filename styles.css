@@ -525,6 +525,19 @@ input.gtd-input-error {
 
 .gtd-status-bar-item {
   order: -1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gtd-status-bucket {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+.gtd-status-bucket:hover {
+  background-color: var(--background-modifier-hover);
 }
 
 /* ── Date range extra fields ─────────────────────────────────────────────── */
