@@ -84,8 +84,8 @@ function stripMetadata(text: string): string {
   return text
     .replace(/📅\s*\d{4}-\d{2}-\d{2}/g, "")
     .replace(/✅\s*\d{4}-\d{2}-\d{2}/g, "")
-    .replace(/🔁[^#\[📅✅]*/g, "")
-    .replace(/[⏫🔼🔽⏬]/g, "")
+    .replace(/🔁[^#[📅✅]*/gu, "")
+    .replace(/[⏫🔼🔽⏬]/gu, "")
     .replace(/#[\w/-]+/g, "")
     .replace(/\[[\w-]+::\s*[^\]]*\]/g, "")
     .replace(/\s{2,}/g, " ")

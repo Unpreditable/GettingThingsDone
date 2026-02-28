@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, Notice, TFolder, Modal } from "obsidian";
+import { App, PluginSettingTab, Setting, TFolder, Modal } from "obsidian";
 import type GtdTasksPlugin from "./main";
 import { BucketConfig, CelebrationMode, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
@@ -283,7 +283,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     }).length;
 
     const annotationSetting = new Setting(containerEl)
-      .setName("Annotation Style")
+      .setName("Annotation style")
       .addDropdown((dd) => {
         dd.addOption("inline-tag", "Inline tag (#tag)");
         dd.addOption("inline-field", "Inline field ([field:: value])");
@@ -329,7 +329,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     // Tag / Field name
     new Setting(containerEl)
-      .setName("Tag / Field name")
+      .setName("Tag / field name")
       .setDesc(
         "Used as the tag prefix in Inline tag mode (#<name>/bucket-id) and as the field key in Inline field mode ([<name>:: bucket-id])."
       )
@@ -551,7 +551,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     const actionRow = containerEl.createEl("div", { cls: "gtd-bucket-actions" });
 
     const addBtn = actionRow.createEl("button", {
-      text: "+ Add bucket",
+      text: "Add bucket",
       cls: "mod-cta gtd-add-bucket-btn",
     });
     addBtn.onclick = async () => {
@@ -601,6 +601,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       cls: "gtd-bucket-name",
     });
     headerEl.createEl("span", {
+      // eslint-disable-next-line obsidianmd/ui/sentence-case
       text: "system · cannot be removed",
       cls: "gtd-bucket-system-label",
     });
@@ -813,7 +814,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       cls: "gtd-bucket-delete-btn mod-warning",
       attr: { title: "Delete this bucket" },
     });
-    deleteBtn.textContent = "🗑 Delete";
+    deleteBtn.textContent = "Delete";
     deleteBtn.onclick = () => {
       new ConfirmModal(
         this.app,

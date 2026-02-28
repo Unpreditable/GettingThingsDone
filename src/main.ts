@@ -5,13 +5,15 @@ import {
   Notice,
   TFile,
   normalizePath,
+  FileSystemAdapter,
+  App,
 } from "obsidian";
 import type { SvelteComponent } from "svelte";
 
 import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
-import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
+import { groupTasksIntoBuckets } from "./core/BucketManager";
 import { moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "./core/TaskWriter";
 import type { TaskRecord } from "./core/TaskParser";
 import GTDPanel from "./views/GTDPanel.svelte";
@@ -33,14 +35,11 @@ export default class GtdTasksPlugin extends Plugin {
     this.statusBarItem.addClass("gtd-status-bar-item");
     this.addSettingTab(new GtdSettingsTab(this.app, this));
 
-    this.registerView(VIEW_TYPE_GTD, (leaf) => {
-      this.panelView = new GtdPanelView(leaf, this);
-      return this.panelView;
-    });
+    this.registerView(VIEW_TYPE_GTD, (leaf) => new GtdPanelView(leaf, this));
 
     this.addCommand({
       id: "open-gtd-panel",
-      name: "Open GTD Tasks panel",
+      name: "Open panel",
       callback: () => this.activateView(),
     });
 
@@ -53,7 +52,7 @@ export default class GtdTasksPlugin extends Plugin {
     });
 
     this.app.workspace.onLayoutReady(() => {
-      this.activateView();
+      void this.activateView();
       this.updateStatusBar();
     });
   }
@@ -61,7 +60,7 @@ export default class GtdTasksPlugin extends Plugin {
   onunload() {}
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<PluginSettings>);
     if (!this.settings.buckets || this.settings.buckets.length === 0) {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }
@@ -111,7 +110,7 @@ export default class GtdTasksPlugin extends Plugin {
         cls: "gtd-status-bucket",
         text: label,
       });
-      span.addEventListener("click", () => this.activateView(bucketId));
+      span.addEventListener("click", () => void this.activateView(bucketId));
     }
   }
 
@@ -122,13 +121,19 @@ export default class GtdTasksPlugin extends Plugin {
   private async activateView(bucketId?: string) {
     const { workspace } = this.app;
 
-    let leaf = workspace.getLeavesOfType(VIEW_TYPE_GTD)[0];
+    let leaf: WorkspaceLeaf | undefined = workspace.getLeavesOfType(VIEW_TYPE_GTD)[0];
+
     if (!leaf) {
       leaf = workspace.getRightLeaf(false) ?? workspace.getLeaf(true);
       await leaf.setViewState({ type: VIEW_TYPE_GTD, active: true });
     }
 
-    workspace.revealLeaf(leaf);
+    if (!this.panelView || this.panelView.leaf !== leaf) {
+      // If the panelView doesn't exist or is associated with a different leaf (e.g., re-opened in a new leaf)
+      this.panelView = new GtdPanelView(leaf, this);
+    }
+
+    await workspace.revealLeaf(leaf);
 
     if (bucketId) {
       this.panelView?.scrollToBucket(bucketId);
@@ -164,7 +169,7 @@ class GtdPanelView extends ItemView {
     ];
     try {
       return filenames.map((name) =>
-        (this.app.vault.adapter as any).getResourcePath(normalizePath(assetDir + '/' + name))
+        (this.app.vault.adapter as FileSystemAdapter).getResourcePath(normalizePath(assetDir + '/' + name))
       );
     } catch {
       return [];
@@ -205,15 +210,14 @@ class GtdPanelView extends ItemView {
       props: {
         bucketGroups,
         settings: this.plugin.settings,
-        celebrationImageUrls: this.celebrationImageUrls,
-        onMove: this.handleMove.bind(this),
-        onToggle: this.handleToggle.bind(this),
-        onNavigate: this.handleNavigate.bind(this),
-        onConfirm: this.handleConfirmPlacement.bind(this),
+        onMove: this.handleMove.bind(this) as (task: TaskRecord, targetBucketId: string | null) => Promise<void>,                                                                                                        
+        onToggle: this.handleToggle.bind(this) as (task: TaskRecord) => Promise<void>,
+        onNavigate: this.handleNavigate.bind(this) as (task: TaskRecord) => void,
+        onConfirm: this.handleConfirmPlacement.bind(this) as (task: TaskRecord, bucketId: string) => Promise<void>,
         onOpenSettings: () => {
-          const appAny = this.app as any;
-          appAny.setting?.open();
-          appAny.setting?.openTabById(this.plugin.manifest.id);
+          const appWithSetting = this.app as App & { setting: { open: () => void; openTabById: (id: string) => void; }; };
+          appWithSetting.setting?.open();
+          appWithSetting.setting?.openTabById(this.plugin.manifest.id);
         },
       },
     });
@@ -273,7 +277,7 @@ class GtdPanelView extends ItemView {
     const file = this.app.vault.getAbstractFileByPath(task.filePath);
     if (!(file instanceof TFile)) return;
 
-    this.app.workspace.getLeaf(false).openFile(file, {
+    void this.app.workspace.getLeaf(false).openFile(file, {
       eState: { line: task.lineNumber },
     });
   }
