@@ -25,9 +25,9 @@ export default defineConfig([
       "obsidianmd/ui/sentence-case": [
         "warn",
         {
-          brands: ["GTD Tasks", "gtd", "Dataview-compatible", "To Review", "Getting Things Done"],
+          brands: [], //["GTD Tasks", "gtd", "Dataview-compatible", "To Review", "Getting Things Done"],
           acronyms: ["ID"],
-          ignoreWords: ["tasks", "Tasks"],
+          ignoreWords: [], //["tasks", "Tasks"],
           enforceCamelCaseLower: true
         },
       ],

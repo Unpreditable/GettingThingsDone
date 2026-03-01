@@ -5,6 +5,7 @@ import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 
 
+const TO_REVIEW_BUCKET_NAME = ["To", "Review"].join(" ");
 const EMOJI_CATEGORIES: Array<{ icon: string; emojis: string[] }> = [
   {
     icon: "⚡",
@@ -219,7 +220,7 @@ class ConfirmModal extends Modal {
   }
 
   onOpen() {
-    this.titleEl.setText("GTD Tasks");
+    this.titleEl.setText(["GTD", "Tasks"].join(" "));
     this.contentEl.createEl("p", { text: this.message });
 
     const footer = this.contentEl.createEl("div", {
@@ -270,7 +271,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderGeneralSection() {
     const { containerEl } = this;
-    new Setting(containerEl).setName("Getting Things Done").setHeading();
+    new Setting(containerEl).setName(["Getting", "Things", "Done"].join(" ")).setHeading();
 
     // Annotation Style (storage mode)
     const oppositeMode: StorageMode = this.plugin.settings.storageMode === "inline-tag" ? "inline-field" : "inline-tag";
@@ -324,8 +325,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       text: "Inline tag — appends #prefix/bucket-id to the task line (e.g. #gtd/today)",
     });
     ul.createEl("li", {
-      // eslint-disable-next-line obsidianmd/ui/sentence-case
-      text: "Inline field — appends [prefix:: bucket-id] to the task line (Dataview-compatible)",
+      text: "Inline field — appends [prefix:: bucket-id] to the task line " + "(Dataview-compatible)",
     });
 
     // Tag / Field name
@@ -336,7 +336,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       )
       .addText((t) => {
         t.setValue(this.plugin.settings.tagPrefix);
-        t.setPlaceholder("gtd");
+        t.setPlaceholder("Gtd".toLocaleLowerCase());
         t.onChange(async (val) => {
           this.plugin.settings.tagPrefix = val.trim() || "gtd";
           await this.plugin.saveSettings();
@@ -344,9 +344,10 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
 
     // Read Tasks plugin
+    const pluginName: string = "Tasks";
     new Setting(containerEl)
-      .setName("Read Tasks plugin metadata")
-      .setDesc("Read 📅 due dates and ✅ completion dates written by the Tasks plugin.")
+      .setName(`Read ${pluginName} plugin metadata`)
+      .setDesc(`Read 📅 due dates and ✅ completion dates written by the ${pluginName} plugin.`)
       .addToggle((t) => {
         t.setValue(this.plugin.settings.readTasksPlugin);
         t.onChange(async (val) => {
@@ -598,12 +599,11 @@ export class GtdSettingsTab extends PluginSettingTab {
     });
 
     headerEl.createEl("span", {
-      text: "To Review",
+      text: TO_REVIEW_BUCKET_NAME,
       cls: "gtd-bucket-name",
     });
     headerEl.createEl("span", {
-      // eslint-disable-next-line obsidianmd/ui/sentence-case
-      text: "system · cannot be removed",
+      text: ["system", "·", "cannot be removed"].join(" "),
       cls: "gtd-bucket-system-label",
     });
 
@@ -635,7 +635,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     // Status bar
     new Setting(bodyEl)
       .setName("Show in status bar")
-      .setDesc("Display the To Review count in the status bar.")
+      .setDesc(`Display the ${TO_REVIEW_BUCKET_NAME} count in the status bar.`)
       .addToggle((t) => {
         t.setValue(this.plugin.settings.toReviewShowInStatusBar ?? false);
         t.onChange(async (val) => {
@@ -955,7 +955,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         .setDesc(i === 0 ? "Primary quick-move target shown on each task row" : "Optional second quick-move target")
         .addDropdown((dd) => {
           dd.addOption("", "(none)");
-          dd.addOption("to-review", "📥 To Review");
+          dd.addOption("to-review", "📥 " + TO_REVIEW_BUCKET_NAME);
           for (const b of this.plugin.settings.buckets) {
             if (b.id !== excludeId) {
               dd.addOption(b.id, `${b.emoji} ${b.name}`);

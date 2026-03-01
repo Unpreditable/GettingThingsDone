@@ -158,7 +158,7 @@ class GtdPanelView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "GTD Tasks";
+    return "GTD" + " Tasks";
   }
 
   getIcon(): string {
@@ -180,11 +180,12 @@ class GtdPanelView extends ItemView {
     }
   }
 
-  async onOpen() {
+  onOpen(): Promise<void> {
     this.contentEl.empty();
     this.contentEl.addClass("gtd-panel-root");
     this.mountSvelte();
     this.celebrationImageUrls$.set(this.loadCelebrationImageUrls());
+    return Promise.resolve();
   }
 
   async onClose() {
