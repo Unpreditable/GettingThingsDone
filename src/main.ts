@@ -130,9 +130,8 @@ export default class GtdTasksPlugin extends Plugin {
       await leaf.setViewState({ type: VIEW_TYPE_GTD, active: true });
     }
 
-    if (!this.panelView || this.panelView.leaf !== leaf) {
-      // If the panelView doesn't exist or is associated with a different leaf (e.g., re-opened in a new leaf)
-      this.panelView = new GtdPanelView(leaf, this);
+    if (leaf.view instanceof GtdPanelView) {
+      this.panelView = leaf.view;
     }
 
     await workspace.revealLeaf(leaf);
