@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import type { Readable } from "svelte/store";
   import { Menu } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
   import Celebration from "./Celebration.svelte";
@@ -9,14 +10,18 @@
   import type { BucketConfig, PluginSettings } from "../settings";
   import { TO_REVIEW_ID } from "../core/BucketManager";
 
-  export let bucketGroups: BucketGroupData[] = [];
-  export let settings: PluginSettings;
+  export let bucketGroups$: Readable<BucketGroupData[]>;
+  export let settings$: Readable<PluginSettings>;
+  export let celebrationImageUrls$: Readable<string[]>;
+  $: bucketGroups = $bucketGroups$;
+  $: settings = $settings$;
+  $: celebrationImageUrls = $celebrationImageUrls$;
+
   export let onMove: (task: TaskRecord, targetBucketId: string | null) => Promise<void>;
   export let onToggle: (task: TaskRecord) => Promise<void>;
   export let onNavigate: (task: TaskRecord) => void;
   export let onConfirm: (task: TaskRecord, bucketId: string) => Promise<void>;
   export let onOpenSettings: () => void;
-  export let celebrationImageUrls: string[] = [];
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])

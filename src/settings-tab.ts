@@ -213,7 +213,7 @@ class ConfirmModal extends Modal {
     app: App,
     private message: string,
     private confirmLabel: string,
-    private onConfirm: () => void
+    private onConfirm: () => void | Promise<void>
   ) {
     super(app);
   }
@@ -231,7 +231,7 @@ class ConfirmModal extends Modal {
       cls: "mod-warning",
     });
     confirmBtn.onclick = () => {
-      this.onConfirm();
+      void this.onConfirm();
       this.close();
     };
 
@@ -324,6 +324,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       text: "Inline tag — appends #prefix/bucket-id to the task line (e.g. #gtd/today)",
     });
     ul.createEl("li", {
+      // eslint-disable-next-line obsidianmd/ui/sentence-case
       text: "Inline field — appends [prefix:: bucket-id] to the task line (Dataview-compatible)",
     });
 
@@ -403,7 +404,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       if (!datalist) {
         datalist = container.createEl("datalist", {
           attr: { id: datalistId },
-        }) as HTMLDataListElement;
+        });
       }
       datalist.empty();
       const options =
@@ -420,7 +421,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           cls: "gtd-scope-input",
           value: path,
           attr: { list: datalistId },
-        }) as HTMLInputElement;
+        });
         input.placeholder =
           scopeType === "folders" ? "e.g. Tasks" : "e.g. Tasks/inbox.md";
 
@@ -494,7 +495,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Mark overdue tasks with !")
       .setDesc(
-        "Tasks that are past their bucket's scheduled window show a ! indicator in the panel."
+        "Tasks that are past their bucket's scheduled window are marked with an overdue indicator."
       )
       .addToggle((t) => {
         t.setValue(this.plugin.settings.staleIndicatorEnabled);
@@ -577,7 +578,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         "Reset all buckets to defaults? This will discard your current bucket configuration.",
         "Reset",
         async () => {
-          this.plugin.settings.buckets = JSON.parse(JSON.stringify(DEFAULT_BUCKETS));
+          this.plugin.settings.buckets = JSON.parse(JSON.stringify(DEFAULT_BUCKETS)) as BucketConfig[];
           await this.plugin.saveSettings();
           this.display();
         }
@@ -618,7 +619,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     renderEmojiSetting(bodyEl, "Emoji", this.plugin.settings.toReviewEmoji, "📥", (emoji) => {
       this.plugin.settings.toReviewEmoji = emoji;
       emojiSpan.textContent = emoji;
-      this.plugin.saveSettings();
+      void this.plugin.saveSettings();
     });
 
     // Quick-move targets
@@ -725,7 +726,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     renderEmojiSetting(container, "Emoji", bucket.emoji, "📌", (emoji) => {
       bucket.emoji = emoji;
       emojiSpan.textContent = emoji;
-      save();
+      void save();
     });
 
     new Setting(container).setName("Name").addText((t) => {
@@ -763,7 +764,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           }
         });
 
-        t.inputEl.addEventListener("blur", async () => {
+        t.inputEl.addEventListener("blur", () => {
           const normalized = t.getValue().replace(/\s+/g, "-").toLowerCase();
           const duplicate = this.plugin.settings.buckets.find(
             (b, i) => i !== idx && b.id === normalized
@@ -774,7 +775,7 @@ export class GtdSettingsTab extends PluginSettingTab {
             t.inputEl.removeClass("gtd-input-error");
           } else {
             bucket.id = normalized;
-            await save();
+            void save();
           }
         });
       });

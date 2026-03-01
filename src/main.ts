@@ -8,7 +8,8 @@ import {
   FileSystemAdapter,
   App,
 } from "obsidian";
-import { createClassComponent } from "svelte/legacy";
+import { mount, unmount } from "svelte";
+import { writable, type Writable } from "svelte/store";
 
 import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
@@ -142,22 +143,11 @@ export default class GtdTasksPlugin extends Plugin {
   }
 }
 
-// createClassComponent (svelte/legacy) wraps a Svelte 5 component with the legacy
-// $set/$destroy API. Svelte 5 marks those methods @deprecated on SvelteComponent, so
-// we re-declare them on our own interface (without @deprecated) to silence ESLint.
-interface LegacyPanel extends Record<string, unknown> {
-  $set(props: Partial<{
-    bucketGroups: BucketGroupData[];
-    settings: PluginSettings;
-    onConfirm: (task: TaskRecord, bucketId: string) => Promise<void>;
-    celebrationImageUrls: string[];
-  }>): void;
-  $destroy(): void;
-}
-
 class GtdPanelView extends ItemView {
-  private svelteInstance?: LegacyPanel;
-  private celebrationImageUrls: string[] = [];
+  private svelteInstance?: Record<string, unknown>;
+  private bucketGroups$ = writable<BucketGroupData[]>([]);
+  private settings$!: Writable<PluginSettings>;
+  private celebrationImageUrls$ = writable<string[]>([]);
 
   constructor(leaf: WorkspaceLeaf, private plugin: GtdTasksPlugin) {
     super(leaf);
@@ -194,13 +184,12 @@ class GtdPanelView extends ItemView {
     this.contentEl.empty();
     this.contentEl.addClass("gtd-panel-root");
     this.mountSvelte();
-    this.celebrationImageUrls = this.loadCelebrationImageUrls();
-    this.svelteInstance?.$set({ celebrationImageUrls: this.celebrationImageUrls });
+    this.celebrationImageUrls$.set(this.loadCelebrationImageUrls());
   }
 
   async onClose() {
     if (this.svelteInstance) {
-      this.svelteInstance.$destroy();
+      await unmount(this.svelteInstance);
       this.svelteInstance = undefined;
     }
   }
@@ -209,25 +198,21 @@ class GtdPanelView extends ItemView {
     if (!this.svelteInstance) return;
 
     const allTasks = this.plugin.taskIndex.getAllTasks();
-    const bucketGroups = groupTasksIntoBuckets(allTasks, this.plugin.settings);
-
-    this.svelteInstance.$set({
-      bucketGroups,
-      settings: this.plugin.settings,
-      onConfirm: this.handleConfirmPlacement.bind(this) as (task: TaskRecord, bucketId: string) => Promise<void>,
-    });
+    this.bucketGroups$.set(groupTasksIntoBuckets(allTasks, this.plugin.settings));
+    this.settings$.set(this.plugin.settings);
   }
 
   private mountSvelte() {
     const allTasks = this.plugin.taskIndex.getAllTasks();
-    const bucketGroups = groupTasksIntoBuckets(allTasks, this.plugin.settings);
+    this.bucketGroups$.set(groupTasksIntoBuckets(allTasks, this.plugin.settings));
+    this.settings$ = writable(this.plugin.settings);
 
-    this.svelteInstance = createClassComponent({
-      component: GTDPanel,
+    this.svelteInstance = mount(GTDPanel, {
       target: this.contentEl,
       props: {
-        bucketGroups,
-        settings: this.plugin.settings,
+        bucketGroups$: this.bucketGroups$,
+        settings$: this.settings$,
+        celebrationImageUrls$: this.celebrationImageUrls$,
         onMove: this.handleMove.bind(this) as (task: TaskRecord, targetBucketId: string | null) => Promise<void>,
         onToggle: this.handleToggle.bind(this) as (task: TaskRecord) => Promise<void>,
         onNavigate: this.handleNavigate.bind(this) as (task: TaskRecord) => void,
@@ -238,7 +223,7 @@ class GtdPanelView extends ItemView {
           appWithSetting.setting?.openTabById(this.plugin.manifest.id);
         },
       },
-    }) as unknown as LegacyPanel;
+    }) as unknown as Record<string, unknown>;
   }
 
   private async handleMove(task: TaskRecord, targetBucketId: string | null) {
