@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { TaskRecord } from "../core/TaskParser";
+  import { stripWikilinks, parseWikilinks } from "../core/TaskParser";
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
 
@@ -145,7 +146,11 @@
     class="gtd-task-text"
     on:click={onTextClick}
   >
-    {task.text || "(empty task)"}
+    {#if task.text}
+      {#each parseWikilinks(task.text) as seg}
+        {#if seg.type === "wikilink"}<strong>{seg.content}</strong>{:else}{seg.content}{/if}
+      {/each}
+    {:else}(empty task){/if}
   </span>
 
   {#if activeDescendantCount > 0}
@@ -155,7 +160,7 @@
   {#if showPopover}
     <div class="gtd-tooltip">
       {#if task.text.length > 40}
-        <div class="gtd-tooltip-text">{task.text}</div>
+        <div class="gtd-tooltip-text">{stripWikilinks(task.text)}</div>
       {/if}
       {#if activeDescendantCount > 0}
         {#if task.text.length > 40}

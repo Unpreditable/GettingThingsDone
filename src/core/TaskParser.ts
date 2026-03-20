@@ -92,6 +92,37 @@ function stripMetadata(text: string): string {
     .trim();
 }
 
+/** Strips [[wikilinks]] to plain display text for tooltips/search. */
+export function stripWikilinks(text: string): string {
+  return text
+    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2") // [[page|alias]] → alias
+    .replace(/\[\[([^\]]+)\]\]/g, "$1");             // [[page]] → page
+}
+
+export interface TextSegment {
+  type: "text" | "wikilink";
+  content: string;
+}
+
+/** Splits text into plain-text and wikilink segments for safe DOM rendering without {@html}. */
+export function parseWikilinks(text: string): TextSegment[] {
+  const segments: TextSegment[] = [];
+  const regex = /\[\[(?:[^\]|]+\|)?([^\]]+)\]\]/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ type: "text", content: text.slice(lastIndex, match.index) });
+    }
+    segments.push({ type: "wikilink", content: match[1] });
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    segments.push({ type: "text", content: text.slice(lastIndex) });
+  }
+  return segments;
+}
+
 function extractIndentLevel(rawLine: string): number {
   let spaces = 0;
   for (const ch of rawLine) {

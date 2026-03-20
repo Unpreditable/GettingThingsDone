@@ -1,4 +1,4 @@
-import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag } from "../src/core/TaskParser";
+import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks } from "../src/core/TaskParser";
 
 describe("parseFile", () => {
   it("parses simple unchecked tasks", () => {
@@ -215,6 +215,38 @@ describe("setSimpleTag", () => {
     const result = setSimpleTag("- [ ] Task #someday", "someday", true);
     const count = (result.match(/#someday/g) ?? []).length;
     expect(count).toBe(1);
+  });
+});
+
+describe("stripWikilinks", () => {
+  it("strips plain wikilinks", () => {
+    expect(stripWikilinks("Buy [[hardware-store]] supplies")).toBe("Buy hardware-store supplies");
+  });
+  it("strips aliased wikilinks", () => {
+    expect(stripWikilinks("See [[long page|short]]")).toBe("See short");
+  });
+});
+
+describe("parseWikilinks", () => {
+  it("returns single text segment for plain text", () => {
+    expect(parseWikilinks("Buy milk")).toEqual([{ type: "text", content: "Buy milk" }]);
+  });
+  it("parses plain wikilink into wikilink segment", () => {
+    expect(parseWikilinks("Buy [[hardware-store]] supplies")).toEqual([
+      { type: "text", content: "Buy " },
+      { type: "wikilink", content: "hardware-store" },
+      { type: "text", content: " supplies" },
+    ]);
+  });
+  it("uses alias for aliased wikilinks", () => {
+    expect(parseWikilinks("See [[long page|short]] here")).toEqual([
+      { type: "text", content: "See " },
+      { type: "wikilink", content: "short" },
+      { type: "text", content: " here" },
+    ]);
+  });
+  it("returns empty array for empty string", () => {
+    expect(parseWikilinks("")).toEqual([]);
   });
 });
 
