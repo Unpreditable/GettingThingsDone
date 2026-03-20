@@ -104,7 +104,7 @@
   background: var(--background-modifier-hover);
 }
 
-.gtd-task.is-completed {
+.gtd-task.is-completed > :not(.gtd-tooltip) {
   opacity: 0.5;
 }
 
