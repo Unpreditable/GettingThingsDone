@@ -19,6 +19,12 @@
   flex-shrink: 0;
 }
 
+.gtd-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .gtd-panel-header h3 {
   margin: 0;
   font-size: var(--font-ui-medium);
@@ -138,6 +144,17 @@
 }
 
 .gtd-task:hover .gtd-task-actions {
+  opacity: 1;
+}
+
+/* The is-completed blanket rule (.gtd-task.is-completed > :not(.gtd-tooltip))
+   sets opacity:0.5 on all direct children, including .gtd-task-actions.
+   These two rules restore hover-only visibility for the actions on completed tasks. */
+.gtd-task.is-completed .gtd-task-actions {
+  opacity: 0;
+}
+
+.gtd-task.is-completed:hover .gtd-task-actions {
   opacity: 1;
 }
 

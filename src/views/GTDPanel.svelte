@@ -251,18 +251,20 @@
   <div class="gtd-panel-header">
     <h3>GTD Tasks</h3>
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <span
-      class="clickable-icon gtd-dismiss-all-icon"
-      title="Dismiss all completed tasks"
-      on:click={dismissAllCompleted}
-    >🧹</span>
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <span
-      class="clickable-icon gtd-settings-icon"
-      title="Open GTD settings"
-      on:click={onOpenSettings}
-    >⚙</span>
+    <div class="gtd-header-actions">
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+      <span
+        class="clickable-icon gtd-dismiss-all-icon"
+        title="Dismiss all completed tasks"
+        on:click={dismissAllCompleted}
+      >🧹</span>
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+      <span
+        class="clickable-icon gtd-settings-icon"
+        title="Open GTD settings"
+        on:click={onOpenSettings}
+      >⚙</span>
+    </div>
   </div>
 
   <div class="gtd-panel-body">
