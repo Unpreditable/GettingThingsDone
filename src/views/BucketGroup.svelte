@@ -36,6 +36,17 @@
 
   $: staleSet = new Set(staleTaskIds);
   $: autoPlacedSet = new Set(autoPlacedTaskIds);
+  $: {
+    // When a task is unchecked, remove it from dismissedIds so it reappears
+    let changed = false;
+    for (const t of tasks) {
+      if (!t.isCompleted && dismissedIds.has(t.id)) {
+        dismissedIds.delete(t.id);
+        changed = true;
+      }
+    }
+    if (changed) dismissedIds = dismissedIds;
+  }
   $: visibleTasks = (() => {
     const midnight = new Date();
     midnight.setHours(0, 0, 0, 0);
@@ -227,6 +238,12 @@
   onDestroy(() => {
     sortable?.destroy();
   });
+
+  export function dismissAllVisible() {
+    const completed = visibleTasks.filter((t) => t.isCompleted);
+    for (const t of completed) dismissedIds.add(t.id);
+    if (completed.length > 0) dismissedIds = dismissedIds;
+  }
 </script>
 
 <div class="gtd-bucket" data-bucket-id={bucketId}>

@@ -221,6 +221,14 @@
     await onToggle(task);
   }
 
+  let bucketGroupRefs: BucketGroup[] = [];
+
+  function dismissAllCompleted() {
+    for (const ref of bucketGroupRefs) {
+      ref?.dismissAllVisible();
+    }
+  }
+
   async function handleDrop(event: CustomEvent<{
     taskId: string;
     sourceBucketId: string;
@@ -243,6 +251,13 @@
   <div class="gtd-panel-header">
     <h3>GTD Tasks</h3>
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <span
+      class="clickable-icon gtd-dismiss-all-icon"
+      title="Dismiss all completed tasks"
+      on:click={dismissAllCompleted}
+    >🧹</span>
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <span
       class="clickable-icon gtd-settings-icon"
       title="Open GTD settings"
@@ -251,9 +266,10 @@
   </div>
 
   <div class="gtd-panel-body">
-    {#each bucketGroups as group (group.bucketId)}
+    {#each bucketGroups as group, i (group.bucketId)}
       {#if !group.isSystem || group.tasks.some((t) => !t.isCompleted)}
       <BucketGroup
+        bind:this={bucketGroupRefs[i]}
         bucketId={group.bucketId}
         name={group.name}
         emoji={group.emoji}
