@@ -27,6 +27,8 @@
     drop: { taskId: string; sourceBucketId: string; targetBucketId: string };
   }>();
 
+  let dismissedIds = new Set<string>();
+
   let collapsed = false;
   let headerDragOver = false;
   let taskListEl: HTMLElement;
@@ -38,6 +40,7 @@
     const midnight = new Date();
     midnight.setHours(0, 0, 0, 0);
     return tasks.filter((t) => {
+      if (dismissedIds.has(t.id)) return false;
       if (!t.isCompleted) return true;
       if (!showCompletedUntilMidnight) return false;
       return !t.completedAt || t.completedAt >= midnight;
@@ -274,6 +277,7 @@
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}
           on:confirm={(e) => dispatch("confirm", e.detail)}
+          on:dismiss={(e) => { dismissedIds.add(e.detail.task.id); dismissedIds = dismissedIds; }}
         />
       {/each}
     {/if}

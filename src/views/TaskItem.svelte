@@ -21,6 +21,7 @@
     toggle: { task: TaskRecord };
     navigate: { task: TaskRecord };
     confirm: { task: TaskRecord; bucketId: string };
+    dismiss: { task: TaskRecord };
   }>();
 
   $: parentTask = task.parentId ? allTasksMap.get(task.parentId) ?? null : null;
@@ -89,6 +90,11 @@
   function onMoveClick(e: MouseEvent, bucketId: string | null) {
     e.stopPropagation();
     dispatch("move", { task, targetBucketId: bucketId });
+  }
+
+  function onDismissClick(e: MouseEvent) {
+    e.stopPropagation();
+    dispatch("dismiss", { task });
   }
 
   function onConfirmClick(e: MouseEvent) {
@@ -172,15 +178,23 @@
   {/if}
 
   <div class="gtd-task-actions">
-    {#each quickMoveTargets as bucket}
+    {#if task.isCompleted && showCompleted}
       <button
-        class="gtd-task-move-btn"
-        title="Move to {bucket.name}"
-        on:click={(e) => onMoveClick(e, bucket.id)}
-      >
-        {bucket.emoji}
-      </button>
-    {/each}
+        class="gtd-task-dismiss-btn"
+        title="Dismiss"
+        on:click={onDismissClick}
+      >🧹</button>
+    {:else}
+      {#each quickMoveTargets as bucket}
+        <button
+          class="gtd-task-move-btn"
+          title="Move to {bucket.name}"
+          on:click={(e) => onMoveClick(e, bucket.id)}
+        >
+          {bucket.emoji}
+        </button>
+      {/each}
+    {/if}
   </div>
 </div>
 
