@@ -180,7 +180,7 @@
   <div class="gtd-task-actions">
     {#if task.isCompleted && showCompleted}
       <button
-        class="gtd-task-dismiss-btn"
+        class="gtd-task-move-btn"
         title="Dismiss"
         on:click={onDismissClick}
       >🧹</button>
