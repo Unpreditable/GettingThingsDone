@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - Patch
+          - Minor
+          - Major
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Compute new version
+        id: version
+        run: |
+          CURRENT=$(jq -r '.version' manifest.json)
+          MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+          MINOR=$(echo "$CURRENT" | cut -d. -f2)
+          PATCH=$(echo "$CURRENT" | cut -d. -f3)
+
+          case "${{ inputs.bump }}" in
+            Major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            Minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            Patch) PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW="$MAJOR.$MINOR.$PATCH"
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          echo "Bumping $CURRENT → $NEW"
+
+      - name: Check tag does not already exist
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          if git tag --list | grep -qx "$TAG"; then
+            echo "Error: tag $TAG already exists on this repo."
+            exit 1
+          fi
+
+      - name: Update manifest version
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          jq --arg v "$TAG" '.version = $v' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
+          echo "Updated manifest.json to version $TAG"
+
+      - name: Commit and tag
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore: release $TAG"
+          git tag "$TAG"
+          git push origin HEAD --tags
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ steps.version.outputs.new }}',
+              name: '${{ steps.version.outputs.new }}',
+              draft: false,
+              prerelease: false,
+            });
