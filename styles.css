@@ -512,6 +512,30 @@ input.gtd-input-error {
   background: var(--background-modifier-hover);
 }
 
+/* ── Inline markdown formatting in task text ────────────────────────────── */
+
+.gtd-md-link {
+  color: var(--link-color, var(--text-accent, var(--interactive-accent)));
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+.gtd-inline-code {
+  font-family: var(--font-monospace);
+  font-size: 0.9em;
+  background: var(--code-background);
+  color: var(--code-normal);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+.gtd-highlight {
+  background: var(--text-highlight-bg);
+  color: var(--text-highlight-fg);
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
 /* ── Utility classes ────────────────────────────────────────────────────── */
 
 .gtd-annotation-control {

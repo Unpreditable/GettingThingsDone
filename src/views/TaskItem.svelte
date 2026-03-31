@@ -154,7 +154,13 @@
   >
     {#if task.text}
       {#each parseWikilinks(task.text) as seg}
-        {#if seg.type === "wikilink"}<strong>{seg.content}</strong>{:else}{seg.content}{/if}
+        {#if seg.type === "wikilink" || seg.type === "bold"}<strong>{seg.content}</strong
+        >{:else if seg.type === "mdlink"}<span class="gtd-md-link">{seg.content}</span
+        >{:else if seg.type === "italic"}<em>{seg.content}</em
+        >{:else if seg.type === "strike"}<s>{seg.content}</s
+        >{:else if seg.type === "code"}<code class="gtd-inline-code">{seg.content}</code
+        >{:else if seg.type === "highlight"}<mark class="gtd-highlight">{seg.content}</mark
+        >{:else}{seg.content}{/if}
       {/each}
     {:else}(empty task){/if}
   </span>
@@ -272,6 +278,7 @@
     font-weight: 600;
     margin-bottom: 2px;
   }
+
 
 
   :global(.gtd-task) {

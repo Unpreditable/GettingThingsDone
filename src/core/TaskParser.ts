@@ -92,33 +92,59 @@ function stripMetadata(text: string): string {
     .trim();
 }
 
-/** Strips [[wikilinks]] to plain display text for tooltips/search. */
+/** Strips all inline markup to plain text for tooltips/search. */
 export function stripWikilinks(text: string): string {
   return text
-    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2") // [[page|alias]] → alias
-    .replace(/\[\[([^\]]+)\]\]/g, "$1");             // [[page]] → page
+    .replace(/%%.*?%%/g, "")                          // %%comments%% → remove
+    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, "$2")   // [[page|alias]] → alias
+    .replace(/\[\[([^\]]+)\]\]/g, "$1")               // [[page]] → page
+    .replace(/(?<!\[)\[([^\]]+)\]\([^)]*\)/g, "$1")  // [text](url) → text
+    .replace(/`([^`]+)`/g, "$1")                      // `code` → code
+    .replace(/\*\*(.+?)\*\*/g, "$1")                  // **bold** → bold
+    .replace(/__(.+?)__/g, "$1")                      // __bold__ → bold
+    .replace(/~~(.+?)~~/g, "$1")                      // ~~strike~~ → strike
+    .replace(/==(.+?)==/g, "$1")                      // ==highlight== → highlight
+    .replace(/\*(.+?)\*/g, "$1")                      // *italic* → italic
+    .replace(/(?<!\w)_(.+?)_(?!\w)/g, "$1");          // _italic_ → italic
 }
 
 export interface TextSegment {
-  type: "text" | "wikilink";
+  type: "text" | "wikilink" | "mdlink" | "bold" | "italic" | "strike" | "code" | "highlight";
   content: string;
 }
 
-/** Splits text into plain-text and wikilink segments for safe DOM rendering without {@html}. */
+/** Splits text into typed segments for safe DOM rendering without {@html}.
+ *  Handles: [[wikilinks]], [md](links), **bold**, __bold__, *italic*, _italic_,
+ *  ~~strike~~, ==highlight==, `code`, and strips %%comments%%. */
 export function parseWikilinks(text: string): TextSegment[] {
   const segments: TextSegment[] = [];
-  const regex = /\[\[(?:[^\]|]+\|)?([^\]]+)\]\]/g;
+  const cleaned = text.replace(/%%.*?%%/g, "");
+
+  // Order matters: longer/more specific patterns before shorter ones.
+  // Group 1: `code`   2: **bold**   3: __bold__   4: ~~strike~~   5: ==highlight==
+  // Group 6: *italic*   7: _italic_ (word-boundary)
+  // Group 8: [[wikilink]]   Group 9: [md](link)
+  const regex = /`([^`]+)`|\*\*(.+?)\*\*|__(.+?)__|~~(.+?)~~|==(.+?)==|\*(.+?)\*|(?<!\w)_(.+?)_(?!\w)|\[\[(?:[^\]|]+\|)?([^\]]+)\]\]|(?<!\[)\[([^\]]+)\]\([^)]*\)/g;
+
   let lastIndex = 0;
   let match: RegExpExecArray | null;
-  while ((match = regex.exec(text)) !== null) {
+  while ((match = regex.exec(cleaned)) !== null) {
     if (match.index > lastIndex) {
-      segments.push({ type: "text", content: text.slice(lastIndex, match.index) });
+      segments.push({ type: "text", content: cleaned.slice(lastIndex, match.index) });
     }
-    segments.push({ type: "wikilink", content: match[1] });
+    if      (match[1] !== undefined) segments.push({ type: "code",      content: match[1] });
+    else if (match[2] !== undefined) segments.push({ type: "bold",      content: match[2] });
+    else if (match[3] !== undefined) segments.push({ type: "bold",      content: match[3] });
+    else if (match[4] !== undefined) segments.push({ type: "strike",    content: match[4] });
+    else if (match[5] !== undefined) segments.push({ type: "highlight", content: match[5] });
+    else if (match[6] !== undefined) segments.push({ type: "italic",    content: match[6] });
+    else if (match[7] !== undefined) segments.push({ type: "italic",    content: match[7] });
+    else if (match[8] !== undefined) segments.push({ type: "wikilink",  content: match[8] });
+    else if (match[9] !== undefined) segments.push({ type: "mdlink",    content: match[9] });
     lastIndex = regex.lastIndex;
   }
-  if (lastIndex < text.length) {
-    segments.push({ type: "text", content: text.slice(lastIndex) });
+  if (lastIndex < cleaned.length) {
+    segments.push({ type: "text", content: cleaned.slice(lastIndex) });
   }
   return segments;
 }
