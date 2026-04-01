@@ -174,6 +174,45 @@ describe("indentLevel and buildTaskHierarchy", () => {
     expect(tasks[0].childIds).not.toContain(tasks[2].id);
   });
 
+  it("task indented under a plain bullet point gets no parentId", () => {
+    // Task A is at level 0, then a plain bullet at level 0, then Task B indented under that bullet.
+    // Task B must NOT inherit Task A as parent.
+    const content = "- [ ] Task A\n- bullet\n  - [ ] Task B";
+    const tasks = parseFile("test.md", content);
+    expect(tasks[0].text).toBe("Task A");
+    expect(tasks[1].text).toBe("Task B");
+    expect(tasks[1].parentId).toBeNull();
+    expect(tasks[0].childIds).toHaveLength(0);
+  });
+
+  it("task-under-task still works when both are under a bullet", () => {
+    // Both tasks are under a bullet, but Task B is nested under Task A.
+    const content = "- bullet\n  - [ ] Task A\n    - [ ] Task B";
+    const tasks = parseFile("test.md", content);
+    expect(tasks[0].text).toBe("Task A");
+    expect(tasks[1].text).toBe("Task B");
+    expect(tasks[0].parentId).toBeNull();
+    expect(tasks[1].parentId).toBe(tasks[0].id);
+  });
+
+  it("task nested under a bullet that is itself under a task inherits that task as parent", () => {
+    // task → bullet (child of task) → sub-task: bullet is transparent, sub-task inherits task
+    const content = "- [ ] Parent\n  - bullet\n    - [ ] Child";
+    const tasks = parseFile("test.md", content);
+    expect(tasks[0].text).toBe("Parent");
+    expect(tasks[1].text).toBe("Child");
+    expect(tasks[1].parentId).toBe(tasks[0].id);
+    expect(tasks[0].childIds).toContain(tasks[1].id);
+  });
+
+  it("sibling bullet still severs unrelated task parenthood", () => {
+    // task → sibling bullet (same level) → indented task: sibling bullet pops task, no parent
+    const content = "- [ ] Unrelated\n- bullet\n  - [ ] Task B";
+    const tasks = parseFile("test.md", content);
+    expect(tasks[1].parentId).toBeNull();
+    expect(tasks[0].childIds).toHaveLength(0);
+  });
+
   it("buildTaskHierarchy works across multiple files", () => {
     const t1 = {
       id: "a1", filePath: "a.md", lineNumber: 0, indentLevel: 0,

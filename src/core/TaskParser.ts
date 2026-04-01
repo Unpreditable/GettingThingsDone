@@ -25,6 +25,7 @@ export interface TaskRecord {
 }
 
 const TASK_REGEX = /^(\s*[-*+]|\s*\d+[.)]) \[([ xX])\] (.*)$/;
+const LIST_ITEM_REGEX = /^(\s*)(?:[-*+]|\d+[.)]) /;
 
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -66,7 +67,44 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
     });
   }
 
-  return buildTaskHierarchy(records);
+  // Build parent/child hierarchy using all list items (tasks + bullets) as context.
+  // Plain bullets are tracked on the stack but are transparent to parenthood: a task
+  // walks up the stack to find the nearest task ancestor. A bullet only severs the
+  // relationship when it causes a task to be popped (sibling case); bullets nested
+  // under a task leave that task reachable on the stack.
+  const taskByLine = new Map<number, TaskRecord>(records.map((r) => [r.lineNumber, r]));
+  const taskLookup = new Map<string, TaskRecord>(records.map((t) => [t.id, t]));
+  const stack: Array<{ indentLevel: number; taskId: string | null }> = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const isTask = taskByLine.has(i);
+    if (!isTask && !LIST_ITEM_REGEX.test(line)) continue;
+
+    const indentLevel = extractIndentLevel(line);
+    while (stack.length > 0 && stack[stack.length - 1].indentLevel >= indentLevel) {
+      stack.pop();
+    }
+
+    if (isTask) {
+      const task = taskByLine.get(i)!;
+      // Walk up the stack to find the nearest task ancestor (skipping bullet entries).
+      let parentTaskId: string | null = null;
+      for (let j = stack.length - 1; j >= 0; j--) {
+        if (stack[j].taskId != null) { parentTaskId = stack[j].taskId; break; }
+      }
+      if (parentTaskId != null) {
+        task.parentId = parentTaskId;
+        const parentTask = taskLookup.get(parentTaskId);
+        if (parentTask) parentTask.childIds.push(task.id);
+      }
+      stack.push({ indentLevel, taskId: task.id });
+    } else {
+      stack.push({ indentLevel, taskId: null });
+    }
+  }
+
+  return records;
 }
 
 function extractTags(text: string): string[] {
