@@ -1,7 +1,7 @@
 {
   "id": "gtd-tasks",
   "name": "GTD Tasks",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "minAppVersion": "1.4.0",
   "description": "A dedicated panel to organize tasks across the vault using the Getting Things Done methodology (Today, This Week, Someday…)",
   "author": "Vitaly Ditman",
