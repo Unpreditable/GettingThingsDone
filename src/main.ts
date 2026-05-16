@@ -108,7 +108,7 @@ export default class GtdTasksPlugin extends Plugin {
 
       const label = active < total ? `${active}/${total}${group.emoji}` : `${total}${group.emoji}`;
       const bucketId = group.bucketId;
-      const span = this.statusBarItem.createEl("span", {
+      const span = this.statusBarItem.createSpan({
         cls: "gtd-status-bucket",
         text: label,
       });

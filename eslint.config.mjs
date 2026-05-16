@@ -5,6 +5,7 @@ import obsidianmd from "eslint-plugin-obsidianmd";
 import globals from "globals";
 
 export default defineConfig([
+  { ignores: ["main.js", "node_modules/**", "*.config.mjs", "*.config.js"] },
   ...obsidianmd.configs.recommended,
   {
     files: ["**/*.ts"],
@@ -25,9 +26,9 @@ export default defineConfig([
       "obsidianmd/ui/sentence-case": [
         "warn",
         {
-          brands: [], //["GTD Tasks", "gtd", "Dataview-compatible", "To Review", "Getting Things Done"],
+          brands: ["gtd", "GTD"], //["GTD Tasks", "gtd", "Dataview-compatible", "To Review", "Getting Things Done"],
           acronyms: ["ID"],
-          ignoreWords: [], //["tasks", "Tasks"],
+          ignoreWords: ["bucket-id"],
           enforceCamelCaseLower: true
         },
       ],

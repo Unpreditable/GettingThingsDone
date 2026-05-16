@@ -103,18 +103,17 @@ function openEmojiPicker(
   anchor: HTMLElement,
   onSelect: (emoji: string) => void
 ): void {
-  document.querySelectorAll(".gtd-emoji-picker").forEach((el) => el.remove());
+  activeDocument.querySelectorAll(".gtd-emoji-picker").forEach((el) => el.remove());
 
-  const picker = document.createElement("div");
-  picker.className = "gtd-emoji-picker";
+  const picker = createDiv({ cls: "gtd-emoji-picker" });
 
-  const tabs = picker.createEl("div", { cls: "gtd-emoji-tabs" });
-  const gridEl = picker.createEl("div", { cls: "gtd-emoji-grid" });
+  const tabs = picker.createDiv({ cls: "gtd-emoji-tabs" });
+  const gridEl = picker.createDiv({ cls: "gtd-emoji-grid" });
 
   const renderGrid = (categoryIndex: number) => {
     gridEl.empty();
     for (const emoji of EMOJI_CATEGORIES[categoryIndex].emojis) {
-      const item = gridEl.createEl("div", { cls: "gtd-emoji-item", text: emoji });
+      const item = gridEl.createDiv({ cls: "gtd-emoji-item", text: emoji });
       item.addEventListener("click", (e) => {
         e.stopPropagation();
         onSelect(emoji);
@@ -124,7 +123,7 @@ function openEmojiPicker(
   };
 
   EMOJI_CATEGORIES.forEach((cat, i) => {
-    const tab = tabs.createEl("div", { cls: "gtd-emoji-tab", text: cat.icon });
+    const tab = tabs.createDiv({ cls: "gtd-emoji-tab", text: cat.icon });
     if (i === 0) tab.addClass("active");
     tab.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -138,7 +137,7 @@ function openEmojiPicker(
 
   const rect = anchor.getBoundingClientRect();
   picker.addClass("gtd-emoji-picker-measuring");
-  document.body.appendChild(picker);
+  activeDocument.body.appendChild(picker);
 
   // Measure picker dimensions
   const pickerRect = picker.getBoundingClientRect();
@@ -166,9 +165,9 @@ function openEmojiPicker(
 
   const removePicker = () => {
     picker.remove();
-    document.removeEventListener("mousedown", closeOnOutside);
-    document.removeEventListener("scroll", closeOnScroll, true);
-    document.removeEventListener("keydown", closeOnEscape);
+    activeDocument.removeEventListener("mousedown", closeOnOutside);
+    activeDocument.removeEventListener("scroll", closeOnScroll, true);
+    activeDocument.removeEventListener("keydown", closeOnEscape);
   };
 
   const closeOnOutside = (e: MouseEvent) => {
@@ -179,10 +178,10 @@ function openEmojiPicker(
     if (e.key === "Escape") removePicker();
   };
 
-  setTimeout(() => {
-    document.addEventListener("mousedown", closeOnOutside);
-    document.addEventListener("scroll", closeOnScroll, true);
-    document.addEventListener("keydown", closeOnEscape);
+  window.setTimeout(() => {
+    activeDocument.addEventListener("mousedown", closeOnOutside);
+    activeDocument.addEventListener("scroll", closeOnScroll, true);
+    activeDocument.addEventListener("keydown", closeOnEscape);
   }, 100);
 }
 
@@ -223,7 +222,7 @@ class ConfirmModal extends Modal {
     this.titleEl.setText(["GTD", "Tasks"].join(" "));
     this.contentEl.createEl("p", { text: this.message });
 
-    const footer = this.contentEl.createEl("div", {
+    const footer = this.contentEl.createDiv({
       cls: "modal-button-container",
     });
 
@@ -286,8 +285,8 @@ export class GtdSettingsTab extends PluginSettingTab {
     const annotationSetting = new Setting(containerEl)
       .setName("Annotation style")
       .addDropdown((dd) => {
-        dd.addOption("inline-tag", "Inline tag (#tag)");
-        dd.addOption("inline-field", "Inline field ([field:: value])");
+        dd.addOption("inline-tag", "Inline tag");
+        dd.addOption("inline-field", "Inline field");
         dd.setValue(this.plugin.settings.storageMode);
         dd.onChange(async (val) => {
           this.plugin.settings.storageMode = val as StorageMode;
@@ -394,7 +393,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       | { type: "folders"; paths: string[] }
       | { type: "files"; paths: string[] };
 
-    const listEl = container.createEl("div", { cls: "gtd-scope-list" });
+    const listEl = container.createDiv({ cls: "gtd-scope-list" });
 
     const renderEntries = () => {
       listEl.empty();
@@ -415,7 +414,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       }
 
       scope.paths.forEach((path, idx) => {
-        const row = listEl.createEl("div", { cls: "gtd-scope-entry" });
+        const row = listEl.createDiv({ cls: "gtd-scope-entry" });
 
         const input = row.createEl("input", {
           type: "text",
@@ -544,13 +543,13 @@ export class GtdSettingsTab extends PluginSettingTab {
     this.renderToReviewConfig(containerEl);
 
     // User-defined buckets
-    const bucketsContainer = containerEl.createEl("div", {
+    const bucketsContainer = containerEl.createDiv({
       cls: "gtd-settings-buckets",
     });
     this.renderBucketList(bucketsContainer);
 
     // Action row
-    const actionRow = containerEl.createEl("div", { cls: "gtd-bucket-actions" });
+    const actionRow = containerEl.createDiv({ cls: "gtd-bucket-actions" });
 
     const addBtn = actionRow.createEl("button", {
       text: "Add bucket",
@@ -588,27 +587,27 @@ export class GtdSettingsTab extends PluginSettingTab {
   }
 
   private renderToReviewConfig(container: HTMLElement) {
-    const itemEl = container.createEl("div", {
+    const itemEl = container.createDiv({
       cls: "gtd-bucket-setting-item gtd-to-review-item",
     });
-    const headerEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-header" });
+    const headerEl = itemEl.createDiv({ cls: "gtd-bucket-setting-header" });
 
-    const emojiSpan = headerEl.createEl("span", {
+    const emojiSpan = headerEl.createSpan({
       text: this.plugin.settings.toReviewEmoji || "📥",
       cls: "gtd-bucket-emoji-display",
     });
 
-    headerEl.createEl("span", {
+    headerEl.createSpan({
       text: TO_REVIEW_BUCKET_NAME,
       cls: "gtd-bucket-name",
     });
-    headerEl.createEl("span", {
+    headerEl.createSpan({
       text: ["system", "·", "cannot be removed"].join(" "),
       cls: "gtd-bucket-system-label",
     });
 
     let expanded = false;
-    const bodyEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-body gtd-hidden" });
+    const bodyEl = itemEl.createDiv({ cls: "gtd-bucket-setting-body gtd-hidden" });
 
     headerEl.onclick = () => {
       expanded = !expanded;
@@ -650,26 +649,26 @@ export class GtdSettingsTab extends PluginSettingTab {
     const buckets = this.plugin.settings.buckets;
 
     buckets.forEach((bucket, idx) => {
-      const itemEl = container.createEl("div", { cls: "gtd-bucket-setting-item" });
-      const headerEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-header" });
+      const itemEl = container.createDiv({ cls: "gtd-bucket-setting-item" });
+      const headerEl = itemEl.createDiv({ cls: "gtd-bucket-setting-header" });
 
       // Emoji display
-      const emojiSpan = headerEl.createEl("span", {
+      const emojiSpan = headerEl.createSpan({
         text: bucket.emoji || "📌",
         cls: "gtd-bucket-emoji-display",
       });
 
       // Name
-      headerEl.createEl("span", {
+      headerEl.createSpan({
         text: `${bucket.name}`,
         cls: "gtd-bucket-name",
       });
 
       // Spacer
-      headerEl.createEl("span", { cls: "gtd-bucket-header-spacer" });
+      headerEl.createSpan({ cls: "gtd-bucket-header-spacer" });
 
       // Order buttons (side by side, on the right)
-      const orderBtns = headerEl.createEl("div", { cls: "gtd-bucket-order-btns" });
+      const orderBtns = headerEl.createDiv({ cls: "gtd-bucket-order-btns" });
       const upBtn = orderBtns.createEl("button", {
         text: "↑",
         cls: "gtd-bucket-order-btn",
@@ -699,7 +698,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
       // Expand/collapse
       let expanded = false;
-      const bodyEl = itemEl.createEl("div", { cls: "gtd-bucket-setting-body gtd-hidden" });
+      const bodyEl = itemEl.createDiv({ cls: "gtd-bucket-setting-body gtd-hidden" });
 
       headerEl.onclick = (e) => {
         if ((e.target as HTMLElement).tagName === "BUTTON") return;
@@ -779,8 +778,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           }
         });
       });
-    idErrorEl = document.createElement("p");
-    idErrorEl.classList.add("gtd-field-error");
+    idErrorEl = createEl("p", { cls: "gtd-field-error" });
     idSetting.settingEl.after(idErrorEl);
 
     // Date range rule
@@ -810,7 +808,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
 
     // Delete button — small, bottom-right, with confirmation
-    const deleteRow = container.createEl("div", { cls: "gtd-bucket-delete-row" });
+    const deleteRow = container.createDiv({ cls: "gtd-bucket-delete-row" });
     const deleteBtn = deleteRow.createEl("button", {
       cls: "gtd-bucket-delete-btn mod-warning",
       attr: { title: "Delete this bucket" },
@@ -855,7 +853,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     // Stable placeholder immediately after the dropdown row — ensures extra
     // inputs always render here, not at the end of the container.
-    const extraPlaceholder = container.createEl("div", { cls: "gtd-date-range-extra" });
+    const extraPlaceholder = container.createDiv({ cls: "gtd-date-range-extra" });
 
     const renderExtra = (type: string) => {
       extraPlaceholder.empty();
@@ -954,7 +952,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         .setName(label)
         .setDesc(i === 0 ? "Primary quick-move target shown on each task row" : "Optional second quick-move target")
         .addDropdown((dd) => {
-          dd.addOption("", "(none)");
+          dd.addOption("", "(None)");
           dd.addOption("to-review", "📥 " + TO_REVIEW_BUCKET_NAME);
           for (const b of this.plugin.settings.buckets) {
             if (b.id !== excludeId) {
