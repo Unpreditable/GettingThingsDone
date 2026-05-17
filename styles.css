@@ -37,6 +37,72 @@
   padding: 4px 0;
 }
 
+.gtd-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  margin: 0 6px 0 12px;
+}
+
+.gtd-panel .gtd-search-input {
+  width: 100%;
+  font-size: var(--font-ui-small);
+  padding: 2px 20px 2px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  height: 22px;
+}
+
+.gtd-panel .gtd-search-input::placeholder {
+  color: var(--text-faint);
+  opacity: 0.6;
+}
+
+.gtd-panel .gtd-search-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.gtd-search-clear {
+  position: absolute;
+  right: 4px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.gtd-search-clear:hover {
+  color: var(--text-normal);
+}
+
+/* Search status bar */
+.gtd-search-status {
+  flex-shrink: 0;
+  padding: 3px 12px;
+  display: flex;
+}
+
+.gtd-panel .gtd-search-pill {
+  border-radius: 99px;
+  padding: 1px 8px;
+  font-size: var(--font-ui-smaller);
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.gtd-panel .gtd-search-pill:hover {
+  border-color: var(--text-normal);
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
 .gtd-empty-state {
   padding: 16px;
   color: var(--text-muted);

@@ -34,6 +34,25 @@
     bucketGroups.flatMap((g) => g.tasks.map((t) => [t.id, g.bucketId]))
   );
 
+  let searchQuery = '';
+
+  $: totalTaskCount = bucketGroups.flatMap((g) => g.tasks).length;
+
+  $: filteredBucketGroups = searchQuery === ''
+    ? bucketGroups
+    : bucketGroups
+        .map((g) => ({
+          ...g,
+          tasks: g.tasks.filter((t) =>
+            t.text.toLowerCase().includes(searchQuery.toLowerCase())
+          ),
+        }))
+        .filter((g) => g.tasks.length > 0);
+
+  $: matchedTaskCount = searchQuery === ''
+    ? totalTaskCount
+    : filteredBucketGroups.flatMap((g) => g.tasks).length;
+
   function getQuickMoveTargets(bucketId: string): BucketConfig[] {
     const targetIds =
       bucketId === TO_REVIEW_ID
@@ -250,7 +269,19 @@
 <div class="gtd-panel" class:gtd-compact={settings.compactView} bind:this={panelEl}>
   <div class="gtd-panel-header">
     <h3>GTD Tasks</h3>
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <div class="gtd-search-wrapper">
+      <input
+        class="gtd-search-input"
+        type="text"
+        placeholder="Search…"
+        bind:value={searchQuery}
+        on:keydown={(e) => { if (e.key === 'Escape') { searchQuery = ''; e.currentTarget.blur(); } }}
+      />
+      {#if searchQuery}
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-search-clear" on:click={() => (searchQuery = '')} title="Clear search">×</span>
+      {/if}
+    </div>
     <div class="gtd-header-actions">
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <span
@@ -267,8 +298,15 @@
     </div>
   </div>
 
+  {#if searchQuery}
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <div class="gtd-search-status">
+      <span class="gtd-search-pill" on:click={() => (searchQuery = '')}>🔍 Showing {matchedTaskCount} of {totalTaskCount} tasks ×</span>
+    </div>
+  {/if}
+
   <div class="gtd-panel-body">
-    {#each bucketGroups as group, i (group.bucketId)}
+    {#each filteredBucketGroups as group, i (group.bucketId)}
       {#if !group.isSystem || group.tasks.some((t) => !t.isCompleted)}
       <BucketGroup
         bind:this={bucketGroupRefs[i]}
