@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout
@@ -56,6 +58,19 @@ jobs:
           jq --arg v "$TAG" '.version = $v' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
           echo "Updated manifest.json to version $TAG"
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Attest build artifacts
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            styles.css
+
       - name: Commit and tag
         run: |
           TAG="${{ steps.version.outputs.new }}"
@@ -66,15 +81,10 @@ jobs:
           git tag "$TAG"
           git push origin HEAD --tags
 
-      - name: Create GitHub Release
-        uses: actions/github-script@v8
-        with:
-          script: |
-            await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: '${{ steps.version.outputs.new }}',
-              name: '${{ steps.version.outputs.new }}',
-              draft: false,
-              prerelease: false,
-            });
+      - name: Create release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          gh release create "$TAG" main.js styles.css manifest.json \
+            --title "$TAG" --draft
