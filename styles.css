@@ -394,8 +394,8 @@
   text-align: right;
 }
 
-input.gtd-input-error {
-  border-color: var(--text-error) !important;
+.gtd-settings-buckets input.gtd-input-error {
+  border-color: var(--text-error);
   outline: 1px solid var(--text-error);
 }
 
@@ -583,7 +583,6 @@ input.gtd-input-error {
 .gtd-md-link {
   color: var(--link-color, var(--text-accent, var(--interactive-accent)));
   text-decoration: underline;
-  text-decoration-color: currentColor;
 }
 
 .gtd-inline-code {

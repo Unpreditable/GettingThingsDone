@@ -70,3 +70,9 @@ Migration between modes via the settings tab.
 ### Tests
 
 Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, `BucketManager`, `TaskWriter`, and `StorageMigrator` — pure logic with no Obsidian API dependency. The mock at `tests/__mocks__/obsidian.ts` stubs the `obsidian` module for Jest.
+
+## CSS rules
+
+- **No `!important`** — increase selector specificity or use CSS variables instead. Exception: utility classes like `.gtd-hidden` where `!important` is semantically required may be kept, but prefer avoiding even there.
+- **No partially-supported CSS properties** — Obsidian's embedded Chromium lags behind the latest spec. Known problematic properties: `text-decoration-color`, `text-decoration-thickness`, `text-decoration-skip-ink`. Use `text-decoration: underline` without sub-properties; style links via `color` and the shorthand only.
+- **Use Obsidian CSS variables** for all colors, fonts, spacing — never hardcode values that themes should control.
