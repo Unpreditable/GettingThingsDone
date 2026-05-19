@@ -608,8 +608,8 @@
   align-items: flex-end;
 }
 
-.gtd-hidden {
-  display: none !important;
+div.gtd-hidden {
+  display: none;
 }
 
 .gtd-field-error-visible {
