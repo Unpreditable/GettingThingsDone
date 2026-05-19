@@ -64,7 +64,9 @@
     return count;
   })();
 
-  $: showPopover = showTooltip && (task.text.length > 40 || activeDescendantCount > 0);
+  $: showPopover = showTooltip;
+  $: sourceFile = task.filePath.split("/").pop() ?? task.filePath;
+  $: displayLineNumber = task.lineNumber + 1;
 
   let showTooltip = false;
   let tooltipTimer: ReturnType<typeof setTimeout>;
@@ -180,6 +182,10 @@
         {/if}
         <div class="gtd-tooltip-subtask-header">{activeDescendantCount} active subtask{activeDescendantCount === 1 ? "" : "s"}</div>
       {/if}
+      {#if task.text.length > 40 || activeDescendantCount > 0}
+        <hr class="gtd-tooltip-divider" />
+      {/if}
+      <div class="gtd-tooltip-source">@ {sourceFile} (L{displayLineNumber})</div>
     </div>
   {/if}
 
@@ -277,6 +283,11 @@
     color: var(--text-muted);
     font-weight: 600;
     margin-bottom: 2px;
+  }
+
+  .gtd-tooltip-source {
+    color: var(--text-faint);
+    opacity: 0.65;
   }
 
 

@@ -74,5 +74,6 @@ Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, `BucketManager`,
 ## CSS rules
 
 - **No `!important`** — increase selector specificity or use CSS variables instead. Exception: utility classes like `.gtd-hidden` where `!important` is semantically required may be kept, but prefer avoiding even there.
+- **No inline styles** — always use scoped `<style>` blocks. Svelte scopes with `:where(.svelte-hash)` (zero specificity), so when Obsidian rules win the cascade, fix it by raising selector specificity (e.g. add a tag selector like `div.my-class`) rather than falling back to `style=""`.
 - **No partially-supported CSS properties** — Obsidian's embedded Chromium lags behind the latest spec. Known problematic properties: `text-decoration-color`, `text-decoration-thickness`, `text-decoration-skip-ink`. Use `text-decoration: underline` without sub-properties; style links via `color` and the shorthand only.
 - **Use Obsidian CSS variables** for all colors, fonts, spacing — never hardcode values that themes should control.
