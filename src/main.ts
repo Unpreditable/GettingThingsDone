@@ -2,6 +2,7 @@ import {
   Plugin,
   WorkspaceLeaf,
   ItemView,
+  MarkdownView,
   Notice,
   TFile,
   normalizePath,
@@ -280,8 +281,15 @@ class GtdPanelView extends ItemView {
     const file = this.app.vault.getAbstractFileByPath(task.filePath);
     if (!(file instanceof TFile)) return;
 
-    void this.app.workspace.getLeaf(false).openFile(file, {
-      eState: { line: task.lineNumber },
-    });
+    const { workspace } = this.app;
+    const existingLeaf = workspace.getLeavesOfType("markdown")
+      .find((leaf) => (leaf.view as MarkdownView).file?.path === task.filePath);
+
+    if (existingLeaf) {
+      void workspace.revealLeaf(existingLeaf);
+      (existingLeaf.view as MarkdownView).editor?.setCursor({ line: task.lineNumber, ch: 0 });
+    } else {
+      void workspace.getLeaf(false).openFile(file, { eState: { line: task.lineNumber } });
+    }
   }
 }
