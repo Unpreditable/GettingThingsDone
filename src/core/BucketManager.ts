@@ -8,6 +8,7 @@
 import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
+import { t } from "../i18n/i18n";
 
 export const TO_REVIEW_ID = "to-review";
 
@@ -31,7 +32,7 @@ export function groupTasksIntoBuckets(
 
   bucketMap.set(TO_REVIEW_ID, {
     bucketId: TO_REVIEW_ID,
-    name: "To Review",
+    name: t("buckets.toReview"),
     emoji: settings.toReviewEmoji,
     tasks: [],
     staleTaskIds: [],

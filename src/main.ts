@@ -8,6 +8,7 @@ import {
   normalizePath,
   FileSystemAdapter,
   App,
+  getLanguage,
 } from "obsidian";
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
@@ -20,12 +21,15 @@ import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "./core/TaskWriter";
 import type { TaskRecord } from "./core/TaskParser";
 import GTDPanel from "./views/GTDPanel.svelte";
+import { t } from "./i18n/i18n";
+import { BucketLocalizer } from "./core/BucketLocalizer";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
 export default class GtdTasksPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
   taskIndex!: TaskIndex;
+  languageChangeNotice = false;
   private panelView?: GtdPanelView;
   private statusBarItem?: HTMLElement;
 
@@ -42,9 +46,17 @@ export default class GtdTasksPlugin extends Plugin {
 
     this.addCommand({
       id: "open-gtd-panel",
-      name: "Open panel",
+      name: t("commands.openPanel"),
       callback: () => this.activateView(),
     });
+
+    const currentLang = getLanguage() ?? "en";
+    if (this.settings.lastSeenLanguage !== currentLang) {
+      BucketLocalizer.renameBuckets(this.settings, this.settings.lastSeenLanguage, currentLang);
+      this.settings.lastSeenLanguage = currentLang;
+      await this.saveSettings();
+      this.languageChangeNotice = true;
+    }
 
     await this.taskIndex.initialScan();
     this.taskIndex.registerVaultEvents();
@@ -148,6 +160,7 @@ class GtdPanelView extends ItemView {
   private bucketGroups$ = writable<BucketGroupData[]>([]);
   private settings$!: Writable<PluginSettings>;
   private celebrationImageUrls$ = writable<string[]>([]);
+  private languageChangeNotice$ = writable<boolean>(false);
 
   constructor(leaf: WorkspaceLeaf, private plugin: GtdTasksPlugin) {
     super(leaf);
@@ -158,7 +171,7 @@ class GtdPanelView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "GTD" + " Tasks";
+    return t("panel.title");
   }
 
   getIcon(): string {
@@ -185,6 +198,9 @@ class GtdPanelView extends ItemView {
     this.contentEl.addClass("gtd-panel-root");
     this.mountSvelte();
     this.celebrationImageUrls$.set(this.loadCelebrationImageUrls());
+    if (this.plugin.languageChangeNotice) {
+      this.languageChangeNotice$.set(true);
+    }
     return Promise.resolve();
   }
 
@@ -208,20 +224,27 @@ class GtdPanelView extends ItemView {
     this.bucketGroups$.set(groupTasksIntoBuckets(allTasks, this.plugin.settings));
     this.settings$ = writable(this.plugin.settings);
 
+    const openSettings = () => {
+      const appWithSetting = this.app as App & { setting: { open: () => void; openTabById: (id: string) => void; }; };
+      appWithSetting.setting?.open();
+      appWithSetting.setting?.openTabById(this.plugin.manifest.id);
+    };
+
     this.svelteInstance = mount(GTDPanel, {
       target: this.contentEl,
       props: {
         bucketGroups$: this.bucketGroups$,
         settings$: this.settings$,
         celebrationImageUrls$: this.celebrationImageUrls$,
+        languageChangeNotice$: this.languageChangeNotice$,
         onMove: this.handleMove.bind(this) as (task: TaskRecord, targetBucketId: string | null) => Promise<void>,
         onToggle: this.handleToggle.bind(this) as (task: TaskRecord) => Promise<void>,
         onNavigate: this.handleNavigate.bind(this) as (task: TaskRecord) => void,
         onConfirm: this.handleConfirmPlacement.bind(this) as (task: TaskRecord, bucketId: string) => Promise<void>,
-        onOpenSettings: () => {
-          const appWithSetting = this.app as App & { setting: { open: () => void; openTabById: (id: string) => void; }; };
-          appWithSetting.setting?.open();
-          appWithSetting.setting?.openTabById(this.plugin.manifest.id);
+        onOpenSettings: openSettings,
+        onDismissLanguageBanner: () => {
+          this.plugin.languageChangeNotice = false;
+          this.languageChangeNotice$.set(false);
         },
       },
     }) as unknown as Record<string, unknown>;
@@ -241,7 +264,7 @@ class GtdPanelView extends ItemView {
     );
 
     if (!result.success) {
-      new Notice(`GTD Tasks: Move failed — ${result.error}`);
+      new Notice(t("notices.moveFailed", { error: result.error }));
       await this.plugin.taskIndex.reindexFile(task.filePath);
     }
   }
@@ -254,7 +277,7 @@ class GtdPanelView extends ItemView {
     );
 
     if (!result.success) {
-      new Notice(`GTD Tasks: Toggle failed — ${result.error}`);
+      new Notice(t("notices.toggleFailed", { error: result.error }));
       await this.plugin.taskIndex.reindexFile(task.filePath);
     }
   }
@@ -267,7 +290,7 @@ class GtdPanelView extends ItemView {
       this.plugin.settings
     );
     if (!result.success) {
-      new Notice(`GTD Tasks: Confirm failed — ${result.error}`);
+      new Notice(t("notices.confirmFailed", { error: result.error }));
       await this.plugin.taskIndex.reindexFile(task.filePath);
     }
   }

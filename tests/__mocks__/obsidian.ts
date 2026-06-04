@@ -1,3 +1,5 @@
+export function getLanguage(): string { return "en"; }
+
 export class Notice {
   constructor(public message: string) {}
 }

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "node",
-    "isolatedModules": false
+    "isolatedModules": false,
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

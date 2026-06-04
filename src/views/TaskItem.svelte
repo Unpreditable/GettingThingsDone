@@ -4,6 +4,7 @@
   import { stripWikilinks, parseWikilinks } from "../core/TaskParser";
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
+  import { t } from "../i18n/i18n";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
@@ -133,20 +134,20 @@
   />
 
   {#if isStale}
-    <span class="gtd-stale-badge" title="Past scheduled window">!</span>
+    <span class="gtd-stale-badge" title={t("task.staleTooltip")}>!</span>
   {/if}
 
   {#if isAutoPlaced}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <span
       class="gtd-auto-badge"
-      title="Auto-placed from due date — click to confirm placement"
+      title={t("task.autoPlacedTooltip")}
       on:click={onConfirmClick}
     >👁</span>
   {/if}
 
   {#if showParentArrow}
-    <span class="gtd-parent-badge" title={parentTooltip ?? "Subtask"}>↖</span>
+    <span class="gtd-parent-badge" title={parentTooltip ?? t("task.subtaskTooltip")}>↖</span>
   {/if}
 
   <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -164,7 +165,7 @@
         >{:else if seg.type === "highlight"}<mark class="gtd-highlight">{seg.content}</mark
         >{:else}{seg.content}{/if}
       {/each}
-    {:else}(empty task){/if}
+    {:else}{t("task.emptyTask")}{/if}
   </span>
 
   {#if activeDescendantCount > 0}
@@ -180,7 +181,7 @@
         {#if task.text.length > 40}
           <hr class="gtd-tooltip-divider" />
         {/if}
-        <div class="gtd-tooltip-subtask-header">{activeDescendantCount} active subtask{activeDescendantCount === 1 ? "" : "s"}</div>
+        <div class="gtd-tooltip-subtask-header">{t("task.activeSubtasks", { count: activeDescendantCount })}</div>
       {/if}
       {#if task.text.length > 40 || activeDescendantCount > 0}
         <hr class="gtd-tooltip-divider" />
@@ -193,14 +194,14 @@
     {#if task.isCompleted && showCompleted}
       <button
         class="gtd-task-move-btn"
-        title="Dismiss"
+        title={t("task.dismiss")}
         on:click={onDismissClick}
       >🧹</button>
     {:else}
       {#each quickMoveTargets as bucket}
         <button
           class="gtd-task-move-btn"
-          title="Move to {bucket.name}"
+          title={t("task.moveTo", { name: bucket.name })}
           on:click={(e) => onMoveClick(e, bucket.id)}
         >
           {bucket.emoji}

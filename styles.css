@@ -80,6 +80,39 @@
   color: var(--text-normal);
 }
 
+/* Language change banner */
+.gtd-language-banner {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.gtd-language-banner-message {
+  line-height: 1.4;
+}
+
+.gtd-language-banner-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.gtd-language-banner-btn {
+  cursor: pointer;
+  color: var(--interactive-accent);
+  white-space: nowrap;
+}
+
+.gtd-language-banner-btn:hover {
+  text-decoration: underline;
+}
+
 /* Search status bar */
 .gtd-search-status {
   flex-shrink: 0;

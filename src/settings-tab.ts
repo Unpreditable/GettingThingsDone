@@ -3,9 +3,7 @@ import type GtdTasksPlugin from "./main";
 import { BucketConfig, CelebrationMode, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
-
-
-const TO_REVIEW_BUCKET_NAME = ["To", "Review"].join(" ");
+import { t } from "./i18n/i18n";
 const EMOJI_CATEGORIES: Array<{ icon: string; emojis: string[] }> = [
   {
     icon: "⚡",
@@ -196,7 +194,7 @@ function renderEmojiSetting(
   const btn = setting.controlEl.createEl("button", {
     cls: "gtd-emoji-btn-display",
     text: currentEmoji || fallback,
-    attr: { type: "button", title: "Click to choose emoji" },
+    attr: { type: "button", title: t("settings.emojiButtonTooltip") },
   });
   btn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -219,7 +217,7 @@ class ConfirmModal extends Modal {
   }
 
   onOpen() {
-    this.titleEl.setText(["GTD", "Tasks"].join(" "));
+    this.titleEl.setText(t("panel.title"));
     this.contentEl.createEl("p", { text: this.message });
 
     const footer = this.contentEl.createDiv({
@@ -235,7 +233,7 @@ class ConfirmModal extends Modal {
       this.close();
     };
 
-    const cancelBtn = footer.createEl("button", { text: "Cancel" });
+    const cancelBtn = footer.createEl("button", { text: t("common.cancel") });
     cancelBtn.onclick = () => this.close();
   }
 
@@ -270,23 +268,23 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderGeneralSection() {
     const { containerEl } = this;
-    new Setting(containerEl).setName(["Getting", "Things", "Done"].join(" ")).setHeading();
+    new Setting(containerEl).setName(t("settings.heading")).setHeading();
 
     // Annotation Style (storage mode)
     const oppositeMode: StorageMode = this.plugin.settings.storageMode === "inline-tag" ? "inline-field" : "inline-tag";
     const allTasks = this.plugin.taskIndex.getAllTasks();
-    const migrateCount = allTasks.filter((t) => {
+    const migrateCount = allTasks.filter((task) => {
       const id = oppositeMode === "inline-tag"
-        ? getTagValue(t.rawLine, this.plugin.settings.tagPrefix)
-        : getInlineFieldValue(t.rawLine, this.plugin.settings.tagPrefix);
+        ? getTagValue(task.rawLine, this.plugin.settings.tagPrefix)
+        : getInlineFieldValue(task.rawLine, this.plugin.settings.tagPrefix);
       return id !== null && this.plugin.settings.buckets.some((b) => b.id === id);
     }).length;
 
     const annotationSetting = new Setting(containerEl)
-      .setName("Annotation style")
+      .setName(t("settings.annotationStyle.name"))
       .addDropdown((dd) => {
-        dd.addOption("inline-tag", "Inline tag");
-        dd.addOption("inline-field", "Inline field");
+        dd.addOption("inline-tag", t("settings.annotationStyle.inlineTag"));
+        dd.addOption("inline-field", t("settings.annotationStyle.inlineField"));
         dd.setValue(this.plugin.settings.storageMode);
         dd.onChange(async (val) => {
           this.plugin.settings.storageMode = val as StorageMode;
@@ -297,13 +295,13 @@ export class GtdSettingsTab extends PluginSettingTab {
       .addButton((btn) => {
         btn.setButtonText(
           migrateCount > 0
-            ? `Migrate ${migrateCount} task${migrateCount === 1 ? "" : "s"}`
-            : "No tasks to migrate"
+            ? t("settings.migrate.button", { count: migrateCount })
+            : t("settings.migrate.none")
         );
         btn.setDisabled(migrateCount === 0);
         btn.onClick(async () => {
           btn.setDisabled(true);
-          btn.setButtonText("Migrating…");
+          btn.setButtonText(t("settings.migrate.inProgress"));
           await migrateStorageMode(
             this.app,
             this.plugin.taskIndex.getAllTasks(),
@@ -316,27 +314,19 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     annotationSetting.controlEl.addClass("gtd-annotation-control");
 
-    annotationSetting.descEl.appendText(
-      "Controls how the plugin stores which bucket each task belongs to:"
-    );
+    annotationSetting.descEl.appendText(t("settings.annotationStyle.descHeader"));
     const ul = annotationSetting.descEl.createEl("ul", { cls: "gtd-desc-list" });
-    ul.createEl("li", {
-      text: "Inline tag — appends #prefix/bucket-id to the task line (e.g. #gtd/today)",
-    });
-    ul.createEl("li", {
-      text: "Inline field — appends [prefix:: bucket-id] to the task line " + "(Dataview-compatible)",
-    });
+    ul.createEl("li", { text: t("settings.annotationStyle.descInlineTag") });
+    ul.createEl("li", { text: t("settings.annotationStyle.descInlineField") });
 
     // Tag / Field name
     new Setting(containerEl)
-      .setName("Tag / field name")
-      .setDesc(
-        "Used as the tag prefix in Inline tag mode (#<name>/bucket-id) and as the field key in Inline field mode ([<name>:: bucket-id])."
-      )
-      .addText((t) => {
-        t.setValue(this.plugin.settings.tagPrefix);
-        t.setPlaceholder("Gtd".toLocaleLowerCase());
-        t.onChange(async (val) => {
+      .setName(t("settings.tagFieldName.name"))
+      .setDesc(t("settings.tagFieldName.description"))
+      .addText((txt) => {
+        txt.setValue(this.plugin.settings.tagPrefix);
+        txt.setPlaceholder(t("settings.tagFieldName.placeholder"));
+        txt.onChange(async (val) => {
           this.plugin.settings.tagPrefix = val.trim() || "gtd";
           await this.plugin.saveSettings();
         });
@@ -345,11 +335,11 @@ export class GtdSettingsTab extends PluginSettingTab {
     // Read Tasks plugin
     const pluginName: string = "Tasks";
     new Setting(containerEl)
-      .setName(`Read ${pluginName} plugin metadata`)
-      .setDesc(`Read 📅 due dates and ✅ completion dates written by the ${pluginName} plugin.`)
-      .addToggle((t) => {
-        t.setValue(this.plugin.settings.readTasksPlugin);
-        t.onChange(async (val) => {
+      .setName(t("settings.tasksPlugin.name", { pluginName }))
+      .setDesc(t("settings.tasksPlugin.description", { pluginName }))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.readTasksPlugin);
+        tog.onChange(async (val) => {
           this.plugin.settings.readTasksPlugin = val;
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
@@ -358,12 +348,12 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     // Scope type selector
     new Setting(containerEl)
-      .setName("Files to scan")
-      .setDesc("Which files the plugin searches for tasks.")
+      .setName(t("settings.filesToScan.name"))
+      .setDesc(t("settings.filesToScan.description"))
       .addDropdown((dd) => {
-        dd.addOption("vault", "Entire vault");
-        dd.addOption("folders", "Specific folders");
-        dd.addOption("files", "Specific files");
+        dd.addOption("vault", t("settings.filesToScan.entireVault"));
+        dd.addOption("folders", t("settings.filesToScan.specificFolders"));
+        dd.addOption("files", t("settings.filesToScan.specificFiles"));
         dd.setValue(this.plugin.settings.taskScope.type);
         dd.onChange(async (val) => {
           if (val === "vault") {
@@ -423,7 +413,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           attr: { list: datalistId },
         });
         input.placeholder =
-          scopeType === "folders" ? "e.g. Tasks" : "e.g. Tasks/inbox.md";
+          scopeType === "folders" ? t("settings.filesToScan.folderPlaceholder") : t("settings.filesToScan.filePlaceholder");
 
         input.onblur = async () => {
           scope.paths[idx] = input.value.trim();
@@ -445,7 +435,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
       // Add entry button
       const addBtn = listEl.createEl("button", {
-        text: `+ Add ${scopeType === "folders" ? "folder" : "file"}`,
+        text: scopeType === "folders" ? t("settings.filesToScan.addFolder") : t("settings.filesToScan.addFile"),
         cls: "gtd-scope-add-btn",
       });
       addBtn.onclick = () => {
@@ -480,26 +470,22 @@ export class GtdSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
 
     new Setting(containerEl)
-      .setName("Show completed tasks until midnight")
-      .setDesc(
-        "Completed tasks remain visible as strikethrough in the panel until midnight, then disappear on next load."
-      )
-      .addToggle((t) => {
-        t.setValue(this.plugin.settings.completedVisibilityUntilMidnight);
-        t.onChange(async (val) => {
+      .setName(t("settings.behaviour.showCompleted.name"))
+      .setDesc(t("settings.behaviour.showCompleted.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.completedVisibilityUntilMidnight);
+        tog.onChange(async (val) => {
           this.plugin.settings.completedVisibilityUntilMidnight = val;
           await this.plugin.saveSettings();
         });
       });
 
     new Setting(containerEl)
-      .setName("Mark overdue tasks with !")
-      .setDesc(
-        "Tasks that are past their bucket's scheduled window are marked with an overdue indicator."
-      )
-      .addToggle((t) => {
-        t.setValue(this.plugin.settings.staleIndicatorEnabled);
-        t.onChange(async (val) => {
+      .setName(t("settings.behaviour.markOverdue.name"))
+      .setDesc(t("settings.behaviour.markOverdue.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.staleIndicatorEnabled);
+        tog.onChange(async (val) => {
           this.plugin.settings.staleIndicatorEnabled = val;
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
@@ -507,26 +493,24 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Compact view")
-      .setDesc(
-        "Reduce padding on bucket headers and task rows to fit more tasks on screen."
-      )
-      .addToggle((t) => {
-        t.setValue(this.plugin.settings.compactView);
-        t.onChange(async (val) => {
+      .setName(t("settings.behaviour.compactView.name"))
+      .setDesc(t("settings.behaviour.compactView.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.compactView);
+        tog.onChange(async (val) => {
           this.plugin.settings.compactView = val;
           await this.plugin.saveSettings();
         });
       });
 
     new Setting(containerEl)
-      .setName("Celebration animations")
-      .setDesc("Choose which animations play when you complete a task.")
+      .setName(t("settings.behaviour.celebration.name"))
+      .setDesc(t("settings.behaviour.celebration.description"))
       .addDropdown((dd) => {
-        dd.addOption("off", "Off");
-        dd.addOption("confetti", "Confetti only");
-        dd.addOption("creature", "Celebration only");
-        dd.addOption("all", "Confetti and celebration");
+        dd.addOption("off", t("settings.behaviour.celebration.off"));
+        dd.addOption("confetti", t("settings.behaviour.celebration.confettiOnly"));
+        dd.addOption("creature", t("settings.behaviour.celebration.celebrationOnly"));
+        dd.addOption("all", t("settings.behaviour.celebration.both"));
         dd.setValue(this.plugin.settings.celebrationMode ?? "all");
         dd.onChange(async (val) => {
           this.plugin.settings.celebrationMode = val as CelebrationMode;
@@ -537,7 +521,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   private renderBucketsSection() {
     const { containerEl } = this;
-    new Setting(containerEl).setName("Buckets").setHeading();
+    new Setting(containerEl).setName(t("settings.buckets.heading")).setHeading();
 
     // To Review (expandable)
     this.renderToReviewConfig(containerEl);
@@ -552,13 +536,13 @@ export class GtdSettingsTab extends PluginSettingTab {
     const actionRow = containerEl.createDiv({ cls: "gtd-bucket-actions" });
 
     const addBtn = actionRow.createEl("button", {
-      text: "Add bucket",
+      text: t("settings.buckets.addBucket"),
       cls: "mod-cta gtd-add-bucket-btn",
     });
     addBtn.onclick = async () => {
       this.plugin.settings.buckets.push({
         id: generateBucketId(),
-        name: "New Bucket",
+        name: t("settings.buckets.newBucketName"),
         emoji: "📌",
         dateRangeRule: null,
         quickMoveTargets: [],
@@ -569,14 +553,14 @@ export class GtdSettingsTab extends PluginSettingTab {
     };
 
     const resetBtn = actionRow.createEl("button", {
-      text: "Reset to defaults",
+      text: t("settings.buckets.resetToDefaults"),
       cls: "mod-warning gtd-reset-btn",
     });
     resetBtn.onclick = () => {
       new ConfirmModal(
         this.app,
-        "Reset all buckets to defaults? This will discard your current bucket configuration.",
-        "Reset",
+        t("settings.buckets.resetConfirm"),
+        t("settings.buckets.resetButton"),
         async () => {
           this.plugin.settings.buckets = JSON.parse(JSON.stringify(DEFAULT_BUCKETS)) as BucketConfig[];
           await this.plugin.saveSettings();
@@ -598,11 +582,11 @@ export class GtdSettingsTab extends PluginSettingTab {
     });
 
     headerEl.createSpan({
-      text: TO_REVIEW_BUCKET_NAME,
+      text: t("buckets.toReview"),
       cls: "gtd-bucket-name",
     });
     headerEl.createSpan({
-      text: ["system", "·", "cannot be removed"].join(" "),
+      text: t("settings.buckets.systemBucket"),
       cls: "gtd-bucket-system-label",
     });
 
@@ -615,7 +599,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     };
 
     // Emoji
-    renderEmojiSetting(bodyEl, "Emoji", this.plugin.settings.toReviewEmoji, "📥", (emoji) => {
+    renderEmojiSetting(bodyEl, t("settings.emoji"), this.plugin.settings.toReviewEmoji, "📥", (emoji) => {
       this.plugin.settings.toReviewEmoji = emoji;
       emojiSpan.textContent = emoji;
       void this.plugin.saveSettings();
@@ -633,11 +617,11 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     // Status bar
     new Setting(bodyEl)
-      .setName("Show in status bar")
-      .setDesc(`Display the ${TO_REVIEW_BUCKET_NAME} count in the status bar.`)
-      .addToggle((t) => {
-        t.setValue(this.plugin.settings.toReviewShowInStatusBar ?? false);
-        t.onChange(async (val) => {
+      .setName(t("settings.buckets.showInStatusBar.name"))
+      .setDesc(t("settings.buckets.showInStatusBar.description", { bucketName: t("buckets.toReview") }))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.toReviewShowInStatusBar ?? false);
+        tog.onChange(async (val) => {
           this.plugin.settings.toReviewShowInStatusBar = val;
           await this.plugin.saveSettings();
         });
@@ -672,12 +656,12 @@ export class GtdSettingsTab extends PluginSettingTab {
       const upBtn = orderBtns.createEl("button", {
         text: "↑",
         cls: "gtd-bucket-order-btn",
-        attr: { title: "Move up" },
+        attr: { title: t("settings.buckets.moveUp") },
       });
       const downBtn = orderBtns.createEl("button", {
         text: "↓",
         cls: "gtd-bucket-order-btn",
-        attr: { title: "Move down" },
+        attr: { title: t("settings.buckets.moveDown") },
       });
 
       upBtn.disabled = idx === 0;
@@ -722,15 +706,15 @@ export class GtdSettingsTab extends PluginSettingTab {
     };
 
     // Emoji
-    renderEmojiSetting(container, "Emoji", bucket.emoji, "📌", (emoji) => {
+    renderEmojiSetting(container, t("settings.emoji"), bucket.emoji, "📌", (emoji) => {
       bucket.emoji = emoji;
       emojiSpan.textContent = emoji;
       void save();
     });
 
-    new Setting(container).setName("Name").addText((t) => {
-      t.setValue(bucket.name);
-      t.onChange(async (val) => {
+    new Setting(container).setName(t("settings.buckets.field.name")).addText((txt) => {
+      txt.setValue(bucket.name);
+      txt.onChange(async (val) => {
         bucket.name = val;
         await save();
       });
@@ -738,40 +722,40 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     let idErrorEl: HTMLElement;
     const idSetting = new Setting(container)
-      .setName("ID / slug")
-      .setDesc("Internal identifier used in tags/fields. No spaces.")
-      .addText((t) => {
-        t.setValue(bucket.id);
+      .setName(t("settings.buckets.field.id"))
+      .setDesc(t("settings.buckets.field.idDescription"))
+      .addText((txt) => {
+        txt.setValue(bucket.id);
         let savedId = bucket.id;
 
-        t.inputEl.addEventListener("focus", () => {
+        txt.inputEl.addEventListener("focus", () => {
           savedId = bucket.id;
         });
 
-        t.onChange((val) => {
+        txt.onChange((val) => {
           const normalized = val.replace(/\s+/g, "-").toLowerCase();
           const duplicate = this.plugin.settings.buckets.find(
             (b, i) => i !== idx && b.id === normalized
           );
           if (duplicate) {
-            idErrorEl.setText(`ID "${normalized}" is already used by "${duplicate.name}".`);
+            idErrorEl.setText(t("settings.buckets.field.idDuplicate", { id: normalized, existing: duplicate.name }));
             idErrorEl.toggleClass("gtd-field-error-visible", true);
-            t.inputEl.addClass("gtd-input-error");
+            txt.inputEl.addClass("gtd-input-error");
           } else {
             idErrorEl.toggleClass("gtd-field-error-visible", false);
-            t.inputEl.removeClass("gtd-input-error");
+            txt.inputEl.removeClass("gtd-input-error");
           }
         });
 
-        t.inputEl.addEventListener("blur", () => {
-          const normalized = t.getValue().replace(/\s+/g, "-").toLowerCase();
+        txt.inputEl.addEventListener("blur", () => {
+          const normalized = txt.getValue().replace(/\s+/g, "-").toLowerCase();
           const duplicate = this.plugin.settings.buckets.find(
             (b, i) => i !== idx && b.id === normalized
           );
           if (duplicate) {
-            t.setValue(savedId);
+            txt.setValue(savedId);
             idErrorEl.toggleClass("gtd-field-error-visible", false);
-            t.inputEl.removeClass("gtd-input-error");
+            txt.inputEl.removeClass("gtd-input-error");
           } else {
             bucket.id = normalized;
             void save();
@@ -797,11 +781,11 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     // Status bar
     new Setting(container)
-      .setName("Show in status bar")
-      .setDesc("Display this bucket's task count in the status bar.")
-      .addToggle((t) => {
-        t.setValue(bucket.showInStatusBar ?? false);
-        t.onChange(async (val) => {
+      .setName(t("settings.buckets.field.showInStatusBar"))
+      .setDesc(t("settings.buckets.field.showInStatusBarDescription"))
+      .addToggle((tog) => {
+        tog.setValue(bucket.showInStatusBar ?? false);
+        tog.onChange(async (val) => {
           bucket.showInStatusBar = val;
           await save();
         });
@@ -811,14 +795,14 @@ export class GtdSettingsTab extends PluginSettingTab {
     const deleteRow = container.createDiv({ cls: "gtd-bucket-delete-row" });
     const deleteBtn = deleteRow.createEl("button", {
       cls: "gtd-bucket-delete-btn mod-warning",
-      attr: { title: "Delete this bucket" },
+      attr: { title: t("settings.buckets.field.deleteTooltip") },
     });
-    deleteBtn.textContent = "Delete";
+    deleteBtn.textContent = t("settings.buckets.field.delete");
     deleteBtn.onclick = () => {
       new ConfirmModal(
         this.app,
-        `Delete bucket "${bucket.name}"? This cannot be undone.`,
-        "Delete",
+        t("settings.buckets.field.deleteConfirm", { name: bucket.name }),
+        t("settings.buckets.field.deleteButton"),
         async () => {
           this.plugin.settings.buckets.splice(idx, 1);
           await this.plugin.saveSettings();
@@ -834,22 +818,22 @@ export class GtdSettingsTab extends PluginSettingTab {
     save: () => Promise<void>
   ) {
     const ruleTypes: Array<{ value: string; label: string }> = [
-      { value: "none",              label: "None (manual/tag only)" },
-      { value: "today",             label: "Today (due today or overdue)" },
-      { value: "this-week",         label: "This week (tomorrow \u2013 end of current Sunday)" },
-      { value: "next-week",         label: "Next week (next Monday \u2013 following Sunday)" },
-      { value: "this-month",        label: "This month (1 day out \u2013 end of current month)" },
-      { value: "next-month",        label: "Next month (1st \u2013 last day of next month)" },
-      { value: "within-days",       label: "Within N days" },
-      { value: "within-days-range", label: "Within day range (from\u2013to)" },
-      { value: "beyond-days",       label: "Beyond N days (catch-all)" },
+      { value: "none",              label: t("settings.buckets.dateRule.none") },
+      { value: "today",             label: t("settings.buckets.dateRule.today") },
+      { value: "this-week",         label: t("settings.buckets.dateRule.thisWeek") },
+      { value: "next-week",         label: t("settings.buckets.dateRule.nextWeek") },
+      { value: "this-month",        label: t("settings.buckets.dateRule.thisMonth") },
+      { value: "next-month",        label: t("settings.buckets.dateRule.nextMonth") },
+      { value: "within-days",       label: t("settings.buckets.dateRule.withinDays") },
+      { value: "within-days-range", label: t("settings.buckets.dateRule.withinRange") },
+      { value: "beyond-days",       label: t("settings.buckets.dateRule.beyondDays") },
     ];
 
     const getCurrentType = () => bucket.dateRangeRule?.type ?? "none";
 
     const setting = new Setting(container)
-      .setName("Date range rule")
-      .setDesc("Auto-assign tasks based on their 📅 due date. If multiple buckets have overlapping rules, the first matching bucket (top to bottom) wins.");
+      .setName(t("settings.buckets.dateRule.name"))
+      .setDesc(t("settings.buckets.dateRule.description"));
 
     // Stable placeholder immediately after the dropdown row — ensures extra
     // inputs always render here, not at the end of the container.
@@ -861,13 +845,13 @@ export class GtdSettingsTab extends PluginSettingTab {
       if (type === "within-days") {
         const rule = bucket.dateRangeRule as { type: "within-days"; days: number } | null;
         new Setting(extraPlaceholder)
-          .setName("Days")
-          .setDesc("Tasks due within this many days from today are assigned here.")
-          .addText((t) => {
-            t.setValue(String(rule?.days ?? 7));
-            t.inputEl.type = "number";
-            t.inputEl.min = "1";
-            t.onChange(async (val) => {
+          .setName(t("settings.buckets.dateRule.days.name"))
+          .setDesc(t("settings.buckets.dateRule.days.description"))
+          .addText((txt) => {
+            txt.setValue(String(rule?.days ?? 7));
+            txt.inputEl.type = "number";
+            txt.inputEl.min = "1";
+            txt.onChange(async (val) => {
               bucket.dateRangeRule = { type: "within-days", days: Math.max(1, parseInt(val) || 7) };
               await save();
             });
@@ -875,26 +859,26 @@ export class GtdSettingsTab extends PluginSettingTab {
       } else if (type === "within-days-range") {
         const rule = bucket.dateRangeRule as { type: "within-days-range"; from: number; to: number } | null;
         new Setting(extraPlaceholder)
-          .setName("From day")
-          .setDesc("Start of the window: number of days from today (e.g. 1 = tomorrow, 7 = one week from today).")
-          .addText((t) => {
-            t.setValue(String(rule?.from ?? 1));
-            t.inputEl.type = "number";
-            t.inputEl.min = "1";
-            t.onChange(async (val) => {
+          .setName(t("settings.buckets.dateRule.fromDay.name"))
+          .setDesc(t("settings.buckets.dateRule.fromDay.description"))
+          .addText((txt) => {
+            txt.setValue(String(rule?.from ?? 1));
+            txt.inputEl.type = "number";
+            txt.inputEl.min = "1";
+            txt.onChange(async (val) => {
               const r = bucket.dateRangeRule as { type: "within-days-range"; from: number; to: number };
               bucket.dateRangeRule = { type: "within-days-range", from: parseInt(val) || 1, to: r?.to ?? 14 };
               await save();
             });
           });
         new Setting(extraPlaceholder)
-          .setName("To day")
-          .setDesc("End of the window: number of days from today (e.g. 14 = two weeks from today).")
-          .addText((t) => {
-            t.setValue(String(rule?.to ?? 14));
-            t.inputEl.type = "number";
-            t.inputEl.min = "1";
-            t.onChange(async (val) => {
+          .setName(t("settings.buckets.dateRule.toDay.name"))
+          .setDesc(t("settings.buckets.dateRule.toDay.description"))
+          .addText((txt) => {
+            txt.setValue(String(rule?.to ?? 14));
+            txt.inputEl.type = "number";
+            txt.inputEl.min = "1";
+            txt.onChange(async (val) => {
               const r = bucket.dateRangeRule as { type: "within-days-range"; from: number; to: number };
               bucket.dateRangeRule = { type: "within-days-range", from: r?.from ?? 1, to: parseInt(val) || 14 };
               await save();
@@ -903,13 +887,13 @@ export class GtdSettingsTab extends PluginSettingTab {
       } else if (type === "beyond-days") {
         const rule = bucket.dateRangeRule as { type: "beyond-days"; days: number } | null;
         new Setting(extraPlaceholder)
-          .setName("Days threshold")
-          .setDesc("Tasks due more than this many days from today are assigned here.")
-          .addText((t) => {
-            t.setValue(String(rule?.days ?? 30));
-            t.inputEl.type = "number";
-            t.inputEl.min = "0";
-            t.onChange(async (val) => {
+          .setName(t("settings.buckets.dateRule.beyondThreshold.name"))
+          .setDesc(t("settings.buckets.dateRule.beyondThreshold.description"))
+          .addText((txt) => {
+            txt.setValue(String(rule?.days ?? 30));
+            txt.inputEl.type = "number";
+            txt.inputEl.min = "0";
+            txt.onChange(async (val) => {
               bucket.dateRangeRule = { type: "beyond-days", days: Math.max(0, parseInt(val) || 30) };
               await save();
             });
@@ -947,13 +931,13 @@ export class GtdSettingsTab extends PluginSettingTab {
     excludeId?: string
   ) {
     for (let i = 0; i < 2; i++) {
-      const label = i === 0 ? "Quick-move button 1" : "Quick-move button 2";
+      const label = i === 0 ? t("settings.buckets.quickMove.button1Name") : t("settings.buckets.quickMove.button2Name");
       new Setting(container)
         .setName(label)
-        .setDesc(i === 0 ? "Primary quick-move target shown on each task row" : "Optional second quick-move target")
+        .setDesc(i === 0 ? t("settings.buckets.quickMove.button1Description") : t("settings.buckets.quickMove.button2Description"))
         .addDropdown((dd) => {
-          dd.addOption("", "(None)");
-          dd.addOption("to-review", "📥 " + TO_REVIEW_BUCKET_NAME);
+          dd.addOption("", t("settings.buckets.quickMove.none"));
+          dd.addOption("to-review", "📥 " + t("buckets.toReview"));
           for (const b of this.plugin.settings.buckets) {
             if (b.id !== excludeId) {
               dd.addOption(b.id, `${b.emoji} ${b.name}`);

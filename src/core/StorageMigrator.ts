@@ -3,6 +3,7 @@ import { TaskRecord } from "./TaskParser";
 import { PluginSettings, StorageMode } from "../settings";
 import { getTagValue, getInlineFieldValue, setTagValue, setInlineFieldValue } from "./TaskParser";
 import { findTaskLine } from "./TaskWriter";
+import { t } from "../i18n/i18n";
 
 export async function migrateStorageMode(
   app: App,
@@ -53,7 +54,7 @@ export async function migrateStorageMode(
     failed += fileFailed;
   }
 
-  new Notice(`GTD Tasks: Migration complete. ${migrated} tasks updated, ${failed} skipped.`);
+  new Notice(t("notices.migrationComplete", { migrated, failed }));
 }
 
 function readBucketId(

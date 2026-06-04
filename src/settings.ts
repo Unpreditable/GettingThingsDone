@@ -36,6 +36,8 @@ export interface PluginSettings {
   storageMode: StorageMode;
   taskScope: TaskScope;
   buckets: BucketConfig[];
+  /** Last Obsidian language seen on load — used to detect language changes. */
+  lastSeenLanguage: string;
   /**
    * Used as the tag prefix in Inline tag mode (#<prefix>/bucket-id)
    * and as the field name in Inline field mode ([<prefix>:: bucket-id]).
@@ -107,6 +109,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   storageMode: "inline-tag",
   taskScope: { type: "vault" },
   buckets: DEFAULT_BUCKETS,
+  lastSeenLanguage: "",
   tagPrefix: "gtd",
   readTasksPlugin: true,
   completedVisibilityUntilMidnight: true,

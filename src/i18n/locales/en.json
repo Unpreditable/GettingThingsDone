@@ -1,0 +1,272 @@
+{
+  "common": {
+    "cancel_comment": "Generic cancel button label used in confirmation dialogs (move subtasks, delete bucket, reset to defaults).",
+    "cancel": "Cancel"
+  },
+  "panel": {
+    "title_comment": "Plugin name shown as the sidebar panel tab title.",
+    "title": "GTD Tasks",
+    "searchPlaceholder_comment": "Placeholder text inside the search input at the top of the panel.",
+    "searchPlaceholder": "Search…",
+    "clearSearch_comment": "Tooltip on the × icon that clears the active search query.",
+    "clearSearch": "Clear search",
+    "dismissAll_comment": "Tooltip on the broom/sweep icon button in the panel header. Removes all completed tasks from view early (they would disappear automatically at midnight). Does NOT delete tasks.",
+    "dismissAll": "Dismiss all completed tasks",
+    "openSettings_comment": "Tooltip on the gear icon button in the panel header. Opens the GTD Tasks settings tab specifically.",
+    "openSettings": "Open GTD settings",
+    "searchStatus_comment": "Shown below the search bar when a search is active. {{matched}} = number of visible tasks, {{total}} = total tasks across all buckets. The × at the end is a clickable clear button.",
+    "searchStatus": "Showing {{matched}} of {{total}} tasks ×",
+    "noTasksFound_comment": "Empty-state message shown in the panel body when no tasks exist in the configured scope (entire vault or specific folders/files). Not shown during search — that uses searchStatus with matched=0.",
+    "noTasksFound": "No tasks found. Adjust the task scope in settings.",
+    "moveConfirm": {
+      "_comment": "Confirmation dialog shown when moving a parent task whose subtasks each have their own bucket assignment. The user chooses whether to move only the parent or all subtasks too.",
+      "message_comment": "{{count}} = number of subtasks that have an explicit bucket assigned.",
+      "message": "{{count}} subtasks have their own bucket assigned. Move them too?",
+      "moveAll_comment": "Button: move the parent task and all its subtasks to the new bucket.",
+      "moveAll": "Move all",
+      "parentOnly_comment": "Button: move only the parent task; leave subtasks in their current buckets.",
+      "parentOnly": "Parent only",
+      "cancel": "Cancel"
+    },
+    "contextMenu": {
+      "moveTo_comment": "Right-click context menu item on a task. {{name}} = the destination bucket's display name.",
+      "moveTo": "Move to: {{name}}",
+      "openFile_comment": "Right-click context menu item on a task. Opens the source markdown file in the editor.",
+      "openFile": "Open file"
+    },
+    "languageBanner": {
+      "message_comment": "Dismissable info banner shown once after the user changes their Obsidian interface language and restarts. 'Bucket names' are the GTD time-horizon categories (Today, This Week, etc.) — their display names may have been auto-renamed to match the new language.",
+      "message": "Your Obsidian language has changed. Bucket names updated where possible — review in settings if needed.",
+      "openSettings_comment": "Button in the language banner. Opens the GTD Tasks settings tab so the user can review bucket names. Different from panel.openSettings — same destination but triggered from the banner.",
+      "openSettings": "Open Settings",
+      "dismiss_comment": "Button in the language banner. Closes the banner without opening settings.",
+      "dismiss": "Dismiss"
+    }
+  },
+  "task": {
+    "staleTooltip_comment": "Tooltip on tasks that are past their bucket's scheduled date window (e.g. a 'This Week' task that was never moved and is now overdue for that window).",
+    "staleTooltip": "Past scheduled window",
+    "autoPlacedTooltip_comment": "Tooltip on tasks automatically assigned to a bucket based on their 📅 due date (written by the Tasks plugin). The user can click the task's bucket badge to confirm the placement and lock it in.",
+    "autoPlacedTooltip": "Auto-placed from due date — click to confirm placement",
+    "subtaskTooltip_comment": "Tooltip on the indentation badge shown on tasks that are nested under a parent task in the source markdown.",
+    "subtaskTooltip": "Subtask",
+    "activeSubtasks_comment": "Tooltip on the subtask count badge shown on parent tasks. i18next plural forms: _one for exactly 1, _other for all other counts. {{count}} is injected automatically by i18next.",
+    "activeSubtasks_one": "{{count}} active subtask",
+    "activeSubtasks_other": "{{count}} active subtasks",
+    "dismiss_comment": "Button label shown on completed tasks when 'show completed until midnight' is enabled. Removes the task from view immediately without waiting for midnight. Does NOT delete the task.",
+    "dismiss": "Dismiss",
+    "moveTo_comment": "Label on quick-move buttons shown on each task row. {{name}} = the destination bucket's display name (e.g. 'Move to Today').",
+    "moveTo": "Move to {{name}}",
+    "emptyTask_comment": "Fallback text shown in the task row when the task's markdown text is completely blank.",
+    "emptyTask": "(empty task)"
+  },
+  "commands": {
+    "openPanel_comment": "Label shown in Obsidian's command palette for the command that opens the GTD sidebar panel.",
+    "openPanel": "Open panel"
+  },
+  "notices": {
+    "_comment": "Toast notifications shown in Obsidian's notification area. All prefixed with 'GTD Tasks:' so users can identify their source. {{error}} is the raw error message from the failed operation.",
+    "moveFailed": "GTD Tasks: Move failed — {{error}}",
+    "toggleFailed": "GTD Tasks: Toggle failed — {{error}}",
+    "confirmFailed": "GTD Tasks: Confirm failed — {{error}}",
+    "migrationComplete_comment": "Shown after the user migrates tasks between storage modes (inline tag ↔ inline field). {{migrated}} = tasks successfully rewritten, {{failed}} = tasks skipped due to errors.",
+    "migrationComplete": "GTD Tasks: Migration complete. {{migrated}} tasks updated, {{failed}} skipped."
+  },
+  "settings": {
+    "heading_comment": "Top-level section heading shown in the Obsidian settings panel above all plugin settings.",
+    "heading": "Getting Things Done",
+    "emoji_comment": "Label for the emoji input field shown in each bucket's configuration row.",
+    "emoji": "Emoji",
+    "emojiButtonTooltip_comment": "Tooltip on the emoji character button next to the emoji input. Clicking it opens Obsidian's native emoji picker.",
+    "emojiButtonTooltip": "Click to choose emoji",
+    "annotationStyle": {
+      "name_comment": "Setting name for the storage mode selector — controls how bucket assignments are written into markdown.",
+      "name": "Annotation style",
+      "inlineTag_comment": "Dropdown option label. In this mode the plugin appends a hashtag like #gtd/today to the task line.",
+      "inlineTag": "Inline tag",
+      "inlineField_comment": "Dropdown option label. In this mode the plugin appends a Dataview-compatible field like [gtd:: today] to the task line.",
+      "inlineField": "Inline field",
+      "descHeader_comment": "Introductory sentence before the two bullet-point descriptions below it.",
+      "descHeader": "Controls how the plugin stores which bucket each task belongs to:",
+      "descInlineTag_comment": "Bullet-point description for the inline-tag mode. The example uses the user's configured prefix (default: gtd).",
+      "descInlineTag": "Inline tag — appends #prefix/bucket-id to the task line (e.g. #gtd/today)",
+      "descInlineField_comment": "Bullet-point description for the inline-field mode. Dataview is a popular Obsidian plugin for querying notes.",
+      "descInlineField": "Inline field — appends [prefix:: bucket-id] to the task line (Dataview-compatible)"
+    },
+    "migrate": {
+      "_comment": "The migrate button rewrites all existing bucket annotations from one storage mode to the other (e.g. all #gtd/today tags → [gtd:: today] fields). Pluralized on {{count}} = number of tasks that need rewriting.",
+      "button_one": "Migrate {{count}} task",
+      "button_other": "Migrate {{count}} tasks",
+      "none_comment": "Shown on the migrate button when all tasks are already in the current storage mode — nothing to rewrite.",
+      "none": "No tasks to migrate",
+      "inProgress_comment": "Shown on the migrate button while the migration is running.",
+      "inProgress": "Migrating…"
+    },
+    "tagFieldName": {
+      "name_comment": "Setting name for the tag/field prefix input (e.g. the 'gtd' part of #gtd/today).",
+      "name": "Tag / field name",
+      "description": "Used as the tag prefix in Inline tag mode (#<name>/bucket-id) and as the field key in Inline field mode ([<name>:: bucket-id]).",
+      "placeholder_comment": "Placeholder text inside the prefix input showing the default value.",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "_comment": "Toggle to enable reading metadata written by the 'Tasks' community plugin (emoji-based due/completion dates). {{pluginName}} is substituted at runtime with the plugin's display name ('Tasks').",
+      "name": "Read {{pluginName}} plugin metadata",
+      "description": "Read 📅 due dates and ✅ completion dates written by the {{pluginName}} plugin."
+    },
+    "filesToScan": {
+      "name_comment": "Setting name for the scope selector — determines which files are scanned for tasks.",
+      "name": "Files to scan",
+      "description": "Which files the plugin searches for tasks.",
+      "entireVault_comment": "Dropdown option: scan every markdown file in the vault.",
+      "entireVault": "Entire vault",
+      "specificFolders_comment": "Dropdown option: scan only the folders listed below.",
+      "specificFolders": "Specific folders",
+      "specificFiles_comment": "Dropdown option: scan only the individual files listed below.",
+      "specificFiles": "Specific files",
+      "addFolder_comment": "Button label to add a folder path to the scan list. The leading '+' is part of the label.",
+      "addFolder": "+ Add folder",
+      "addFile_comment": "Button label to add a file path to the scan list. The leading '+' is part of the label.",
+      "addFile": "+ Add file",
+      "folderPlaceholder_comment": "Placeholder inside each folder path input showing an example value.",
+      "folderPlaceholder": "e.g. Tasks",
+      "filePlaceholder_comment": "Placeholder inside each file path input showing an example value.",
+      "filePlaceholder": "e.g. Tasks/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Show completed tasks until midnight",
+        "description_comment": "The 'strikethrough' refers to the visual style of completed tasks in the panel.",
+        "description": "Completed tasks remain visible as strikethrough in the panel until midnight, then disappear on next load."
+      },
+      "markOverdue": {
+        "name_comment": "The '!' is the literal character displayed as an overdue indicator badge on the task row.",
+        "name": "Mark overdue tasks with !",
+        "description": "Tasks that are past their bucket's scheduled window are marked with an overdue indicator."
+      },
+      "compactView": {
+        "name": "Compact view",
+        "description": "Reduce padding on bucket headers and task rows to fit more tasks on screen."
+      },
+      "celebration": {
+        "name": "Celebration animations",
+        "description_comment": "Dropdown description. Two independent animation types can play on task completion: confetti (particles raining down) and a celebration image (an animal illustration bouncing in).",
+        "description": "Choose which animations play when you complete a task.",
+        "off": "Off",
+        "confettiOnly_comment": "Dropdown option: play only the confetti particle effect.",
+        "confettiOnly": "Confetti only",
+        "celebrationOnly_comment": "Dropdown option: play only the animal illustration bounce animation.",
+        "celebrationOnly": "Celebration only",
+        "both_comment": "Dropdown option: play both animations simultaneously.",
+        "both": "Confetti and celebration"
+      }
+    },
+    "buckets": {
+      "heading_comment": "Section heading above the bucket list in settings.",
+      "heading": "Buckets",
+      "moveUp_comment": "Tooltip on the ↑ reorder button for a bucket row in the settings list.",
+      "moveUp": "Move up",
+      "moveDown_comment": "Tooltip on the ↓ reorder button for a bucket row in the settings list.",
+      "moveDown": "Move down",
+      "addBucket_comment": "Button at the bottom of the bucket list that creates a new empty bucket.",
+      "addBucket": "Add bucket",
+      "newBucketName_comment": "Default display name given to a newly created bucket before the user renames it.",
+      "newBucketName": "New Bucket",
+      "resetToDefaults_comment": "Button that discards all bucket configuration and restores the five default GTD buckets.",
+      "resetToDefaults": "Reset to defaults",
+      "resetConfirm_comment": "Confirmation prompt shown in a dialog before resetting. Warns that the current configuration will be lost.",
+      "resetConfirm": "Reset all buckets to defaults? This will discard your current bucket configuration.",
+      "resetButton_comment": "Confirm button inside the reset confirmation dialog.",
+      "resetButton": "Reset",
+      "systemBucket_comment": "Badge shown next to the 'To Review' bucket in the settings list. It is a built-in system bucket and cannot be deleted.",
+      "systemBucket": "system · cannot be removed",
+      "showInStatusBar": {
+        "name_comment": "Section heading for the status bar visibility group in settings.",
+        "name": "Show in status bar",
+        "description_comment": "{{bucketName}} = the bucket's display name.",
+        "description": "Display the {{bucketName}} count in the status bar."
+      },
+      "field": {
+        "name_comment": "Label for the bucket display name text input.",
+        "name": "Name",
+        "id_comment": "Label for the bucket ID input. 'Slug' is a URL-safe identifier — lowercase, no spaces. This value is what gets written into markdown (e.g. the 'today' in #gtd/today).",
+        "id": "ID / slug",
+        "idDescription_comment": "Helper text below the ID input.",
+        "idDescription": "Internal identifier used in tags/fields. No spaces.",
+        "idDuplicate_comment": "Inline validation error when the user types an ID already in use. {{id}} = the duplicate value entered, {{existing}} = display name of the bucket that already owns that ID.",
+        "idDuplicate": "ID \"{{id}}\" is already used by \"{{existing}}\".",
+        "showInStatusBar_comment": "Toggle label inside an individual bucket's config row (as opposed to settings.buckets.showInStatusBar.name which is a section heading).",
+        "showInStatusBar": "Show in status bar",
+        "showInStatusBarDescription": "Display this bucket's task count in the status bar.",
+        "delete_comment": "Label on the inline delete icon/button on each bucket row.",
+        "delete": "Delete",
+        "deleteTooltip_comment": "Tooltip on the delete icon button.",
+        "deleteTooltip": "Delete this bucket",
+        "deleteConfirm_comment": "Confirmation prompt in a dialog before deleting a bucket. {{name}} = the bucket's display name.",
+        "deleteConfirm": "Delete bucket \"{{name}}\"? This cannot be undone.",
+        "deleteButton_comment": "Confirm button inside the delete confirmation dialog (as opposed to field.delete which is the inline trigger).",
+        "deleteButton": "Delete"
+      },
+      "dateRule": {
+        "_comment": "Date range rules auto-assign tasks to a bucket based on their 📅 due date. The dropdown option labels below describe the rule type. Calendar weeks run Monday–Sunday.",
+        "name": "Date range rule",
+        "description": "Auto-assign tasks based on their 📅 due date. If multiple buckets have overlapping rules, the first matching bucket (top to bottom) wins.",
+        "none_comment": "Dropdown option: no automatic date-based assignment; tasks are only placed by manual tag/field.",
+        "none": "None (manual/tag only)",
+        "today": "Today (due today or overdue)",
+        "thisWeek": "This week (tomorrow – end of current Sunday)",
+        "nextWeek": "Next week (next Monday – following Sunday)",
+        "thisMonth": "This month (1 day out – end of current month)",
+        "nextMonth": "Next month (1st – last day of next month)",
+        "withinDays_comment": "Dropdown option: tasks due within a user-configured number of days from today.",
+        "withinDays": "Within N days",
+        "withinRange_comment": "Dropdown option: tasks due within a user-configured day range (from day X to day Y from today).",
+        "withinRange": "Within day range (from–to)",
+        "beyondDays_comment": "Dropdown option: catch-all rule for tasks due further out than a user-configured number of days.",
+        "beyondDays": "Beyond N days (catch-all)",
+        "days": {
+          "name": "Days",
+          "description": "Tasks due within this many days from today are assigned here."
+        },
+        "fromDay": {
+          "name": "From day",
+          "description": "Start of the window: number of days from today (e.g. 1 = tomorrow, 7 = one week from today)."
+        },
+        "toDay": {
+          "name": "To day",
+          "description": "End of the window: number of days from today (e.g. 14 = two weeks from today)."
+        },
+        "beyondThreshold": {
+          "name": "Days threshold",
+          "description": "Tasks due more than this many days from today are assigned here."
+        }
+      },
+      "quickMove": {
+        "_comment": "Each task row can show up to two quick-move buttons for common destinations. These settings let the user configure which buckets those buttons target.",
+        "button1Name_comment": "Setting name for the primary (first) quick-move button target.",
+        "button1Name": "Quick-move button 1",
+        "button2Name_comment": "Setting name for the optional secondary quick-move button target.",
+        "button2Name": "Quick-move button 2",
+        "button1Description": "Primary quick-move target shown on each task row.",
+        "button2Description": "Optional second quick-move target.",
+        "none_comment": "Dropdown option meaning no bucket is assigned to this quick-move button slot (button hidden).",
+        "none": "(None)"
+      }
+    }
+  },
+  "buckets": {
+    "_comment": "Default display names for the five built-in GTD buckets. Keys (today, this-week, etc.) are the fixed internal IDs written into the vault — they never change regardless of language. Only the 'name' values are translatable.",
+    "defaults": {
+      "today":      { "name": "Today" },
+      "this-week":  { "name": "This Week" },
+      "next-week":  { "name": "Next Week" },
+      "this-month": { "name": "This Month" },
+      "someday":    {
+        "name_comment": "'Someday / Maybe' is a standard GTD (Getting Things Done) methodology term for tasks with no fixed time horizon.",
+        "name": "Someday / Maybe"
+      }
+    },
+    "toReview_comment": "Display name of the built-in system bucket that collects tasks with no bucket assignment. Always shown first in the panel. Cannot be renamed or deleted by the user.",
+    "toReview": "To Review"
+  }
+}

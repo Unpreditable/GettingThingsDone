@@ -9,19 +9,23 @@
   import { getTagValue, getInlineFieldValue } from "../core/TaskParser";
   import type { BucketConfig, PluginSettings } from "../settings";
   import { TO_REVIEW_ID } from "../core/BucketManager";
+  import { t } from "../i18n/i18n";
 
   export let bucketGroups$: Readable<BucketGroupData[]>;
   export let settings$: Readable<PluginSettings>;
   export let celebrationImageUrls$: Readable<string[]>;
+  export let languageChangeNotice$: Readable<boolean>;
   $: bucketGroups = $bucketGroups$;
   $: settings = $settings$;
   $: celebrationImageUrls = $celebrationImageUrls$;
+  $: showLanguageBanner = $languageChangeNotice$;
 
   export let onMove: (task: TaskRecord, targetBucketId: string | null) => Promise<void>;
   export let onToggle: (task: TaskRecord) => Promise<void>;
   export let onNavigate: (task: TaskRecord) => void;
   export let onConfirm: (task: TaskRecord, bucketId: string) => Promise<void>;
   export let onOpenSettings: () => void;
+  export let onDismissLanguageBanner: () => void;
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
@@ -65,7 +69,7 @@
         if (id === TO_REVIEW_ID) {
           return {
             id: TO_REVIEW_ID,
-            name: "To Review",
+            name: t("buckets.toReview"),
             emoji: settings.toReviewEmoji,
             dateRangeRule: null,
             quickMoveTargets: [] as [string?, string?],
@@ -153,7 +157,7 @@
 
     menu.addItem((item) =>
       item
-        .setTitle(`${settings.toReviewEmoji} Move to: To Review`)
+        .setTitle(`${settings.toReviewEmoji} ${t("panel.contextMenu.moveTo", { name: t("buckets.toReview") })}`)
         .setIcon("inbox")
         .onClick(() => onMove(task, null))
     );
@@ -164,7 +168,7 @@
       const b = bucket;
       menu.addItem((item) =>
         item
-          .setTitle(`${b.emoji} Move to: ${b.name}`)
+          .setTitle(`${b.emoji} ${t("panel.contextMenu.moveTo", { name: b.name })}`)
           .onClick(() => onMove(task, b.id))
       );
     }
@@ -172,7 +176,7 @@
     menu.addSeparator();
     menu.addItem((item) =>
       item
-        .setTitle("Open file")
+        .setTitle(t("panel.contextMenu.openFile"))
         .setIcon("file-text")
         .onClick(() => onNavigate(task))
     );
@@ -268,40 +272,52 @@
 
 <div class="gtd-panel" class:gtd-compact={settings.compactView} bind:this={panelEl}>
   <div class="gtd-panel-header">
-    <h3>GTD Tasks</h3>
+    <h3>{t("panel.title")}</h3>
     <div class="gtd-search-wrapper">
       <input
         class="gtd-search-input"
         type="text"
-        placeholder="Search…"
+        placeholder={t("panel.searchPlaceholder")}
         bind:value={searchQuery}
         on:keydown={(e) => { if (e.key === 'Escape') { searchQuery = ''; e.currentTarget.blur(); } }}
       />
       {#if searchQuery}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-        <span class="gtd-search-clear" on:click={() => (searchQuery = '')} title="Clear search">×</span>
+        <span class="gtd-search-clear" on:click={() => (searchQuery = '')} title={t("panel.clearSearch")}>×</span>
       {/if}
     </div>
     <div class="gtd-header-actions">
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <span
         class="clickable-icon gtd-dismiss-all-icon"
-        title="Dismiss all completed tasks"
+        title={t("panel.dismissAll")}
         on:click={dismissAllCompleted}
       >🧹</span>
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <span
         class="clickable-icon gtd-settings-icon"
-        title="Open GTD settings"
+        title={t("panel.openSettings")}
         on:click={onOpenSettings}
       >⚙</span>
     </div>
   </div>
 
+  {#if showLanguageBanner}
+    <div class="gtd-language-banner">
+      <span class="gtd-language-banner-message">{t("panel.languageBanner.message")}</span>
+      <div class="gtd-language-banner-actions">
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={() => { onOpenSettings(); onDismissLanguageBanner(); }}>{t("panel.languageBanner.openSettings")}</span>
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={onDismissLanguageBanner}>{t("panel.languageBanner.dismiss")}</span>
+      </div>
+    </div>
+  {/if}
+
   {#if searchQuery}
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
     <div class="gtd-search-status">
-      <span class="gtd-search-pill" on:click={() => (searchQuery = '')}>🔍 Showing {matchedTaskCount} of {totalTaskCount} tasks ×</span>
+      <span class="gtd-search-pill" on:click={() => (searchQuery = '')}>🔍 {t("panel.searchStatus", { matched: matchedTaskCount, total: totalTaskCount })}</span>
     </div>
   {/if}
 
@@ -331,7 +347,7 @@
     {/each}
 
     {#if bucketGroups.length === 0}
-      <div class="gtd-empty-state">No tasks found. Adjust the task scope in settings.</div>
+      <div class="gtd-empty-state">{t("panel.noTasksFound")}</div>
     {/if}
   </div>
 
@@ -340,11 +356,11 @@
     <div class="gtd-confirm-overlay" on:click={() => (pendingMoveConfirm = null)}>
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <div class="gtd-confirm-dialog" on:click|stopPropagation>
-        <p>{pendingMoveConfirm.explicitChildren.length} subtask(s) have their own bucket assigned. Move them too?</p>
+        <p>{t("panel.moveConfirm.message", { count: pendingMoveConfirm.explicitChildren.length })}</p>
         <div class="gtd-confirm-buttons">
-          <button class="mod-cta" on:click={() => confirmMoveChildren(true)}>Move all</button>
-          <button on:click={() => confirmMoveChildren(false)}>Parent only</button>
-          <button on:click={() => (pendingMoveConfirm = null)}>Cancel</button>
+          <button class="mod-cta" on:click={() => confirmMoveChildren(true)}>{t("panel.moveConfirm.moveAll")}</button>
+          <button on:click={() => confirmMoveChildren(false)}>{t("panel.moveConfirm.parentOnly")}</button>
+          <button on:click={() => (pendingMoveConfirm = null)}>{t("panel.moveConfirm.cancel")}</button>
         </div>
       </div>
     </div>
