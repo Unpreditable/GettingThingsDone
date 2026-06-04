@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "取消"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "搜索…",
+    "clearSearch": "清除搜索",
+    "dismissAll": "关闭所有已完成任务",
+    "openSettings": "打开 GTD 设置",
+    "searchStatus": "显示 {{total}} 项中的 {{matched}} 项 ×",
+    "noTasksFound": "未找到任务。请在设置中调整任务范围。",
+    "moveConfirm": {
+      "message": "{{count}} 个子任务已分配了自己的分类。也一起移动吗？",
+      "moveAll": "全部移动",
+      "parentOnly": "仅父任务",
+      "cancel": "取消"
+    },
+    "contextMenu": {
+      "moveTo": "移动到：{{name}}",
+      "openFile": "打开文件"
+    },
+    "languageBanner": {
+      "message": "您的 Obsidian 语言已更改。已尽可能更新分类名称——如需要请在设置中查看。",
+      "openSettings": "打开设置",
+      "dismiss": "好的"
+    }
+  },
+  "task": {
+    "staleTooltip": "已超出计划时间窗口",
+    "autoPlacedTooltip": "根据截止日期自动放置——点击确认放置",
+    "subtaskTooltip": "子任务",
+    "activeSubtasks_one": "{{count}} 个活跃子任务",
+    "activeSubtasks_other": "{{count}} 个活跃子任务",
+    "dismiss": "隐藏",
+    "moveTo": "移动到 {{name}}",
+    "emptyTask": "（空任务）"
+  },
+  "commands": {
+    "openPanel": "打开面板"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks：移动失败——{{error}}",
+    "toggleFailed": "GTD Tasks：切换失败——{{error}}",
+    "confirmFailed": "GTD Tasks：确认失败——{{error}}",
+    "migrationComplete": "GTD Tasks：迁移完成。已更新 {{migrated}} 个任务，跳过 {{failed}} 个。"
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "表情符号",
+    "emojiButtonTooltip": "点击选择表情符号",
+    "annotationStyle": {
+      "name": "注释样式",
+      "inlineTag": "内联标签",
+      "inlineField": "内联字段",
+      "descHeader": "控制插件如何存储每个任务所属的分类：",
+      "descInlineTag": "内联标签——在任务行后添加 #前缀/分类ID（例：#gtd/today）",
+      "descInlineField": "内联字段——在任务行后添加 [前缀:: 分类ID]（兼容 Dataview）"
+    },
+    "migrate": {
+      "button_one": "迁移 {{count}} 个任务",
+      "button_other": "迁移 {{count}} 个任务",
+      "none": "没有需要迁移的任务",
+      "inProgress": "迁移中…"
+    },
+    "tagFieldName": {
+      "name": "标签 / 字段名称",
+      "description": "在内联标签模式下用作标签前缀（#<名称>/分类ID），在内联字段模式下用作字段键（[<名称>:: 分类ID]）。",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "读取 {{pluginName}} 插件元数据",
+      "description": "读取 {{pluginName}} 插件写入的 📅 截止日期和 ✅ 完成日期。"
+    },
+    "filesToScan": {
+      "name": "扫描文件",
+      "description": "插件搜索任务的文件范围。",
+      "entireVault": "整个库",
+      "specificFolders": "特定文件夹",
+      "specificFiles": "特定文件",
+      "addFolder": "+ 添加文件夹",
+      "addFile": "+ 添加文件",
+      "folderPlaceholder": "例：Tasks",
+      "filePlaceholder": "例：Tasks/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "在午夜前显示已完成任务",
+        "description": "已完成的任务将以删除线形式在面板中显示至午夜，之后在下次加载时消失。"
+      },
+      "markOverdue": {
+        "name": "用 ! 标记逾期任务",
+        "description": "超过分类计划时间窗口的任务将标记逾期指示符。"
+      },
+      "compactView": {
+        "name": "紧凑视图",
+        "description": "减少分类标题和任务行的内边距，以在屏幕上显示更多任务。"
+      },
+      "celebration": {
+        "name": "庆祝动画",
+        "description": "选择完成任务时播放的动画。",
+        "off": "关闭",
+        "confettiOnly": "仅彩纸",
+        "celebrationOnly": "仅庆祝",
+        "both": "彩纸和庆祝"
+      }
+    },
+    "buckets": {
+      "heading": "分类",
+      "moveUp": "上移",
+      "moveDown": "下移",
+      "addBucket": "添加分类",
+      "newBucketName": "新分类",
+      "resetToDefaults": "重置为默认值",
+      "resetConfirm": "将所有分类重置为默认值？这将丢弃当前的分类配置。",
+      "resetButton": "重置",
+      "systemBucket": "系统 · 无法删除",
+      "showInStatusBar": {
+        "name": "在状态栏中显示",
+        "description": "在状态栏中显示 {{bucketName}} 的数量。"
+      },
+      "field": {
+        "name": "名称",
+        "id": "ID / 别名",
+        "idDescription": "用于标签/字段的内部标识符。不允许空格。",
+        "idDuplicate": "ID「{{id}}」已被「{{existing}}」使用。",
+        "showInStatusBar": "在状态栏中显示",
+        "showInStatusBarDescription": "在状态栏中显示此分类的任务数量。",
+        "delete": "删除",
+        "deleteTooltip": "删除此分类",
+        "deleteConfirm": "删除分类「{{name}}」？此操作无法撤销。",
+        "deleteButton": "删除"
+      },
+      "dateRule": {
+        "name": "日期范围规则",
+        "description": "根据 📅 截止日期自动分配任务。如果多个分类有重叠规则，第一个匹配的分类（从上到下）优先。",
+        "none": "无（仅手动/标签）",
+        "today": "今天（今天到期或已逾期）",
+        "thisWeek": "本周（明天至本周日结束）",
+        "nextWeek": "下周（下周一至下周日）",
+        "thisMonth": "本月（1天后至本月底）",
+        "nextMonth": "下月（下月1日至末日）",
+        "withinDays": "N天内",
+        "withinRange": "日期范围内（从–到）",
+        "beyondDays": "N天以上（兜底）",
+        "days": {
+          "name": "天数",
+          "description": "在今天起指定天数内到期的任务将分配到此处。"
+        },
+        "fromDay": {
+          "name": "从第几天",
+          "description": "窗口起点：距今天的天数（例：1 = 明天，7 = 一周后）。"
+        },
+        "toDay": {
+          "name": "到第几天",
+          "description": "窗口终点：距今天的天数（例：14 = 两周后）。"
+        },
+        "beyondThreshold": {
+          "name": "天数阈值",
+          "description": "距今超过指定天数后到期的任务将分配到此处。"
+        }
+      },
+      "quickMove": {
+        "button1Name": "快速移动按钮 1",
+        "button2Name": "快速移动按钮 2",
+        "button1Description": "每行任务上显示的主要快速移动目标。",
+        "button2Description": "可选的第二个快速移动目标。",
+        "none": "（无）"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "今天" },
+      "this-week":  { "name": "本周" },
+      "next-week":  { "name": "下周" },
+      "this-month": { "name": "本月" },
+      "someday":    { "name": "某天 / 也许" }
+    },
+    "toReview": "待审查"
+  }
+}

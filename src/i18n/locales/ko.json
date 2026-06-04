@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "취소"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "검색…",
+    "clearSearch": "검색 지우기",
+    "dismissAll": "완료된 모든 작업 숨기기",
+    "openSettings": "GTD 설정 열기",
+    "searchStatus": "전체 {{total}}개 중 {{matched}}개 표시 ×",
+    "noTasksFound": "작업을 찾을 수 없습니다. 설정에서 작업 범위를 조정하세요.",
+    "moveConfirm": {
+      "message": "{{count}}개의 하위 작업에 자체 카테고리가 지정되어 있습니다. 함께 이동하시겠습니까?",
+      "moveAll": "모두 이동",
+      "parentOnly": "상위 작업만",
+      "cancel": "취소"
+    },
+    "contextMenu": {
+      "moveTo": "이동: {{name}}",
+      "openFile": "파일 열기"
+    },
+    "languageBanner": {
+      "message": "Obsidian 언어가 변경되었습니다. 가능한 경우 카테고리 이름이 업데이트되었습니다 — 필요하면 설정을 확인하세요.",
+      "openSettings": "설정 열기",
+      "dismiss": "닫기"
+    }
+  },
+  "task": {
+    "staleTooltip": "예약된 기간이 지났습니다",
+    "autoPlacedTooltip": "마감일에서 자동 배치됨 — 클릭하여 배치 확인",
+    "subtaskTooltip": "하위 작업",
+    "activeSubtasks_one": "활성 하위 작업 {{count}}개",
+    "activeSubtasks_other": "활성 하위 작업 {{count}}개",
+    "dismiss": "숨기기",
+    "moveTo": "{{name}}(으)로 이동",
+    "emptyTask": "(빈 작업)"
+  },
+  "commands": {
+    "openPanel": "패널 열기"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: 이동 실패 — {{error}}",
+    "toggleFailed": "GTD Tasks: 전환 실패 — {{error}}",
+    "confirmFailed": "GTD Tasks: 확인 실패 — {{error}}",
+    "migrationComplete": "GTD Tasks: 마이그레이션 완료. {{migrated}}개 업데이트, {{failed}}개 건너뜀."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "이모지",
+    "emojiButtonTooltip": "클릭하여 이모지 선택",
+    "annotationStyle": {
+      "name": "주석 스타일",
+      "inlineTag": "인라인 태그",
+      "inlineField": "인라인 필드",
+      "descHeader": "플러그인이 각 작업이 속한 카테고리를 저장하는 방법:",
+      "descInlineTag": "인라인 태그 — 작업 줄에 #접두사/카테고리ID 추가 (예: #gtd/today)",
+      "descInlineField": "인라인 필드 — 작업 줄에 [접두사:: 카테고리ID] 추가 (Dataview 호환)"
+    },
+    "migrate": {
+      "button_one": "{{count}}개 작업 마이그레이션",
+      "button_other": "{{count}}개 작업 마이그레이션",
+      "none": "마이그레이션할 작업 없음",
+      "inProgress": "마이그레이션 중…"
+    },
+    "tagFieldName": {
+      "name": "태그 / 필드 이름",
+      "description": "인라인 태그 모드에서는 태그 접두사(#<이름>/카테고리ID), 인라인 필드 모드에서는 필드 키([<이름>:: 카테고리ID])로 사용됩니다.",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "{{pluginName}} 플러그인 메타데이터 읽기",
+      "description": "{{pluginName}} 플러그인이 작성한 📅 마감일과 ✅ 완료일을 읽습니다."
+    },
+    "filesToScan": {
+      "name": "검색할 파일",
+      "description": "플러그인이 작업을 검색하는 파일.",
+      "entireVault": "전체 볼트",
+      "specificFolders": "특정 폴더",
+      "specificFiles": "특정 파일",
+      "addFolder": "+ 폴더 추가",
+      "addFile": "+ 파일 추가",
+      "folderPlaceholder": "예: Tasks",
+      "filePlaceholder": "예: Tasks/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "자정까지 완료된 작업 표시",
+        "description": "완료된 작업은 자정까지 패널에 취소선으로 표시되며, 다음 로드 시 사라집니다."
+      },
+      "markOverdue": {
+        "name": "기한 초과 작업에 ! 표시",
+        "description": "카테고리의 예약 기간이 지난 작업에 기한 초과 표시가 나타납니다."
+      },
+      "compactView": {
+        "name": "컴팩트 보기",
+        "description": "카테고리 헤더와 작업 행의 여백을 줄여 화면에 더 많은 작업을 표시합니다."
+      },
+      "celebration": {
+        "name": "축하 애니메이션",
+        "description": "작업 완료 시 재생할 애니메이션을 선택합니다.",
+        "off": "끄기",
+        "confettiOnly": "색종이만",
+        "celebrationOnly": "축하만",
+        "both": "색종이 및 축하"
+      }
+    },
+    "buckets": {
+      "heading": "카테고리",
+      "moveUp": "위로",
+      "moveDown": "아래로",
+      "addBucket": "카테고리 추가",
+      "newBucketName": "새 카테고리",
+      "resetToDefaults": "기본값으로 재설정",
+      "resetConfirm": "모든 카테고리를 기본값으로 재설정하시겠습니까? 현재 카테고리 구성이 삭제됩니다.",
+      "resetButton": "재설정",
+      "systemBucket": "시스템 · 제거 불가",
+      "showInStatusBar": {
+        "name": "상태 표시줄에 표시",
+        "description": "상태 표시줄에 {{bucketName}} 수를 표시합니다."
+      },
+      "field": {
+        "name": "이름",
+        "id": "ID / 슬러그",
+        "idDescription": "태그/필드에 사용되는 내부 식별자. 공백 불가.",
+        "idDuplicate": "ID \"{{id}}\"은(는) 이미 \"{{existing}}\"에서 사용 중입니다.",
+        "showInStatusBar": "상태 표시줄에 표시",
+        "showInStatusBarDescription": "상태 표시줄에 이 카테고리의 작업 수를 표시합니다.",
+        "delete": "삭제",
+        "deleteTooltip": "이 카테고리 삭제",
+        "deleteConfirm": "카테고리 \"{{name}}\"을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+        "deleteButton": "삭제"
+      },
+      "dateRule": {
+        "name": "날짜 범위 규칙",
+        "description": "📅 마감일에 따라 자동으로 작업을 할당합니다. 여러 카테고리의 규칙이 겹치면 첫 번째 일치 카테고리(위에서 아래로)가 우선합니다.",
+        "none": "없음 (수동/태그만)",
+        "today": "오늘 (오늘 마감 또는 기한 초과)",
+        "thisWeek": "이번 주 (내일 ~ 이번 주 일요일 끝)",
+        "nextWeek": "다음 주 (다음 월요일 ~ 다음 일요일)",
+        "thisMonth": "이번 달 (1일 후 ~ 이번 달 말)",
+        "nextMonth": "다음 달 (다음 달 1일 ~ 말일)",
+        "withinDays": "N일 이내",
+        "withinRange": "날짜 범위 내 (시작~끝)",
+        "beyondDays": "N일 초과 (포괄)",
+        "days": {
+          "name": "일수",
+          "description": "오늘부터 지정한 일수 이내에 마감인 작업이 여기에 할당됩니다."
+        },
+        "fromDay": {
+          "name": "시작일",
+          "description": "기간 시작: 오늘부터의 일수 (예: 1 = 내일, 7 = 1주일 후)."
+        },
+        "toDay": {
+          "name": "종료일",
+          "description": "기간 끝: 오늘부터의 일수 (예: 14 = 2주일 후)."
+        },
+        "beyondThreshold": {
+          "name": "일수 임계값",
+          "description": "오늘부터 지정한 일수보다 더 먼 마감인 작업이 여기에 할당됩니다."
+        }
+      },
+      "quickMove": {
+        "button1Name": "빠른 이동 버튼 1",
+        "button2Name": "빠른 이동 버튼 2",
+        "button1Description": "각 작업 행에 표시되는 기본 빠른 이동 대상.",
+        "button2Description": "선택적인 두 번째 빠른 이동 대상.",
+        "none": "(없음)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "오늘" },
+      "this-week":  { "name": "이번 주" },
+      "next-week":  { "name": "다음 주" },
+      "this-month": { "name": "이번 달" },
+      "someday":    { "name": "언젠가 / 어쩌면" }
+    },
+    "toReview": "검토 필요"
+  }
+}

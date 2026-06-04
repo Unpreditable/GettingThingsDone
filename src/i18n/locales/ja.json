@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "キャンセル"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "検索…",
+    "clearSearch": "検索をクリア",
+    "dismissAll": "完了したタスクをすべて非表示",
+    "openSettings": "GTD設定を開く",
+    "searchStatus": "{{total}}件中{{matched}}件表示 ×",
+    "noTasksFound": "タスクが見つかりません。設定でタスクの対象範囲を調整してください。",
+    "moveConfirm": {
+      "message": "{{count}}件のサブタスクに独自のカテゴリが割り当てられています。一緒に移動しますか？",
+      "moveAll": "すべて移動",
+      "parentOnly": "親タスクのみ",
+      "cancel": "キャンセル"
+    },
+    "contextMenu": {
+      "moveTo": "移動先: {{name}}",
+      "openFile": "ファイルを開く"
+    },
+    "languageBanner": {
+      "message": "Obsidianの言語が変更されました。可能な場合はカテゴリ名を更新しました — 必要に応じて設定を確認してください。",
+      "openSettings": "設定を開く",
+      "dismiss": "閉じる"
+    }
+  },
+  "task": {
+    "staleTooltip": "スケジュールの期間を過ぎています",
+    "autoPlacedTooltip": "期日から自動配置 — クリックして配置を確認",
+    "subtaskTooltip": "サブタスク",
+    "activeSubtasks_one": "アクティブなサブタスク {{count}} 件",
+    "activeSubtasks_other": "アクティブなサブタスク {{count}} 件",
+    "dismiss": "非表示",
+    "moveTo": "{{name}}に移動",
+    "emptyTask": "(空のタスク)"
+  },
+  "commands": {
+    "openPanel": "パネルを開く"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: 移動に失敗しました — {{error}}",
+    "toggleFailed": "GTD Tasks: 切り替えに失敗しました — {{error}}",
+    "confirmFailed": "GTD Tasks: 確認に失敗しました — {{error}}",
+    "migrationComplete": "GTD Tasks: 移行完了。{{migrated}}件更新、{{failed}}件スキップ。"
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "絵文字",
+    "emojiButtonTooltip": "クリックして絵文字を選択",
+    "annotationStyle": {
+      "name": "アノテーションスタイル",
+      "inlineTag": "インラインタグ",
+      "inlineField": "インラインフィールド",
+      "descHeader": "プラグインが各タスクのカテゴリ所属を保存する方法:",
+      "descInlineTag": "インラインタグ — タスク行に #プレフィックス/カテゴリID を追加 (例: #gtd/today)",
+      "descInlineField": "インラインフィールド — タスク行に [プレフィックス:: カテゴリID] を追加 (Dataview互換)"
+    },
+    "migrate": {
+      "button_one": "{{count}}件のタスクを移行",
+      "button_other": "{{count}}件のタスクを移行",
+      "none": "移行するタスクがありません",
+      "inProgress": "移行中…"
+    },
+    "tagFieldName": {
+      "name": "タグ / フィールド名",
+      "description": "インラインタグモードではタグプレフィックス (#<名前>/カテゴリID)、インラインフィールドモードではフィールドキー ([<名前>:: カテゴリID]) として使用されます。",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "{{pluginName}}プラグインのメタデータを読み込む",
+      "description": "{{pluginName}}プラグインが書き込んだ📅期日と✅完了日を読み込みます。"
+    },
+    "filesToScan": {
+      "name": "スキャン対象ファイル",
+      "description": "プラグインがタスクを検索するファイル。",
+      "entireVault": "保管庫全体",
+      "specificFolders": "特定のフォルダ",
+      "specificFiles": "特定のファイル",
+      "addFolder": "+ フォルダを追加",
+      "addFile": "+ ファイルを追加",
+      "folderPlaceholder": "例: Tasks",
+      "filePlaceholder": "例: Tasks/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "完了タスクを深夜まで表示",
+        "description": "完了したタスクは深夜まで取り消し線付きでパネルに表示され、次回読み込み時に消えます。"
+      },
+      "markOverdue": {
+        "name": "期限切れタスクに ! を付ける",
+        "description": "カテゴリのスケジュール期間を過ぎたタスクに期限切れインジケーターが表示されます。"
+      },
+      "compactView": {
+        "name": "コンパクト表示",
+        "description": "カテゴリヘッダーとタスク行のパディングを減らして、より多くのタスクを画面に表示します。"
+      },
+      "celebration": {
+        "name": "セレブレーションアニメーション",
+        "description": "タスク完了時に再生するアニメーションを選択します。",
+        "off": "オフ",
+        "confettiOnly": "紙吹雪のみ",
+        "celebrationOnly": "セレブレーションのみ",
+        "both": "紙吹雪とセレブレーション"
+      }
+    },
+    "buckets": {
+      "heading": "カテゴリ",
+      "moveUp": "上へ",
+      "moveDown": "下へ",
+      "addBucket": "カテゴリを追加",
+      "newBucketName": "新しいカテゴリ",
+      "resetToDefaults": "デフォルトにリセット",
+      "resetConfirm": "すべてのカテゴリをデフォルトにリセットしますか？現在の設定は破棄されます。",
+      "resetButton": "リセット",
+      "systemBucket": "システム · 削除できません",
+      "showInStatusBar": {
+        "name": "ステータスバーに表示",
+        "description": "ステータスバーに{{bucketName}}の件数を表示します。"
+      },
+      "field": {
+        "name": "名前",
+        "id": "ID / スラッグ",
+        "idDescription": "タグ/フィールドで使用される内部識別子。スペース不可。",
+        "idDuplicate": "ID「{{id}}」はすでに「{{existing}}」で使用されています。",
+        "showInStatusBar": "ステータスバーに表示",
+        "showInStatusBarDescription": "ステータスバーにこのカテゴリのタスク件数を表示します。",
+        "delete": "削除",
+        "deleteTooltip": "このカテゴリを削除",
+        "deleteConfirm": "カテゴリ「{{name}}」を削除しますか？この操作は元に戻せません。",
+        "deleteButton": "削除"
+      },
+      "dateRule": {
+        "name": "日付範囲ルール",
+        "description": "📅期日に基づいてタスクを自動割り当て。複数のカテゴリのルールが重複する場合、最初に一致したカテゴリ（上から下）が優先されます。",
+        "none": "なし（手動/タグのみ）",
+        "today": "今日（今日期日または期限切れ）",
+        "thisWeek": "今週（明日〜今週の日曜日）",
+        "nextWeek": "来週（来週月曜〜翌日曜日）",
+        "thisMonth": "今月（1日後〜今月末）",
+        "nextMonth": "来月（来月1日〜末日）",
+        "withinDays": "N日以内",
+        "withinRange": "日付範囲内（開始〜終了）",
+        "beyondDays": "N日超（キャッチオール）",
+        "days": {
+          "name": "日数",
+          "description": "今日から指定した日数以内に期日があるタスクがここに割り当てられます。"
+        },
+        "fromDay": {
+          "name": "開始日",
+          "description": "期間の開始: 今日からの日数 (例: 1 = 明日、7 = 1週間後)。"
+        },
+        "toDay": {
+          "name": "終了日",
+          "description": "期間の終了: 今日からの日数 (例: 14 = 2週間後)。"
+        },
+        "beyondThreshold": {
+          "name": "日数のしきい値",
+          "description": "今日から指定した日数より先に期日があるタスクがここに割り当てられます。"
+        }
+      },
+      "quickMove": {
+        "button1Name": "クイック移動ボタン 1",
+        "button2Name": "クイック移動ボタン 2",
+        "button1Description": "各タスク行に表示されるメインのクイック移動先。",
+        "button2Description": "オプションの2番目のクイック移動先。",
+        "none": "(なし)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "今日" },
+      "this-week":  { "name": "今週" },
+      "next-week":  { "name": "来週" },
+      "this-month": { "name": "今月" },
+      "someday":    { "name": "いつか / もしかしたら" }
+    },
+    "toReview": "レビュー待ち"
+  }
+}

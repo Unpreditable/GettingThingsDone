@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "Abbrechen"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "Suchen…",
+    "clearSearch": "Suche löschen",
+    "dismissAll": "Alle erledigten Aufgaben ausblenden",
+    "openSettings": "GTD-Einstellungen öffnen",
+    "searchStatus": "{{matched}} von {{total}} Aufgaben angezeigt ×",
+    "noTasksFound": "Keine Aufgaben gefunden. Passe den Aufgabenbereich in den Einstellungen an.",
+    "moveConfirm": {
+      "message": "{{count}} Unteraufgaben haben eine eigene Kategorie zugewiesen. Auch verschieben?",
+      "moveAll": "Alle verschieben",
+      "parentOnly": "Nur übergeordnete Aufgabe",
+      "cancel": "Abbrechen"
+    },
+    "contextMenu": {
+      "moveTo": "Verschieben nach: {{name}}",
+      "openFile": "Datei öffnen"
+    },
+    "languageBanner": {
+      "message": "Deine Obsidian-Sprache hat sich geändert. Kategorienamen wurden wenn möglich aktualisiert — überprüfe die Einstellungen falls nötig.",
+      "openSettings": "Einstellungen öffnen",
+      "dismiss": "OK"
+    }
+  },
+  "task": {
+    "staleTooltip": "Außerhalb des geplanten Zeitfensters",
+    "autoPlacedTooltip": "Automatisch anhand des Fälligkeitsdatums zugewiesen — klicken zum Bestätigen",
+    "subtaskTooltip": "Unteraufgabe",
+    "activeSubtasks_one": "{{count}} aktive Unteraufgabe",
+    "activeSubtasks_other": "{{count}} aktive Unteraufgaben",
+    "dismiss": "Ausblenden",
+    "moveTo": "Verschieben nach {{name}}",
+    "emptyTask": "(leere Aufgabe)"
+  },
+  "commands": {
+    "openPanel": "Panel öffnen"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: Verschieben fehlgeschlagen — {{error}}",
+    "toggleFailed": "GTD Tasks: Umschalten fehlgeschlagen — {{error}}",
+    "confirmFailed": "GTD Tasks: Bestätigung fehlgeschlagen — {{error}}",
+    "migrationComplete": "GTD Tasks: Migration abgeschlossen. {{migrated}} Aufgaben aktualisiert, {{failed}} übersprungen."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "Emoji",
+    "emojiButtonTooltip": "Klicken um Emoji auszuwählen",
+    "annotationStyle": {
+      "name": "Annotationsstil",
+      "inlineTag": "Inline-Tag",
+      "inlineField": "Inline-Feld",
+      "descHeader": "Legt fest, wie das Plugin speichert, welcher Kategorie eine Aufgabe zugeordnet ist:",
+      "descInlineTag": "Inline-Tag — fügt #Präfix/Kategorie-ID an die Aufgabenzeile an (z.B. #gtd/today)",
+      "descInlineField": "Inline-Feld — fügt [Präfix:: Kategorie-ID] an die Aufgabenzeile an (Dataview-kompatibel)"
+    },
+    "migrate": {
+      "button_one": "{{count}} Aufgabe migrieren",
+      "button_other": "{{count}} Aufgaben migrieren",
+      "none": "Keine Aufgaben zu migrieren",
+      "inProgress": "Migriere…"
+    },
+    "tagFieldName": {
+      "name": "Tag- / Feldname",
+      "description": "Wird als Tag-Präfix im Inline-Tag-Modus (#<Name>/Kategorie-ID) und als Feldschlüssel im Inline-Feld-Modus ([<Name>:: Kategorie-ID]) verwendet.",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "Metadaten des {{pluginName}}-Plugins lesen",
+      "description": "📅 Fälligkeitsdaten und ✅ Erledigungsdaten des {{pluginName}}-Plugins lesen."
+    },
+    "filesToScan": {
+      "name": "Zu durchsuchende Dateien",
+      "description": "Welche Dateien das Plugin nach Aufgaben durchsucht.",
+      "entireVault": "Gesamter Tresor",
+      "specificFolders": "Bestimmte Ordner",
+      "specificFiles": "Bestimmte Dateien",
+      "addFolder": "+ Ordner hinzufügen",
+      "addFile": "+ Datei hinzufügen",
+      "folderPlaceholder": "z.B. Aufgaben",
+      "filePlaceholder": "z.B. Aufgaben/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Erledigte Aufgaben bis Mitternacht anzeigen",
+        "description": "Erledigte Aufgaben bleiben bis Mitternacht durchgestrichen im Panel sichtbar und verschwinden beim nächsten Laden."
+      },
+      "markOverdue": {
+        "name": "Überfällige Aufgaben mit ! markieren",
+        "description": "Aufgaben, die ihr geplantes Zeitfenster überschritten haben, werden mit einem Überfälligkeitsindikator markiert."
+      },
+      "compactView": {
+        "name": "Kompakte Ansicht",
+        "description": "Abstände bei Kategorieüberschriften und Aufgabenzeilen reduzieren, um mehr Aufgaben auf dem Bildschirm anzuzeigen."
+      },
+      "celebration": {
+        "name": "Feieranimationen",
+        "description": "Wähle, welche Animationen beim Abschließen einer Aufgabe abgespielt werden.",
+        "off": "Aus",
+        "confettiOnly": "Nur Konfetti",
+        "celebrationOnly": "Nur Feier",
+        "both": "Konfetti und Feier"
+      }
+    },
+    "buckets": {
+      "heading": "Kategorien",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "addBucket": "Kategorie hinzufügen",
+      "newBucketName": "Neue Kategorie",
+      "resetToDefaults": "Auf Standardwerte zurücksetzen",
+      "resetConfirm": "Alle Kategorien auf Standardwerte zurücksetzen? Die aktuelle Konfiguration wird verworfen.",
+      "resetButton": "Zurücksetzen",
+      "systemBucket": "System · kann nicht entfernt werden",
+      "showInStatusBar": {
+        "name": "In Statusleiste anzeigen",
+        "description": "{{bucketName}}-Anzahl in der Statusleiste anzeigen."
+      },
+      "field": {
+        "name": "Name",
+        "id": "ID / Slug",
+        "idDescription": "Interner Bezeichner für Tags/Felder. Keine Leerzeichen.",
+        "idDuplicate": "ID \"{{id}}\" wird bereits von \"{{existing}}\" verwendet.",
+        "showInStatusBar": "In Statusleiste anzeigen",
+        "showInStatusBarDescription": "Aufgabenanzahl dieser Kategorie in der Statusleiste anzeigen.",
+        "delete": "Löschen",
+        "deleteTooltip": "Diese Kategorie löschen",
+        "deleteConfirm": "Kategorie \"{{name}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+        "deleteButton": "Löschen"
+      },
+      "dateRule": {
+        "name": "Datumsbereichsregel",
+        "description": "Aufgaben automatisch anhand ihres 📅 Fälligkeitsdatums zuweisen. Bei überlappenden Regeln gewinnt die erste passende Kategorie (von oben nach unten).",
+        "none": "Keine (nur manuell/Tag)",
+        "today": "Heute (heute fällig oder überfällig)",
+        "thisWeek": "Diese Woche (morgen – Ende des aktuellen Sonntags)",
+        "nextWeek": "Nächste Woche (nächster Montag – folgender Sonntag)",
+        "thisMonth": "Dieser Monat (1 Tag bis Ende des aktuellen Monats)",
+        "nextMonth": "Nächster Monat (1. – letzter Tag des nächsten Monats)",
+        "withinDays": "Innerhalb von N Tagen",
+        "withinRange": "Innerhalb des Tagesbereichs (von–bis)",
+        "beyondDays": "Mehr als N Tage (Sammelbecken)",
+        "days": {
+          "name": "Tage",
+          "description": "Aufgaben, die innerhalb dieser Anzahl von Tagen ab heute fällig sind, werden hier zugewiesen."
+        },
+        "fromDay": {
+          "name": "Ab Tag",
+          "description": "Beginn des Zeitfensters: Anzahl Tage ab heute (z.B. 1 = morgen, 7 = eine Woche ab heute)."
+        },
+        "toDay": {
+          "name": "Bis Tag",
+          "description": "Ende des Zeitfensters: Anzahl Tage ab heute (z.B. 14 = zwei Wochen ab heute)."
+        },
+        "beyondThreshold": {
+          "name": "Tagesschwelle",
+          "description": "Aufgaben, die mehr als diese Anzahl von Tagen ab heute fällig sind, werden hier zugewiesen."
+        }
+      },
+      "quickMove": {
+        "button1Name": "Schnellverschiebung Schaltfläche 1",
+        "button2Name": "Schnellverschiebung Schaltfläche 2",
+        "button1Description": "Primäres Schnellverschiebungsziel auf jeder Aufgabenzeile.",
+        "button2Description": "Optionales zweites Schnellverschiebungsziel.",
+        "none": "(Keine)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "Heute" },
+      "this-week":  { "name": "Diese Woche" },
+      "next-week":  { "name": "Nächste Woche" },
+      "this-month": { "name": "Dieser Monat" },
+      "someday":    { "name": "Irgendwann / Vielleicht" }
+    },
+    "toReview": "Zu überprüfen"
+  }
+}

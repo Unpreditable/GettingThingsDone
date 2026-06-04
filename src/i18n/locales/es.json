@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "Cancelar"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "Buscar…",
+    "clearSearch": "Limpiar búsqueda",
+    "dismissAll": "Descartar todas las tareas completadas",
+    "openSettings": "Abrir ajustes de GTD",
+    "searchStatus": "Mostrando {{matched}} de {{total}} tareas ×",
+    "noTasksFound": "No se encontraron tareas. Ajusta el alcance en los ajustes.",
+    "moveConfirm": {
+      "message": "{{count}} subtareas tienen su propia categoría asignada. ¿Moverlas también?",
+      "moveAll": "Mover todas",
+      "parentOnly": "Solo tarea principal",
+      "cancel": "Cancelar"
+    },
+    "contextMenu": {
+      "moveTo": "Mover a: {{name}}",
+      "openFile": "Abrir archivo"
+    },
+    "languageBanner": {
+      "message": "Tu idioma de Obsidian ha cambiado. Los nombres de las categorías se han actualizado donde fue posible — revisa los ajustes si es necesario.",
+      "openSettings": "Abrir ajustes",
+      "dismiss": "Descartar"
+    }
+  },
+  "task": {
+    "staleTooltip": "Fuera de la ventana programada",
+    "autoPlacedTooltip": "Colocado automáticamente por fecha de vencimiento — haz clic para confirmar",
+    "subtaskTooltip": "Subtarea",
+    "activeSubtasks_one": "{{count}} subtarea activa",
+    "activeSubtasks_other": "{{count}} subtareas activas",
+    "dismiss": "Descartar",
+    "moveTo": "Mover a {{name}}",
+    "emptyTask": "(tarea vacía)"
+  },
+  "commands": {
+    "openPanel": "Abrir panel"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: Error al mover — {{error}}",
+    "toggleFailed": "GTD Tasks: Error al cambiar estado — {{error}}",
+    "confirmFailed": "GTD Tasks: Error al confirmar — {{error}}",
+    "migrationComplete": "GTD Tasks: Migración completada. {{migrated}} tareas actualizadas, {{failed}} omitidas."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "Emoji",
+    "emojiButtonTooltip": "Haz clic para elegir emoji",
+    "annotationStyle": {
+      "name": "Estilo de anotación",
+      "inlineTag": "Etiqueta en línea",
+      "inlineField": "Campo en línea",
+      "descHeader": "Controla cómo el plugin almacena a qué categoría pertenece cada tarea:",
+      "descInlineTag": "Etiqueta en línea — añade #prefijo/id-categoría a la línea de tarea (ej. #gtd/today)",
+      "descInlineField": "Campo en línea — añade [prefijo:: id-categoría] a la línea de tarea (compatible con Dataview)"
+    },
+    "migrate": {
+      "button_one": "Migrar {{count}} tarea",
+      "button_other": "Migrar {{count}} tareas",
+      "none": "No hay tareas para migrar",
+      "inProgress": "Migrando…"
+    },
+    "tagFieldName": {
+      "name": "Nombre de etiqueta / campo",
+      "description": "Usado como prefijo de etiqueta en el modo Etiqueta en línea (#<nombre>/id-categoría) y como clave de campo en el modo Campo en línea ([<nombre>:: id-categoría]).",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "Leer metadatos del plugin {{pluginName}}",
+      "description": "Leer fechas de vencimiento 📅 y fechas de completado ✅ escritas por el plugin {{pluginName}}."
+    },
+    "filesToScan": {
+      "name": "Archivos a escanear",
+      "description": "Qué archivos busca el plugin para encontrar tareas.",
+      "entireVault": "Bóveda completa",
+      "specificFolders": "Carpetas específicas",
+      "specificFiles": "Archivos específicos",
+      "addFolder": "+ Añadir carpeta",
+      "addFile": "+ Añadir archivo",
+      "folderPlaceholder": "ej. Tareas",
+      "filePlaceholder": "ej. Tareas/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Mostrar tareas completadas hasta medianoche",
+        "description": "Las tareas completadas permanecen visibles con tachado en el panel hasta medianoche, luego desaparecen al siguiente cargado."
+      },
+      "markOverdue": {
+        "name": "Marcar tareas vencidas con !",
+        "description": "Las tareas que superaron la ventana programada de su categoría se marcan con un indicador de vencimiento."
+      },
+      "compactView": {
+        "name": "Vista compacta",
+        "description": "Reducir el relleno en los encabezados de categorías y filas de tareas para mostrar más tareas en pantalla."
+      },
+      "celebration": {
+        "name": "Animaciones de celebración",
+        "description": "Elige qué animaciones se reproducen cuando completas una tarea.",
+        "off": "Desactivado",
+        "confettiOnly": "Solo confeti",
+        "celebrationOnly": "Solo celebración",
+        "both": "Confeti y celebración"
+      }
+    },
+    "buckets": {
+      "heading": "Categorías",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "addBucket": "Añadir categoría",
+      "newBucketName": "Nueva categoría",
+      "resetToDefaults": "Restablecer valores predeterminados",
+      "resetConfirm": "¿Restablecer todas las categorías a los valores predeterminados? Esto descartará tu configuración actual.",
+      "resetButton": "Restablecer",
+      "systemBucket": "sistema · no se puede eliminar",
+      "showInStatusBar": {
+        "name": "Mostrar en la barra de estado",
+        "description": "Mostrar el recuento de {{bucketName}} en la barra de estado."
+      },
+      "field": {
+        "name": "Nombre",
+        "id": "ID / slug",
+        "idDescription": "Identificador interno usado en etiquetas/campos. Sin espacios.",
+        "idDuplicate": "El ID \"{{id}}\" ya está siendo usado por \"{{existing}}\".",
+        "showInStatusBar": "Mostrar en la barra de estado",
+        "showInStatusBarDescription": "Mostrar el recuento de tareas de esta categoría en la barra de estado.",
+        "delete": "Eliminar",
+        "deleteTooltip": "Eliminar esta categoría",
+        "deleteConfirm": "¿Eliminar la categoría \"{{name}}\"? Esta acción no se puede deshacer.",
+        "deleteButton": "Eliminar"
+      },
+      "dateRule": {
+        "name": "Regla de rango de fechas",
+        "description": "Asignar tareas automáticamente según su fecha de vencimiento 📅. Si varias categorías tienen reglas superpuestas, la primera coincidente (de arriba a abajo) tiene prioridad.",
+        "none": "Ninguna (solo manual/etiqueta)",
+        "today": "Hoy (vence hoy o vencido)",
+        "thisWeek": "Esta semana (mañana – fin del domingo actual)",
+        "nextWeek": "Próxima semana (próximo lunes – siguiente domingo)",
+        "thisMonth": "Este mes (1 día – fin del mes actual)",
+        "nextMonth": "Próximo mes (1.° – último día del próximo mes)",
+        "withinDays": "Dentro de N días",
+        "withinRange": "Dentro del rango de días (desde–hasta)",
+        "beyondDays": "Más de N días (comodín)",
+        "days": {
+          "name": "Días",
+          "description": "Las tareas vencidas en este número de días desde hoy se asignan aquí."
+        },
+        "fromDay": {
+          "name": "Desde el día",
+          "description": "Inicio de la ventana: número de días desde hoy (ej. 1 = mañana, 7 = una semana desde hoy)."
+        },
+        "toDay": {
+          "name": "Hasta el día",
+          "description": "Fin de la ventana: número de días desde hoy (ej. 14 = dos semanas desde hoy)."
+        },
+        "beyondThreshold": {
+          "name": "Umbral de días",
+          "description": "Las tareas vencidas en más de este número de días desde hoy se asignan aquí."
+        }
+      },
+      "quickMove": {
+        "button1Name": "Botón de movimiento rápido 1",
+        "button2Name": "Botón de movimiento rápido 2",
+        "button1Description": "Destino primario de movimiento rápido en cada fila de tarea.",
+        "button2Description": "Segundo destino de movimiento rápido opcional.",
+        "none": "(Ninguno)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "Hoy" },
+      "this-week":  { "name": "Esta semana" },
+      "next-week":  { "name": "Próxima semana" },
+      "this-month": { "name": "Este mes" },
+      "someday":    { "name": "Algún día / Quizás" }
+    },
+    "toReview": "Por revisar"
+  }
+}

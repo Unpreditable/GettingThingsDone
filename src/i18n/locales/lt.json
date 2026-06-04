@@ -1,0 +1,186 @@
+{
+  "common": {
+    "cancel": "Atšaukti"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "Ieškoti…",
+    "clearSearch": "Išvalyti paiešką",
+    "dismissAll": "Slėpti visas atliktas užduotis",
+    "openSettings": "Atidaryti GTD nustatymus",
+    "searchStatus": "Rodoma {{matched}} iš {{total}} užduočių ×",
+    "noTasksFound": "Užduočių nerasta. Pakeiskite užduočių aprėptį nustatymuose.",
+    "moveConfirm": {
+      "message": "{{count}} použduočių turi savo kategoriją. Perkelti ir jas?",
+      "moveAll": "Perkelti visas",
+      "parentOnly": "Tik pagrindinę užduotį",
+      "cancel": "Atšaukti"
+    },
+    "contextMenu": {
+      "moveTo": "Perkelti į: {{name}}",
+      "openFile": "Atidaryti failą"
+    },
+    "languageBanner": {
+      "message": "Obsidian kalba pasikeitė. Kategorijų pavadinimai atnaujinti ten, kur buvo įmanoma — patikrinkite nustatymus, jei reikia.",
+      "openSettings": "Atidaryti nustatymus",
+      "dismiss": "Gerai"
+    }
+  },
+  "task": {
+    "staleTooltip": "Už planuoto laiko lango ribų",
+    "autoPlacedTooltip": "Automatiškai patalpinta pagal terminą — spustelėkite patvirtinti",
+    "subtaskTooltip": "Použduotis",
+    "activeSubtasks_one": "{{count}} aktyvi použduotis",
+    "activeSubtasks_few": "{{count}} aktyvios použduotys",
+    "activeSubtasks_many": "{{count}} aktyvių použduočių",
+    "activeSubtasks_other": "{{count}} aktyvių použduočių",
+    "dismiss": "Slėpti",
+    "moveTo": "Perkelti į {{name}}",
+    "emptyTask": "(tuščia užduotis)"
+  },
+  "commands": {
+    "openPanel": "Atidaryti skydelį"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: Perkėlimas nepavyko — {{error}}",
+    "toggleFailed": "GTD Tasks: Perjungimas nepavyko — {{error}}",
+    "confirmFailed": "GTD Tasks: Patvirtinimas nepavyko — {{error}}",
+    "migrationComplete": "GTD Tasks: Migracija baigta. Atnaujinta {{migrated}} užduočių, praleista {{failed}}."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "Emoji",
+    "emojiButtonTooltip": "Spustelėkite pasirinkti emoji",
+    "annotationStyle": {
+      "name": "Anotacijos stilius",
+      "inlineTag": "Eilutinis žymos",
+      "inlineField": "Eilutinis laukas",
+      "descHeader": "Nustato, kaip įskiepis saugo informaciją apie užduoties kategoriją:",
+      "descInlineTag": "Eilutinis žyma — prideda #prefiksas/kategorijos-id prie užduoties eilutės (pvz. #gtd/today)",
+      "descInlineField": "Eilutinis laukas — prideda [prefiksas:: kategorijos-id] prie užduoties eilutės (suderinama su Dataview)"
+    },
+    "migrate": {
+      "button_one": "Migruoti {{count}} užduotį",
+      "button_few": "Migruoti {{count}} užduotis",
+      "button_many": "Migruoti {{count}} užduočių",
+      "button_other": "Migruoti {{count}} užduočių",
+      "none": "Nėra užduočių migracijai",
+      "inProgress": "Migruojama…"
+    },
+    "tagFieldName": {
+      "name": "Žymos / lauko pavadinimas",
+      "description": "Naudojamas kaip žymos prefiksas eilutinio žymos režime (#<pavadinimas>/kategorijos-id) ir kaip lauko raktas eilutinio lauko režime ([<pavadinimas>:: kategorijos-id]).",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "Skaityti {{pluginName}} įskiepio metaduomenis",
+      "description": "Skaityti termino datas 📅 ir užbaigimo datas ✅, parašytas {{pluginName}} įskiepio."
+    },
+    "filesToScan": {
+      "name": "Nuskaityti failai",
+      "description": "Failai, kuriuose įskiepis ieško užduočių.",
+      "entireVault": "Visas saugykla",
+      "specificFolders": "Konkretūs aplankai",
+      "specificFiles": "Konkretūs failai",
+      "addFolder": "+ Pridėti aplanką",
+      "addFile": "+ Pridėti failą",
+      "folderPlaceholder": "pvz. Užduotys",
+      "filePlaceholder": "pvz. Užduotys/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Rodyti atliktas užduotis iki vidurnakčio",
+        "description": "Atliktos užduotys lieka matomos skydelyje su perbraukimu iki vidurnakčio, tada dingsta kitą kartą įkėlus."
+      },
+      "markOverdue": {
+        "name": "Žymėti vėluojančias užduotis !",
+        "description": "Užduotys, viršijusios kategorijos planuotą laiko langą, žymimos vėlavimo indikatoriumi."
+      },
+      "compactView": {
+        "name": "Kompaktiškas rodinys",
+        "description": "Sumažinti kategorijų antraščių ir užduočių eilučių atstumus, kad ekrane tilptų daugiau užduočių."
+      },
+      "celebration": {
+        "name": "Šventimo animacijos",
+        "description": "Pasirinkite animacijas, kurios groja atlikus užduotį.",
+        "off": "Išjungta",
+        "confettiOnly": "Tik konfeti",
+        "celebrationOnly": "Tik šventimas",
+        "both": "Konfeti ir šventimas"
+      }
+    },
+    "buckets": {
+      "heading": "Kategorijos",
+      "moveUp": "Perkelti aukštyn",
+      "moveDown": "Perkelti žemyn",
+      "addBucket": "Pridėti kategoriją",
+      "newBucketName": "Nauja kategorija",
+      "resetToDefaults": "Atkurti numatytuosius",
+      "resetConfirm": "Atkurti visas kategorijas į numatytuosius? Dabartinė konfigūracija bus ištrinta.",
+      "resetButton": "Atkurti",
+      "systemBucket": "sistema · negalima pašalinti",
+      "showInStatusBar": {
+        "name": "Rodyti būsenos juostoje",
+        "description": "Rodyti {{bucketName}} skaičių būsenos juostoje."
+      },
+      "field": {
+        "name": "Pavadinimas",
+        "id": "ID / Slug",
+        "idDescription": "Vidinis identifikatorius žymoms/laukams. Be tarpų.",
+        "idDuplicate": "ID \"{{id}}\" jau naudoja \"{{existing}}\".",
+        "showInStatusBar": "Rodyti būsenos juostoje",
+        "showInStatusBarDescription": "Rodyti šios kategorijos užduočių skaičių būsenos juostoje.",
+        "delete": "Ištrinti",
+        "deleteTooltip": "Ištrinti šią kategoriją",
+        "deleteConfirm": "Ištrinti kategoriją \"{{name}}\"? Šio veiksmo negalima atšaukti.",
+        "deleteButton": "Ištrinti"
+      },
+      "dateRule": {
+        "name": "Datų diapazono taisyklė",
+        "description": "Automatiškai priskirti užduotis pagal jų termino datą 📅. Jei kelios kategorijos turi persidengančias taisykles, laimi pirmoji tinkama (iš viršaus į apačią).",
+        "none": "Nėra (tik rankiniu būdu/žyma)",
+        "today": "Šiandien (terminas šiandien arba vėluoja)",
+        "thisWeek": "Šią savaitę (rytoj – einamojo sekmadienio pabaiga)",
+        "nextWeek": "Kitą savaitę (kitas pirmadienis – kitas sekmadienis)",
+        "thisMonth": "Šį mėnesį (1 diena – einamojo mėnesio pabaiga)",
+        "nextMonth": "Kitą mėnesį (1-a – paskutinė kito mėnesio diena)",
+        "withinDays": "Per N dienų",
+        "withinRange": "Dienų diapazone (nuo–iki)",
+        "beyondDays": "Daugiau nei N dienų (visi kiti)",
+        "days": {
+          "name": "Dienos",
+          "description": "Užduotys, kurių terminas yra per nurodytą dienų skaičių nuo šiandien, priskiriamos čia."
+        },
+        "fromDay": {
+          "name": "Nuo dienos",
+          "description": "Lango pradžia: dienų skaičius nuo šiandien (pvz. 1 = rytoj, 7 = savaitė nuo šiandien)."
+        },
+        "toDay": {
+          "name": "Iki dienos",
+          "description": "Lango pabaiga: dienų skaičius nuo šiandien (pvz. 14 = dvi savaitės nuo šiandien)."
+        },
+        "beyondThreshold": {
+          "name": "Dienų riba",
+          "description": "Užduotys, kurių terminas yra daugiau nei nurodytas dienų skaičius nuo šiandien, priskiriamos čia."
+        }
+      },
+      "quickMove": {
+        "button1Name": "Greito perkėlimo mygtukas 1",
+        "button2Name": "Greito perkėlimo mygtukas 2",
+        "button1Description": "Pagrindinis greito perkėlimo tikslas kiekvienoje užduoties eilutėje.",
+        "button2Description": "Neprivalomas antras greito perkėlimo tikslas.",
+        "none": "(Nėra)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "Šiandien" },
+      "this-week":  { "name": "Šią savaitę" },
+      "next-week":  { "name": "Kitą savaitę" },
+      "this-month": { "name": "Šį mėnesį" },
+      "someday":    { "name": "Kažkada / Galbūt" }
+    },
+    "toReview": "Peržiūrėti"
+  }
+}

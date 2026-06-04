@@ -1,0 +1,184 @@
+{
+  "common": {
+    "cancel": "Atcelt"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "Meklēt…",
+    "clearSearch": "Notīrīt meklēšanu",
+    "dismissAll": "Paslēpt visus paveiktos uzdevumus",
+    "openSettings": "Atvērt GTD iestatījumus",
+    "searchStatus": "Rāda {{matched}} no {{total}} uzdevumiem ×",
+    "noTasksFound": "Uzdevumi nav atrasti. Pielāgojiet uzdevumu tvērumu iestatījumos.",
+    "moveConfirm": {
+      "message": "{{count}} apakšuzdevumiem ir piesaistīta sava kategorija. Pārvietot arī tos?",
+      "moveAll": "Pārvietot visus",
+      "parentOnly": "Tikai vecākuzdevumu",
+      "cancel": "Atcelt"
+    },
+    "contextMenu": {
+      "moveTo": "Pārvietot uz: {{name}}",
+      "openFile": "Atvērt failu"
+    },
+    "languageBanner": {
+      "message": "Obsidian valoda ir mainīta. Kategoriju nosaukumi atjaunināti, kur iespējams — pārbaudiet iestatījumus, ja nepieciešams.",
+      "openSettings": "Atvērt iestatījumus",
+      "dismiss": "Aizvērt"
+    }
+  },
+  "task": {
+    "staleTooltip": "Ārpus plānotā laika loga",
+    "autoPlacedTooltip": "Automātiski izvietots pēc izpildes datuma — noklikšķiniet, lai apstiprinātu",
+    "subtaskTooltip": "Apakšuzdevums",
+    "activeSubtasks_zero": "{{count}} aktīvu apakšuzdevumu",
+    "activeSubtasks_one": "{{count}} aktīvs apakšuzdevums",
+    "activeSubtasks_other": "{{count}} aktīvi apakšuzdevumi",
+    "dismiss": "Paslēpt",
+    "moveTo": "Pārvietot uz {{name}}",
+    "emptyTask": "(tukšs uzdevums)"
+  },
+  "commands": {
+    "openPanel": "Atvērt paneli"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: Pārvietošana neizdevās — {{error}}",
+    "toggleFailed": "GTD Tasks: Pārslēgšana neizdevās — {{error}}",
+    "confirmFailed": "GTD Tasks: Apstiprināšana neizdevās — {{error}}",
+    "migrationComplete": "GTD Tasks: Migrācija pabeigta. Atjaunināti {{migrated}} uzdevumi, izlaisti {{failed}}."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "Emocijzīme",
+    "emojiButtonTooltip": "Noklikšķiniet, lai izvēlētos emocijzīmi",
+    "annotationStyle": {
+      "name": "Anotācijas stils",
+      "inlineTag": "Iekļautā birka",
+      "inlineField": "Iekļautais lauks",
+      "descHeader": "Nosaka, kā spraudnis glabā informāciju par uzdevuma kategoriju:",
+      "descInlineTag": "Iekļautā birka — pievieno #prefikss/kategorijas-id uzdevuma rindai (piem. #gtd/today)",
+      "descInlineField": "Iekļautais lauks — pievieno [prefikss:: kategorijas-id] uzdevuma rindai (saderīgs ar Dataview)"
+    },
+    "migrate": {
+      "button_zero": "Migrēt {{count}} uzdevumu",
+      "button_one": "Migrēt {{count}} uzdevumu",
+      "button_other": "Migrēt {{count}} uzdevumus",
+      "none": "Nav uzdevumu migrācijai",
+      "inProgress": "Notiek migrācija…"
+    },
+    "tagFieldName": {
+      "name": "Birkas / lauka nosaukums",
+      "description": "Izmanto kā birkas prefiksu iekļautās birkas režīmā (#<nosaukums>/kategorijas-id) un kā lauka atslēgu iekļautā lauka režīmā ([<nosaukums>:: kategorijas-id]).",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "Lasīt {{pluginName}} spraudņa metadatus",
+      "description": "Lasīt izpildes datumus 📅 un pabeigšanas datumus ✅, ko uzrakstījis {{pluginName}} spraudnis."
+    },
+    "filesToScan": {
+      "name": "Skenējamie faili",
+      "description": "Kuri faili tiek meklēti uzdevumu atrašanai.",
+      "entireVault": "Viss glabātuve",
+      "specificFolders": "Konkrētas mapes",
+      "specificFiles": "Konkrēti faili",
+      "addFolder": "+ Pievienot mapi",
+      "addFile": "+ Pievienot failu",
+      "folderPlaceholder": "piem. Uzdevumi",
+      "filePlaceholder": "piem. Uzdevumi/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Rādīt paveiktos uzdevumus līdz pusnaktij",
+        "description": "Paveiktie uzdevumi paliek redzami paneļa ar pārsvītrojumu līdz pusnaktij, pēc tam pazūd nākamajā ielādē."
+      },
+      "markOverdue": {
+        "name": "Atzīmēt kavētos uzdevumus ar !",
+        "description": "Uzdevumi, kas pārsnieguši savas kategorijas plānoto laika logu, tiek atzīmēti ar kavēšanās indikatoru."
+      },
+      "compactView": {
+        "name": "Kompakts skats",
+        "description": "Samazināt atkāpes kategoriju virsrakstos un uzdevumu rindās, lai ekrānā rādītu vairāk uzdevumu."
+      },
+      "celebration": {
+        "name": "Svinību animācijas",
+        "description": "Izvēlieties animācijas, kas tiek atskaņotas uzdevuma izpildes brīdī.",
+        "off": "Izslēgts",
+        "confettiOnly": "Tikai konfeti",
+        "celebrationOnly": "Tikai svinības",
+        "both": "Konfeti un svinības"
+      }
+    },
+    "buckets": {
+      "heading": "Kategorijas",
+      "moveUp": "Uz augšu",
+      "moveDown": "Uz leju",
+      "addBucket": "Pievienot kategoriju",
+      "newBucketName": "Jauna kategorija",
+      "resetToDefaults": "Atjaunot noklusējumu",
+      "resetConfirm": "Atjaunot visas kategorijas uz noklusējumu? Pašreizējā konfigurācija tiks dzēsta.",
+      "resetButton": "Atjaunot",
+      "systemBucket": "sistēma · nevar noņemt",
+      "showInStatusBar": {
+        "name": "Rādīt statusa joslā",
+        "description": "Rādīt {{bucketName}} skaitu statusa joslā."
+      },
+      "field": {
+        "name": "Nosaukums",
+        "id": "ID / Slug",
+        "idDescription": "Iekšējais identifikators birkām/laukiem. Bez atstarpēm.",
+        "idDuplicate": "ID «{{id}}» jau izmanto «{{existing}}».",
+        "showInStatusBar": "Rādīt statusa joslā",
+        "showInStatusBarDescription": "Rādīt šīs kategorijas uzdevumu skaitu statusa joslā.",
+        "delete": "Dzēst",
+        "deleteTooltip": "Dzēst šo kategoriju",
+        "deleteConfirm": "Dzēst kategoriju «{{name}}»? Šo darbību nevar atsaukt.",
+        "deleteButton": "Dzēst"
+      },
+      "dateRule": {
+        "name": "Datumu diapazona kārtula",
+        "description": "Automātiski piešķirt uzdevumus pēc to izpildes datuma 📅. Ja vairākām kategorijām ir pārklājošās kārtulas, uzvar pirmā atbilstošā (no augšas uz leju).",
+        "none": "Nav (tikai manuāli/birka)",
+        "today": "Šodien (izpilde šodien vai kavēts)",
+        "thisWeek": "Šī nedēļa (rīt – pašreizējās svētdienas beigas)",
+        "nextWeek": "Nākamā nedēļa (nākamais pirmdiena – nākamā svētdiena)",
+        "thisMonth": "Šis mēnesis (1 diena – pašreizējā mēneša beigas)",
+        "nextMonth": "Nākamais mēnesis (1. – nākamā mēneša pēdējā diena)",
+        "withinDays": "N dienu laikā",
+        "withinRange": "Dienu diapazonā (no–līdz)",
+        "beyondDays": "Vairāk par N dienām (visi pārējie)",
+        "days": {
+          "name": "Dienas",
+          "description": "Uzdevumi ar izpildes termiņu norādītajā dienu skaitā no šodienas tiek piešķirti šeit."
+        },
+        "fromDay": {
+          "name": "Sākuma diena",
+          "description": "Loga sākums: dienu skaits no šodienas (piem. 1 = rīt, 7 = pēc nedēļas)."
+        },
+        "toDay": {
+          "name": "Beigu diena",
+          "description": "Loga beigas: dienu skaits no šodienas (piem. 14 = pēc divām nedēļām)."
+        },
+        "beyondThreshold": {
+          "name": "Dienu slieksnis",
+          "description": "Uzdevumi ar izpildes termiņu vairāk par norādīto dienu skaitu no šodienas tiek piešķirti šeit."
+        }
+      },
+      "quickMove": {
+        "button1Name": "Ātrās pārvietošanas poga 1",
+        "button2Name": "Ātrās pārvietošanas poga 2",
+        "button1Description": "Primārais ātrās pārvietošanas mērķis katrā uzdevuma rindā.",
+        "button2Description": "Neobligāts otrais ātrās pārvietošanas mērķis.",
+        "none": "(Nav)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "Šodien" },
+      "this-week":  { "name": "Šajā nedēļā" },
+      "next-week":  { "name": "Nākamajā nedēļā" },
+      "this-month": { "name": "Šajā mēnesī" },
+      "someday":    { "name": "Kādreiz / Varbūt" }
+    },
+    "toReview": "Jāpārskata"
+  }
+}

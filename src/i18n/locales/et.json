@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "Tühista"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "Otsi…",
+    "clearSearch": "Kustuta otsing",
+    "dismissAll": "Peida kõik lõpetatud ülesanded",
+    "openSettings": "Ava GTD seaded",
+    "searchStatus": "Näitan {{matched}} / {{total}} ülesannet ×",
+    "noTasksFound": "Ülesandeid ei leitud. Muuda ülesannete ulatust seadetes.",
+    "moveConfirm": {
+      "message": "{{count}} alamülesandel on oma kategooria määratud. Teisaldada ka need?",
+      "moveAll": "Teisalda kõik",
+      "parentOnly": "Ainult peaülesanne",
+      "cancel": "Tühista"
+    },
+    "contextMenu": {
+      "moveTo": "Teisalda: {{name}}",
+      "openFile": "Ava fail"
+    },
+    "languageBanner": {
+      "message": "Obsidiani keel on muutunud. Kategooriate nimed uuendati võimalusel — vaata vajadusel seadetest üle.",
+      "openSettings": "Ava seaded",
+      "dismiss": "OK"
+    }
+  },
+  "task": {
+    "staleTooltip": "Väljaspool planeeritud ajavahemikku",
+    "autoPlacedTooltip": "Paigutatud automaatselt tähtaja järgi — kinnita klõpsates",
+    "subtaskTooltip": "Alamülesanne",
+    "activeSubtasks_one": "{{count}} aktiivne alamülesanne",
+    "activeSubtasks_other": "{{count}} aktiivset alamülesannet",
+    "dismiss": "Peida",
+    "moveTo": "Teisalda: {{name}}",
+    "emptyTask": "(tühi ülesanne)"
+  },
+  "commands": {
+    "openPanel": "Ava paneel"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks: Teisaldamine ebaõnnestus — {{error}}",
+    "toggleFailed": "GTD Tasks: Lülitamine ebaõnnestus — {{error}}",
+    "confirmFailed": "GTD Tasks: Kinnitamine ebaõnnestus — {{error}}",
+    "migrationComplete": "GTD Tasks: Migratsioon lõpetatud. {{migrated}} ülesannet uuendatud, {{failed}} vahele jäetud."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "Emoji",
+    "emojiButtonTooltip": "Klõpsa emoji valimiseks",
+    "annotationStyle": {
+      "name": "Annotatsiooni stiil",
+      "inlineTag": "Reasisene silt",
+      "inlineField": "Reasisene väli",
+      "descHeader": "Määrab, kuidas plugin salvestab iga ülesande kuuluvuse kategooriasse:",
+      "descInlineTag": "Reasisene silt — lisab #eesliide/kategooria-id ülesande reale (nt #gtd/today)",
+      "descInlineField": "Reasisene väli — lisab [eesliide:: kategooria-id] ülesande reale (Dataview-ühilduv)"
+    },
+    "migrate": {
+      "button_one": "Migreeri {{count}} ülesanne",
+      "button_other": "Migreeri {{count}} ülesannet",
+      "none": "Migreerida pole midagi",
+      "inProgress": "Migreeritakse…"
+    },
+    "tagFieldName": {
+      "name": "Sildi / välja nimi",
+      "description": "Kasutatakse sildi eesliitena reasisese sildi režiimis (#<nimi>/kategooria-id) ja välja võtmena reasisese välja režiimis ([<nimi>:: kategooria-id]).",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "Loe {{pluginName}} plugina metaandmeid",
+      "description": "Loe tähtaegu 📅 ja lõpetamise kuupäevi ✅, mille on kirjutanud {{pluginName}} plugin."
+    },
+    "filesToScan": {
+      "name": "Skaneeritavad failid",
+      "description": "Millistes failides plugin ülesandeid otsib.",
+      "entireVault": "Kogu hoidla",
+      "specificFolders": "Konkreetsed kaustad",
+      "specificFiles": "Konkreetsed failid",
+      "addFolder": "+ Lisa kaust",
+      "addFile": "+ Lisa fail",
+      "folderPlaceholder": "nt Ülesanded",
+      "filePlaceholder": "nt Ülesanded/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Näita lõpetatud ülesandeid kuni südaööni",
+        "description": "Lõpetatud ülesanded jäävad paneelile läbikriipsutuna nähtavaks kuni südaööni, seejärel kaovad järgmisel laadimisel."
+      },
+      "markOverdue": {
+        "name": "Märgi hilinenud ülesanded !-ga",
+        "description": "Ülesanded, mis on kategooria planeeritud ajavahemikust väljas, märgitakse hilinemise indikaatoriga."
+      },
+      "compactView": {
+        "name": "Kompaktne vaade",
+        "description": "Vähenda kategooriate päiste ja ülesannete ridade täidist, et ekraanil mahutada rohkem ülesandeid."
+      },
+      "celebration": {
+        "name": "Tähistamise animatsioonid",
+        "description": "Vali animatsioonid, mis mängivad ülesande lõpetamisel.",
+        "off": "Väljas",
+        "confettiOnly": "Ainult konfetti",
+        "celebrationOnly": "Ainult tähistamine",
+        "both": "Konfetti ja tähistamine"
+      }
+    },
+    "buckets": {
+      "heading": "Kategooriad",
+      "moveUp": "Liiguta üles",
+      "moveDown": "Liiguta alla",
+      "addBucket": "Lisa kategooria",
+      "newBucketName": "Uus kategooria",
+      "resetToDefaults": "Lähtesta vaikeväärtused",
+      "resetConfirm": "Lähtesta kõik kategooriad vaikeväärtustele? See kustutab praeguse konfiguratsiooni.",
+      "resetButton": "Lähtesta",
+      "systemBucket": "süsteem · ei saa eemaldada",
+      "showInStatusBar": {
+        "name": "Kuva olekuribal",
+        "description": "Kuva {{bucketName}} arv olekuribal."
+      },
+      "field": {
+        "name": "Nimi",
+        "id": "ID / slug",
+        "idDescription": "Siltides/väljades kasutatav siseidentifikaator. Tühikud ei ole lubatud.",
+        "idDuplicate": "ID \"{{id}}\" on juba kasutusel: \"{{existing}}\".",
+        "showInStatusBar": "Kuva olekuribal",
+        "showInStatusBarDescription": "Kuva selle kategooria ülesannete arv olekuribal.",
+        "delete": "Kustuta",
+        "deleteTooltip": "Kustuta see kategooria",
+        "deleteConfirm": "Kustuta kategooria \"{{name}}\"? Seda ei saa tagasi võtta.",
+        "deleteButton": "Kustuta"
+      },
+      "dateRule": {
+        "name": "Kuupäevavahemiku reegel",
+        "description": "Määra ülesanded automaatselt nende tähtpäeva 📅 järgi. Kui mitmel kategoorial on kattuvad reeglid, võidab esimene sobiv (ülalt alla).",
+        "none": "Puudub (ainult käsitsi/silt)",
+        "today": "Täna (tähtaeg täna või hilinenud)",
+        "thisWeek": "See nädal (homme – praeguse pühapäeva lõpp)",
+        "nextWeek": "Järgmine nädal (järgmine esmaspäev – järgmine pühapäev)",
+        "thisMonth": "See kuu (1 päev – praeguse kuu lõpp)",
+        "nextMonth": "Järgmine kuu (1. – järgmise kuu viimane päev)",
+        "withinDays": "N päeva jooksul",
+        "withinRange": "Päevavahemikus (alates–kuni)",
+        "beyondDays": "Rohkem kui N päeva (kõik muud)",
+        "days": {
+          "name": "Päevad",
+          "description": "Ülesanded, mille tähtaeg on määratud päevade arvu jooksul tänasest, määratakse siia."
+        },
+        "fromDay": {
+          "name": "Alates päevast",
+          "description": "Akna algus: päevade arv tänasest (nt 1 = homme, 7 = nädal tänasest)."
+        },
+        "toDay": {
+          "name": "Kuni päevani",
+          "description": "Akna lõpp: päevade arv tänasest (nt 14 = kaks nädalat tänasest)."
+        },
+        "beyondThreshold": {
+          "name": "Päevade lävi",
+          "description": "Ülesanded, mille tähtaeg on rohkem kui määratud päevade arv tänasest, määratakse siia."
+        }
+      },
+      "quickMove": {
+        "button1Name": "Kiirteisalduse nupp 1",
+        "button2Name": "Kiirteisalduse nupp 2",
+        "button1Description": "Esmane kiirteisalduse sihtkoht igal ülesande real.",
+        "button2Description": "Valikuline teine kiirteisalduse sihtkoht.",
+        "none": "(Puudub)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "Täna" },
+      "this-week":  { "name": "Sel nädalal" },
+      "next-week":  { "name": "Järgmisel nädalal" },
+      "this-month": { "name": "Sel kuul" },
+      "someday":    { "name": "Kunagi / Ehk" }
+    },
+    "toReview": "Ülevaatamiseks"
+  }
+}

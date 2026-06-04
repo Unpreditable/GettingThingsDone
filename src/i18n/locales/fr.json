@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": "Annuler"
+  },
+  "panel": {
+    "title": "GTD Tasks",
+    "searchPlaceholder": "Rechercher…",
+    "clearSearch": "Effacer la recherche",
+    "dismissAll": "Ignorer toutes les tâches terminées",
+    "openSettings": "Ouvrir les paramètres GTD",
+    "searchStatus": "Affichage de {{matched}} sur {{total}} tâches ×",
+    "noTasksFound": "Aucune tâche trouvée. Ajustez la portée des tâches dans les paramètres.",
+    "moveConfirm": {
+      "message": "{{count}} sous-tâches ont leur propre catégorie assignée. Les déplacer aussi ?",
+      "moveAll": "Tout déplacer",
+      "parentOnly": "Tâche parente uniquement",
+      "cancel": "Annuler"
+    },
+    "contextMenu": {
+      "moveTo": "Déplacer vers : {{name}}",
+      "openFile": "Ouvrir le fichier"
+    },
+    "languageBanner": {
+      "message": "Votre langue Obsidian a changé. Les noms des catégories ont été mis à jour si possible — vérifiez les paramètres si nécessaire.",
+      "openSettings": "Ouvrir les paramètres",
+      "dismiss": "Ignorer"
+    }
+  },
+  "task": {
+    "staleTooltip": "Hors de la fenêtre planifiée",
+    "autoPlacedTooltip": "Placé automatiquement selon la date d'échéance — cliquez pour confirmer",
+    "subtaskTooltip": "Sous-tâche",
+    "activeSubtasks_one": "{{count}} sous-tâche active",
+    "activeSubtasks_other": "{{count}} sous-tâches actives",
+    "dismiss": "Ignorer",
+    "moveTo": "Déplacer vers {{name}}",
+    "emptyTask": "(tâche vide)"
+  },
+  "commands": {
+    "openPanel": "Ouvrir le panneau"
+  },
+  "notices": {
+    "moveFailed": "GTD Tasks : Déplacement échoué — {{error}}",
+    "toggleFailed": "GTD Tasks : Basculement échoué — {{error}}",
+    "confirmFailed": "GTD Tasks : Confirmation échouée — {{error}}",
+    "migrationComplete": "GTD Tasks : Migration terminée. {{migrated}} tâches mises à jour, {{failed}} ignorées."
+  },
+  "settings": {
+    "heading": "Getting Things Done",
+    "emoji": "Emoji",
+    "emojiButtonTooltip": "Cliquer pour choisir un emoji",
+    "annotationStyle": {
+      "name": "Style d'annotation",
+      "inlineTag": "Étiquette en ligne",
+      "inlineField": "Champ en ligne",
+      "descHeader": "Contrôle la façon dont le plugin stocke l'appartenance de chaque tâche à une catégorie :",
+      "descInlineTag": "Étiquette en ligne — ajoute #préfixe/id-catégorie à la ligne de tâche (ex. #gtd/today)",
+      "descInlineField": "Champ en ligne — ajoute [préfixe:: id-catégorie] à la ligne de tâche (compatible Dataview)"
+    },
+    "migrate": {
+      "button_one": "Migrer {{count}} tâche",
+      "button_other": "Migrer {{count}} tâches",
+      "none": "Aucune tâche à migrer",
+      "inProgress": "Migration en cours…"
+    },
+    "tagFieldName": {
+      "name": "Nom de l'étiquette / du champ",
+      "description": "Utilisé comme préfixe d'étiquette en mode Étiquette en ligne (#<nom>/id-catégorie) et comme clé de champ en mode Champ en ligne ([<nom>:: id-catégorie]).",
+      "placeholder": "gtd"
+    },
+    "tasksPlugin": {
+      "name": "Lire les métadonnées du plugin {{pluginName}}",
+      "description": "Lire les dates d'échéance 📅 et les dates de complétion ✅ écrites par le plugin {{pluginName}}."
+    },
+    "filesToScan": {
+      "name": "Fichiers à analyser",
+      "description": "Quels fichiers le plugin recherche pour les tâches.",
+      "entireVault": "Coffre entier",
+      "specificFolders": "Dossiers spécifiques",
+      "specificFiles": "Fichiers spécifiques",
+      "addFolder": "+ Ajouter un dossier",
+      "addFile": "+ Ajouter un fichier",
+      "folderPlaceholder": "ex. Tâches",
+      "filePlaceholder": "ex. Tâches/inbox.md"
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "Afficher les tâches terminées jusqu'à minuit",
+        "description": "Les tâches terminées restent visibles en barré dans le panneau jusqu'à minuit, puis disparaissent au prochain chargement."
+      },
+      "markOverdue": {
+        "name": "Marquer les tâches en retard avec !",
+        "description": "Les tâches qui ont dépassé la fenêtre planifiée de leur catégorie sont marquées d'un indicateur de retard."
+      },
+      "compactView": {
+        "name": "Vue compacte",
+        "description": "Réduire les marges des en-têtes de catégories et des lignes de tâches pour afficher plus de tâches à l'écran."
+      },
+      "celebration": {
+        "name": "Animations de célébration",
+        "description": "Choisissez les animations qui se jouent lorsque vous terminez une tâche.",
+        "off": "Désactivé",
+        "confettiOnly": "Confettis uniquement",
+        "celebrationOnly": "Célébration uniquement",
+        "both": "Confettis et célébration"
+      }
+    },
+    "buckets": {
+      "heading": "Catégories",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "addBucket": "Ajouter une catégorie",
+      "newBucketName": "Nouvelle catégorie",
+      "resetToDefaults": "Réinitialiser les paramètres par défaut",
+      "resetConfirm": "Réinitialiser toutes les catégories par défaut ? La configuration actuelle sera supprimée.",
+      "resetButton": "Réinitialiser",
+      "systemBucket": "système · ne peut pas être supprimé",
+      "showInStatusBar": {
+        "name": "Afficher dans la barre d'état",
+        "description": "Afficher le nombre de {{bucketName}} dans la barre d'état."
+      },
+      "field": {
+        "name": "Nom",
+        "id": "ID / slug",
+        "idDescription": "Identifiant interne utilisé dans les étiquettes/champs. Pas d'espaces.",
+        "idDuplicate": "L'ID « {{id}} » est déjà utilisé par « {{existing}} ».",
+        "showInStatusBar": "Afficher dans la barre d'état",
+        "showInStatusBarDescription": "Afficher le nombre de tâches de cette catégorie dans la barre d'état.",
+        "delete": "Supprimer",
+        "deleteTooltip": "Supprimer cette catégorie",
+        "deleteConfirm": "Supprimer la catégorie « {{name}} » ? Cette action est irréversible.",
+        "deleteButton": "Supprimer"
+      },
+      "dateRule": {
+        "name": "Règle de plage de dates",
+        "description": "Assignation automatique des tâches selon leur date d'échéance 📅. En cas de règles chevauchantes, la première catégorie correspondante (de haut en bas) l'emporte.",
+        "none": "Aucune (manuel/étiquette uniquement)",
+        "today": "Aujourd'hui (échéance aujourd'hui ou en retard)",
+        "thisWeek": "Cette semaine (demain – fin du dimanche courant)",
+        "nextWeek": "Semaine prochaine (lundi prochain – dimanche suivant)",
+        "thisMonth": "Ce mois (1 jour – fin du mois courant)",
+        "nextMonth": "Mois prochain (1er – dernier jour du mois prochain)",
+        "withinDays": "Dans N jours",
+        "withinRange": "Dans une plage de jours (de–à)",
+        "beyondDays": "Au-delà de N jours (fourre-tout)",
+        "days": {
+          "name": "Jours",
+          "description": "Les tâches dues dans ce nombre de jours à partir d'aujourd'hui sont assignées ici."
+        },
+        "fromDay": {
+          "name": "Depuis le jour",
+          "description": "Début de la fenêtre : nombre de jours depuis aujourd'hui (ex. 1 = demain, 7 = une semaine depuis aujourd'hui)."
+        },
+        "toDay": {
+          "name": "Jusqu'au jour",
+          "description": "Fin de la fenêtre : nombre de jours depuis aujourd'hui (ex. 14 = deux semaines depuis aujourd'hui)."
+        },
+        "beyondThreshold": {
+          "name": "Seuil en jours",
+          "description": "Les tâches dues dans plus de ce nombre de jours depuis aujourd'hui sont assignées ici."
+        }
+      },
+      "quickMove": {
+        "button1Name": "Bouton de déplacement rapide 1",
+        "button2Name": "Bouton de déplacement rapide 2",
+        "button1Description": "Cible principale de déplacement rapide affichée sur chaque ligne de tâche.",
+        "button2Description": "Deuxième cible de déplacement rapide optionnelle.",
+        "none": "(Aucun)"
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "Aujourd'hui" },
+      "this-week":  { "name": "Cette semaine" },
+      "next-week":  { "name": "Semaine prochaine" },
+      "this-month": { "name": "Ce mois" },
+      "someday":    { "name": "Un jour / Peut-être" }
+    },
+    "toReview": "À examiner"
+  }
+}
