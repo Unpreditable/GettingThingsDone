@@ -73,7 +73,7 @@
   let tooltipTimer: ReturnType<typeof setTimeout>;
 
   function onMouseEnter() {
-    tooltipTimer = setTimeout(() => (showTooltip = true), 400);
+    tooltipTimer = setTimeout(() => (showTooltip = true), 800);
   }
 
   function onMouseLeave() {
