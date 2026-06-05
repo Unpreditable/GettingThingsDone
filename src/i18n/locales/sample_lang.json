@@ -1,0 +1,182 @@
+{
+  "common": {
+    "cancel": ""
+  },
+  "panel": {
+    "title": "",
+    "searchPlaceholder": "",
+    "clearSearch": "",
+    "dismissAll": "",
+    "openSettings": "",
+    "searchStatus": "",
+    "noTasksFound": "",
+    "moveConfirm": {
+      "message": "",
+      "moveAll": "",
+      "parentOnly": "",
+      "cancel": ""
+    },
+    "contextMenu": {
+      "moveTo": "",
+      "openFile": ""
+    },
+    "languageBanner": {
+      "message": "",
+      "openSettings": "",
+      "dismiss": ""
+    }
+  },
+  "task": {
+    "staleTooltip": "",
+    "autoPlacedTooltip": "",
+    "subtaskTooltip": "",
+    "activeSubtasks_one": "",
+    "activeSubtasks_other": "",
+    "dismiss": "",
+    "moveTo": "",
+    "emptyTask": ""
+  },
+  "commands": {
+    "openPanel": ""
+  },
+  "notices": {
+    "moveFailed": "",
+    "toggleFailed": "",
+    "confirmFailed": "",
+    "migrationComplete": ""
+  },
+  "settings": {
+    "heading": "",
+    "emoji": "",
+    "emojiButtonTooltip": "",
+    "annotationStyle": {
+      "name": "",
+      "inlineTag": "",
+      "inlineField": "",
+      "descHeader": "",
+      "descInlineTag": "",
+      "descInlineField": ""
+    },
+    "migrate": {
+      "button_one": "",
+      "button_other": "",
+      "none": "",
+      "inProgress": ""
+    },
+    "tagFieldName": {
+      "name": "",
+      "description": "",
+      "placeholder": ""
+    },
+    "tasksPlugin": {
+      "name": "",
+      "description": ""
+    },
+    "filesToScan": {
+      "name": "",
+      "description": "",
+      "entireVault": "",
+      "specificFolders": "",
+      "specificFiles": "",
+      "addFolder": "",
+      "addFile": "",
+      "folderPlaceholder": "",
+      "filePlaceholder": ""
+    },
+    "behaviour": {
+      "showCompleted": {
+        "name": "",
+        "description": ""
+      },
+      "markOverdue": {
+        "name": "",
+        "description": ""
+      },
+      "compactView": {
+        "name": "",
+        "description": ""
+      },
+      "celebration": {
+        "name": "",
+        "description": "",
+        "off": "",
+        "confettiOnly": "",
+        "celebrationOnly": "",
+        "both": ""
+      }
+    },
+    "buckets": {
+      "heading": "",
+      "moveUp": "",
+      "moveDown": "",
+      "addBucket": "",
+      "newBucketName": "",
+      "resetToDefaults": "",
+      "resetConfirm": "",
+      "resetButton": "",
+      "systemBucket": "",
+      "showInStatusBar": {
+        "name": "",
+        "description": ""
+      },
+      "field": {
+        "name": "",
+        "id": "",
+        "idDescription": "",
+        "idDuplicate": "",
+        "showInStatusBar": "",
+        "showInStatusBarDescription": "",
+        "delete": "",
+        "deleteTooltip": "",
+        "deleteConfirm": "",
+        "deleteButton": ""
+      },
+      "dateRule": {
+        "name": "",
+        "description": "",
+        "none": "",
+        "today": "",
+        "thisWeek": "",
+        "nextWeek": "",
+        "thisMonth": "",
+        "nextMonth": "",
+        "withinDays": "",
+        "withinRange": "",
+        "beyondDays": "",
+        "days": {
+          "name": "",
+          "description": ""
+        },
+        "fromDay": {
+          "name": "",
+          "description": ""
+        },
+        "toDay": {
+          "name": "",
+          "description": ""
+        },
+        "beyondThreshold": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "quickMove": {
+        "button1Name": "",
+        "button2Name": "",
+        "button1Description": "",
+        "button2Description": "",
+        "none": ""
+      }
+    }
+  },
+  "buckets": {
+    "defaults": {
+      "today":      { "name": "" },
+      "this-week":  { "name": "" },
+      "next-week":  { "name": "" },
+      "this-month": { "name": "" },
+      "someday":    { "name": "" }
+    },
+    "toReview": ""
+  }
+}
