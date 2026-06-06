@@ -258,6 +258,10 @@ export class GtdSettingsTab extends PluginSettingTab {
   }
 
   display(): void {
+    this.refresh();
+  }
+
+  private refresh(): void {
     const { containerEl } = this;
     containerEl.empty();
 
@@ -289,7 +293,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.onChange(async (val) => {
           this.plugin.settings.storageMode = val as StorageMode;
           await this.plugin.saveSettings();
-          this.display();
+          this.refresh();
         });
       })
       .addButton((btn) => {
@@ -308,7 +312,7 @@ export class GtdSettingsTab extends PluginSettingTab {
             oppositeMode,
             this.plugin.settings
           );
-          this.display();
+          this.refresh();
         });
       });
 
@@ -365,7 +369,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           }
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
-          this.display();
+          this.refresh();
         });
       });
 
@@ -549,7 +553,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         showInStatusBar: false,
       });
       await this.plugin.saveSettings();
-      this.display();
+      this.refresh();
     };
 
     const resetBtn = actionRow.createEl("button", {
@@ -564,7 +568,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         async () => {
           this.plugin.settings.buckets = JSON.parse(JSON.stringify(DEFAULT_BUCKETS)) as BucketConfig[];
           await this.plugin.saveSettings();
-          this.display();
+          this.refresh();
         }
       ).open();
     };
@@ -671,13 +675,13 @@ export class GtdSettingsTab extends PluginSettingTab {
         e.stopPropagation();
         [buckets[idx - 1], buckets[idx]] = [buckets[idx], buckets[idx - 1]];
         await this.plugin.saveSettings();
-        this.display();
+        this.refresh();
       };
       downBtn.onclick = async (e) => {
         e.stopPropagation();
         [buckets[idx + 1], buckets[idx]] = [buckets[idx], buckets[idx + 1]];
         await this.plugin.saveSettings();
-        this.display();
+        this.refresh();
       };
 
       // Expand/collapse
@@ -806,7 +810,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         async () => {
           this.plugin.settings.buckets.splice(idx, 1);
           await this.plugin.saveSettings();
-          this.display();
+          this.refresh();
         }
       ).open();
     };
