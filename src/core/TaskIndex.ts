@@ -38,17 +38,10 @@ export class TaskIndex {
 
   registerVaultEvents(): void {
     this.plugin.registerEvent(
-      this.app.vault.on("modify", async (file) => {
-        if (file instanceof TFile && this.isInScope(file)) {
-          await this.indexFile(file);
-          this.emit();
-        }
-      })
-    );
-    this.plugin.registerEvent(
-      this.app.vault.on("create", async (file) => {
-        if (file instanceof TFile && this.isInScope(file)) {
-          await this.indexFile(file);
+      this.app.metadataCache.on("changed", (file, data) => {
+        if (this.isInScope(file)) {
+          const tasks = parseFile(file.path, data);
+          this.index.set(file.path, tasks);
           this.emit();
         }
       })
