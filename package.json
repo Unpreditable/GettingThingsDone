@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "tsc -noEmit -skipLibCheck && npm run lint && node esbuild.config.mjs production",
+    "validate-translations": "node scripts/validate-translations.mjs",
+    "build": "npm run validate-translations && tsc -noEmit -skipLibCheck && npm run lint && node esbuild.config.mjs production",
     "lint": "eslint src/",
     "test": "jest --passWithNoTests"
   },
