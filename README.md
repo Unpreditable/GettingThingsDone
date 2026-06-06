@@ -2,7 +2,7 @@
 
 An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks using the **Getting Things Done** methodology. Tasks are grouped into time-horizon buckets (Today, This Week, Someday…) in a sidebar panel, with one-click moves between buckets.
 
-![Obsidian minimum version](https://img.shields.io/badge/Obsidian-1.4.0%2B-7c3aed)
+![Obsidian minimum version](https://img.shields.io/badge/Obsidian-1.8.7%2B-7c3aed)
 
 ---
 
