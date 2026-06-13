@@ -58,7 +58,6 @@ export default class GtdTasksPlugin extends Plugin {
       this.languageChangeNotice = true;
     }
 
-    await this.taskIndex.initialScan();
     this.taskIndex.registerVaultEvents();
 
     this.taskIndex.onChange(() => {
@@ -66,8 +65,9 @@ export default class GtdTasksPlugin extends Plugin {
       this.updateStatusBar();
     });
 
-    this.app.workspace.onLayoutReady(() => {
-      void this.activateView();
+    this.app.workspace.onLayoutReady(async () => {
+      await this.activateView();
+      await this.taskIndex.initialScan();
       this.updateStatusBar();
     });
   }
