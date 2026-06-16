@@ -4,6 +4,8 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 
 ![Obsidian minimum version](https://img.shields.io/badge/Obsidian-1.8.7%2B-7c3aed)
 
+![Demo](assets/demo.gif)
+
 ---
 
 ## Features
