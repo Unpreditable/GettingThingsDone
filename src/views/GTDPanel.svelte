@@ -225,20 +225,13 @@
 
   async function handleToggle(task: TaskRecord) {
     if (!task.isCompleted) {
-      const mode = settings.celebrationMode ?? "all";
-      if (mode !== "off") {
-        const group = bucketGroups.find((g) => g.tasks.some((t) => t.id === task.id));
-        const isLastInToday =
-          group?.bucketId === "today" &&
-          group.tasks.filter((t) => !t.isCompleted && t.id !== task.id).length === 0;
-
-        if (isLastInToday && mode === "all") {
-          triggerCelebration("creature-and-confetti", 2520);
-        } else if (isLastInToday && mode === "creature") {
-          triggerCelebration("creature", 2520);
-        } else if (mode === "confetti" || mode === "all") {
-          triggerCelebration("confetti", 2100);
-        }
+      const mode = settings.celebrationMode ?? "confetti";
+      if (mode === "all") {
+        triggerCelebration("creature-and-confetti", 2520);
+      } else if (mode === "creature") {
+        triggerCelebration("creature", 2520);
+      } else if (mode === "confetti") {
+        triggerCelebration("confetti", 2100);
       }
     }
     await onToggle(task);

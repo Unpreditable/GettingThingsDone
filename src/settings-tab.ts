@@ -515,7 +515,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.addOption("confetti", t("settings.behaviour.celebration.confettiOnly"));
         dd.addOption("creature", t("settings.behaviour.celebration.celebrationOnly"));
         dd.addOption("all", t("settings.behaviour.celebration.both"));
-        dd.setValue(this.plugin.settings.celebrationMode ?? "all");
+        dd.setValue(this.plugin.settings.celebrationMode ?? "confetti");
         dd.onChange(async (val) => {
           this.plugin.settings.celebrationMode = val as CelebrationMode;
           await this.plugin.saveSettings();

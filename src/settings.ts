@@ -118,5 +118,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewQuickMoveTargets: ["today", "this-week"],
   toReviewShowInStatusBar: false,
   compactView: false,
-  celebrationMode: "all",
+  celebrationMode: "confetti",
 };

@@ -5,8 +5,6 @@ import {
   MarkdownView,
   Notice,
   TFile,
-  normalizePath,
-  FileSystemAdapter,
   App,
   getLanguage,
 } from "obsidian";
@@ -23,6 +21,7 @@ import type { TaskRecord } from "./core/TaskParser";
 import GTDPanel from "./views/GTDPanel.svelte";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
+import { celebrationImages } from "./assets/celebrationImages";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
@@ -161,7 +160,7 @@ class GtdPanelView extends ItemView {
   private svelteInstance?: Record<string, unknown>;
   private bucketGroups$ = writable<BucketGroupData[]>([]);
   private settings$!: Writable<PluginSettings>;
-  private celebrationImageUrls$ = writable<string[]>([]);
+  private celebrationImageUrls$ = writable<string[]>(celebrationImages);
   private languageChangeNotice$ = writable<boolean>(false);
 
   constructor(leaf: WorkspaceLeaf, private plugin: GtdTasksPlugin) {
@@ -180,26 +179,10 @@ class GtdPanelView extends ItemView {
     return "check-square";
   }
 
-  private loadCelebrationImageUrls(): string[] {
-    const assetDir = normalizePath(this.plugin.manifest.dir + '/assets/celebration');
-    const filenames = [
-      'elephant.png', 'flamingo.png', 'iguana.png', 'penguin.png',
-      'red panda.png', 'sloth.png', 'stork.png',
-    ];
-    try {
-      return filenames.map((name) =>
-        (this.app.vault.adapter as FileSystemAdapter).getResourcePath(normalizePath(assetDir + '/' + name))
-      );
-    } catch {
-      return [];
-    }
-  }
-
   onOpen(): Promise<void> {
     this.contentEl.empty();
     this.contentEl.addClass("gtd-panel-root");
     this.mountSvelte();
-    this.celebrationImageUrls$.set(this.loadCelebrationImageUrls());
     if (this.plugin.languageChangeNotice) {
       this.languageChangeNotice$.set(true);
     }
