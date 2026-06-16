@@ -52,10 +52,12 @@ export default class GtdTasksPlugin extends Plugin {
 
     const currentLang = getLanguage() ?? "en";
     if (this.settings.lastSeenLanguage !== currentLang) {
-      BucketLocalizer.renameBuckets(this.settings, this.settings.lastSeenLanguage, currentLang);
+      if (this.settings.lastSeenLanguage !== "") {
+        BucketLocalizer.renameBuckets(this.settings, this.settings.lastSeenLanguage, currentLang);
+        this.languageChangeNotice = true;
+      }
       this.settings.lastSeenLanguage = currentLang;
       await this.saveSettings();
-      this.languageChangeNotice = true;
     }
 
     this.taskIndex.registerVaultEvents();
