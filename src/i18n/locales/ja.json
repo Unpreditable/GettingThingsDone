@@ -47,6 +47,11 @@
   },
   "settings": {
     "heading": "Getting Things Done",
+    "banner": {
+      "message": "GTD Tasksをご利用いただきありがとうございます!このプラグインは私自身の日々の仕事を整理するために作りました。あなたの仕事にも役立てば嬉しいです。何がうまくいっているか、何がうまくいっていないか、どんな機能が欲しいか、ぜひ教えてください。",
+      "buttonText": "フィードバック・要望を送る",
+      "signature": "- Vitaly"
+    },
     "emoji": "絵文字",
     "emojiButtonTooltip": "クリックして絵文字を選択",
     "annotationStyle": {

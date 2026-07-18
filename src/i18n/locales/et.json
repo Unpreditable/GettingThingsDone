@@ -47,6 +47,11 @@
   },
   "settings": {
     "heading": "Getting Things Done",
+    "banner": {
+      "message": "Täname, et kasutate GTD Tasksit! Ehitasin selle oma igapäevase töö korraldamiseks ja loodan, et see teeb ka teie oma pisut lihtsamaks. Mul on hea meel kuulda, mis toimib, mis mitte, ja mida te sooviksite, et see teeks.",
+      "buttonText": "Jaga tagasisidet ja ideid",
+      "signature": "- Vitaly"
+    },
     "emoji": "Emoji",
     "emojiButtonTooltip": "Klõpsa emoji valimiseks",
     "annotationStyle": {

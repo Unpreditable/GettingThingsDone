@@ -47,6 +47,11 @@
   },
   "settings": {
     "heading": "Getting Things Done",
+    "banner": {
+      "message": "Merci d'utiliser GTD Tasks ! Je l'ai créé pour organiser mon propre travail au quotidien, et j'espère qu'il facilitera aussi le vôtre. J'aimerais vraiment savoir ce qui fonctionne, ce qui ne fonctionne pas, et ce que vous aimeriez qu'il fasse.",
+      "buttonText": "Partager vos retours et idées",
+      "signature": "- Vitaly"
+    },
     "emoji": "Emoji",
     "emojiButtonTooltip": "Cliquer pour choisir un emoji",
     "annotationStyle": {

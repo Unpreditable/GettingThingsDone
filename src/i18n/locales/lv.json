@@ -48,6 +48,11 @@
   },
   "settings": {
     "heading": "Getting Things Done",
+    "banner": {
+      "message": "Paldies, ka izmantojat GTD Tasks! Es to izveidoju, lai organizētu savu ikdienas darbu, un ceru, ka tas atvieglos arī jūsējo. Man tiešām būtu interesanti uzzināt, kas darbojas labi, kas ne, un ko jūs vēlētos, lai tas dara.",
+      "buttonText": "Dalīties atsauksmēs un idejās",
+      "signature": "- Vitālijs"
+    },
     "emoji": "Emocijzīme",
     "emojiButtonTooltip": "Noklikšķiniet, lai izvēlētos emocijzīmi",
     "annotationStyle": {

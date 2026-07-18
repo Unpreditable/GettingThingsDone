@@ -75,6 +75,14 @@
   "settings": {
     "heading_comment": "Top-level section heading shown in the Obsidian settings panel above all plugin settings.",
     "heading": "Getting Things Done",
+    "banner": {
+      "message_comment": "Personal thank-you note from the author, shown at the top of the settings tab. Stands alone as a complete sentence — no link is embedded in it.",
+      "message": "Thanks for using GTD Tasks! I built it to manage my own work every day, and I hope it makes yours a little easier too. I'd genuinely appreciate hearing what's working, what's not, or what you wish it did.",
+      "buttonText_comment": "Label on the call-to-action button next to the message. Opens the GitHub issues page in the default browser.",
+      "buttonText": "Share feedback & ideas",
+      "signature_comment": "Sign-off shown under the message, on its own line. A name, not translated per-locale.",
+      "signature": "- Vitaly"
+    },
     "emoji_comment": "Label for the emoji input field shown in each bucket's configuration row.",
     "emoji": "Emoji",
     "emojiButtonTooltip_comment": "Tooltip on the emoji character button next to the emoji input. Clicking it opens Obsidian's native emoji picker.",

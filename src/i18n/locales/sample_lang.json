@@ -47,6 +47,11 @@
   },
   "settings": {
     "heading": "",
+    "banner": {
+      "message": "",
+      "buttonText": "",
+      "signature": ""
+    },
     "emoji": "",
     "emojiButtonTooltip": "",
     "annotationStyle": {

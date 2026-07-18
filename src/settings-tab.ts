@@ -265,9 +265,26 @@ export class GtdSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
+    this.renderBanner();
     this.renderGeneralSection();
     this.renderBehaviourSection();
     this.renderBucketsSection();
+  }
+
+  private renderBanner() {
+    const { containerEl } = this;
+    const banner = containerEl.createDiv({ cls: "gtd-settings-banner" });
+
+    const text = banner.createDiv({ cls: "gtd-settings-banner-text" });
+    text.createDiv({ cls: "gtd-settings-banner-message", text: t("settings.banner.message") });
+    text.createDiv({ cls: "gtd-settings-banner-signature", text: t("settings.banner.signature") });
+
+    banner.createEl("button", {
+      cls: "mod-cta gtd-settings-banner-button",
+      text: t("settings.banner.buttonText"),
+    }).addEventListener("click", () => {
+      window.open("https://github.com/Unpreditable/GettingThingsDone/issues/new", "_blank");
+    });
   }
 
   private renderGeneralSection() {

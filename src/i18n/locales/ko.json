@@ -47,6 +47,11 @@
   },
   "settings": {
     "heading": "Getting Things Done",
+    "banner": {
+      "message": "GTD Tasks를 사용해 주셔서 감사합니다! 저의 일상 업무를 정리하기 위해 만들었는데, 여러분의 일에도 조금이나마 도움이 되길 바랍니다. 무엇이 잘 되고 있는지, 무엇이 아쉬운지, 어떤 기능을 원하시는지 진심으로 듣고 싶습니다.",
+      "buttonText": "피드백 및 아이디어 공유",
+      "signature": "- Vitaly"
+    },
     "emoji": "이모지",
     "emojiButtonTooltip": "클릭하여 이모지 선택",
     "annotationStyle": {

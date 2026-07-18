@@ -325,6 +325,42 @@
 
 /* ── Settings tab ───────────────────────────────────────────────────────── */
 
+.gtd-settings-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: var(--background-secondary);
+}
+
+.gtd-settings-banner-text {
+  flex: 1;
+}
+
+.gtd-settings-banner-message {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+  text-align: justify;
+}
+
+.gtd-settings-banner-signature {
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 2px;
+  text-align: right;
+}
+
+.gtd-settings-banner-button {
+  flex-shrink: 0;
+  font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+}
+
 .gtd-section-separator {
   border: none;
   border-top: 1px solid var(--background-modifier-border);

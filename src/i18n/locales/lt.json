@@ -49,6 +49,11 @@
   },
   "settings": {
     "heading": "Getting Things Done",
+    "banner": {
+      "message": "Ačiū, kad naudojatės GTD Tasks! Sukūriau jį savo kasdieniam darbui tvarkyti ir tikiuosi, kad jis palengvins ir jūsų darbą. Man tikrai įdomu išgirsti, kas veikia gerai, kas ne, ir ko jums trūksta.",
+      "buttonText": "Dalintis atsiliepimais ir idėjomis",
+      "signature": "- Vitaly"
+    },
     "emoji": "Emoji",
     "emojiButtonTooltip": "Spustelėkite pasirinkti emoji",
     "annotationStyle": {
