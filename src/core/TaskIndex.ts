@@ -15,6 +15,7 @@ export class TaskIndex {
   ) {}
 
   async initialScan(): Promise<void> {
+    this.index.clear();
     const files = this.getScopedFiles();
     await Promise.all(files.map((f) => this.indexFile(f)));
     this.emit();
