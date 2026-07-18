@@ -10,6 +10,7 @@
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
+    "strictBindCallApply": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "lib": ["DOM", "ES2021"]

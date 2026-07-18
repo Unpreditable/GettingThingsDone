@@ -222,17 +222,17 @@ class GtdPanelView extends ItemView {
         settings$: this.settings$,
         celebrationImageUrls$: this.celebrationImageUrls$,
         languageChangeNotice$: this.languageChangeNotice$,
-        onMove: this.handleMove.bind(this) as (task: TaskRecord, targetBucketId: string | null) => Promise<void>,
-        onToggle: this.handleToggle.bind(this) as (task: TaskRecord) => Promise<void>,
-        onNavigate: this.handleNavigate.bind(this) as (task: TaskRecord) => void,
-        onConfirm: this.handleConfirmPlacement.bind(this) as (task: TaskRecord, bucketId: string) => Promise<void>,
+        onMove: this.handleMove.bind(this),
+        onToggle: this.handleToggle.bind(this),
+        onNavigate: this.handleNavigate.bind(this),
+        onConfirm: this.handleConfirmPlacement.bind(this),
         onOpenSettings: openSettings,
         onDismissLanguageBanner: () => {
           this.plugin.languageChangeNotice = false;
           this.languageChangeNotice$.set(false);
         },
       },
-    }) as unknown as Record<string, unknown>;
+    });
   }
 
   private async handleMove(task: TaskRecord, targetBucketId: string | null) {

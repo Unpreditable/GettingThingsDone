@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, TFolder, Modal } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, CelebrationMode, DateRangeRule, StorageMode, DEFAULT_BUCKETS } from "./settings";
+import { BucketConfig, CelebrationMode, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { t } from "./i18n/i18n";
@@ -939,7 +939,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         if (val === "none") {
           bucket.dateRangeRule = null;
         } else if (val === "today" || val === "this-week" || val === "next-week" || val === "this-month" || val === "next-month") {
-          bucket.dateRangeRule = { type: val } as DateRangeRule;
+          bucket.dateRangeRule = { type: val };
         } else if (val === "within-days") {
           bucket.dateRangeRule = { type: "within-days", days: 7 };
         } else if (val === "within-days-range") {
