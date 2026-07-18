@@ -83,7 +83,9 @@
       "addFolder": "+ Pievienot mapi",
       "addFile": "+ Pievienot failu",
       "folderPlaceholder": "piem. Uzdevumi",
-      "filePlaceholder": "piem. Uzdevumi/inbox.md"
+      "filePlaceholder": "piem. Uzdevumi/inbox.md",
+      "noFoldersSelected": "Nav izvēlēta neviena mape. Spraudnis nemeklēs nevienu uzdevumu.",
+      "noFilesSelected": "Nav izvēlēts neviens fails. Spraudnis nemeklēs nevienu uzdevumu."
     },
     "behaviour": {
       "showCompleted": {

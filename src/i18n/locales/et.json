@@ -81,7 +81,9 @@
       "addFolder": "+ Lisa kaust",
       "addFile": "+ Lisa fail",
       "folderPlaceholder": "nt Ülesanded",
-      "filePlaceholder": "nt Ülesanded/inbox.md"
+      "filePlaceholder": "nt Ülesanded/inbox.md",
+      "noFoldersSelected": "Kaustu pole valitud. Plugin ei otsi ühestki kaustast ülesandeid.",
+      "noFilesSelected": "Faile pole valitud. Plugin ei otsi ühestki failist ülesandeid."
     },
     "behaviour": {
       "showCompleted": {

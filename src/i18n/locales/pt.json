@@ -81,7 +81,9 @@
       "addFolder": "+ Adicionar pasta",
       "addFile": "+ Adicionar ficheiro",
       "folderPlaceholder": "ex. Tarefas",
-      "filePlaceholder": "ex. Tarefas/inbox.md"
+      "filePlaceholder": "ex. Tarefas/inbox.md",
+      "noFoldersSelected": "Nenhuma pasta selecionada. O plugin não irá procurar tarefas.",
+      "noFilesSelected": "Nenhum ficheiro selecionado. O plugin não irá procurar tarefas."
     },
     "behaviour": {
       "showCompleted": {

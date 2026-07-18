@@ -81,7 +81,9 @@
       "addFolder": "+ 폴더 추가",
       "addFile": "+ 파일 추가",
       "folderPlaceholder": "예: Tasks",
-      "filePlaceholder": "예: Tasks/inbox.md"
+      "filePlaceholder": "예: Tasks/inbox.md",
+      "noFoldersSelected": "선택된 폴더가 없습니다. 플러그인이 작업을 검색하지 않습니다.",
+      "noFilesSelected": "선택된 파일이 없습니다. 플러그인이 작업을 검색하지 않습니다."
     },
     "behaviour": {
       "showCompleted": {

@@ -85,7 +85,9 @@
       "addFolder": "+ Додати папку",
       "addFile": "+ Додати файл",
       "folderPlaceholder": "напр. Завдання",
-      "filePlaceholder": "напр. Завдання/inbox.md"
+      "filePlaceholder": "напр. Завдання/inbox.md",
+      "noFoldersSelected": "Папки не вибрано. Плагін не шукатиме завдання.",
+      "noFilesSelected": "Файли не вибрано. Плагін не шукатиме завдання."
     },
     "behaviour": {
       "showCompleted": {

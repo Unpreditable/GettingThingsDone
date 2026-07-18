@@ -81,7 +81,9 @@
       "addFolder": "+ Ordner hinzufügen",
       "addFile": "+ Datei hinzufügen",
       "folderPlaceholder": "z.B. Aufgaben",
-      "filePlaceholder": "z.B. Aufgaben/inbox.md"
+      "filePlaceholder": "z.B. Aufgaben/inbox.md",
+      "noFoldersSelected": "Keine Ordner ausgewählt. Das Plugin durchsucht nichts nach Aufgaben.",
+      "noFilesSelected": "Keine Dateien ausgewählt. Das Plugin durchsucht nichts nach Aufgaben."
     },
     "behaviour": {
       "showCompleted": {

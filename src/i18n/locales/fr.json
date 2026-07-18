@@ -81,7 +81,9 @@
       "addFolder": "+ Ajouter un dossier",
       "addFile": "+ Ajouter un fichier",
       "folderPlaceholder": "ex. Tâches",
-      "filePlaceholder": "ex. Tâches/inbox.md"
+      "filePlaceholder": "ex. Tâches/inbox.md",
+      "noFoldersSelected": "Aucun dossier sélectionné. Le plugin ne recherchera aucune tâche.",
+      "noFilesSelected": "Aucun fichier sélectionné. Le plugin ne recherchera aucune tâche."
     },
     "behaviour": {
       "showCompleted": {

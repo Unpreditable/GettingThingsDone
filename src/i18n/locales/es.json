@@ -81,7 +81,9 @@
       "addFolder": "+ Añadir carpeta",
       "addFile": "+ Añadir archivo",
       "folderPlaceholder": "ej. Tareas",
-      "filePlaceholder": "ej. Tareas/inbox.md"
+      "filePlaceholder": "ej. Tareas/inbox.md",
+      "noFoldersSelected": "No hay carpetas seleccionadas. El plugin no buscará tareas.",
+      "noFilesSelected": "No hay archivos seleccionados. El plugin no buscará tareas."
     },
     "behaviour": {
       "showCompleted": {

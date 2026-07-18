@@ -81,7 +81,9 @@
       "addFolder": "+ フォルダを追加",
       "addFile": "+ ファイルを追加",
       "folderPlaceholder": "例: Tasks",
-      "filePlaceholder": "例: Tasks/inbox.md"
+      "filePlaceholder": "例: Tasks/inbox.md",
+      "noFoldersSelected": "フォルダが選択されていません。プラグインはタスクを検索しません。",
+      "noFilesSelected": "ファイルが選択されていません。プラグインはタスクを検索しません。"
     },
     "behaviour": {
       "showCompleted": {

@@ -81,7 +81,9 @@
       "addFolder": "",
       "addFile": "",
       "folderPlaceholder": "",
-      "filePlaceholder": ""
+      "filePlaceholder": "",
+      "noFoldersSelected": "",
+      "noFilesSelected": ""
     },
     "behaviour": {
       "showCompleted": {

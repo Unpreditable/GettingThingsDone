@@ -85,7 +85,9 @@
       "addFolder": "+ Добавить папку",
       "addFile": "+ Добавить файл",
       "folderPlaceholder": "напр. Задачи",
-      "filePlaceholder": "напр. Задачи/inbox.md"
+      "filePlaceholder": "напр. Задачи/inbox.md",
+      "noFoldersSelected": "Папки не выбраны. Плагин не будет искать задачи.",
+      "noFilesSelected": "Файлы не выбраны. Плагин не будет искать задачи."
     },
     "behaviour": {
       "showCompleted": {

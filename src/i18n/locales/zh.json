@@ -81,7 +81,9 @@
       "addFolder": "+ 添加文件夹",
       "addFile": "+ 添加文件",
       "folderPlaceholder": "例：Tasks",
-      "filePlaceholder": "例：Tasks/inbox.md"
+      "filePlaceholder": "例：Tasks/inbox.md",
+      "noFoldersSelected": "未选择任何文件夹。插件不会搜索任务。",
+      "noFilesSelected": "未选择任何文件。插件不会搜索任务。"
     },
     "behaviour": {
       "showCompleted": {

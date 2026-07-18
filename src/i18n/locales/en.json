@@ -131,7 +131,11 @@
       "folderPlaceholder_comment": "Placeholder inside each folder path input showing an example value.",
       "folderPlaceholder": "e.g. Tasks",
       "filePlaceholder_comment": "Placeholder inside each file path input showing an example value.",
-      "filePlaceholder": "e.g. Tasks/inbox.md"
+      "filePlaceholder": "e.g. Tasks/inbox.md",
+      "noFoldersSelected_comment": "Shown above the add-folder button when the folder list is empty.",
+      "noFoldersSelected": "No folders selected. The plugin won't scan anything for tasks.",
+      "noFilesSelected_comment": "Shown above the add-file button when the file list is empty.",
+      "noFilesSelected": "No files selected. The plugin won't scan anything for tasks."
     },
     "behaviour": {
       "showCompleted": {

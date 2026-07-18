@@ -387,6 +387,13 @@
   color: var(--text-error);
 }
 
+.gtd-scope-empty {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-style: italic;
+  padding: 2px 0;
+}
+
 .gtd-scope-add-btn {
   align-self: flex-start;
   padding: 3px 10px;

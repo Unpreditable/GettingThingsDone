@@ -85,7 +85,9 @@
       "addFolder": "+ Pridėti aplanką",
       "addFile": "+ Pridėti failą",
       "folderPlaceholder": "pvz. Užduotys",
-      "filePlaceholder": "pvz. Užduotys/inbox.md"
+      "filePlaceholder": "pvz. Užduotys/inbox.md",
+      "noFoldersSelected": "Nepasirinktas nė vienas aplankas. Įskiepis neieškos jokių užduočių.",
+      "noFilesSelected": "Nepasirinktas nė vienas failas. Įskiepis neieškos jokių užduočių."
     },
     "behaviour": {
       "showCompleted": {

@@ -407,6 +407,16 @@ export class GtdSettingsTab extends PluginSettingTab {
         datalist.createEl("option", { attr: { value: opt } });
       }
 
+      if (scope.paths.length === 0) {
+        listEl.createDiv({
+          cls: "gtd-scope-empty",
+          text:
+            scopeType === "folders"
+              ? t("settings.filesToScan.noFoldersSelected")
+              : t("settings.filesToScan.noFilesSelected"),
+        });
+      }
+
       scope.paths.forEach((path, idx) => {
         const row = listEl.createDiv({ cls: "gtd-scope-entry" });
 
