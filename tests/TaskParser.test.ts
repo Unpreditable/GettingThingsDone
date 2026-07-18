@@ -40,6 +40,12 @@ describe("parseFile", () => {
     expect(tasks[0].text).toBe("Buy milk");
   });
 
+  it("strips a trailing block reference marker from text", () => {
+    const content = "- [ ] Buy milk #gtd/today ^abc123";
+    const tasks = parseFile("test.md", content);
+    expect(tasks[0].text).toBe("Buy milk");
+  });
+
   it("extracts tags", () => {
     const content = "- [ ] Task #someday #project/alpha";
     const tasks = parseFile("test.md", content);
@@ -89,6 +95,21 @@ describe("getTagValue / setTagValue", () => {
     const result = setTagValue("- [ ] Task #gtd/today", "gtd", null);
     expect(result).not.toContain("#gtd");
   });
+
+  it("inserts a new tag before a trailing block reference marker", () => {
+    const result = setTagValue("- [ ] Task ^abc123", "gtd", "today");
+    expect(result).toBe("- [ ] Task #gtd/today ^abc123");
+  });
+
+  it("keeps the block reference marker at the end when replacing an existing tag", () => {
+    const result = setTagValue("- [ ] Task #gtd/today ^abc123", "gtd", "next-week");
+    expect(result).toBe("- [ ] Task #gtd/next-week ^abc123");
+  });
+
+  it("preserves the block reference marker when removing a tag", () => {
+    const result = setTagValue("- [ ] Task #gtd/today ^abc123", "gtd", null);
+    expect(result).toBe("- [ ] Task ^abc123");
+  });
 });
 
 describe("getInlineFieldValue / setInlineFieldValue", () => {
@@ -111,6 +132,11 @@ describe("getInlineFieldValue / setInlineFieldValue", () => {
   it("removes an inline field when value is null", () => {
     const result = setInlineFieldValue("- [ ] Task [horizon:: today]", "horizon", null);
     expect(result).not.toContain("[horizon::");
+  });
+
+  it("inserts a new field before a trailing block reference marker", () => {
+    const result = setInlineFieldValue("- [ ] Task ^abc123", "horizon", "today");
+    expect(result).toBe("- [ ] Task [horizon:: today] ^abc123");
   });
 });
 
@@ -254,6 +280,11 @@ describe("setSimpleTag", () => {
     const result = setSimpleTag("- [ ] Task #someday", "someday", true);
     const count = (result.match(/#someday/g) ?? []).length;
     expect(count).toBe(1);
+  });
+
+  it("inserts a new tag before a trailing block reference marker", () => {
+    const result = setSimpleTag("- [ ] Task ^abc123", "someday", true);
+    expect(result).toBe("- [ ] Task #someday ^abc123");
   });
 });
 

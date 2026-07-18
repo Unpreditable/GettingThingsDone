@@ -31,6 +31,20 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/**
+ * Appends `token` to `line`, inserting it before a trailing Obsidian block
+ * reference marker (e.g. `^abc123`) if present, since that marker must stay
+ * the last thing on the line for the reference to keep working.
+ */
+function insertBeforeBlockRef(line: string, token: string): string {
+  const blockRefMatch = line.match(/\s+(\^[\w-]+)\s*$/);
+  if (blockRefMatch) {
+    const base = line.slice(0, blockRefMatch.index).trimEnd();
+    return `${base} ${token} ${blockRefMatch[1]}`;
+  }
+  return `${line.trimEnd()} ${token}`;
+}
+
 export function parseFile(filePath: string, content: string): TaskRecord[] {
   const lines = content.split("\n");
   const records: TaskRecord[] = [];
@@ -120,6 +134,7 @@ function extractInlineField(text: string): string | null {
 
 function stripMetadata(text: string): string {
   return text
+    .replace(/\s+\^[\w-]+\s*$/, "")
     .replace(/📅\s*\d{4}-\d{2}-\d{2}/g, "")
     .replace(/✅\s*\d{4}-\d{2}-\d{2}/g, "")
     .replace(/🔁[^#[📅✅]*/gu, "")
@@ -269,7 +284,7 @@ export function setInlineFieldValue(
   if (hasField) {
     return rawLine.replace(new RegExp(`\\[${escaped}::\\s*[^\\]]*\\]`, "i"), token);
   }
-  return rawLine.trimEnd() + " " + token;
+  return insertBeforeBlockRef(rawLine, token);
 }
 
 export function getTagValue(rawLine: string, prefix: string): string | null {
@@ -287,7 +302,7 @@ export function setTagValue(
   const cleaned = rawLine.replace(re, "").trimEnd();
 
   if (value === null) return cleaned;
-  return cleaned + ` #${prefix}/${value}`;
+  return insertBeforeBlockRef(cleaned, `#${prefix}/${value}`);
 }
 
 export function setSimpleTag(
@@ -298,5 +313,5 @@ export function setSimpleTag(
   const re = new RegExp(`\\s*#${escapeRegExp(tag)}(?=[\\s,]|$)`, "gi");
   const cleaned = rawLine.replace(re, "").trimEnd();
   if (!present) return cleaned;
-  return cleaned + ` #${tag}`;
+  return insertBeforeBlockRef(cleaned, `#${tag}`);
 }
