@@ -410,12 +410,13 @@ export class GtdSettingsTab extends PluginSettingTab {
         btn.onClick(async () => {
           btn.setDisabled(true);
           btn.setButtonText(t("settings.migrate.inProgress"));
-          await migrateStorageMode(
+          const changedPaths = await migrateStorageMode(
             this.app,
             this.plugin.taskIndex.getAllTasks(),
             oppositeMode,
             this.plugin.settings
           );
+          await Promise.all(changedPaths.map((p) => this.plugin.taskIndex.reindexFile(p)));
           this.rerender();
         });
       });

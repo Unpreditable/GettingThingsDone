@@ -10,9 +10,9 @@ export async function migrateStorageMode(
   allTasks: TaskRecord[],
   fromMode: StorageMode,
   toSettings: PluginSettings
-): Promise<void> {
+): Promise<string[]> {
   const { storageMode: toMode, tagPrefix, buckets } = toSettings;
-  if (fromMode === toMode) return;
+  if (fromMode === toMode) return [];
 
   const byFile = new Map<string, TaskRecord[]>();
   for (const t of allTasks) {
@@ -22,6 +22,7 @@ export async function migrateStorageMode(
 
   let migrated = 0;
   let failed = 0;
+  const changedPaths: string[] = [];
 
   for (const [filePath, tasks] of byFile) {
     const file = app.vault.getAbstractFileByPath(filePath);
@@ -52,9 +53,11 @@ export async function migrateStorageMode(
 
     migrated += fileMigrated;
     failed += fileFailed;
+    if (fileMigrated > 0) changedPaths.push(filePath);
   }
 
   new Notice(t("notices.migrationComplete", { migrated, failed }));
+  return changedPaths;
 }
 
 function readBucketId(

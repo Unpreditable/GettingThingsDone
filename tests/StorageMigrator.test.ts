@@ -171,6 +171,43 @@ describe("migrateStorageMode", () => {
     expect(getContent("b.md")).toContain("[gtd:: someday]");
   });
 
+  it("returns the paths of files that were actually changed", async () => {
+    const { app } = makeMockApp({
+      "changed.md": "- [ ] Task A #gtd/today",
+      "unchanged.md": "- [ ] Task B #gtd/deleted-bucket",
+    });
+    const tasks = [
+      makeTask({ id: "1", filePath: "changed.md", rawLine: "- [ ] Task A #gtd/today" }),
+      makeTask({ id: "2", filePath: "unchanged.md", rawLine: "- [ ] Task B #gtd/deleted-bucket" }),
+    ];
+    const toSettings = {
+      ...DEFAULT_SETTINGS,
+      storageMode: "inline-field" as const,
+      tagPrefix: "gtd",
+      buckets: baseBuckets,
+    };
+
+    const changedPaths = await migrateStorageMode(app, tasks, "inline-tag", toSettings);
+
+    expect(changedPaths).toEqual(["changed.md"]);
+  });
+
+  it("returns an empty array when from and to modes are the same", async () => {
+    const content = "- [ ] Task #gtd/today";
+    const { app } = makeMockApp({ "test.md": content });
+    const task = makeTask({ rawLine: content });
+    const toSettings = {
+      ...DEFAULT_SETTINGS,
+      storageMode: "inline-tag" as const,
+      tagPrefix: "gtd",
+      buckets: baseBuckets,
+    };
+
+    const changedPaths = await migrateStorageMode(app, [task], "inline-tag", toSettings);
+
+    expect(changedPaths).toEqual([]);
+  });
+
   it("only modifies the correct line in a multi-line file", async () => {
     const content = "- [ ] First\n- [ ] Target #gtd/today\n- [ ] Third";
     const { app, getContent } = makeMockApp({ "test.md": content });
