@@ -15,6 +15,8 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 - **One-click quick-move buttons** on every task row
 - **Drag-and-drop** reordering and cross-bucket moves
 - **Context menu** (right-click) for moving tasks
+- **Subtask-aware**: indented child tasks are tracked separately, with an active-subtask count badge and a prompt to move them along with their parent
+- **Search**: filter the panel down to matching tasks
 - **Checkbox completion** with optional celebration animations (confetti, pixel creature, both, or off)
 - **Tasks plugin integration** — reads 📅 due dates and auto-assigns tasks to the matching bucket
 - **Two storage modes** — inline tag (`#gtd/today`) or inline field (`[gtd:: today]`)
@@ -22,6 +24,7 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 - **Stale indicator** (!) on tasks that have passed their scheduled window
 - **Status bar task count**
 - **Compact view** option
+- **Localized** into 13 languages, matching your Obsidian UI language automatically
 - Fully **customizable buckets** — name, emoji, date range rule, quick-move targets
 
 ---
@@ -66,7 +69,7 @@ Click the checklist icon in the left ribbon, or run **Open GTD Panel** from the 
 
 ### Complete a task
 
-Click the checkbox on any task row. A celebration animation plays (if enabled), and the task fades out.
+Click the checkbox on any task row. A celebration animation plays (if enabled). The task is struck through and stays visible until midnight by default (adjustable in settings), then disappears on next load. You can also dismiss all completed tasks early with the broom icon in the panel header.
 
 ### Move a task
 
@@ -78,7 +81,11 @@ Three ways to move a task to a different bucket:
 | **Drag-and-drop** | Drag a task row to any bucket, including collapsed ones |
 | **Context menu** | Right-click a task row → **Move to…** |
 
-The plugin writes the assignment back to the source markdown file immediately.
+The plugin writes the assignment back to the source markdown file immediately. If the task has subtasks that each have their own bucket assigned, you'll be asked whether to move them along with it.
+
+### Search
+
+Type in the search box at the top of the panel to filter down to matching tasks. The status line below it shows how many tasks are currently visible; click it (or the × in the search box) to clear the search.
 
 ---
 
@@ -119,9 +126,9 @@ Choose what plays when you check off a task:
 
 | Setting | Effect |
 |---|---|
-| **All** (default) | Confetti burst + pixel creature |
-| **Confetti** | Confetti burst only |
+| **Confetti** (default) | Confetti burst only |
 | **Creature** | Pixel creature only |
+| **All** | Confetti burst + pixel creature |
 | **Off** | No animation |
 
 ### Stale indicator
@@ -160,6 +167,18 @@ Tasks with no due date and no manual assignment land in **To Review**.
 ## To Review Bucket
 
 The To Review bucket is a permanent system bucket that always appears first in the panel. It collects every task that has no manual assignment and no matching due date rule. Use it as a GTD-style inbox: process tasks from here by moving them into the appropriate time-horizon bucket.
+
+---
+
+## Subtasks
+
+A task indented under another task in your markdown file is tracked as its subtask. Parent rows show an active-subtask count badge, and a subtask that's been moved to a different bucket than its parent gets a small indicator pointing back to it. Moving a parent that has subtasks with their own bucket assignments will ask whether to move those subtasks along with it, or leave them where they are.
+
+---
+
+## Localization
+
+The panel and settings UI are available in German, Spanish, Estonian, French, Japanese, Korean, Lithuanian, Latvian, Portuguese, Russian, Ukrainian, and Chinese, in addition to English, matching Obsidian's UI language automatically. If you change Obsidian's language, default bucket names update to match on next load, with a one-time notice in the panel.
 
 ---
 
