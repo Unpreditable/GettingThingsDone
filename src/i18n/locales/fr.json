@@ -91,6 +91,7 @@
       "noFilesSelected": "Aucun fichier sélectionné. Le plugin ne recherchera aucune tâche."
     },
     "behaviour": {
+      "heading": "Comportement",
       "showCompleted": {
         "name": "Afficher les tâches terminées jusqu'à minuit",
         "description": "Les tâches terminées restent visibles en barré dans le panneau jusqu'à minuit, puis disparaissent au prochain chargement."

@@ -91,6 +91,7 @@
       "noFilesSelected": "未选择任何文件。插件不会搜索任务。"
     },
     "behaviour": {
+      "heading": "行为",
       "showCompleted": {
         "name": "在午夜前显示已完成任务",
         "description": "已完成的任务将以删除线形式在面板中显示至午夜，之后在下次加载时消失。"

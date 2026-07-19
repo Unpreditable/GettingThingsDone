@@ -93,6 +93,7 @@
       "noFilesSelected": "Nav izvēlēts neviens fails. Spraudnis nemeklēs nevienu uzdevumu."
     },
     "behaviour": {
+      "heading": "Uzvedība",
       "showCompleted": {
         "name": "Rādīt paveiktos uzdevumus līdz pusnaktij",
         "description": "Paveiktie uzdevumi paliek redzami paneļa ar pārsvītrojumu līdz pusnaktij, pēc tam pazūd nākamajā ielādē."

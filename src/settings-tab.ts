@@ -1,6 +1,6 @@
-import { App, PluginSettingTab, Setting, TFolder, Modal } from "obsidian";
+import { App, PluginSettingTab, Setting, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, CelebrationMode, StorageMode, DEFAULT_BUCKETS } from "./settings";
+import { BucketConfig, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { t } from "./i18n/i18n";
@@ -265,14 +265,102 @@ export class GtdSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    this.renderBanner();
-    this.renderGeneralSection();
-    this.renderBehaviourSection();
-    this.renderBucketsSection();
+    this.renderBanner(containerEl);
+    this.renderGeneralSection(containerEl);
+    this.renderLegacyBehaviourFallback(containerEl);
+    this.renderBucketsSection(containerEl);
   }
 
-  private renderBanner() {
-    const { containerEl } = this;
+  /**
+   * Triggers a full re-render after settings state changes. Uses the
+   * declarative `update()` API on Obsidian 1.13.0+ (re-invokes
+   * getSettingDefinitions() and re-renders from the result); falls back to
+   * the legacy imperative refresh() on older Obsidian, where update() is
+   * unavailable.
+   */
+  private rerender(): void {
+    if (requireApiVersion("1.13.0")) {
+      this.update();
+    } else {
+      this.refresh();
+    }
+  }
+
+  getControlValue(key: string): unknown {
+    return (this.plugin.settings as unknown as Record<string, unknown>)[key];
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+    await this.plugin.saveSettings();
+    if (key === "staleIndicatorEnabled") {
+      await this.plugin.refreshIndex();
+    }
+  }
+
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: t("settings.banner.buttonText"),
+        searchable: false,
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderBanner(setting.settingEl);
+        },
+      },
+      {
+        name: t("settings.heading"),
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderGeneralSection(setting.settingEl);
+        },
+      },
+      {
+        type: "group",
+        heading: t("settings.behaviour.heading"),
+        items: [
+          {
+            name: t("settings.behaviour.showCompleted.name"),
+            desc: t("settings.behaviour.showCompleted.description"),
+            control: { type: "toggle", key: "completedVisibilityUntilMidnight" },
+          },
+          {
+            name: t("settings.behaviour.markOverdue.name"),
+            desc: t("settings.behaviour.markOverdue.description"),
+            control: { type: "toggle", key: "staleIndicatorEnabled" },
+          },
+          {
+            name: t("settings.behaviour.compactView.name"),
+            desc: t("settings.behaviour.compactView.description"),
+            control: { type: "toggle", key: "compactView" },
+          },
+          {
+            name: t("settings.behaviour.celebration.name"),
+            desc: t("settings.behaviour.celebration.description"),
+            control: {
+              type: "dropdown",
+              key: "celebrationMode",
+              options: {
+                off: t("settings.behaviour.celebration.off"),
+                confetti: t("settings.behaviour.celebration.confettiOnly"),
+                creature: t("settings.behaviour.celebration.celebrationOnly"),
+                all: t("settings.behaviour.celebration.both"),
+              },
+            },
+          },
+        ],
+      },
+      {
+        name: t("settings.buckets.heading"),
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderBucketsSection(setting.settingEl);
+        },
+      },
+    ];
+  }
+
+  private renderBanner(containerEl: HTMLElement) {
     const banner = containerEl.createDiv({ cls: "gtd-settings-banner" });
 
     const text = banner.createDiv({ cls: "gtd-settings-banner-text" });
@@ -287,8 +375,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     });
   }
 
-  private renderGeneralSection() {
-    const { containerEl } = this;
+  private renderGeneralSection(containerEl: HTMLElement) {
     new Setting(containerEl).setName(t("settings.heading")).setHeading();
 
     // Annotation Style (storage mode)
@@ -310,7 +397,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.onChange(async (val) => {
           this.plugin.settings.storageMode = val as StorageMode;
           await this.plugin.saveSettings();
-          this.refresh();
+          this.rerender();
         });
       })
       .addButton((btn) => {
@@ -329,7 +416,7 @@ export class GtdSettingsTab extends PluginSettingTab {
             oppositeMode,
             this.plugin.settings
           );
-          this.refresh();
+          this.rerender();
         });
       });
 
@@ -386,7 +473,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           }
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
-          this.refresh();
+          this.rerender();
         });
       });
 
@@ -497,8 +584,14 @@ export class GtdSettingsTab extends PluginSettingTab {
       .sort();
   }
 
-  private renderBehaviourSection() {
-    const { containerEl } = this;
+  /**
+   * Pre-1.13.0 fallback: renders the Behaviour group's 4 rows imperatively,
+   * since those Obsidian versions never call getSettingDefinitions() and
+   * would otherwise lose this section entirely after its declarative
+   * conversion. Mirrors the control definitions in getSettingDefinitions().
+   */
+  private renderLegacyBehaviourFallback(containerEl: HTMLElement) {
+    new Setting(containerEl).setName(t("settings.behaviour.heading")).setHeading();
 
     new Setting(containerEl)
       .setName(t("settings.behaviour.showCompleted.name"))
@@ -506,8 +599,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.completedVisibilityUntilMidnight);
         tog.onChange(async (val) => {
-          this.plugin.settings.completedVisibilityUntilMidnight = val;
-          await this.plugin.saveSettings();
+          await this.setControlValue("completedVisibilityUntilMidnight", val);
         });
       });
 
@@ -517,9 +609,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.staleIndicatorEnabled);
         tog.onChange(async (val) => {
-          this.plugin.settings.staleIndicatorEnabled = val;
-          await this.plugin.saveSettings();
-          await this.plugin.refreshIndex();
+          await this.setControlValue("staleIndicatorEnabled", val);
         });
       });
 
@@ -529,8 +619,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.compactView);
         tog.onChange(async (val) => {
-          this.plugin.settings.compactView = val;
-          await this.plugin.saveSettings();
+          await this.setControlValue("compactView", val);
         });
       });
 
@@ -544,14 +633,12 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.addOption("all", t("settings.behaviour.celebration.both"));
         dd.setValue(this.plugin.settings.celebrationMode ?? "confetti");
         dd.onChange(async (val) => {
-          this.plugin.settings.celebrationMode = val as CelebrationMode;
-          await this.plugin.saveSettings();
+          await this.setControlValue("celebrationMode", val);
         });
       });
   }
 
-  private renderBucketsSection() {
-    const { containerEl } = this;
+  private renderBucketsSection(containerEl: HTMLElement) {
     new Setting(containerEl).setName(t("settings.buckets.heading")).setHeading();
 
     // To Review (expandable)
@@ -580,7 +667,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         showInStatusBar: false,
       });
       await this.plugin.saveSettings();
-      this.refresh();
+      this.rerender();
     };
 
     const resetBtn = actionRow.createEl("button", {
@@ -595,7 +682,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         async () => {
           this.plugin.settings.buckets = JSON.parse(JSON.stringify(DEFAULT_BUCKETS)) as BucketConfig[];
           await this.plugin.saveSettings();
-          this.refresh();
+          this.rerender();
         }
       ).open();
     };
@@ -702,13 +789,13 @@ export class GtdSettingsTab extends PluginSettingTab {
         e.stopPropagation();
         [buckets[idx - 1], buckets[idx]] = [buckets[idx], buckets[idx - 1]];
         await this.plugin.saveSettings();
-        this.refresh();
+        this.rerender();
       };
       downBtn.onclick = async (e) => {
         e.stopPropagation();
         [buckets[idx + 1], buckets[idx]] = [buckets[idx], buckets[idx + 1]];
         await this.plugin.saveSettings();
-        this.refresh();
+        this.rerender();
       };
 
       // Expand/collapse
@@ -837,7 +924,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         async () => {
           this.plugin.settings.buckets.splice(idx, 1);
           await this.plugin.saveSettings();
-          this.refresh();
+          this.rerender();
         }
       ).open();
     };

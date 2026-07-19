@@ -91,6 +91,7 @@
       "noFilesSelected": "ファイルが選択されていません。プラグインはタスクを検索しません。"
     },
     "behaviour": {
+      "heading": "動作",
       "showCompleted": {
         "name": "完了タスクを深夜まで表示",
         "description": "完了したタスクは深夜まで取り消し線付きでパネルに表示され、次回読み込み時に消えます。"

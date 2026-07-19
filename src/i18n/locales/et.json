@@ -91,6 +91,7 @@
       "noFilesSelected": "Faile pole valitud. Plugin ei otsi ühestki failist ülesandeid."
     },
     "behaviour": {
+      "heading": "Käitumine",
       "showCompleted": {
         "name": "Näita lõpetatud ülesandeid kuni südaööni",
         "description": "Lõpetatud ülesanded jäävad paneelile läbikriipsutuna nähtavaks kuni südaööni, seejärel kaovad järgmisel laadimisel."
