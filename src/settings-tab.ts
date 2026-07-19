@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, CelebrationMode, StorageMode, DEFAULT_BUCKETS } from "./settings";
+import { BucketConfig, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { t } from "./i18n/i18n";
@@ -267,7 +267,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     this.renderBanner(containerEl);
     this.renderGeneralSection(containerEl);
-    this.renderBehaviourSection(containerEl);
+    this.renderLegacyBehaviourFallback(containerEl);
     this.renderBucketsSection(containerEl);
   }
 
@@ -283,6 +283,18 @@ export class GtdSettingsTab extends PluginSettingTab {
       this.update();
     } else {
       this.refresh();
+    }
+  }
+
+  getControlValue(key: string): unknown {
+    return (this.plugin.settings as unknown as Record<string, unknown>)[key];
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+    await this.plugin.saveSettings();
+    if (key === "staleIndicatorEnabled") {
+      await this.plugin.refreshIndex();
     }
   }
 
@@ -304,11 +316,39 @@ export class GtdSettingsTab extends PluginSettingTab {
         },
       },
       {
-        name: t("settings.behaviour.heading"),
-        render: (setting) => {
-          setting.settingEl.empty();
-          this.renderBehaviourSection(setting.settingEl);
-        },
+        type: "group",
+        heading: t("settings.behaviour.heading"),
+        items: [
+          {
+            name: t("settings.behaviour.showCompleted.name"),
+            desc: t("settings.behaviour.showCompleted.description"),
+            control: { type: "toggle", key: "completedVisibilityUntilMidnight" },
+          },
+          {
+            name: t("settings.behaviour.markOverdue.name"),
+            desc: t("settings.behaviour.markOverdue.description"),
+            control: { type: "toggle", key: "staleIndicatorEnabled" },
+          },
+          {
+            name: t("settings.behaviour.compactView.name"),
+            desc: t("settings.behaviour.compactView.description"),
+            control: { type: "toggle", key: "compactView" },
+          },
+          {
+            name: t("settings.behaviour.celebration.name"),
+            desc: t("settings.behaviour.celebration.description"),
+            control: {
+              type: "dropdown",
+              key: "celebrationMode",
+              options: {
+                off: t("settings.behaviour.celebration.off"),
+                confetti: t("settings.behaviour.celebration.confettiOnly"),
+                creature: t("settings.behaviour.celebration.celebrationOnly"),
+                all: t("settings.behaviour.celebration.both"),
+              },
+            },
+          },
+        ],
       },
       {
         name: t("settings.buckets.heading"),
@@ -544,15 +584,22 @@ export class GtdSettingsTab extends PluginSettingTab {
       .sort();
   }
 
-  private renderBehaviourSection(containerEl: HTMLElement) {
+  /**
+   * Pre-1.13.0 fallback: renders the Behaviour group's 4 rows imperatively,
+   * since those Obsidian versions never call getSettingDefinitions() and
+   * would otherwise lose this section entirely after its declarative
+   * conversion. Mirrors the control definitions in getSettingDefinitions().
+   */
+  private renderLegacyBehaviourFallback(containerEl: HTMLElement) {
+    new Setting(containerEl).setName(t("settings.behaviour.heading")).setHeading();
+
     new Setting(containerEl)
       .setName(t("settings.behaviour.showCompleted.name"))
       .setDesc(t("settings.behaviour.showCompleted.description"))
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.completedVisibilityUntilMidnight);
         tog.onChange(async (val) => {
-          this.plugin.settings.completedVisibilityUntilMidnight = val;
-          await this.plugin.saveSettings();
+          await this.setControlValue("completedVisibilityUntilMidnight", val);
         });
       });
 
@@ -562,9 +609,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.staleIndicatorEnabled);
         tog.onChange(async (val) => {
-          this.plugin.settings.staleIndicatorEnabled = val;
-          await this.plugin.saveSettings();
-          await this.plugin.refreshIndex();
+          await this.setControlValue("staleIndicatorEnabled", val);
         });
       });
 
@@ -574,8 +619,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.compactView);
         tog.onChange(async (val) => {
-          this.plugin.settings.compactView = val;
-          await this.plugin.saveSettings();
+          await this.setControlValue("compactView", val);
         });
       });
 
@@ -589,8 +633,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.addOption("all", t("settings.behaviour.celebration.both"));
         dd.setValue(this.plugin.settings.celebrationMode ?? "confetti");
         dd.onChange(async (val) => {
-          this.plugin.settings.celebrationMode = val as CelebrationMode;
-          await this.plugin.saveSettings();
+          await this.setControlValue("celebrationMode", val);
         });
       });
   }
