@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, DEFAULT_BUCKETS } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { t } from "./i18n/i18n";
@@ -463,24 +463,18 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.addOption("vault", t("settings.filesToScan.entireVault"));
         dd.addOption("folders", t("settings.filesToScan.specificFolders"));
         dd.addOption("files", t("settings.filesToScan.specificFiles"));
-        dd.setValue(this.plugin.settings.taskScope.type);
+        dd.setValue(this.plugin.settings.scopeType);
         dd.onChange(async (val) => {
-          if (val === "vault") {
-            this.plugin.settings.taskScope = { type: "vault" };
-          } else if (val === "folders") {
-            this.plugin.settings.taskScope = { type: "folders", paths: [] };
-          } else {
-            this.plugin.settings.taskScope = { type: "files", paths: [] };
-          }
+          this.plugin.settings.scopeType = val as ScopeType;
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
           this.rerender();
         });
       });
 
-    const scope = this.plugin.settings.taskScope;
-    if (scope.type === "folders" || scope.type === "files") {
-      this.renderScopePathList(containerEl, scope.type);
+    const scopeType = this.plugin.settings.scopeType;
+    if (scopeType === "folders" || scopeType === "files") {
+      this.renderScopePathList(containerEl, scopeType);
     }
   }
 
@@ -488,9 +482,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     container: HTMLElement,
     scopeType: "folders" | "files"
   ) {
-    const scope = this.plugin.settings.taskScope as
-      | { type: "folders"; paths: string[] }
-      | { type: "files"; paths: string[] };
+    const paths = scopeType === "folders" ? this.plugin.settings.folderPaths : this.plugin.settings.filePaths;
 
     const listEl = container.createDiv({ cls: "gtd-scope-list" });
 
@@ -512,7 +504,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         datalist.createEl("option", { attr: { value: opt } });
       }
 
-      if (scope.paths.length === 0) {
+      if (paths.length === 0) {
         listEl.createDiv({
           cls: "gtd-scope-empty",
           text:
@@ -522,7 +514,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       }
 
-      scope.paths.forEach((path, idx) => {
+      paths.forEach((path, idx) => {
         const row = listEl.createDiv({ cls: "gtd-scope-entry" });
 
         const input = row.createEl("input", {
@@ -535,7 +527,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           scopeType === "folders" ? t("settings.filesToScan.folderPlaceholder") : t("settings.filesToScan.filePlaceholder");
 
         input.onblur = async () => {
-          scope.paths[idx] = input.value.trim();
+          paths[idx] = input.value.trim();
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
         };
@@ -545,7 +537,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           cls: "gtd-scope-remove-btn",
         });
         removeBtn.onclick = async () => {
-          scope.paths.splice(idx, 1);
+          paths.splice(idx, 1);
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
           renderEntries();
@@ -558,7 +550,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         cls: "gtd-scope-add-btn",
       });
       addBtn.onclick = () => {
-        scope.paths.push("");
+        paths.push("");
         renderEntries();
       };
     };

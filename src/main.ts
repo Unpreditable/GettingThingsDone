@@ -11,7 +11,7 @@ import {
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
-import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "./settings";
+import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, getActiveScope, migrateSettingsData } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets } from "./core/BucketManager";
@@ -35,7 +35,7 @@ export default class GtdTasksPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
 
-    this.taskIndex = new TaskIndex(this.app, this, () => this.settings.taskScope);
+    this.taskIndex = new TaskIndex(this.app, this, () => getActiveScope(this.settings));
 
     this.statusBarItem = this.addStatusBarItem();
     this.statusBarItem.addClass("gtd-status-bar-item");
@@ -76,7 +76,7 @@ export default class GtdTasksPlugin extends Plugin {
   onunload() {}
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<PluginSettings>);
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, migrateSettingsData(await this.loadData()));
     if (!this.settings.buckets || this.settings.buckets.length === 0) {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }

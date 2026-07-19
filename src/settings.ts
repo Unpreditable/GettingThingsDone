@@ -32,9 +32,16 @@ export type TaskScope =
   | { type: "folders"; paths: string[] }
   | { type: "files"; paths: string[] };
 
+export type ScopeType = "vault" | "folders" | "files";
+
 export interface PluginSettings {
   storageMode: StorageMode;
-  taskScope: TaskScope;
+  /** Which scope mode is active. Path lists below persist independently of this. */
+  scopeType: ScopeType;
+  /** Folder paths for "folders" scope. Preserved even while a different scope mode is active. */
+  folderPaths: string[];
+  /** File paths for "files" scope. Preserved even while a different scope mode is active. */
+  filePaths: string[];
   buckets: BucketConfig[];
   /** Last Obsidian language seen on load — used to detect language changes. */
   lastSeenLanguage: string;
@@ -107,7 +114,9 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
 
 export const DEFAULT_SETTINGS: PluginSettings = {
   storageMode: "inline-tag",
-  taskScope: { type: "vault" },
+  scopeType: "vault",
+  folderPaths: [],
+  filePaths: [],
   buckets: DEFAULT_BUCKETS,
   lastSeenLanguage: "",
   tagPrefix: "gtd",
@@ -120,3 +129,40 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   compactView: false,
   celebrationMode: "confetti",
 };
+
+/** Builds the scope TaskIndex scans with, from the active scopeType and its matching persistent path list. */
+export function getActiveScope(
+  settings: Pick<PluginSettings, "scopeType" | "folderPaths" | "filePaths">
+): TaskScope {
+  switch (settings.scopeType) {
+    case "vault":
+      return { type: "vault" };
+    case "folders":
+      return { type: "folders", paths: settings.folderPaths };
+    case "files":
+      return { type: "files", paths: settings.filePaths };
+  }
+}
+
+interface LegacyTaskScope {
+  type: ScopeType;
+  paths?: string[];
+}
+
+/**
+ * Normalizes raw loaded plugin data for the scopeType/folderPaths/filePaths
+ * split. Pre-persistence saves stored a single nested `taskScope: {type, paths}`
+ * object; this seeds the new fields from it once, without losing the user's
+ * existing folder/file selections on upgrade.
+ */
+export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
+  if (!raw || typeof raw !== "object") return {};
+  const data = raw as Record<string, unknown> & { taskScope?: LegacyTaskScope };
+  if (!data.taskScope || "scopeType" in data) return data as Partial<PluginSettings>;
+
+  const { taskScope, ...rest } = data;
+  const migrated: Partial<PluginSettings> = { ...rest, scopeType: taskScope.type };
+  if (taskScope.type === "folders") migrated.folderPaths = taskScope.paths ?? [];
+  if (taskScope.type === "files") migrated.filePaths = taskScope.paths ?? [];
+  return migrated;
+}
