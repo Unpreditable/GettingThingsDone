@@ -146,6 +146,8 @@
       "noFilesSelected": "No files selected. The plugin won't scan anything for tasks."
     },
     "behaviour": {
+      "heading_comment": "Section heading for the Behaviour group of settings (completed-task visibility, overdue marking, compact view, celebration animations). Shown above the group and used as its search label in Obsidian 1.13.0+.",
+      "heading": "Behaviour",
       "showCompleted": {
         "name": "Show completed tasks until midnight",
         "description_comment": "The 'strikethrough' refers to the visual style of completed tasks in the panel.",

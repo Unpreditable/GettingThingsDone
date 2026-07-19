@@ -91,6 +91,7 @@
       "noFilesSelected": "선택된 파일이 없습니다. 플러그인이 작업을 검색하지 않습니다."
     },
     "behaviour": {
+      "heading": "동작",
       "showCompleted": {
         "name": "자정까지 완료된 작업 표시",
         "description": "완료된 작업은 자정까지 패널에 취소선으로 표시되며, 다음 로드 시 사라집니다."

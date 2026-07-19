@@ -95,6 +95,7 @@
       "noFilesSelected": "Nepasirinktas nė vienas failas. Įskiepis neieškos jokių užduočių."
     },
     "behaviour": {
+      "heading": "Elgsena",
       "showCompleted": {
         "name": "Rodyti atliktas užduotis iki vidurnakčio",
         "description": "Atliktos užduotys lieka matomos skydelyje su perbraukimu iki vidurnakčio, tada dingsta kitą kartą įkėlus."

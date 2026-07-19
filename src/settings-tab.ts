@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, TFolder, Modal } from "obsidian";
+import { App, PluginSettingTab, Setting, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
 import { BucketConfig, CelebrationMode, StorageMode, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
@@ -265,14 +265,62 @@ export class GtdSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    this.renderBanner();
-    this.renderGeneralSection();
-    this.renderBehaviourSection();
-    this.renderBucketsSection();
+    this.renderBanner(containerEl);
+    this.renderGeneralSection(containerEl);
+    this.renderBehaviourSection(containerEl);
+    this.renderBucketsSection(containerEl);
   }
 
-  private renderBanner() {
-    const { containerEl } = this;
+  /**
+   * Triggers a full re-render after settings state changes. Uses the
+   * declarative `update()` API on Obsidian 1.13.0+ (re-invokes
+   * getSettingDefinitions() and re-renders from the result); falls back to
+   * the legacy imperative refresh() on older Obsidian, where update() is
+   * unavailable.
+   */
+  private rerender(): void {
+    if (requireApiVersion("1.13.0")) {
+      this.update();
+    } else {
+      this.refresh();
+    }
+  }
+
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: t("settings.banner.buttonText"),
+        searchable: false,
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderBanner(setting.settingEl);
+        },
+      },
+      {
+        name: t("settings.heading"),
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderGeneralSection(setting.settingEl);
+        },
+      },
+      {
+        name: t("settings.behaviour.heading"),
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderBehaviourSection(setting.settingEl);
+        },
+      },
+      {
+        name: t("settings.buckets.heading"),
+        render: (setting) => {
+          setting.settingEl.empty();
+          this.renderBucketsSection(setting.settingEl);
+        },
+      },
+    ];
+  }
+
+  private renderBanner(containerEl: HTMLElement) {
     const banner = containerEl.createDiv({ cls: "gtd-settings-banner" });
 
     const text = banner.createDiv({ cls: "gtd-settings-banner-text" });
@@ -287,8 +335,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     });
   }
 
-  private renderGeneralSection() {
-    const { containerEl } = this;
+  private renderGeneralSection(containerEl: HTMLElement) {
     new Setting(containerEl).setName(t("settings.heading")).setHeading();
 
     // Annotation Style (storage mode)
@@ -310,7 +357,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.onChange(async (val) => {
           this.plugin.settings.storageMode = val as StorageMode;
           await this.plugin.saveSettings();
-          this.refresh();
+          this.rerender();
         });
       })
       .addButton((btn) => {
@@ -329,7 +376,7 @@ export class GtdSettingsTab extends PluginSettingTab {
             oppositeMode,
             this.plugin.settings
           );
-          this.refresh();
+          this.rerender();
         });
       });
 
@@ -386,7 +433,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           }
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
-          this.refresh();
+          this.rerender();
         });
       });
 
@@ -497,9 +544,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       .sort();
   }
 
-  private renderBehaviourSection() {
-    const { containerEl } = this;
-
+  private renderBehaviourSection(containerEl: HTMLElement) {
     new Setting(containerEl)
       .setName(t("settings.behaviour.showCompleted.name"))
       .setDesc(t("settings.behaviour.showCompleted.description"))
@@ -550,8 +595,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
   }
 
-  private renderBucketsSection() {
-    const { containerEl } = this;
+  private renderBucketsSection(containerEl: HTMLElement) {
     new Setting(containerEl).setName(t("settings.buckets.heading")).setHeading();
 
     // To Review (expandable)
@@ -580,7 +624,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         showInStatusBar: false,
       });
       await this.plugin.saveSettings();
-      this.refresh();
+      this.rerender();
     };
 
     const resetBtn = actionRow.createEl("button", {
@@ -595,7 +639,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         async () => {
           this.plugin.settings.buckets = JSON.parse(JSON.stringify(DEFAULT_BUCKETS)) as BucketConfig[];
           await this.plugin.saveSettings();
-          this.refresh();
+          this.rerender();
         }
       ).open();
     };
@@ -702,13 +746,13 @@ export class GtdSettingsTab extends PluginSettingTab {
         e.stopPropagation();
         [buckets[idx - 1], buckets[idx]] = [buckets[idx], buckets[idx - 1]];
         await this.plugin.saveSettings();
-        this.refresh();
+        this.rerender();
       };
       downBtn.onclick = async (e) => {
         e.stopPropagation();
         [buckets[idx + 1], buckets[idx]] = [buckets[idx], buckets[idx + 1]];
         await this.plugin.saveSettings();
-        this.refresh();
+        this.rerender();
       };
 
       // Expand/collapse
@@ -837,7 +881,7 @@ export class GtdSettingsTab extends PluginSettingTab {
         async () => {
           this.plugin.settings.buckets.splice(idx, 1);
           await this.plugin.saveSettings();
-          this.refresh();
+          this.rerender();
         }
       ).open();
     };

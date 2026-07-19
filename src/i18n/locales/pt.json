@@ -91,6 +91,7 @@
       "noFilesSelected": "Nenhum ficheiro selecionado. O plugin não irá procurar tarefas."
     },
     "behaviour": {
+      "heading": "Comportamento",
       "showCompleted": {
         "name": "Mostrar tarefas concluídas até à meia-noite",
         "description": "As tarefas concluídas permanecem visíveis com riscado no painel até à meia-noite, desaparecendo no próximo carregamento."

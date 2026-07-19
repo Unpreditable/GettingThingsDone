@@ -91,6 +91,7 @@
       "noFilesSelected": "No hay archivos seleccionados. El plugin no buscará tareas."
     },
     "behaviour": {
+      "heading": "Comportamiento",
       "showCompleted": {
         "name": "Mostrar tareas completadas hasta medianoche",
         "description": "Las tareas completadas permanecen visibles con tachado en el panel hasta medianoche, luego desaparecen al siguiente cargado."

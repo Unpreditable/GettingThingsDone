@@ -91,6 +91,7 @@
       "noFilesSelected": "Keine Dateien ausgewählt. Das Plugin durchsucht nichts nach Aufgaben."
     },
     "behaviour": {
+      "heading": "Verhalten",
       "showCompleted": {
         "name": "Erledigte Aufgaben bis Mitternacht anzeigen",
         "description": "Erledigte Aufgaben bleiben bis Mitternacht durchgestrichen im Panel sichtbar und verschwinden beim nächsten Laden."
