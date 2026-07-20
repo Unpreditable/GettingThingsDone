@@ -371,7 +371,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       cls: "mod-cta gtd-settings-banner-button",
       text: t("settings.banner.buttonText"),
     }).addEventListener("click", () => {
-      window.open("https://github.com/Unpreditable/GettingThingsDone/issues/new", "_blank");
+      window.open("https://github.com/Unpreditable/GettingThingsDone/issues/new/choose", "_blank");
     });
   }
 

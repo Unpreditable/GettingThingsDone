@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest an idea for this plugin
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    id: scope-check
+    attributes:
+      label: Scope check
+      options:
+        - label: This is about the [GTD Tasks plugin](https://community.obsidian.md/plugins/gtd-tasks), and I think it'd be useful beyond just my own workflow
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Tell me what you're trying to do, not just the feature you have in mind. There might be a better way to solve it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: How would you solve it?
+      description: Your idea for a solution, if you have one.
+    validations:
+      required: false

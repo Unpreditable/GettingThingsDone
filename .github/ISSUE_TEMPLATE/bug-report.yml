@@ -1,0 +1,57 @@
+name: Bug Report
+description: Report something that isn't working right
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: latest-version
+    attributes:
+      label: Version check
+      options:
+        - label: I'm using the latest version of the [GTD Tasks plugin](https://community.obsidian.md/plugins/gtd-tasks)
+          required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: What's the bug?
+      description: Describe what's going wrong, and which exact steps can you take to reproduce it? The more detail, the easier it is to track down.
+      placeholder: |
+        1. Create a task with '...'
+        2. Move it to bucket '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-vs-actual
+    attributes:
+      label: Expected vs. actual behavior
+      description: What did you expect to happen, and what happened instead?
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian-version
+    attributes:
+      label: Obsidian version
+      description: Found in Settings → About.
+      placeholder: 1.12.7
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Found in Settings → Community plugins → GTD Tasks.
+      placeholder: 0.1.9
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Screenshots, error messages, or anything else that might help.
+    validations:
+      required: false
