@@ -7,7 +7,7 @@ artifacts:
   - main.js
   - styles.css
   - manifest.json
-changelog: true
+changelog: false
 ---
 
 ## Version bump
