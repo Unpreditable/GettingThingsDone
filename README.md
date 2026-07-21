@@ -182,6 +182,12 @@ The panel and settings UI are available in German, Spanish, Estonian, French, Ja
 
 ---
 
+## Network Use
+
+This plugin opens github.com in your default browser when you click **Share feedback & ideas** in settings, after you confirm a dialog. No background connections, and your data never leaves your machine.
+
+---
+
 ## License
 
 [GPL-3.0](LICENSE) © 2026 Vitaly Ditman

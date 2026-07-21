@@ -80,6 +80,10 @@
       "message": "Thanks for using GTD Tasks! I built it to manage my own work every day, and I hope it makes yours a little easier too. I'd genuinely appreciate hearing what's working, what's not, or what you wish it did.",
       "buttonText_comment": "Label on the call-to-action button next to the message. Opens the GitHub issues page in the default browser.",
       "buttonText": "Share feedback & ideas",
+      "confirmMessage_comment": "Confirmation prompt shown before opening the GitHub issues page in the default browser, since this is the plugin's only network request.",
+      "confirmMessage": "This will open github.com in your default browser to create a new issue.",
+      "confirmButton_comment": "Confirm button inside the open-GitHub-link confirmation dialog.",
+      "confirmButton": "Continue",
       "signature_comment": "Sign-off shown under the message, on its own line. A name, not translated per-locale.",
       "signature": "- Vitaly"
     },

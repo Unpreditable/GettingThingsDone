@@ -52,6 +52,8 @@
     "banner": {
       "message": "Ačiū, kad naudojatės GTD Tasks! Sukūriau jį savo kasdieniam darbui tvarkyti ir tikiuosi, kad jis palengvins ir jūsų darbą. Man tikrai įdomu išgirsti, kas veikia gerai, kas ne, ir ko jums trūksta.",
       "buttonText": "Dalintis atsiliepimais ir idėjomis",
+      "confirmMessage": "Tai atvers github.com jūsų numatytojoje naršyklėje, kad galėtumėte pranešti apie naują problemą.",
+      "confirmButton": "Tęsti",
       "signature": "- Vitaly"
     },
     "emoji": "Emoji",

@@ -50,6 +50,8 @@
     "banner": {
       "message": "感谢使用 GTD Tasks!我开发它是为了整理自己每天的工作,也希望它能让你的工作轻松一些。我很想听听哪些地方好用,哪些不好用,还有你希望它增加什么功能。",
       "buttonText": "分享反馈与想法",
+      "confirmMessage": "这将在默认浏览器中打开 github.com,以创建新的议题。",
+      "confirmButton": "继续",
       "signature": "- Vitaly"
     },
     "emoji": "表情符号",
