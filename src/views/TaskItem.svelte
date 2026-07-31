@@ -5,6 +5,7 @@
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { t } from "../i18n/i18n";
+  import { isDragging } from "./dragState";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
@@ -66,6 +67,14 @@
   })();
 
   $: showPopover = showTooltip;
+  // A drag reflows sibling rows under the still-stationary cursor (possibly
+  // in a different bucket, for a cross-bucket drag), which fires a genuine
+  // mouseenter on whichever row lands there. Cancel/hide immediately so that
+  // reflow can't pop up this task's tooltip mid-drag.
+  $: if ($isDragging) {
+    clearTimeout(tooltipTimer);
+    showTooltip = false;
+  }
   $: sourceFile = task.filePath.split("/").pop() ?? task.filePath;
   $: displayLineNumber = task.lineNumber + 1;
 
@@ -73,10 +82,23 @@
   let tooltipTimer: ReturnType<typeof setTimeout>;
 
   function onMouseEnter() {
+    if ($isDragging) return;
     tooltipTimer = setTimeout(() => (showTooltip = true), 800);
   }
 
   function onMouseLeave() {
+    clearTimeout(tooltipTimer);
+    showTooltip = false;
+  }
+
+  // Hides on mousedown, not just via the isDragging store reactive block:
+  // a drag's native drag-image is a DOM snapshot taken essentially at
+  // dragstart, which fires shortly after mousedown but before SortableJS's
+  // onStart callback runs. If the tooltip was already visible, it would
+  // still be in the DOM at snapshot time and get dragged along (faint,
+  // since browsers render native drag images at reduced opacity) unless
+  // it's already gone by mousedown.
+  function onMouseDown() {
     clearTimeout(tooltipTimer);
     showTooltip = false;
   }
@@ -121,6 +143,7 @@
   style="padding-left: {12 + visualIndentLevel * 16}px"
   on:mouseenter={onMouseEnter}
   on:mouseleave={onMouseLeave}
+  on:mousedown={onMouseDown}
   on:contextmenu={onContextMenu}
   data-task-id={task.id}
   data-file-path={task.filePath}

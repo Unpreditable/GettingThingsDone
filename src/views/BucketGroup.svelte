@@ -6,6 +6,7 @@
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { TO_REVIEW_ID } from "../core/BucketManager";
+  import { isDragging } from "./dragState";
 
   export let bucketId: string;
   export let name: string;
@@ -184,6 +185,12 @@
       ghostClass: "sortable-ghost",
       chosenClass: "sortable-chosen",
       dataIdAttr: "data-task-id",
+      onStart() {
+        isDragging.set(true);
+      },
+      onEnd() {
+        isDragging.set(false);
+      },
       onMove(evt) {
         const draggedId = evt.dragged.dataset.taskId ?? "";
         const relatedId = (evt.related as HTMLElement).dataset.taskId ?? "";
