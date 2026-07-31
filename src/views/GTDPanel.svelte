@@ -20,10 +20,15 @@
   $: celebrationImageUrls = $celebrationImageUrls$;
   $: showLanguageBanner = $languageChangeNotice$;
 
-  export let onMove: (task: TaskRecord, targetBucketId: string | null) => Promise<void>;
+  export let onMove: (
+    task: TaskRecord,
+    targetBucketId: string | null,
+    orderedTaskIds?: string[] | null
+  ) => Promise<void>;
   export let onToggle: (task: TaskRecord) => Promise<void>;
   export let onNavigate: (task: TaskRecord) => void;
   export let onConfirm: (task: TaskRecord, bucketId: string) => Promise<void>;
+  export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onOpenSettings: () => void;
   export let onDismissLanguageBanner: () => void;
 
@@ -111,9 +116,14 @@
     task: TaskRecord;
     targetBucketId: string | null;
     explicitChildren: TaskRecord[];
+    orderedTaskIds: string[] | null;
   } | null = null;
 
-  async function handleMove(task: TaskRecord, targetBucketId: string | null) {
+  async function handleMove(
+    task: TaskRecord,
+    targetBucketId: string | null,
+    orderedTaskIds: string[] | null = null
+  ) {
     if (targetBucketId === "__context_menu__") {
       showContextMenu(task);
       return;
@@ -128,19 +138,19 @@
     );
 
     if (explicitChildren.length > 0) {
-      pendingMoveConfirm = { task, targetBucketId, explicitChildren };
+      pendingMoveConfirm = { task, targetBucketId, explicitChildren, orderedTaskIds };
       return;
     }
 
-    await onMove(task, targetBucketId);
+    await onMove(task, targetBucketId, orderedTaskIds);
   }
 
   async function confirmMoveChildren(moveChildren: boolean) {
     if (!pendingMoveConfirm) return;
-    const { task, targetBucketId, explicitChildren } = pendingMoveConfirm;
+    const { task, targetBucketId, explicitChildren, orderedTaskIds } = pendingMoveConfirm;
     pendingMoveConfirm = null;
 
-    await onMove(task, targetBucketId);
+    await onMove(task, targetBucketId, orderedTaskIds);
 
     if (moveChildren) {
       for (const child of explicitChildren) {
@@ -249,17 +259,22 @@
     taskId: string;
     sourceBucketId: string;
     targetBucketId: string;
+    orderedTaskIds: string[] | null;
   }>) {
-    const { taskId, targetBucketId } = event.detail;
+    const { taskId, targetBucketId, orderedTaskIds } = event.detail;
     const resolvedTarget = targetBucketId === TO_REVIEW_ID ? null : targetBucketId;
 
     for (const group of bucketGroups) {
       const task = group.tasks.find((t) => t.id === taskId);
       if (task) {
-        await handleMove(task, resolvedTarget);
+        await handleMove(task, resolvedTarget, orderedTaskIds);
         return;
       }
     }
+  }
+
+  async function handleReorderEvent(event: CustomEvent<{ bucketId: string; orderedTaskIds: string[] }>) {
+    await onReorder(event.detail.bucketId, event.detail.orderedTaskIds);
   }
 </script>
 
@@ -335,6 +350,7 @@
         on:navigate={(e) => onNavigate(e.detail.task)}
         on:confirm={(e) => onConfirm(e.detail.task, e.detail.bucketId)}
         on:drop={handleDrop}
+        on:reorder={handleReorderEvent}
       />
       {/if}
     {/each}

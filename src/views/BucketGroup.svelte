@@ -24,7 +24,13 @@
     toggle: { task: TaskRecord };
     navigate: { task: TaskRecord };
     confirm: { task: TaskRecord; bucketId: string };
-    drop: { taskId: string; sourceBucketId: string; targetBucketId: string };
+    drop: {
+      taskId: string;
+      sourceBucketId: string;
+      targetBucketId: string;
+      orderedTaskIds: string[] | null;
+    };
+    reorder: { bucketId: string; orderedTaskIds: string[] };
   }>();
 
   let dismissedIds = new Set<string>();
@@ -91,7 +97,7 @@
     const sourceBucketId =
       (dragged.parentElement as HTMLElement)?.dataset?.bucketId ?? "";
     if (!taskId || sourceBucketId === bucketId) return;
-    dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId });
+    dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId, orderedTaskIds: null });
   }
 
   /**
@@ -120,6 +126,52 @@
         const child = allTasksMap.get(id);
         if (child) queue.push(...child.childIds);
       }
+    }
+    return result;
+  }
+
+  /** Same as getDescendantIdsInBucket, but scoped to an arbitrary bucket ID
+   * rather than this component's own bucketId — needed because onMove's
+   * Constraint 2 must check descendants in the DROP TARGET bucket, which
+   * during a cross-bucket drag is not this component's bucketId (onMove
+   * fires on the source sortable; see the targetBucket comment below). */
+  function getDescendantIdsInBucketId(task: TaskRecord, targetBucketId: string): Set<string> {
+    const result = new Set<string>();
+    const queue = [...task.childIds];
+    while (queue.length > 0) {
+      const id = queue.shift()!;
+      if (taskBucketMap.get(id) === targetBucketId) {
+        result.add(id);
+        const child = allTasksMap.get(id);
+        if (child) queue.push(...child.childIds);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * A drag only ever moves the one row you grabbed — a dragged parent's
+   * same-bucket children are still sitting wherever they physically were.
+   * This moves them (preserving their own relative order) to immediately
+   * after draggedId in the raw captured order, so same-bucket drags are
+   * correct at the moment of capture rather than relying on a later
+   * render-time pass. For a cross-bucket drop this can only catch children
+   * that already independently lived in the target bucket — an
+   * auto-inheriting child isn't part of orderedIds yet at all, since it
+   * only appears in this bucket after the file write is reindexed.
+   */
+  function reattachDescendants(orderedIds: string[], draggedId: string): string[] {
+    const draggedTask = allTasksMap.get(draggedId);
+    if (!draggedTask) return orderedIds;
+    const descIds = getDescendantIdsInBucket(draggedTask);
+    if (descIds.size === 0) return orderedIds;
+
+    const descendantsInOrder = orderedIds.filter((id) => descIds.has(id));
+    const result: string[] = [];
+    for (const id of orderedIds) {
+      if (descIds.has(id)) continue;
+      result.push(id);
+      if (id === draggedId) result.push(...descendantsInOrder);
     }
     return result;
   }
@@ -176,33 +228,36 @@
 
         // Constraint 1 (cross- and same-bucket): the insertion point must not lie
         // inside another task's group. If the elements immediately before AND after
-        // share the same group root, only members of that group may be placed there.
+        // share the same group root, only members of that group may be placed there
+        // — including the case where the dragged task IS that group's own root: a
+        // parent can't be dropped in between two of its own children either.
         if (beforeId && afterId) {
           const beforeRoot = targetGroupRoot(beforeId);
           const afterRoot = targetGroupRoot(afterId);
-          if (beforeRoot === afterRoot && draggedRoot !== beforeRoot) return false;
+          if (beforeRoot === afterRoot) {
+            if (draggedRoot !== beforeRoot) return false;
+            if (draggedId === beforeRoot) return false;
+          }
         }
 
-        // Remaining constraints only apply within the same bucket.
-        if (isCrossBucket) return true;
-
-        const descIds = getDescendantIdsInBucket(draggedTask);
-
-        // Constraint 2: A parent can't be placed below any of its same-bucket descendants.
-        for (let i = 0; i < insertIdx; i++) {
-          if (descIds.has(currentIds[i])) return false;
-        }
-
-        // Constraint 3: A subtask can't be placed above its parent, and must stay within
-        // its group's contiguous range.
+        // Constraint 2: A subtask can't be placed above its parent, and must stay within
+        // its group's contiguous range — checked against the TARGET bucket (not this
+        // component's own bucketId, which during a cross-bucket drag is the SOURCE), so
+        // this applies whether the parent already lives in the target bucket via a
+        // same-bucket reorder or a cross-bucket drop. (A dragged PARENT has no
+        // equivalent restriction here — onAdd/onUpdate above already reattach a moved
+        // parent's same-bucket children to follow it wherever it's dropped, and
+        // BucketManager's regroupByHierarchy is a render-time backstop for the rest —
+        // so the parent is free to move to any top-level position, just never literally
+        // in between its own children per Constraint 1 above.)
         const parentId = draggedTask.parentId;
-        if (parentId && taskBucketMap.get(parentId) === bucketId) {
+        if (parentId && taskBucketMap.get(parentId) === targetBucket) {
           const parentIdx = currentIds.indexOf(parentId);
           if (parentIdx !== -1 && insertIdx <= parentIdx) return false;
 
           const parentTask = allTasksMap.get(parentId);
           if (parentTask) {
-            const groupIds = getDescendantIdsInBucket(parentTask);
+            const groupIds = getDescendantIdsInBucketId(parentTask, targetBucket);
             groupIds.add(parentId);
             let lastGroupIdx = -1;
             for (let i = 0; i < currentIds.length; i++) {
@@ -212,25 +267,32 @@
           }
         }
 
-        // Constraint 4: A parent can't be placed where non-descendant tasks would appear
-        // between it and its first same-bucket descendant (keeps the group contiguous).
-        if (descIds.size > 0) {
-          let firstDescIdx = currentIds.length;
-          for (let i = 0; i < currentIds.length; i++) {
-            if (descIds.has(currentIds[i])) { firstDescIdx = i; break; }
-          }
-          for (let i = insertIdx; i < firstDescIdx; i++) {
-            if (!descIds.has(currentIds[i])) return false;
-          }
-        }
-
         return true;
       },
       onAdd(evt) {
         const taskId = evt.item.dataset.taskId ?? "";
         const sourceBucketId = evt.from.dataset.bucketId ?? "";
+        const rawOrderedTaskIds = Array.from(evt.to.children)
+          .map((el) => (el as HTMLElement).dataset.taskId ?? "")
+          .filter(Boolean);
+        const orderedTaskIds = reattachDescendants(rawOrderedTaskIds, taskId);
+        // SortableJS already moved evt.item into evt.to's DOM at the drop
+        // position (that's what triggered onAdd) — read it above, then
+        // revert the manual DOM move so Svelte's keyed {#each} in the
+        // *source* bucket doesn't lose track of a node it still thinks it
+        // owns. The real re-render happens once the drop/reorder handlers
+        // persist the new order and the store refreshes.
         evt.from.appendChild(evt.item);
-        dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId });
+        dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId, orderedTaskIds });
+      },
+      onUpdate(evt) {
+        const taskId = evt.item.dataset.taskId ?? "";
+        const rawOrderedTaskIds = Array.from(evt.to.children)
+          .map((el) => (el as HTMLElement).dataset.taskId ?? "")
+          .filter(Boolean);
+        const orderedTaskIds = reattachDescendants(rawOrderedTaskIds, taskId);
+        evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex ?? 0] ?? null);
+        dispatch("reorder", { bucketId, orderedTaskIds });
       },
     });
   });

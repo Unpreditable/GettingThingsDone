@@ -1,6 +1,7 @@
-import { groupTasksIntoBuckets, TO_REVIEW_ID } from "../src/core/BucketManager";
+import { groupTasksIntoBuckets, regroupByHierarchy, TO_REVIEW_ID } from "../src/core/BucketManager";
 import { DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
+import { computeOrderKeys } from "../src/core/TaskOrder";
 
 // Use a fixed Monday so calendar-aware week boundaries are predictable
 const FIXED_MONDAY = new Date("2026-02-23T00:00:00"); // Monday Feb 23, 2026
@@ -388,5 +389,193 @@ describe("date range edge cases", () => {
     for (const g of groups) {
       expect(g.tasks).toHaveLength(0);
     }
+  });
+});
+
+describe("groupTasksIntoBuckets manual order", () => {
+  const settings = { ...DEFAULT_SETTINGS, buckets: DEFAULT_BUCKETS };
+
+  it("reorders a bucket's tasks per settings.taskOrder", () => {
+    const a = makeTask({ id: "a", filePath: "x.md", lineNumber: 0, text: "A" });
+    const b = makeTask({ id: "b", filePath: "x.md", lineNumber: 1, text: "B" });
+    const c = makeTask({ id: "c", filePath: "x.md", lineNumber: 2, text: "C" });
+
+    const unordered = groupTasksIntoBuckets([a, b, c], settings);
+    const review = unordered.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.tasks.map((t) => t.id)).toEqual(["a", "b", "c"]);
+
+    const keys = computeOrderKeys([a, b, c]);
+    const withOrder = {
+      ...settings,
+      taskOrder: { [TO_REVIEW_ID]: [keys.get("c")!, keys.get("a")!, keys.get("b")!] },
+    };
+
+    const ordered = groupTasksIntoBuckets([a, b, c], withOrder);
+    const reviewOrdered = ordered.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(reviewOrdered.tasks.map((t) => t.id)).toEqual(["c", "a", "b"]);
+  });
+
+  it("appends a newly-appearing task after the manually ordered ones", () => {
+    const a = makeTask({ id: "a", filePath: "x.md", lineNumber: 0, text: "A" });
+    const b = makeTask({ id: "b", filePath: "x.md", lineNumber: 1, text: "B" });
+
+    const keys = computeOrderKeys([a]);
+    const withOrder = {
+      ...settings,
+      taskOrder: { [TO_REVIEW_ID]: [keys.get("a")!] },
+    };
+
+    const ordered = groupTasksIntoBuckets([a, b], withOrder);
+    const review = ordered.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.tasks.map((t) => t.id)).toEqual(["a", "b"]);
+  });
+
+  it("keeps a moved parent's auto-inherited children contiguous with it, even though only the parent has a saved position", () => {
+    const parent = makeTask({ id: "p", filePath: "x.md", lineNumber: 0, text: "Parent" });
+    const child1 = makeTask({ id: "c1", filePath: "x.md", lineNumber: 1, text: "Child 1", parentId: "p" });
+    const child2 = makeTask({ id: "c2", filePath: "x.md", lineNumber: 2, text: "Child 2", parentId: "p" });
+    parent.childIds = ["c1", "c2"];
+    const other = makeTask({ id: "o", filePath: "x.md", lineNumber: 3, text: "Other" });
+
+    // Only the parent has an explicit saved order key (simulating: it was
+    // dragged into this bucket, children auto-inherited with no saved
+    // position of their own).
+    const keys = computeOrderKeys([parent, child1, child2, other]);
+    const withOrder = {
+      ...settings,
+      taskOrder: { [TO_REVIEW_ID]: [keys.get("p")!] },
+    };
+
+    const grouped = groupTasksIntoBuckets([other, parent, child1, child2], withOrder);
+    const review = grouped.find((g) => g.bucketId === TO_REVIEW_ID)!;
+
+    expect(review.tasks.map((t) => t.id)).toEqual(["p", "c1", "c2", "o"]);
+  });
+});
+
+describe("regroupByHierarchy", () => {
+  it("leaves an already-contiguous list unchanged", () => {
+    const parent = makeTask({ id: "p", text: "Parent" });
+    const child = makeTask({ id: "c", text: "Child", parentId: "p" });
+    parent.childIds = ["c"];
+
+    const result = regroupByHierarchy([parent, child]);
+
+    expect(result.map((t) => t.id)).toEqual(["p", "c"]);
+  });
+
+  it("pulls scattered children back to immediately after their parent", () => {
+    const parent = makeTask({ id: "p", text: "Parent" });
+    const other = makeTask({ id: "o", text: "Other" });
+    const child1 = makeTask({ id: "c1", text: "Child 1", parentId: "p" });
+    const child2 = makeTask({ id: "c2", text: "Child 2", parentId: "p" });
+    parent.childIds = ["c1", "c2"];
+
+    // Simulate a cross-bucket move: parent lands at the top (its saved
+    // position), children get appended at the bottom (never had a saved
+    // position of their own), with an unrelated task in between.
+    const result = regroupByHierarchy([parent, other, child1, child2]);
+
+    expect(result.map((t) => t.id)).toEqual(["p", "c1", "c2", "o"]);
+  });
+
+  it("preserves each child-group's own relative order when regrouping", () => {
+    const parent = makeTask({ id: "p", text: "Parent" });
+    const child1 = makeTask({ id: "c1", text: "Child 1", parentId: "p" });
+    const child2 = makeTask({ id: "c2", text: "Child 2", parentId: "p" });
+    parent.childIds = ["c1", "c2"];
+
+    // child2 currently sits before child1 (e.g. from their own prior manual
+    // reorder) — that relative order must survive being pulled next to parent.
+    const result = regroupByHierarchy([child2, parent, child1]);
+
+    expect(result.map((t) => t.id)).toEqual(["p", "c2", "c1"]);
+  });
+
+  it("treats a child whose parent is absent (assigned to a different bucket) as its own independent root", () => {
+    const other = makeTask({ id: "o", text: "Other" });
+    // "child"'s parent is NOT in this list — e.g. the parent lives in a
+    // different bucket because this child has its own explicit assignment.
+    const child = makeTask({ id: "c", text: "Child", parentId: "missing-parent" });
+
+    const result = regroupByHierarchy([child, other]);
+
+    expect(result.map((t) => t.id)).toEqual(["c", "o"]);
+  });
+
+  it("handles multi-level nesting (grandparent -> parent -> child), all contiguous", () => {
+    const grandparent = makeTask({ id: "gp", text: "Grandparent" });
+    const parent = makeTask({ id: "p", text: "Parent", parentId: "gp" });
+    const child = makeTask({ id: "c", text: "Child", parentId: "p" });
+    grandparent.childIds = ["p"];
+    parent.childIds = ["c"];
+
+    // Scattered: parent and child both separated from grandparent and from
+    // each other by an unrelated task.
+    const other = makeTask({ id: "o", text: "Other" });
+    const result = regroupByHierarchy([grandparent, other, parent, child]);
+
+    expect(result.map((t) => t.id)).toEqual(["gp", "p", "c", "o"]);
+  });
+
+  it("keeps multiple independent top-level families contiguous, preserving family order", () => {
+    const parentA = makeTask({ id: "pa", text: "Parent A" });
+    const childA = makeTask({ id: "ca", text: "Child A", parentId: "pa" });
+    parentA.childIds = ["ca"];
+    const parentB = makeTask({ id: "pb", text: "Parent B" });
+    const childB = makeTask({ id: "cb", text: "Child B", parentId: "pb" });
+    parentB.childIds = ["cb"];
+
+    const result = regroupByHierarchy([parentA, parentB, childA, childB]);
+
+    expect(result.map((t) => t.id)).toEqual(["pa", "ca", "pb", "cb"]);
+  });
+});
+
+describe("groupTasksIntoBuckets performance", () => {
+  it("stays fast with thousands of tasks in one large, long-lived file", () => {
+    // Models a single daily-note-style file accumulating tasks over months —
+    // the scenario where a per-refresh cost that scales with total task
+    // count (not file count) would actually be felt.
+    const taskCount = 5000;
+    const tasks: TaskRecord[] = [];
+
+    for (let i = 0; i < taskCount; i++) {
+      const isParent = i % 20 === 0;
+      const isChild = i % 20 === 1;
+      tasks.push(
+        makeTask({
+          id: `t${i}`,
+          filePath: "big-daily-note.md",
+          lineNumber: i,
+          text: `Task ${i}`,
+          isCompleted: i % 3 === 0,
+          parentId: isChild ? `t${i - 1}` : null,
+          childIds: isParent ? [`t${i + 1}`] : [],
+        })
+      );
+    }
+
+    const bigSettings = {
+      ...DEFAULT_SETTINGS,
+      buckets: DEFAULT_BUCKETS,
+      taskOrder: {} as Record<string, string[]>,
+    };
+    const orderKeys = computeOrderKeys(tasks);
+    // A long-lived file accumulates a large manual order over months of use.
+    bigSettings.taskOrder[TO_REVIEW_ID] = tasks
+      .slice(0, 1000)
+      .map((t) => orderKeys.get(t.id)!)
+      .reverse();
+
+    const start = performance.now();
+    const result = groupTasksIntoBuckets(tasks, bigSettings);
+    const elapsed = performance.now() - start;
+
+    expect(result.find((g) => g.bucketId === TO_REVIEW_ID)?.tasks.length).toBe(taskCount);
+    // Generous threshold — this guards against an accidental quadratic-time
+    // regression (e.g. an O(n^2) lookup creeping into regroupByHierarchy or
+    // applyManualOrder), not a tight budget tuned to one specific machine.
+    expect(elapsed).toBeLessThan(500);
   });
 });

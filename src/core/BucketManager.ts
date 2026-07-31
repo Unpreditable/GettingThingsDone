@@ -9,6 +9,7 @@ import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
 import { t } from "../i18n/i18n";
+import { computeOrderKeys, applyManualOrder } from "./TaskOrder";
 
 export const TO_REVIEW_ID = "to-review";
 
@@ -110,10 +111,59 @@ export function groupTasksIntoBuckets(
     bucketMap.get(TO_REVIEW_ID)!.tasks.push(task);
   }
 
+  const orderKeys = computeOrderKeys(tasks);
+  for (const group of bucketMap.values()) {
+    const saved = settings.taskOrder?.[group.bucketId];
+    if (saved && saved.length > 0) {
+      group.tasks = applyManualOrder(group.tasks, orderKeys, saved);
+    }
+    group.tasks = regroupByHierarchy(group.tasks);
+  }
+
   const result: BucketGroup[] = [bucketMap.get(TO_REVIEW_ID)!];
   for (const b of settings.buckets) {
     result.push(bucketMap.get(b.id)!);
   }
+
+  return result;
+}
+
+/**
+ * Re-flattens `tasks` (already in the desired top-level order — e.g. from
+ * applyManualOrder) so each task's same-bucket descendants render
+ * immediately after it, recursively. This is the render-time backstop for
+ * parent/child contiguity: BucketGroup.svelte's onAdd/onUpdate handlers
+ * already reattach a moved parent's children into the captured order at
+ * drop time for SAME-bucket drags, but a CROSS-bucket move can't do that —
+ * an auto-inherited child (no explicit assignment, inheriting its parent's
+ * effective bucket) only starts appearing in the target bucket once the
+ * file write is reindexed, a beat after the drop's own synchronous DOM
+ * event, so there's no drag event to hook for it. This pass is also
+ * defense-in-depth for anything else that could leave taskOrder
+ * inconsistent with the tree (entries saved before this fix shipped, a
+ * hand-edited data.json, a future bulk-move feature). A child whose parent
+ * ISN'T in `tasks` (assigned to a different bucket) is untouched and
+ * renders as its own independent root.
+ */
+export function regroupByHierarchy(tasks: TaskRecord[]): TaskRecord[] {
+  const taskIds = new Set(tasks.map((t) => t.id));
+  const childrenOf = new Map<string, TaskRecord[]>();
+
+  for (const task of tasks) {
+    if (task.parentId && taskIds.has(task.parentId)) {
+      if (!childrenOf.has(task.parentId)) childrenOf.set(task.parentId, []);
+      childrenOf.get(task.parentId)!.push(task);
+    }
+  }
+
+  const roots = tasks.filter((t) => !t.parentId || !taskIds.has(t.parentId));
+
+  const result: TaskRecord[] = [];
+  const visit = (task: TaskRecord) => {
+    result.push(task);
+    for (const child of childrenOf.get(task.id) ?? []) visit(child);
+  };
+  for (const root of roots) visit(root);
 
   return result;
 }

@@ -14,10 +14,11 @@ import { writable, type Writable } from "svelte/store";
 import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, getActiveScope, migrateSettingsData } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
-import { groupTasksIntoBuckets } from "./core/BucketManager";
+import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "./core/TaskWriter";
 import type { TaskRecord } from "./core/TaskParser";
+import { computeOrderKeys, mapToOrderKeys, purgeOrderKey } from "./core/TaskOrder";
 import GTDPanel from "./views/GTDPanel.svelte";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
@@ -80,6 +81,7 @@ export default class GtdTasksPlugin extends Plugin {
     if (!this.settings.buckets || this.settings.buckets.length === 0) {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }
+    this.settings.taskOrder = { ...(this.settings.taskOrder ?? {}) };
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -226,6 +228,7 @@ class GtdPanelView extends ItemView {
         onToggle: this.handleToggle.bind(this),
         onNavigate: this.handleNavigate.bind(this),
         onConfirm: this.handleConfirmPlacement.bind(this),
+        onReorder: this.handleReorder.bind(this),
         onOpenSettings: openSettings,
         onDismissLanguageBanner: () => {
           this.plugin.languageChangeNotice = false;
@@ -235,7 +238,26 @@ class GtdPanelView extends ItemView {
     });
   }
 
-  private async handleMove(task: TaskRecord, targetBucketId: string | null) {
+  private async handleReorder(bucketId: string, orderedTaskIds: string[]) {
+    const orderKeys = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
+    this.plugin.settings.taskOrder[bucketId] = mapToOrderKeys(orderedTaskIds, orderKeys);
+    await this.plugin.saveSettings();
+  }
+
+  /**
+   * Reindexes and settles taskOrder BEFORE the single refresh at the end
+   * (via saveSettings()), rather than refreshing once per step. Refreshing
+   * after each step (reindex, then separately after taskOrder is saved)
+   * would render the same drop as two visibly different in-between states —
+   * correct bucket but stale position, then correct position a beat later —
+   * instead of one settled result. reindexFileSilently is used instead of
+   * reindexFile so this doesn't ALSO trigger its own premature refresh.
+   */
+  private async handleMove(
+    task: TaskRecord,
+    targetBucketId: string | null,
+    orderedTaskIds?: string[] | null
+  ) {
     const targetBucket =
       targetBucketId === null
         ? null
@@ -251,7 +273,27 @@ class GtdPanelView extends ItemView {
     if (!result.success) {
       new Notice(t("notices.moveFailed", { error: result.error }));
       await this.plugin.taskIndex.reindexFile(task.filePath);
+      return;
     }
+
+    await this.plugin.taskIndex.reindexFileSilently(task.filePath);
+
+    const orderKeys = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
+    const key = orderKeys.get(task.id);
+    if (key) {
+      const purged = purgeOrderKey(this.plugin.settings.taskOrder, key);
+      this.plugin.settings.taskOrder = purged.taskOrder;
+    }
+
+    if (orderedTaskIds) {
+      const targetId = targetBucketId ?? TO_REVIEW_ID;
+      this.plugin.settings.taskOrder[targetId] = mapToOrderKeys(orderedTaskIds, orderKeys);
+    }
+
+    // Always refresh once here, now that the index and taskOrder are both
+    // settled — the moved task's bucket assignment changed regardless of
+    // whether taskOrder itself did, so the panel always needs to redraw.
+    await this.plugin.saveSettings();
   }
 
   private async handleToggle(task: TaskRecord) {

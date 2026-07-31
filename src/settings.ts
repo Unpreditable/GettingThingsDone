@@ -66,6 +66,13 @@ export interface PluginSettings {
   compactView: boolean;
   /** Controls which celebration animations play on task completion. */
   celebrationMode: CelebrationMode;
+  /**
+   * Manual per-bucket task order from drag-and-drop, keyed by bucket ID.
+   * Each value is an array of stable order keys (see core/TaskOrder.ts) in
+   * display order. Tasks not present in a bucket's array render after it,
+   * in their natural (file scan) order.
+   */
+  taskOrder: Record<string, string[]>;
 }
 
 
@@ -128,6 +135,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewShowInStatusBar: false,
   compactView: false,
   celebrationMode: "confetti",
+  taskOrder: {},
 };
 
 /** Builds the scope TaskIndex scans with, from the active scopeType and its matching persistent path list. */
