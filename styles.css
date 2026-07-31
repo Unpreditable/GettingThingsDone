@@ -325,6 +325,24 @@
 
 /* ── Settings tab ───────────────────────────────────────────────────────── */
 
+/* Obsidian 1.13+'s declarative settings API wraps every getSettingDefinitions()
+   item — including custom `render:` items — in a `.setting-item`, which is
+   `display: flex` (row) for laying out a single name/desc/control row. Our
+   banner/General/Buckets sections render many rows and free-form DOM into
+   that one row via `render:`, so without this override they end up as flex
+   siblings squeezed into columns instead of stacking. This selector only
+   matches elements that received the class from getSettingDefinitions()'s
+   render callbacks, which core only calls on Obsidian 1.13+; older versions
+   use the untouched imperative display()/refresh() path and never add the
+   class, so this rule has no effect there. */
+.setting-item.gtd-settings-escape-hatch {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
 .gtd-settings-banner {
   display: flex;
   align-items: center;
