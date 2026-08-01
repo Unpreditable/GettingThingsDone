@@ -295,12 +295,14 @@
       {/if}
     </div>
     <div class="gtd-header-actions">
-      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-      <span
-        class="clickable-icon gtd-dismiss-all-icon"
-        title={t("panel.dismissAll")}
-        on:click={dismissAllCompleted}
-      >🧹</span>
+      {#if settings.completedVisibilityUntilMidnight}
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span
+          class="clickable-icon gtd-dismiss-all-icon"
+          title={t("panel.dismissAll")}
+          on:click={dismissAllCompleted}
+        >🧹</span>
+      {/if}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <span
         class="clickable-icon gtd-settings-icon"
