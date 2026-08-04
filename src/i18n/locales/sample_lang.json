@@ -183,5 +183,8 @@
       "someday":    { "name": "" }
     },
     "toReview": ""
+  },
+  "ribbon": {
+    "openPanel": ""
   }
 }

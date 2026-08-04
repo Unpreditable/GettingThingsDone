@@ -189,5 +189,8 @@
       "someday":    { "name": "Kažkada / Galbūt" }
     },
     "toReview": "Peržiūrėti"
+  },
+  "ribbon": {
+    "openPanel": "Atidaryti GTD Tasks skydelį"
   }
 }

@@ -283,5 +283,9 @@
     },
     "toReview_comment": "Display name of the built-in system bucket that collects tasks with no bucket assignment. Always shown first in the panel. Cannot be renamed or deleted by the user.",
     "toReview": "To Review"
+  },
+  "ribbon": {
+    "openPanel_comment": "Tooltip on the ribbon icon in Obsidian's left sidebar that opens the GTD panel. The plugin name stays untranslated, matching panel.title.",
+    "openPanel": "Open GTD Tasks panel"
   }
 }

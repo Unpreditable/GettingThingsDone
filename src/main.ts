@@ -56,6 +56,14 @@ export default class GtdTasksPlugin extends Plugin {
       callback: () => this.activateView(),
     });
 
+    // The panel is this plugin's whole UI, and nothing else reopens it: the
+    // one-time auto-open never fires again after the first install, and the
+    // status bar entry only exists if a bucket opted into it. Without this the
+    // command palette is the sole way back to a closed panel.
+    this.addRibbonIcon("check-square", t("ribbon.openPanel"), () => {
+      void this.activateView();
+    });
+
     const currentLang = getLanguage() ?? "en";
     if (this.settings.lastSeenLanguage !== currentLang) {
       if (this.settings.lastSeenLanguage !== "") {

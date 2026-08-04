@@ -185,5 +185,8 @@
       "someday":    { "name": "Um dia / Talvez" }
     },
     "toReview": "Para rever"
+  },
+  "ribbon": {
+    "openPanel": "Abrir painel do GTD Tasks"
   }
 }

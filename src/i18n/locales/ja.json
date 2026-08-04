@@ -185,5 +185,8 @@
       "someday":    { "name": "いつか / もしかしたら" }
     },
     "toReview": "レビュー待ち"
+  },
+  "ribbon": {
+    "openPanel": "GTD Tasks パネルを開く"
   }
 }

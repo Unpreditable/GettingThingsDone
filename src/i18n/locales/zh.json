@@ -185,5 +185,8 @@
       "someday":    { "name": "某天 / 也许" }
     },
     "toReview": "待审查"
+  },
+  "ribbon": {
+    "openPanel": "打开 GTD Tasks 面板"
   }
 }

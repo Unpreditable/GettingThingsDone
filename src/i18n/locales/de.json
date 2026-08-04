@@ -185,5 +185,8 @@
       "someday":    { "name": "Irgendwann / Vielleicht" }
     },
     "toReview": "Zu überprüfen"
+  },
+  "ribbon": {
+    "openPanel": "GTD Tasks-Panel öffnen"
   }
 }

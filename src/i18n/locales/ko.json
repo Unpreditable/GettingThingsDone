@@ -185,5 +185,8 @@
       "someday":    { "name": "언젠가 / 어쩌면" }
     },
     "toReview": "검토 필요"
+  },
+  "ribbon": {
+    "openPanel": "GTD Tasks 패널 열기"
   }
 }

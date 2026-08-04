@@ -187,5 +187,8 @@
       "someday":    { "name": "Kādreiz / Varbūt" }
     },
     "toReview": "Jāpārskata"
+  },
+  "ribbon": {
+    "openPanel": "Atvērt GTD Tasks paneli"
   }
 }

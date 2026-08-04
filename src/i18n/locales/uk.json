@@ -189,5 +189,8 @@
       "someday":    { "name": "Колись / Можливо" }
     },
     "toReview": "На розгляді"
+  },
+  "ribbon": {
+    "openPanel": "Відкрити панель GTD Tasks"
   }
 }

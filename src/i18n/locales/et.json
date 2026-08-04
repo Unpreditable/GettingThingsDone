@@ -185,5 +185,8 @@
       "someday":    { "name": "Kunagi / Ehk" }
     },
     "toReview": "Ülevaatamiseks"
+  },
+  "ribbon": {
+    "openPanel": "Ava GTD Tasks paneel"
   }
 }
