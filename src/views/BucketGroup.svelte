@@ -6,6 +6,8 @@
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { TO_REVIEW_ID } from "../core/BucketManager";
+  import { isInsertionAllowed } from "../core/DragConstraints";
+  import type { BucketTree } from "../core/DragConstraints";
   import { isDragging } from "./dragState";
 
   export let bucketId: string;
@@ -97,21 +99,6 @@
       (dragged.parentElement as HTMLElement)?.dataset?.bucketId ?? "";
     if (!taskId || sourceBucketId === bucketId) return;
     dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId, orderedTaskIds: null });
-  }
-
-  /**
-   * Returns the ID of the topmost ancestor of taskId whose bucket is this bucket.
-   * Tasks with no in-bucket ancestor are their own group root.
-   * This defines the "group" a task belongs to within this bucket.
-   */
-  function getGroupRoot(taskId: string): string {
-    let cur = allTasksMap.get(taskId);
-    let rootId = taskId;
-    while (cur?.parentId && taskBucketMap.get(cur.parentId) === bucketId) {
-      rootId = cur.parentId;
-      cur = allTasksMap.get(cur.parentId);
-    }
-    return rootId;
   }
 
   /** IDs of all descendants of task that are currently in this bucket. */
@@ -218,32 +205,15 @@
           ? (evt.to as HTMLElement).dataset.bucketId ?? bucketId
           : bucketId;
 
-        // Group root within the TARGET bucket.
-        function targetGroupRoot(taskId: string): string {
-          let cur = allTasksMap.get(taskId);
-          let rootId = taskId;
-          while (cur?.parentId && taskBucketMap.get(cur.parentId) === targetBucket) {
-            rootId = cur.parentId;
-            cur = allTasksMap.get(cur.parentId);
-          }
-          return rootId;
-        }
-
-        const draggedRoot = targetGroupRoot(draggedId);
-
-        // Constraint 1 (cross- and same-bucket): the insertion point must not lie
-        // inside another task's group. If the elements immediately before AND after
-        // share the same group root, only members of that group may be placed there
-        // — including the case where the dragged task IS that group's own root: a
-        // parent can't be dropped in between two of its own children either.
-        if (beforeId && afterId) {
-          const beforeRoot = targetGroupRoot(beforeId);
-          const afterRoot = targetGroupRoot(afterId);
-          if (beforeRoot === afterRoot) {
-            if (draggedRoot !== beforeRoot) return false;
-            if (draggedId === beforeRoot) return false;
-          }
-        }
+        // Constraint 1 (cross- and same-bucket): the insertion point must not
+        // split another task's contiguous block. Evaluated against the TARGET
+        // bucket's tree — see isInsertionAllowed for the rule itself.
+        const targetTree: BucketTree = {
+          allTasks: allTasksMap,
+          taskBucket: taskBucketMap,
+          bucketId: targetBucket,
+        };
+        if (!isInsertionAllowed(draggedId, beforeId, afterId, targetTree)) return false;
 
         // Constraint 2: A subtask can't be placed above its parent, and must stay within
         // its group's contiguous range — checked against the TARGET bucket (not this
@@ -287,7 +257,17 @@
         // *source* bucket doesn't lose track of a node it still thinks it
         // owns. The real re-render happens once the drop/reorder handlers
         // persist the new order and the store refreshes.
-        evt.from.appendChild(evt.item);
+        //
+        // It has to go back to its exact old index, not just the old
+        // container: if the move is abandoned (the move-children dialog is
+        // cancelled, or the write aborts), the source bucket's task list never
+        // changes, so its keyed {#each} has nothing to update and will NEVER
+        // repair this node — reindexing on a later file edit doesn't help
+        // either, since the keys are still in the same order. Whatever
+        // position it is left in is the position it keeps. evt.item is in
+        // evt.to right now, so evt.from's indices are unshifted and oldIndex
+        // addresses the node that follows it directly.
+        evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex ?? 0] ?? null);
         dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId, orderedTaskIds });
       },
       onUpdate(evt) {
@@ -296,6 +276,17 @@
           .map((el) => (el as HTMLElement).dataset.taskId ?? "")
           .filter(Boolean);
         const orderedTaskIds = reattachDescendants(rawOrderedTaskIds, taskId);
+        // Put the node back where it started and let the re-render place it,
+        // for the same reason onAdd does — Svelte's keyed {#each} still thinks
+        // it owns this node at its old position. evt.item must be DETACHED
+        // before indexing the siblings: it is still among evt.from.children
+        // here, so on an upward move (new index < old) everything it jumped
+        // over has shifted right and children[oldIndex] is the node that was at
+        // oldIndex - 1, landing the item one slot short of home. That silently
+        // sticks whenever the re-render produces the order Svelte already had —
+        // e.g. regroupByHierarchy normalising a drop back — leaving the node
+        // visibly misplaced and creeping one more slot per repeat drag.
+        evt.item.remove();
         evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex ?? 0] ?? null);
         dispatch("reorder", { bucketId, orderedTaskIds });
       },
