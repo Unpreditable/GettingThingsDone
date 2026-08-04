@@ -18,7 +18,7 @@ import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "./core/TaskWriter";
 import type { TaskRecord } from "./core/TaskParser";
-import { computeOrderKeys, mapToOrderKeys, purgeOrderKey } from "./core/TaskOrder";
+import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
 import GTDPanel from "./views/GTDPanel.svelte";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
@@ -82,6 +82,7 @@ export default class GtdTasksPlugin extends Plugin {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }
     this.settings.taskOrder = { ...(this.settings.taskOrder ?? {}) };
+    this.settings.completionSeen = { ...(this.settings.completionSeen ?? {}) };
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -239,8 +240,8 @@ class GtdPanelView extends ItemView {
   }
 
   private async handleReorder(bucketId: string, orderedTaskIds: string[]) {
-    const orderKeys = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
-    this.plugin.settings.taskOrder[bucketId] = mapToOrderKeys(orderedTaskIds, orderKeys);
+    const orderEntries = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
+    this.plugin.settings.taskOrder[bucketId] = mapToOrderEntries(orderedTaskIds, orderEntries);
     await this.plugin.saveSettings();
   }
 
@@ -278,16 +279,16 @@ class GtdPanelView extends ItemView {
 
     await this.plugin.taskIndex.reindexFileSilently(task.filePath);
 
-    const orderKeys = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
-    const key = orderKeys.get(task.id);
-    if (key) {
-      const purged = purgeOrderKey(this.plugin.settings.taskOrder, key);
+    const orderEntries = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
+    const entry = orderEntries.get(task.id);
+    if (entry) {
+      const purged = purgeOrderEntry(this.plugin.settings.taskOrder, entry);
       this.plugin.settings.taskOrder = purged.taskOrder;
     }
 
     if (orderedTaskIds) {
       const targetId = targetBucketId ?? TO_REVIEW_ID;
-      this.plugin.settings.taskOrder[targetId] = mapToOrderKeys(orderedTaskIds, orderKeys);
+      this.plugin.settings.taskOrder[targetId] = mapToOrderEntries(orderedTaskIds, orderEntries);
     }
 
     // Always refresh once here, now that the index and taskOrder are both

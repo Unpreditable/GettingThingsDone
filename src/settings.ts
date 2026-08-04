@@ -1,3 +1,5 @@
+import type { OrderEntry } from "./core/TaskOrder";
+
 export type DateRangeRule =
   | { type: "today" }
   | { type: "this-week" }               // tomorrow → end of current Sunday
@@ -68,11 +70,18 @@ export interface PluginSettings {
   celebrationMode: CelebrationMode;
   /**
    * Manual per-bucket task order from drag-and-drop, keyed by bucket ID.
-   * Each value is an array of stable order keys (see core/TaskOrder.ts) in
+   * Each value is an array of order entries (see core/TaskOrder.ts) in
    * display order. Tasks not present in a bucket's array render after it,
    * in their natural (file scan) order.
    */
-  taskOrder: Record<string, string[]>;
+  taskOrder: Record<string, OrderEntry[]>;
+  /**
+   * Epoch-ms timestamps for dateless completions the index actually
+   * witnessed, keyed by `${file}::${key}`. Only today's records are kept —
+   * OrderPurge drops older ones, and an unwitnessed completion never gets a
+   * record at all, so this map cannot accumulate history.
+   */
+  completionSeen: Record<string, number>;
 }
 
 
@@ -136,6 +145,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   compactView: false,
   celebrationMode: "confetti",
   taskOrder: {},
+  completionSeen: {},
 };
 
 /** Builds the scope TaskIndex scans with, from the active scopeType and its matching persistent path list. */
@@ -173,4 +183,16 @@ export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
   if (taskScope.type === "folders") migrated.folderPaths = taskScope.paths ?? [];
   if (taskScope.type === "files") migrated.filePaths = taskScope.paths ?? [];
   return migrated;
+}
+
+/** Whether `path` falls inside `scope`. Extension filtering is the caller's job. */
+export function isPathInScope(path: string, scope: TaskScope): boolean {
+  switch (scope.type) {
+    case "vault":
+      return true;
+    case "folders":
+      return scope.paths.some((p) => path.startsWith(p.endsWith("/") ? p : p + "/"));
+    case "files":
+      return scope.paths.includes(path);
+  }
 }

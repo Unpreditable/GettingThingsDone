@@ -2,6 +2,7 @@ import { groupTasksIntoBuckets, regroupByHierarchy, TO_REVIEW_ID } from "../src/
 import { DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
 import { computeOrderKeys } from "../src/core/TaskOrder";
+import type { OrderEntry } from "../src/core/TaskOrder";
 
 // Use a fixed Monday so calendar-aware week boundaries are predictable
 const FIXED_MONDAY = new Date("2026-02-23T00:00:00"); // Monday Feb 23, 2026
@@ -559,7 +560,7 @@ describe("groupTasksIntoBuckets performance", () => {
     const bigSettings = {
       ...DEFAULT_SETTINGS,
       buckets: DEFAULT_BUCKETS,
-      taskOrder: {} as Record<string, string[]>,
+      taskOrder: {} as Record<string, OrderEntry[]>,
     };
     const orderKeys = computeOrderKeys(tasks);
     // A long-lived file accumulates a large manual order over months of use.

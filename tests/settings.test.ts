@@ -1,4 +1,4 @@
-import { getActiveScope, migrateSettingsData } from "../src/settings";
+import { getActiveScope, isPathInScope, migrateSettingsData } from "../src/settings";
 
 describe("getActiveScope", () => {
   it("returns a vault scope when scopeType is vault", () => {
@@ -46,5 +46,22 @@ describe("migrateSettingsData", () => {
   it("does not re-migrate data that already has scopeType", () => {
     const data = { scopeType: "folders", folderPaths: ["Tasks"] };
     expect(migrateSettingsData(data)).toEqual(data);
+  });
+});
+
+describe("isPathInScope", () => {
+  it("accepts every path under a vault scope", () => {
+    expect(isPathInScope("anything/at/all.md", { type: "vault" })).toBe(true);
+  });
+
+  it("matches folder scopes by prefix, with or without a trailing slash", () => {
+    expect(isPathInScope("Tasks/a.md", { type: "folders", paths: ["Tasks"] })).toBe(true);
+    expect(isPathInScope("Tasks/a.md", { type: "folders", paths: ["Tasks/"] })).toBe(true);
+    expect(isPathInScope("TasksArchive/a.md", { type: "folders", paths: ["Tasks"] })).toBe(false);
+  });
+
+  it("matches file scopes by exact path", () => {
+    expect(isPathInScope("Tasks/a.md", { type: "files", paths: ["Tasks/a.md"] })).toBe(true);
+    expect(isPathInScope("Tasks/b.md", { type: "files", paths: ["Tasks/a.md"] })).toBe(false);
   });
 });

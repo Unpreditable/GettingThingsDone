@@ -28,54 +28,119 @@ function disambiguator(task: TaskRecord): string {
 }
 
 /**
- * Stable identity for persisting a task's manual bucket-order position across
- * reindexes. Unlike TaskRecord.id (hash of filePath+lineNumber+text), this
- * excludes lineNumber so it survives unrelated line churn elsewhere in the
- * file. Tasks that still collide after including due date/tags/inline field
- * (genuinely identical content) are disambiguated by their occurrence order
- * (first gets :0, second gets :1, ...).
+ * A saved order position. The file path is stored beside the key rather than
+ * hashed into it: that is what turns a file rename into an in-place field
+ * rewrite instead of a rehash of every entry belonging to that file.
  */
-export function computeOrderKeys(tasks: TaskRecord[]): Map<string, string> {
+export interface OrderEntry {
+  file: string;
+  /** hash(text|dueDate) + ":" + occurrence index within the file. */
+  key: string;
+}
+
+/** `${file}::${key}` — the identity used to key completionSeen records. */
+export function entryId(entry: OrderEntry): string {
+  return `${entry.file}::${entry.key}`;
+}
+
+export function sameEntry(a: OrderEntry, b: OrderEntry): boolean {
+  return a.file === b.file && a.key === b.key;
+}
+
+/**
+ * Guards against pre-0.2 data.json content, where each saved position was a
+ * flat string. Those survive in memory until migrateOrderFormat runs at
+ * startup reconciliation, so every consumer must tolerate them.
+ */
+export function isOrderEntry(value: unknown): value is OrderEntry {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as OrderEntry).file === "string" &&
+    typeof (value as OrderEntry).key === "string"
+  );
+}
+
+/**
+ * Walks tasks grouped by file in line order, handing each one its
+ * disambiguator and the running occurrence index for that disambiguator.
+ * Shared by the current and legacy key formats so the two can never drift
+ * on occurrence counting.
+ */
+function forEachWithOccurrence(
+  tasks: TaskRecord[],
+  cb: (task: TaskRecord, disambig: string, occurrence: number) => void
+): void {
   const byFile = new Map<string, TaskRecord[]>();
   for (const task of tasks) {
     if (!byFile.has(task.filePath)) byFile.set(task.filePath, []);
     byFile.get(task.filePath)!.push(task);
   }
 
-  const result = new Map<string, string>();
-  for (const [filePath, fileTasks] of byFile) {
+  for (const fileTasks of byFile.values()) {
     const sorted = [...fileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
     const occurrenceCount = new Map<string, number>();
     for (const task of sorted) {
       const disambig = disambiguator(task);
       const count = occurrenceCount.get(disambig) ?? 0;
       occurrenceCount.set(disambig, count + 1);
-      result.set(task.id, `${hashString(`${filePath}:${disambig}`)}:${count}`);
+      cb(task, disambig, count);
     }
   }
+}
+
+/**
+ * Stable identity for persisting a task's manual bucket-order position across
+ * reindexes. Excludes lineNumber so it survives unrelated line churn, and
+ * excludes the file path from the hash so a rename is a field rewrite. Tasks
+ * that still collide (genuinely identical content in one file) are
+ * disambiguated by their occurrence order (first gets :0, second :1, ...).
+ */
+export function computeOrderKeys(tasks: TaskRecord[]): Map<string, OrderEntry> {
+  const result = new Map<string, OrderEntry>();
+  forEachWithOccurrence(tasks, (task, disambig, occurrence) => {
+    result.set(task.id, {
+      file: task.filePath,
+      key: `${hashString(disambig)}:${occurrence}`,
+    });
+  });
   return result;
 }
 
 /**
- * Sorts `tasks` to match `savedOrder` (order keys in the desired sequence).
- * Tasks with no match in `savedOrder` — new tasks, or stale/unmatched keys —
- * are appended at the end in their original relative order.
+ * The pre-0.2 key format: file path folded into the hash, stored as a bare
+ * string. Used only by migrateOrderFormat, to match saved flat keys against
+ * the tasks currently in the vault.
+ */
+export function computeLegacyOrderKeys(tasks: TaskRecord[]): Map<string, string> {
+  const result = new Map<string, string>();
+  forEachWithOccurrence(tasks, (task, disambig, occurrence) => {
+    result.set(task.id, `${hashString(`${task.filePath}:${disambig}`)}:${occurrence}`);
+  });
+  return result;
+}
+
+/**
+ * Sorts `tasks` to match `savedOrder`. Tasks with no match — new tasks, or
+ * stale/unmatched entries — are appended at the end in their original
+ * relative order.
  */
 export function applyManualOrder(
   tasks: TaskRecord[],
-  orderKeys: Map<string, string>,
-  savedOrder: string[]
+  orderEntries: Map<string, OrderEntry>,
+  savedOrder: OrderEntry[]
 ): TaskRecord[] {
-  const byKey = new Map<string, TaskRecord>();
+  const byEntry = new Map<string, TaskRecord>();
   for (const task of tasks) {
-    const key = orderKeys.get(task.id);
-    if (key) byKey.set(key, task);
+    const entry = orderEntries.get(task.id);
+    if (entry) byEntry.set(entryId(entry), task);
   }
 
   const result: TaskRecord[] = [];
   const used = new Set<string>();
-  for (const key of savedOrder) {
-    const task = byKey.get(key);
+  for (const entry of savedOrder) {
+    if (!isOrderEntry(entry)) continue;
+    const task = byEntry.get(entryId(entry));
     if (task && !used.has(task.id)) {
       result.push(task);
       used.add(task.id);
@@ -87,30 +152,53 @@ export function applyManualOrder(
   return result;
 }
 
-/** Resolves task ids to their stable order keys, dropping any that don't resolve. */
-export function mapToOrderKeys(taskIds: string[], orderKeys: Map<string, string>): string[] {
+/** Resolves task ids to their order entries, dropping any that don't resolve. */
+export function mapToOrderEntries(
+  taskIds: string[],
+  orderEntries: Map<string, OrderEntry>
+): OrderEntry[] {
   return taskIds
-    .map((id) => orderKeys.get(id))
-    .filter((k): k is string => k !== undefined);
+    .map((id) => orderEntries.get(id))
+    .filter((e): e is OrderEntry => e !== undefined);
 }
 
 /**
- * Removes `key` from every bucket's array in `taskOrder`. Returns a new
+ * Removes `entry` from every bucket's array in `taskOrder`. Returns a new
  * record (does not mutate the input) and whether anything changed.
  */
-export function purgeOrderKey(
-  taskOrder: Record<string, string[]>,
-  key: string
-): { taskOrder: Record<string, string[]>; changed: boolean } {
+export function purgeOrderEntry(
+  taskOrder: Record<string, OrderEntry[]>,
+  entry: OrderEntry
+): { taskOrder: Record<string, OrderEntry[]>; changed: boolean } {
   let changed = false;
-  const result: Record<string, string[]> = {};
+  const result: Record<string, OrderEntry[]> = {};
   for (const [bucketId, saved] of Object.entries(taskOrder)) {
-    if (saved.includes(key)) {
-      result[bucketId] = saved.filter((k) => k !== key);
+    const filtered = saved.filter((e) => !(isOrderEntry(e) && sameEntry(e, entry)));
+    if (filtered.length !== saved.length) {
       changed = true;
+      result[bucketId] = filtered;
     } else {
       result[bucketId] = saved;
     }
   }
   return { taskOrder: result, changed };
+}
+
+/**
+ * When a completed task's completion happened, in epoch ms: the ✅ date if the
+ * line carries one, else the timestamp recorded when the index witnessed the
+ * transition. null means no evidence at all — the completion happened outside
+ * this plugin's sight, and is treated as aged.
+ */
+export function completionClock(
+  task: TaskRecord,
+  entry: OrderEntry | undefined,
+  completionSeen: Record<string, number>
+): number | null {
+  if (task.completedAt) return task.completedAt.getTime();
+  if (entry) {
+    const seen = completionSeen[entryId(entry)];
+    if (typeof seen === "number") return seen;
+  }
+  return null;
 }
