@@ -18,7 +18,7 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 - **Subtask-aware**: indented child tasks are tracked separately, with an active-subtask count badge and a prompt to move them along with their parent
 - **Search**: filter the panel down to matching tasks
 - **Checkbox completion** with optional celebration animations (confetti, pixel creature, both, or off)
-- **Tasks plugin integration** — reads 📅 due dates and auto-assigns tasks to the matching bucket
+- **Tasks plugin integration** — reads 📅 due dates, auto-assigns tasks to the matching bucket, and hands completion toggles to the Tasks plugin when it's installed
 - **Two storage modes** — inline tag (`#gtd/today`) or inline field (`[gtd:: today]`)
 - **Scope filtering** — scan the entire vault, specific folders, or specific files
 - **Stale indicator** (!) on tasks that have passed their scheduled window
@@ -118,7 +118,11 @@ Limit which files are indexed:
 
 ### Tasks plugin integration
 
-When enabled, the plugin reads `📅 YYYY-MM-DD` due dates written by the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) community plugin and automatically assigns tasks to the matching time-horizon bucket. Manual assignments (tag/field) always take priority over date-based ones.
+The plugin always reads `📅 YYYY-MM-DD` due dates written by the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) community plugin and automatically assigns tasks to the matching time-horizon bucket. Manual assignments (tag/field) always take priority over date-based ones. To opt a bucket out of date-based assignment, clear its date rule in the bucket settings.
+
+When the Tasks plugin is installed, checking a task off in the panel runs Tasks' own toggle command, so the panel behaves exactly like the editor does — including its ✅-date setting, `🔁` recurrence and `🏁 delete` on-completion actions. Without the Tasks plugin, the panel flips the checkbox and writes no date.
+
+> **Behavior change:** earlier versions wrote a `✅` date on panel completions even without the Tasks plugin installed. They no longer do. Completed tasks still stay visible until midnight — the plugin remembers dateless completions it witnessed rather than relying on a date in the file.
 
 ### Celebration animations
 

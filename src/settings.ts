@@ -52,8 +52,6 @@ export interface PluginSettings {
    * and as the field name in Inline field mode ([<prefix>:: bucket-id]).
    */
   tagPrefix: string;
-  /** If true, read 📅 / ✅ metadata from the Tasks plugin. */
-  readTasksPlugin: boolean;
   /** Completed tasks remain visible (as strikethrough) until midnight. */
   completedVisibilityUntilMidnight: boolean;
   /** Show a ! indicator on tasks that are past their bucket's scheduled window. */
@@ -136,7 +134,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   buckets: DEFAULT_BUCKETS,
   lastSeenLanguage: "",
   tagPrefix: "gtd",
-  readTasksPlugin: true,
   completedVisibilityUntilMidnight: true,
   staleIndicatorEnabled: true,
   toReviewEmoji: "📥",
@@ -168,14 +165,17 @@ interface LegacyTaskScope {
 }
 
 /**
- * Normalizes raw loaded plugin data for the scopeType/folderPaths/filePaths
- * split. Pre-persistence saves stored a single nested `taskScope: {type, paths}`
- * object; this seeds the new fields from it once, without losing the user's
- * existing folder/file selections on upgrade.
+ * Normalizes raw loaded plugin data. Two migrations live here:
+ * the pre-persistence `taskScope: {type, paths}` object is split into
+ * scopeType/folderPaths/filePaths (seeded once, without losing the user's
+ * existing selections), and the removed `readTasksPlugin` field is dropped —
+ * 📅/✅ parsing and due-date auto-assign are unconditional now.
  */
 export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
   if (!raw || typeof raw !== "object") return {};
-  const data = raw as Record<string, unknown> & { taskScope?: LegacyTaskScope };
+  const data = { ...(raw as Record<string, unknown> & { taskScope?: LegacyTaskScope }) };
+  delete data.readTasksPlugin;
+
   if (!data.taskScope || "scopeType" in data) return data as Partial<PluginSettings>;
 
   const { taskScope, ...rest } = data;

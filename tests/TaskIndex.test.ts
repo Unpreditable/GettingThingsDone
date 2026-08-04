@@ -18,13 +18,17 @@ function makeMockEnv(initialFiles: Record<string, string>) {
   for (const path of contents.keys()) tfiles.set(path, makeTFile(path));
 
   let changedCb: ((file: TFile, data: string) => void) | null = null;
+  const vaultCbs = new Map<string, (file: TFile, oldPath?: string) => void>();
 
   const app = {
     vault: {
       getMarkdownFiles: () => Array.from(tfiles.values()),
       getAbstractFileByPath: (path: string) => tfiles.get(path) ?? null,
       cachedRead: async (file: TFile) => contents.get(file.path) ?? "",
-      on: (_event: string, _cb: any) => ({}),
+      on: (event: string, cb: (file: TFile, oldPath?: string) => void) => {
+        vaultCbs.set(event, cb);
+        return {};
+      },
     },
     metadataCache: {
       on: (event: string, cb: (file: TFile, data: string) => void) => {
@@ -49,6 +53,14 @@ function makeMockEnv(initialFiles: Record<string, string>) {
     },
     setContentSilently(path: string, content: string) {
       contents.set(path, content);
+    },
+    async fireRename(oldPath: string, newPath: string) {
+      const content = contents.get(oldPath) ?? "";
+      contents.delete(oldPath);
+      tfiles.delete(oldPath);
+      contents.set(newPath, content);
+      tfiles.set(newPath, makeTFile(newPath));
+      await (vaultCbs.get("rename") as any)?.(tfiles.get(newPath)!, oldPath);
     },
   };
 }
@@ -135,5 +147,70 @@ describe("TaskIndex", () => {
 
     expect(notifyCount).toBe(1);
     expect(index.getAllTasks().map((t) => t.text).sort()).toEqual(["Task A", "Task A2", "Task A3"]);
+  });
+
+  it("hands onFileReplaced the previous parse alongside the new one", async () => {
+    const { app, plugin, fireChanged } = makeMockEnv({ "a.md": "- [ ] Old text" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    const seen: Array<{ path: string; old: string[]; next: string[] }> = [];
+    index.onFileReplaced((path, oldTasks, newTasks) => {
+      seen.push({
+        path,
+        old: oldTasks.map((t) => t.text),
+        next: newTasks.map((t) => t.text),
+      });
+    });
+
+    fireChanged("a.md", "- [ ] New text");
+
+    expect(seen).toEqual([{ path: "a.md", old: ["Old text"], next: ["New text"] }]);
+  });
+
+  it("does not fire onFileReplaced when the changed event reports already-indexed content", async () => {
+    const { app, plugin, fireChanged } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    let calls = 0;
+    index.onFileReplaced(() => calls++);
+
+    fireChanged("a.md", "- [ ] Task A");
+
+    expect(calls).toBe(0);
+  });
+
+  it("notifies rename listeners before applying the scope check", async () => {
+    let scopePaths = ["old.md"];
+    const { app, plugin, fireRename } = makeMockEnv({ "old.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => ({ type: "files", paths: scopePaths }));
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    index.onRename((oldPath, newPath) => {
+      scopePaths = scopePaths.map((p) => (p === oldPath ? newPath : p));
+    });
+
+    await fireRename("old.md", "new.md");
+
+    expect(index.getAllTasks().map((t) => t.filePath)).toEqual(["new.md"]);
+  });
+
+  it("returns an unsubscribe function from onFileReplaced", async () => {
+    const { app, plugin, fireChanged } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    let calls = 0;
+    const off = index.onFileReplaced(() => calls++);
+    off();
+
+    fireChanged("a.md", "- [ ] Task B");
+
+    expect(calls).toBe(0);
   });
 });

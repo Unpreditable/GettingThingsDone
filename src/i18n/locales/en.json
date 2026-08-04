@@ -121,11 +121,6 @@
       "placeholder_comment": "Placeholder text inside the prefix input showing the default value.",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "_comment": "Toggle to enable reading metadata written by the 'Tasks' community plugin (emoji-based due/completion dates). {{pluginName}} is substituted at runtime with the plugin's display name ('Tasks').",
-      "name": "Read {{pluginName}} plugin metadata",
-      "description": "Read 📅 due dates and ✅ completion dates written by the {{pluginName}} plugin."
-    },
     "filesToScan": {
       "name_comment": "Setting name for the scope selector — determines which files are scanned for tasks.",
       "name": "Files to scan",

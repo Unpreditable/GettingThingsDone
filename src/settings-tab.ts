@@ -451,20 +451,6 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
 
-    // Read Tasks plugin
-    const pluginName: string = "Tasks";
-    new Setting(containerEl)
-      .setName(t("settings.tasksPlugin.name", { pluginName }))
-      .setDesc(t("settings.tasksPlugin.description", { pluginName }))
-      .addToggle((tog) => {
-        tog.setValue(this.plugin.settings.readTasksPlugin);
-        tog.onChange(async (val) => {
-          this.plugin.settings.readTasksPlugin = val;
-          await this.plugin.saveSettings();
-          await this.plugin.refreshIndex();
-        });
-      });
-
     // Scope type selector
     new Setting(containerEl)
       .setName(t("settings.filesToScan.name"))

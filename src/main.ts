@@ -298,11 +298,7 @@ class GtdPanelView extends ItemView {
   }
 
   private async handleToggle(task: TaskRecord) {
-    const result = await toggleTaskCompletion(
-      this.app,
-      task,
-      this.plugin.settings
-    );
+    const result = await toggleTaskCompletion(this.app, task);
 
     if (!result.success) {
       new Notice(t("notices.toggleFailed", { error: result.error }));

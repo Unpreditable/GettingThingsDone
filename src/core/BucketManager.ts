@@ -70,7 +70,7 @@ export function groupTasksIntoBuckets(
       continue;
     }
 
-    if (task.dueDate && settings.readTasksPlugin) {
+    if (task.dueDate) {
       const autoId = autoAssign(task.dueDate, settings.buckets, now);
       if (autoId) {
         effectiveBucket.set(task.id, autoId);

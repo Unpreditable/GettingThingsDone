@@ -163,12 +163,19 @@ describe("groupTasksIntoBuckets", () => {
     expect(groups[1].bucketId).toBe("today");
   });
 
-  it("readTasksPlugin=false: tasks with dueDate go to To Review (no auto-assign)", () => {
-    const settingsNoPlugin = { ...settings, readTasksPlugin: false };
-    const task = makeTask({ dueDate: daysFromMonday(1) });
-    const groups = groupTasksIntoBuckets([task], settingsNoPlugin);
-    const review = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
-    expect(review.tasks).toHaveLength(1);
+  it("auto-assigns by due date with no toggle to gate it", () => {
+    const task = makeTask({ dueDate: daysFromMonday(0) });
+    const groups = groupTasksIntoBuckets([task], settings);
+    expect(groups.find((g) => g.bucketId === "today")!.tasks).toHaveLength(1);
+  });
+
+  it("does not auto-assign into a bucket whose dateRangeRule is null", () => {
+    const noRuleBuckets = DEFAULT_BUCKETS.map((b) => ({ ...b, dateRangeRule: null }));
+    const task = makeTask({ dueDate: daysFromMonday(0) });
+
+    const groups = groupTasksIntoBuckets([task], { ...settings, buckets: noRuleBuckets });
+
+    expect(groups.find((g) => g.bucketId === TO_REVIEW_ID)!.tasks).toHaveLength(1);
   });
 });
 

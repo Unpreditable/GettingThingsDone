@@ -75,10 +75,6 @@
       "description": "Usado como prefixo de etiqueta no modo Etiqueta inline (#<nome>/id-categoria) e como chave de campo no modo Campo inline ([<nome>:: id-categoria]).",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Ler metadados do plugin {{pluginName}}",
-      "description": "Ler datas de entrega 📅 e datas de conclusão ✅ escritas pelo plugin {{pluginName}}."
-    },
     "filesToScan": {
       "name": "Ficheiros a analisar",
       "description": "Quais os ficheiros que o plugin pesquisa para encontrar tarefas.",

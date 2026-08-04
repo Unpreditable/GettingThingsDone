@@ -75,10 +75,6 @@
       "description": "Wird als Tag-Präfix im Inline-Tag-Modus (#<Name>/Kategorie-ID) und als Feldschlüssel im Inline-Feld-Modus ([<Name>:: Kategorie-ID]) verwendet.",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Metadaten des {{pluginName}}-Plugins lesen",
-      "description": "📅 Fälligkeitsdaten und ✅ Erledigungsdaten des {{pluginName}}-Plugins lesen."
-    },
     "filesToScan": {
       "name": "Zu durchsuchende Dateien",
       "description": "Welche Dateien das Plugin nach Aufgaben durchsucht.",

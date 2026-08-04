@@ -75,10 +75,6 @@
       "description": "Usado como prefijo de etiqueta en el modo Etiqueta en línea (#<nombre>/id-categoría) y como clave de campo en el modo Campo en línea ([<nombre>:: id-categoría]).",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Leer metadatos del plugin {{pluginName}}",
-      "description": "Leer fechas de vencimiento 📅 y fechas de completado ✅ escritas por el plugin {{pluginName}}."
-    },
     "filesToScan": {
       "name": "Archivos a escanear",
       "description": "Qué archivos busca el plugin para encontrar tareas.",

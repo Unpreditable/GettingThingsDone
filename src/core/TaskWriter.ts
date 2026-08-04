@@ -2,11 +2,59 @@ import { App, TFile, Notice } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
 import { setTagValue, setInlineFieldValue } from "./TaskParser";
-import { formatDate } from "../integrations/TasksPluginParser";
 
 export interface MoveResult {
   success: boolean;
   error?: string;
+}
+
+/** The subset of the Tasks plugin's documented apiV1 that this plugin uses. */
+export interface TasksPluginApiV1 {
+  executeToggleTaskDoneCommand: (line: string, path: string) => string;
+}
+
+/** The Tasks community plugin's apiV1, if it is installed and enabled. */
+export function getTasksApi(app: App): TasksPluginApiV1 | null {
+  const plugins = (app as App & {
+    plugins?: { plugins?: Record<string, { apiV1?: TasksPluginApiV1 }> };
+  }).plugins;
+  const api = plugins?.plugins?.["obsidian-tasks-plugin"]?.apiV1;
+  return typeof api?.executeToggleTaskDoneCommand === "function" ? api : null;
+}
+
+/**
+ * The line(s) that replace `rawLine` when its checkbox is toggled. Delegates
+ * to Tasks whenever it is installed, for both completing and reopening, so
+ * the panel behaves exactly like the editor does on the same device: Tasks
+ * applies its own ✅-date setting, global filter, 🔁 recurrence (two lines
+ * back) and 🏁 on-completion delete (no lines back). Without Tasks — or if
+ * the call fails — this flips the checkbox and writes no date; visibility
+ * still works, via the witnessed completionSeen clock.
+ */
+export function toggleTaskLine(
+  rawLine: string,
+  filePath: string,
+  isCompleted: boolean,
+  api: TasksPluginApiV1 | null
+): string[] {
+  if (api) {
+    try {
+      const result = api.executeToggleTaskDoneCommand(rawLine, filePath);
+      if (typeof result === "string") return result === "" ? [] : result.split("\n");
+    } catch {
+      // Fall through to the minimal flip — a valid outcome, not an error.
+    }
+  }
+
+  if (isCompleted) {
+    return [
+      rawLine
+        .replace(/\[[ xX]\]/, "[ ]")
+        .replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "")
+        .trimEnd(),
+    ];
+  }
+  return [rawLine.replace(/\[ \]/, "[x]")];
 }
 
 /**
@@ -68,14 +116,14 @@ export async function confirmTaskPlacement(
 
 export async function toggleTaskCompletion(
   app: App,
-  task: TaskRecord,
-  settings: PluginSettings
+  task: TaskRecord
 ): Promise<MoveResult> {
   const file = app.vault.getAbstractFileByPath(task.filePath);
   if (!(file instanceof TFile)) {
     return { success: false, error: `File not found: ${task.filePath}` };
   }
 
+  const api = getTasksApi(app);
   let result: MoveResult = { success: false, error: "Task line not found in file (stale index)" };
 
   try {
@@ -88,18 +136,7 @@ export async function toggleTaskCompletion(
         return content;
       }
 
-      let line = lines[lineIdx];
-      if (task.isCompleted) {
-        line = line.replace(/\[[ xX]\]/, "[ ]");
-        line = line.replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "").trimEnd();
-      } else {
-        line = line.replace(/\[ \]/, "[x]");
-        if (settings.readTasksPlugin) {
-          line = line.trimEnd() + ` ✅ ${formatDate(new Date())}`;
-        }
-      }
-
-      lines[lineIdx] = line;
+      lines.splice(lineIdx, 1, ...toggleTaskLine(lines[lineIdx], task.filePath, task.isCompleted, api));
       result = { success: true };
       return lines.join("\n");
     });

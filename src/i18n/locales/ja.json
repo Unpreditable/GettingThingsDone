@@ -75,10 +75,6 @@
       "description": "インラインタグモードではタグプレフィックス (#<名前>/カテゴリID)、インラインフィールドモードではフィールドキー ([<名前>:: カテゴリID]) として使用されます。",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "{{pluginName}}プラグインのメタデータを読み込む",
-      "description": "{{pluginName}}プラグインが書き込んだ📅期日と✅完了日を読み込みます。"
-    },
     "filesToScan": {
       "name": "スキャン対象ファイル",
       "description": "プラグインがタスクを検索するファイル。",

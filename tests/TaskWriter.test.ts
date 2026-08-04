@@ -1,4 +1,4 @@
-import { findTaskLine, moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "../src/core/TaskWriter";
+import { findTaskLine, moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement, toggleTaskLine } from "../src/core/TaskWriter";
 import { DEFAULT_SETTINGS } from "../src/settings";
 import { TFile } from "obsidian";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -149,59 +149,106 @@ describe("moveTaskToBucket", () => {
   });
 });
 
+describe("toggleTaskLine", () => {
+  it("delegates to the Tasks API when present and returns its line", () => {
+    const api = {
+      executeToggleTaskDoneCommand: jest.fn(() => "- [x] Test task ✅ 2026-08-02"),
+    };
+
+    const result = toggleTaskLine("- [ ] Test task", "test.md", false, api);
+
+    expect(api.executeToggleTaskDoneCommand).toHaveBeenCalledWith("- [ ] Test task", "test.md");
+    expect(result).toEqual(["- [x] Test task ✅ 2026-08-02"]);
+  });
+
+  it("returns both lines when Tasks expands a recurring task into two", () => {
+    const api = {
+      executeToggleTaskDoneCommand: () => "- [ ] Water plants 🔁 every week 📅 2026-08-09\n- [x] Water plants 🔁 every week 📅 2026-08-02 ✅ 2026-08-02",
+    };
+
+    const result = toggleTaskLine("- [ ] Water plants 🔁 every week 📅 2026-08-02", "test.md", false, api);
+
+    expect(result).toHaveLength(2);
+  });
+
+  it("returns no lines when Tasks deletes the task on completion", () => {
+    const api = { executeToggleTaskDoneCommand: () => "" };
+
+    expect(toggleTaskLine("- [ ] Throwaway 🏁 delete", "test.md", false, api)).toEqual([]);
+  });
+
+  it("also delegates when reopening a completed task", () => {
+    const api = { executeToggleTaskDoneCommand: jest.fn(() => "- [ ] Test task") };
+
+    expect(toggleTaskLine("- [x] Test task ✅ 2026-08-02", "test.md", true, api)).toEqual([
+      "- [ ] Test task",
+    ]);
+    expect(api.executeToggleTaskDoneCommand).toHaveBeenCalled();
+  });
+
+  it("falls back to a minimal flip when the API throws", () => {
+    const api = {
+      executeToggleTaskDoneCommand: () => {
+        throw new Error("boom");
+      },
+    };
+
+    expect(toggleTaskLine("- [ ] Test task", "test.md", false, api)).toEqual(["- [x] Test task"]);
+  });
+
+  it("flips the checkbox and writes no date when Tasks is absent", () => {
+    expect(toggleTaskLine("- [ ] Test task", "test.md", false, null)).toEqual(["- [x] Test task"]);
+  });
+
+  it("clears the checkbox and strips an existing ✅ date on reopen when Tasks is absent", () => {
+    expect(toggleTaskLine("- [x] Test task ✅ 2026-08-02", "test.md", true, null)).toEqual([
+      "- [ ] Test task",
+    ]);
+  });
+
+  it("preserves other metadata on the line in the fallback path", () => {
+    expect(toggleTaskLine("- [ ] Test task 📅 2026-08-09 #gtd/today", "test.md", false, null)).toEqual([
+      "- [x] Test task 📅 2026-08-09 #gtd/today",
+    ]);
+  });
+});
+
 describe("toggleTaskCompletion", () => {
-  const settings = { ...DEFAULT_SETTINGS, readTasksPlugin: true };
-
-  it("checks an unchecked task", async () => {
+  it("checks an open task without writing a date (no Tasks plugin)", async () => {
     const { app, getContent } = makeMockApp("- [ ] Test task");
-    const task = makeTask({ isCompleted: false });
-    const result = await toggleTaskCompletion(app, task, settings);
+    const task = makeTask({ rawLine: "- [ ] Test task" });
+
+    const result = await toggleTaskCompletion(app, task);
+
     expect(result.success).toBe(true);
-    expect(getContent()).toContain("[x]");
+    expect(getContent()).toBe("- [x] Test task");
   });
 
-  it("adds completion date when Tasks plugin is enabled", async () => {
-    const { app, getContent } = makeMockApp("- [ ] Test task");
-    const task = makeTask({ isCompleted: false });
-    await toggleTaskCompletion(app, task, settings);
-    expect(getContent()).toMatch(/✅ \d{4}-\d{2}-\d{2}/);
-  });
-
-  it("does not add completion date when Tasks plugin is disabled", async () => {
-    const noPluginSettings = { ...settings, readTasksPlugin: false };
-    const { app, getContent } = makeMockApp("- [ ] Test task");
-    const task = makeTask({ isCompleted: false });
-    await toggleTaskCompletion(app, task, noPluginSettings);
-    expect(getContent()).not.toContain("✅");
-    expect(getContent()).toContain("[x]");
-  });
-
-  it("unchecks a completed task and removes completion date", async () => {
-    const { app, getContent } = makeMockApp("- [x] Done ✅ 2026-02-20");
+  it("unchecks a completed task and strips its ✅ date", async () => {
+    const { app, getContent } = makeMockApp("- [x] Test task ✅ 2026-08-02");
     const task = makeTask({
-      rawLine: "- [x] Done ✅ 2026-02-20",
+      rawLine: "- [x] Test task ✅ 2026-08-02",
       isCompleted: true,
     });
-    const result = await toggleTaskCompletion(app, task, settings);
+
+    const result = await toggleTaskCompletion(app, task);
+
     expect(result.success).toBe(true);
-    expect(getContent()).toContain("[ ]");
-    expect(getContent()).not.toContain("✅");
-    expect(getContent()).not.toContain("2026-02-20");
+    expect(getContent()).toBe("- [ ] Test task");
   });
 
   it("fails when file not found", async () => {
     const { app } = makeMockApp("- [ ] Test task");
     const task = makeTask({ filePath: "missing.md" });
-    const result = await toggleTaskCompletion(app, task, settings);
+    const result = await toggleTaskCompletion(app, task);
     expect(result.success).toBe(false);
   });
 
-  it("fails on stale index", async () => {
+  it("fails cleanly when the task line can't be located", async () => {
     const { app } = makeMockApp("- [ ] Something else");
-    const task = makeTask({ rawLine: "- [ ] Not here" });
-    const result = await toggleTaskCompletion(app, task, settings);
-    expect(result.success).toBe(false);
-    expect(result.error).toContain("stale index");
+    const task = makeTask({ rawLine: "- [ ] Test task", lineNumber: 5 });
+
+    expect((await toggleTaskCompletion(app, task)).success).toBe(false);
   });
 });
 

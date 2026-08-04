@@ -75,10 +75,6 @@
       "description": "Utilisé comme préfixe d'étiquette en mode Étiquette en ligne (#<nom>/id-catégorie) et comme clé de champ en mode Champ en ligne ([<nom>:: id-catégorie]).",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Lire les métadonnées du plugin {{pluginName}}",
-      "description": "Lire les dates d'échéance 📅 et les dates de complétion ✅ écrites par le plugin {{pluginName}}."
-    },
     "filesToScan": {
       "name": "Fichiers à analyser",
       "description": "Quels fichiers le plugin recherche pour les tâches.",

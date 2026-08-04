@@ -79,10 +79,6 @@
       "description": "Naudojamas kaip žymos prefiksas eilutinio žymos režime (#<pavadinimas>/kategorijos-id) ir kaip lauko raktas eilutinio lauko režime ([<pavadinimas>:: kategorijos-id]).",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Skaityti {{pluginName}} įskiepio metaduomenis",
-      "description": "Skaityti termino datas 📅 ir užbaigimo datas ✅, parašytas {{pluginName}} įskiepio."
-    },
     "filesToScan": {
       "name": "Nuskaityti failai",
       "description": "Failai, kuriuose įskiepis ieško užduočių.",

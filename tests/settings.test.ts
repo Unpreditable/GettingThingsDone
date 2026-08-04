@@ -47,6 +47,18 @@ describe("migrateSettingsData", () => {
     const data = { scopeType: "folders", folderPaths: ["Tasks"] };
     expect(migrateSettingsData(data)).toEqual(data);
   });
+
+  it("drops the removed readTasksPlugin field", () => {
+    expect(migrateSettingsData({ scopeType: "vault", readTasksPlugin: true })).toEqual({
+      scopeType: "vault",
+    });
+  });
+
+  it("drops readTasksPlugin while also migrating a legacy taskScope", () => {
+    expect(migrateSettingsData({ taskScope: { type: "vault" }, readTasksPlugin: false })).toEqual({
+      scopeType: "vault",
+    });
+  });
 });
 
 describe("isPathInScope", () => {

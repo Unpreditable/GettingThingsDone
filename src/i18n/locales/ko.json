@@ -75,10 +75,6 @@
       "description": "인라인 태그 모드에서는 태그 접두사(#<이름>/카테고리ID), 인라인 필드 모드에서는 필드 키([<이름>:: 카테고리ID])로 사용됩니다.",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "{{pluginName}} 플러그인 메타데이터 읽기",
-      "description": "{{pluginName}} 플러그인이 작성한 📅 마감일과 ✅ 완료일을 읽습니다."
-    },
     "filesToScan": {
       "name": "검색할 파일",
       "description": "플러그인이 작업을 검색하는 파일.",

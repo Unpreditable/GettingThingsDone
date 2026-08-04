@@ -75,10 +75,6 @@
       "description": "Kasutatakse sildi eesliitena reasisese sildi režiimis (#<nimi>/kategooria-id) ja välja võtmena reasisese välja režiimis ([<nimi>:: kategooria-id]).",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Loe {{pluginName}} plugina metaandmeid",
-      "description": "Loe tähtaegu 📅 ja lõpetamise kuupäevi ✅, mille on kirjutanud {{pluginName}} plugin."
-    },
     "filesToScan": {
       "name": "Skaneeritavad failid",
       "description": "Millistes failides plugin ülesandeid otsib.",

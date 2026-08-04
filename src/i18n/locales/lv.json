@@ -77,10 +77,6 @@
       "description": "Izmanto kā birkas prefiksu iekļautās birkas režīmā (#<nosaukums>/kategorijas-id) un kā lauka atslēgu iekļautā lauka režīmā ([<nosaukums>:: kategorijas-id]).",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "Lasīt {{pluginName}} spraudņa metadatus",
-      "description": "Lasīt izpildes datumus 📅 un pabeigšanas datumus ✅, ko uzrakstījis {{pluginName}} spraudnis."
-    },
     "filesToScan": {
       "name": "Skenējamie faili",
       "description": "Kuri faili tiek meklēti uzdevumu atrašanai.",

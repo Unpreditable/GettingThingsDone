@@ -1,9 +1,15 @@
 import { App, TFile, Plugin } from "obsidian";
 import { parseFile, TaskRecord } from "./TaskParser";
-import { TaskScope } from "../settings";
+import { TaskScope, isPathInScope } from "../settings";
 import { hashString } from "./TaskOrder";
 
 type ChangeCallback = (allTasks: TaskRecord[]) => void;
+type FileReplacedCallback = (
+  filePath: string,
+  oldTasks: TaskRecord[],
+  newTasks: TaskRecord[]
+) => void;
+type RenameCallback = (oldPath: string, newPath: string) => void;
 
 export class TaskIndex {
   private index = new Map<string, TaskRecord[]>();
@@ -14,6 +20,8 @@ export class TaskIndex {
    * never masked: it simply won't match the cached hash. */
   private contentHashes = new Map<string, string>();
   private listeners: ChangeCallback[] = [];
+  private fileReplacedListeners: FileReplacedCallback[] = [];
+  private renameListeners: RenameCallback[] = [];
 
   constructor(
     private app: App,
@@ -45,6 +53,33 @@ export class TaskIndex {
     };
   }
 
+  /**
+   * Fires when an external edit replaces a file's parse, with the parse it
+   * replaced. Consumers diff the two to migrate saved order through in-place
+   * edits and to witness completion transitions. Fires before onChange, so
+   * the refresh that follows already sees migrated order.
+   */
+  onFileReplaced(cb: FileReplacedCallback): () => void {
+    this.fileReplacedListeners.push(cb);
+    return () => {
+      const idx = this.fileReplacedListeners.indexOf(cb);
+      if (idx !== -1) this.fileReplacedListeners.splice(idx, 1);
+    };
+  }
+
+  /**
+   * Fires at the very top of the rename handler — before the new path is
+   * scope-checked — so a listener can update a "specific files" scope list
+   * and keep the file indexed across the rename.
+   */
+  onRename(cb: RenameCallback): () => void {
+    this.renameListeners.push(cb);
+    return () => {
+      const idx = this.renameListeners.indexOf(cb);
+      if (idx !== -1) this.renameListeners.splice(idx, 1);
+    };
+  }
+
   registerVaultEvents(): void {
     this.plugin.registerEvent(
       this.app.metadataCache.on("changed", (file, data) => {
@@ -52,8 +87,10 @@ export class TaskIndex {
           const hash = hashString(data);
           if (this.contentHashes.get(file.path) === hash) return;
           this.contentHashes.set(file.path, hash);
+          const oldTasks = this.index.get(file.path) ?? [];
           const tasks = parseFile(file.path, data);
           this.index.set(file.path, tasks);
+          for (const cb of this.fileReplacedListeners) cb(file.path, oldTasks, tasks);
           this.emit();
         }
       })
@@ -72,6 +109,7 @@ export class TaskIndex {
     this.plugin.registerEvent(
       this.app.vault.on("rename", async (file, oldPath) => {
         if (!(file instanceof TFile)) return;
+        for (const cb of this.renameListeners) cb(oldPath, file.path);
         const wasIndexed = this.index.has(oldPath);
         if (wasIndexed) {
           this.index.delete(oldPath);
@@ -123,35 +161,12 @@ export class TaskIndex {
   }
 
   private isInScope(file: TFile): boolean {
-    const scope = this.getScope();
-    if (file.extension !== "md") return false;
-
-    switch (scope.type) {
-      case "vault":
-        return true;
-      case "folders":
-        return scope.paths.some((p) => file.path.startsWith(p.endsWith("/") ? p : p + "/"));
-      case "files":
-        return scope.paths.includes(file.path);
-    }
+    return file.extension === "md" && isPathInScope(file.path, this.getScope());
   }
 
   private getScopedFiles(): TFile[] {
     const scope = this.getScope();
-    const all = this.app.vault.getMarkdownFiles();
-
-    switch (scope.type) {
-      case "vault":
-        return all;
-      case "folders":
-        return all.filter((f) =>
-          scope.paths.some((p) =>
-            f.path.startsWith(p.endsWith("/") ? p : p + "/")
-          )
-        );
-      case "files":
-        return all.filter((f) => scope.paths.includes(f.path));
-    }
+    return this.app.vault.getMarkdownFiles().filter((f) => isPathInScope(f.path, scope));
   }
 
   private emit(): void {

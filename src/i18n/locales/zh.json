@@ -75,10 +75,6 @@
       "description": "在内联标签模式下用作标签前缀（#<名称>/分类ID），在内联字段模式下用作字段键（[<名称>:: 分类ID]）。",
       "placeholder": "gtd"
     },
-    "tasksPlugin": {
-      "name": "读取 {{pluginName}} 插件元数据",
-      "description": "读取 {{pluginName}} 插件写入的 📅 截止日期和 ✅ 完成日期。"
-    },
     "filesToScan": {
       "name": "扫描文件",
       "description": "插件搜索任务的文件范围。",
