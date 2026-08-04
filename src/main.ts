@@ -33,7 +33,6 @@ export default class GtdTasksPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
   taskIndex!: TaskIndex;
   languageChangeNotice = false;
-  private panelView?: GtdPanelView;
   private statusBarItem?: HTMLElement;
   /** Set when an event handler has changed order state that isn't saved yet. */
   private orderStateDirty = false;
@@ -98,17 +97,37 @@ export default class GtdTasksPlugin extends Plugin {
     });
 
     this.app.workspace.onLayoutReady(async () => {
-      await this.activateView();
       await this.taskIndex.initialScan();
       await this.reconcileOrderState();
+
+      // Deliberately does NOT open the panel on every load. Obsidian restores a
+      // leaf that was left open by rebuilding its view once registerView makes
+      // the type available again — but it does that ASYNCHRONOUSLY, a beat
+      // after onload. Opening the panel here used to race that restore:
+      // getLeavesOfType() still reported zero while the rebuild was pending, so
+      // the "no panel exists" branch fired and created a SECOND one, every
+      // reload and every plugin update. Only a genuinely fresh install has
+      // nothing to restore, and that is the one case handled here.
+      if (!this.settings.panelOpenedOnce) {
+        this.settings.panelOpenedOnce = true;
+        await this.saveSettings();
+        await this.activateView();
+      }
+
       this.updateStatusBar();
     });
   }
 
-  onunload() {}
-
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, migrateSettingsData(await this.loadData()));
+    const raw: unknown = await this.loadData();
+    const migrated = migrateSettingsData(raw);
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, migrated);
+    // An install that already has a data.json has had its panel opened long
+    // ago; treating it as fresh would fire the one-time auto-open exactly once
+    // more, which is the duplicate-panel race this flag exists to avoid.
+    if (migrated.panelOpenedOnce === undefined) {
+      this.settings.panelOpenedOnce = raw != null;
+    }
     if (!this.settings.buckets || this.settings.buckets.length === 0) {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }
@@ -149,8 +168,19 @@ export default class GtdTasksPlugin extends Plugin {
    */
   private renderAll(): void {
     const bucketGroups = groupTasksIntoBuckets(this.taskIndex.getAllTasks(), this.settings);
-    this.panelView?.setBucketGroups(bucketGroups);
+    // Every panel gets the update, not a single remembered one. Holding one
+    // reference meant any second panel — whether the user opened it or Obsidian
+    // restored it — was frozen forever at whatever mountSvelte seeded it with.
+    for (const view of this.panelViews()) view.setBucketGroups(bucketGroups);
     this.renderStatusBar(bucketGroups);
+  }
+
+  /** Every live panel view belonging to this plugin instance. */
+  private panelViews(): GtdPanelView[] {
+    return this.app.workspace
+      .getLeavesOfType(VIEW_TYPE_GTD)
+      .map((leaf) => leaf.view)
+      .filter((view): view is GtdPanelView => view instanceof GtdPanelView);
   }
 
   private updateStatusBar(): void {
@@ -267,14 +297,12 @@ export default class GtdTasksPlugin extends Plugin {
       await leaf.setViewState({ type: VIEW_TYPE_GTD, active: true });
     }
 
-    if (leaf.view instanceof GtdPanelView) {
-      this.panelView = leaf.view;
-    }
-
     await workspace.revealLeaf(leaf);
 
-    if (bucketId) {
-      this.panelView?.scrollToBucket(bucketId);
+    // Read the view AFTER revealLeaf: revealing can rebuild a leaf's view, so a
+    // reference captured earlier can already be a discarded instance.
+    if (bucketId && leaf.view instanceof GtdPanelView) {
+      leaf.view.scrollToBucket(bucketId);
     }
   }
 }

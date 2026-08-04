@@ -48,6 +48,12 @@ export interface PluginSettings {
   /** Last Obsidian language seen on load — used to detect language changes. */
   lastSeenLanguage: string;
   /**
+   * Set once the panel has been opened for this install. Afterwards the plugin
+   * never opens it itself: Obsidian restores a panel that was left open, and
+   * a panel the user actually closed should stay closed.
+   */
+  panelOpenedOnce: boolean;
+  /**
    * Used as the tag prefix in Inline tag mode (#<prefix>/bucket-id)
    * and as the field name in Inline field mode ([<prefix>:: bucket-id]).
    */
@@ -133,6 +139,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   filePaths: [],
   buckets: DEFAULT_BUCKETS,
   lastSeenLanguage: "",
+  panelOpenedOnce: false,
   tagPrefix: "gtd",
   completedVisibilityUntilMidnight: true,
   staleIndicatorEnabled: true,
