@@ -185,6 +185,41 @@ export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
   return migrated;
 }
 
+/**
+ * Guards the shapes the rest of the code assumes taskOrder/completionSeen/
+ * folderPaths/filePaths hold, once loadSettings() has merged raw data.json
+ * onto DEFAULT_SETTINGS. A hand-edited or corrupted data.json can put any
+ * JSON value under these keys (e.g. a bucket's taskOrder value being a
+ * number instead of an array), which would otherwise throw deep inside
+ * OrderMigration/OrderPurge. This is the single trust boundary: everything
+ * downstream keeps assuming the typed shape and stays unguarded.
+ */
+export function normalizeSettingsShapes(settings: PluginSettings): PluginSettings {
+  const rawTaskOrder = settings.taskOrder as unknown;
+  const taskOrder: Record<string, OrderEntry[]> = {};
+  if (rawTaskOrder && typeof rawTaskOrder === "object") {
+    for (const [bucketId, value] of Object.entries(rawTaskOrder as Record<string, unknown>)) {
+      if (Array.isArray(value)) taskOrder[bucketId] = value as OrderEntry[];
+    }
+  }
+
+  const rawCompletionSeen = settings.completionSeen as unknown;
+  const completionSeen: Record<string, number> = {};
+  if (rawCompletionSeen && typeof rawCompletionSeen === "object") {
+    for (const [id, value] of Object.entries(rawCompletionSeen as Record<string, unknown>)) {
+      if (typeof value === "number" && Number.isFinite(value)) completionSeen[id] = value;
+    }
+  }
+
+  return {
+    ...settings,
+    taskOrder,
+    completionSeen,
+    folderPaths: Array.isArray(settings.folderPaths) ? settings.folderPaths : [],
+    filePaths: Array.isArray(settings.filePaths) ? settings.filePaths : [],
+  };
+}
+
 /** Whether `path` falls inside `scope`. Extension filtering is the caller's job. */
 export function isPathInScope(path: string, scope: TaskScope): boolean {
   switch (scope.type) {

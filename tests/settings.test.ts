@@ -1,4 +1,5 @@
-import { getActiveScope, isPathInScope, migrateSettingsData } from "../src/settings";
+import { getActiveScope, isPathInScope, migrateSettingsData, normalizeSettingsShapes, DEFAULT_SETTINGS } from "../src/settings";
+import type { PluginSettings } from "../src/settings";
 
 describe("getActiveScope", () => {
   it("returns a vault scope when scopeType is vault", () => {
@@ -58,6 +59,56 @@ describe("migrateSettingsData", () => {
     expect(migrateSettingsData({ taskScope: { type: "vault" }, readTasksPlugin: false })).toEqual({
       scopeType: "vault",
     });
+  });
+});
+
+describe("normalizeSettingsShapes", () => {
+  it("passes through already-well-formed settings unchanged", () => {
+    const settings: PluginSettings = {
+      ...DEFAULT_SETTINGS,
+      taskOrder: { today: [{ file: "a.md", key: "k1" }] },
+      completionSeen: { "a.md::k1": 123 },
+      folderPaths: ["Tasks"],
+      filePaths: ["a.md"],
+    };
+    expect(normalizeSettingsShapes(settings)).toEqual(settings);
+  });
+
+  it("drops taskOrder bucket values that are not arrays", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      taskOrder: { today: 5, week: null, ok: [{ file: "a.md", key: "k1" }] },
+    } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(settings).taskOrder).toEqual({
+      ok: [{ file: "a.md", key: "k1" }],
+    });
+  });
+
+  it("tolerates taskOrder itself being null or a primitive", () => {
+    const asNull = { ...DEFAULT_SETTINGS, taskOrder: null } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(asNull).taskOrder).toEqual({});
+
+    const asPrimitive = { ...DEFAULT_SETTINGS, taskOrder: 5 } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(asPrimitive).taskOrder).toEqual({});
+  });
+
+  it("drops completionSeen values that are not finite numbers", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      completionSeen: { a: "not-a-number", b: NaN, c: Infinity, d: 42 },
+    } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(settings).completionSeen).toEqual({ d: 42 });
+  });
+
+  it("forces folderPaths/filePaths to an array if they are not one", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      folderPaths: "Tasks",
+      filePaths: null,
+    } as unknown as PluginSettings;
+    const result = normalizeSettingsShapes(settings);
+    expect(result.folderPaths).toEqual([]);
+    expect(result.filePaths).toEqual([]);
   });
 });
 

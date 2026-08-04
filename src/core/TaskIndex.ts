@@ -90,7 +90,7 @@ export class TaskIndex {
           const oldTasks = this.index.get(file.path) ?? [];
           const tasks = parseFile(file.path, data);
           this.index.set(file.path, tasks);
-          for (const cb of this.fileReplacedListeners) cb(file.path, oldTasks, tasks);
+          this.notifyFileReplaced(file.path, oldTasks, tasks);
           this.emit();
         }
       })
@@ -109,7 +109,16 @@ export class TaskIndex {
     this.plugin.registerEvent(
       this.app.vault.on("rename", async (file, oldPath) => {
         if (!(file instanceof TFile)) return;
-        for (const cb of this.renameListeners) cb(oldPath, file.path);
+        // Same containment as the "changed" handler above: a throwing
+        // listener must not abort the rest of the rename handling, or the
+        // renamed file is left stale in the index.
+        for (const cb of this.renameListeners) {
+          try {
+            cb(oldPath, file.path);
+          } catch (e) {
+            console.error("GTD Tasks: onRename listener threw", e);
+          }
+        }
         const wasIndexed = this.index.has(oldPath);
         if (wasIndexed) {
           this.index.delete(oldPath);
@@ -152,11 +161,36 @@ export class TaskIndex {
     try {
       const content = await this.app.vault.cachedRead(file);
       this.contentHashes.set(file.path, hashString(content));
+      const oldTasks = this.index.get(file.path) ?? [];
       const tasks = parseFile(file.path, content);
       this.index.set(file.path, tasks);
+      // Priming contentHashes above makes Obsidian's own later "changed"
+      // event a no-op for this content, so this is the only chance to
+      // report the replacement — a caller catching the index up after its
+      // own write must still get the diff.
+      this.notifyFileReplaced(file.path, oldTasks, tasks);
     } catch {
       this.index.delete(file.path);
       this.contentHashes.delete(file.path);
+    }
+  }
+
+  /**
+   * A listener that throws must not abort the caller — in the "changed"
+   * handler that would skip emit(), recur on every subsequent edit, and
+   * leave the panel stuck stale until Obsidian restarts.
+   */
+  private notifyFileReplaced(
+    filePath: string,
+    oldTasks: TaskRecord[],
+    newTasks: TaskRecord[]
+  ): void {
+    for (const cb of this.fileReplacedListeners) {
+      try {
+        cb(filePath, oldTasks, newTasks);
+      } catch (e) {
+        console.error("GTD Tasks: onFileReplaced listener threw", e);
+      }
     }
   }
 

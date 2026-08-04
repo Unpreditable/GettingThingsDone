@@ -199,6 +199,81 @@ describe("TaskIndex", () => {
     expect(index.getAllTasks().map((t) => t.filePath)).toEqual(["new.md"]);
   });
 
+  it("still fires onChange listeners when an onFileReplaced listener throws", async () => {
+    const { app, plugin, fireChanged } = makeMockEnv({ "a.md": "- [ ] Old text" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    index.onFileReplaced(() => {
+      throw new Error("boom");
+    });
+
+    let notifyCount = 0;
+    index.onChange(() => notifyCount++);
+
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    fireChanged("a.md", "- [ ] New text");
+    errorSpy.mockRestore();
+
+    expect(notifyCount).toBe(1);
+    expect(index.getAllTasks().map((t) => t.text)).toEqual(["New text"]);
+  });
+
+  it("still updates the index for the renamed file when an onRename listener throws", async () => {
+    const { app, plugin, fireRename } = makeMockEnv({ "old.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    index.onRename(() => {
+      throw new Error("boom");
+    });
+
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    await fireRename("old.md", "new.md");
+    errorSpy.mockRestore();
+
+    expect(index.getAllTasks().map((t) => t.filePath)).toEqual(["new.md"]);
+  });
+
+  it("reindexFile fires onFileReplaced with the previous parse, so a caller catching the index up after its own write still gets the diff", async () => {
+    // handleToggle re-indexes after writing, which primes contentHashes and
+    // makes Obsidian's later metadataCache event a no-op. If this path stayed
+    // silent, that write's completion transition would never be witnessed.
+    const { app, plugin, setContentSilently } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    const seen: Array<{ old: string[]; next: string[] }> = [];
+    index.onFileReplaced((_path, oldTasks, newTasks) => {
+      seen.push({ old: oldTasks.map((t) => t.rawLine), next: newTasks.map((t) => t.rawLine) });
+    });
+
+    setContentSilently("a.md", "- [x] Task A");
+    await index.reindexFile("a.md");
+
+    expect(seen).toEqual([{ old: ["- [ ] Task A"], next: ["- [x] Task A"] }]);
+  });
+
+  it("reindexFileSilently also fires onFileReplaced (it suppresses onChange, not the diff)", async () => {
+    const { app, plugin, setContentSilently } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    let replaced = 0;
+    let changed = 0;
+    index.onFileReplaced(() => replaced++);
+    index.onChange(() => changed++);
+
+    setContentSilently("a.md", "- [x] Task A");
+    await index.reindexFileSilently("a.md");
+
+    expect([replaced, changed]).toEqual([1, 0]);
+  });
+
   it("returns an unsubscribe function from onFileReplaced", async () => {
     const { app, plugin, fireChanged } = makeMockEnv({ "a.md": "- [ ] Task A" });
     const index = new TaskIndex(app, plugin, () => vaultScope);
