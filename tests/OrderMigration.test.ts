@@ -32,7 +32,7 @@ describe("diffFileTasks", () => {
 
     expect(diffFileTasks([task], [task])).toEqual({
       rekeys: [],
-      completedWithoutDate: [],
+      completed: [],
       reopened: [],
     });
   });
@@ -105,15 +105,17 @@ describe("diffFileTasks", () => {
 
     const diff = diffFileTasks([before], [after]);
 
-    expect(diff.completedWithoutDate).toEqual([keyOf(after)]);
+    expect(diff.completed).toEqual([keyOf(after)]);
     expect(diff.reopened).toEqual([]);
   });
 
-  it("records nothing when the completed line carries a ✅ date", () => {
+  it("records the transition even when the completed line carries a ✅ date", () => {
+    // Visibility keys off "did this session watch it happen", not the date,
+    // so a dated completion needs a record just as much as a dateless one.
     const before = makeTask({ id: "a", text: "Foo", isCompleted: false });
     const after = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: new Date("2026-08-02") });
 
-    expect(diffFileTasks([before], [after]).completedWithoutDate).toEqual([]);
+    expect(diffFileTasks([before], [after]).completed).toEqual([keyOf(after)]);
   });
 
   it("records a completed → open transition", () => {
@@ -123,7 +125,7 @@ describe("diffFileTasks", () => {
     const diff = diffFileTasks([before], [after]);
 
     expect(diff.reopened).toEqual([keyOf(after)]);
-    expect(diff.completedWithoutDate).toEqual([]);
+    expect(diff.completed).toEqual([]);
   });
 
   it("records a completion transition on a paired edit, under the NEW key", () => {
@@ -133,13 +135,13 @@ describe("diffFileTasks", () => {
     const diff = diffFileTasks([before], [after]);
 
     expect(diff.rekeys).toEqual([{ from: keyOf(before), to: keyOf(after) }]);
-    expect(diff.completedWithoutDate).toEqual([keyOf(after)]);
+    expect(diff.completed).toEqual([keyOf(after)]);
   });
 
   it("does not record a completion for a task that was already completed when first seen", () => {
     const done = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: null });
 
-    expect(diffFileTasks([], [done]).completedWithoutDate).toEqual([]);
+    expect(diffFileTasks([], [done]).completed).toEqual([]);
   });
 });
 
@@ -164,7 +166,7 @@ describe("applyTaskDiff", () => {
     const { state: after, changed } = applyTaskDiff(
       before,
       "a.md",
-      { rekeys: [{ from: "old:0", to: "new:0" }], completedWithoutDate: [], reopened: [] },
+      { rekeys: [{ from: "old:0", to: "new:0" }], completed: [], reopened: [] },
       NOW
     );
 
@@ -182,7 +184,7 @@ describe("applyTaskDiff", () => {
     const { state: after, changed } = applyTaskDiff(
       before,
       "a.md",
-      { rekeys: [{ from: "old:0", to: "new:0" }], completedWithoutDate: [], reopened: [] },
+      { rekeys: [{ from: "old:0", to: "new:0" }], completed: [], reopened: [] },
       NOW
     );
 
@@ -196,7 +198,7 @@ describe("applyTaskDiff", () => {
     const { state: after } = applyTaskDiff(
       before,
       "a.md",
-      { rekeys: [{ from: "old:0", to: "new:0" }], completedWithoutDate: [], reopened: [] },
+      { rekeys: [{ from: "old:0", to: "new:0" }], completed: [], reopened: [] },
       NOW
     );
 
@@ -207,7 +209,7 @@ describe("applyTaskDiff", () => {
     const { state: after, changed } = applyTaskDiff(
       state(),
       "a.md",
-      { rekeys: [], completedWithoutDate: ["k:0"], reopened: [] },
+      { rekeys: [], completed: ["k:0"], reopened: [] },
       NOW
     );
 
@@ -221,7 +223,7 @@ describe("applyTaskDiff", () => {
     const { state: after, changed } = applyTaskDiff(
       before,
       "a.md",
-      { rekeys: [], completedWithoutDate: [], reopened: ["k:0"] },
+      { rekeys: [], completed: [], reopened: ["k:0"] },
       NOW
     );
 
@@ -238,7 +240,7 @@ describe("applyTaskDiff", () => {
     const { changed } = applyTaskDiff(
       before,
       "a.md",
-      { rekeys: [], completedWithoutDate: [], reopened: [] },
+      { rekeys: [], completed: [], reopened: [] },
       NOW
     );
 
@@ -253,7 +255,7 @@ describe("applyTaskDiff", () => {
     const { state: after } = applyTaskDiff(
       before,
       "a.md",
-      { rekeys: [{ from: "legacy:0", to: "new:0" }], completedWithoutDate: [], reopened: [] },
+      { rekeys: [{ from: "legacy:0", to: "new:0" }], completed: [], reopened: [] },
       NOW
     );
 
@@ -297,6 +299,64 @@ describe("renameFileInState", () => {
     const before = state({ taskOrder: { today: [{ file: "other.md", key: "k:0" }] } });
 
     expect(renameFileInState(before, "old.md", "new.md").changed).toBe(false);
+  });
+});
+
+describe("legacy key format (pinned against the shipped pre-upgrade build)", () => {
+  // These strings were produced by actually RUNNING computeOrderKeys from
+  // commit 6e21fac — the last build before structured entries — not by
+  // re-deriving them from computeLegacyOrderKeys. Without this pin, the
+  // migration tests below would only prove we are self-consistent: a wrong
+  // transcription of the old format would pass every one of them and still
+  // orphan every real user's saved order on upgrade.
+  const REAL_LEGACY_KEYS: Array<[string, string, string | null, string]> = [
+    ["Inbox.md", "Buy milk", null, "2078015980:0"],
+    ["Inbox.md", "Buy milk", null, "2078015980:1"],
+    ["Inbox.md", "Call Bob", "2026-08-09T00:00:00Z", "1757815861:0"],
+    ["Work/Notes.md", "Buy milk", null, "1301982511:0"],
+    ["Work/Notes.md", "Ship it", null, "1812805701:0"],
+  ];
+
+  it("computeLegacyOrderKeys reproduces the shipped format exactly", () => {
+    const tasks = REAL_LEGACY_KEYS.map(([filePath, text, due], i) =>
+      makeTask({
+        id: `t${i}`,
+        filePath,
+        lineNumber: i,
+        text,
+        dueDate: due ? new Date(due) : null,
+      })
+    );
+
+    const produced = computeLegacyOrderKeys(tasks);
+
+    expect(REAL_LEGACY_KEYS.map((_, i) => produced.get(`t${i}`))).toEqual(
+      REAL_LEGACY_KEYS.map(([, , , key]) => key)
+    );
+  });
+
+  it("migrates those real keys onto the right tasks", () => {
+    const tasks = REAL_LEGACY_KEYS.map(([filePath, text, due], i) =>
+      makeTask({
+        id: `t${i}`,
+        filePath,
+        lineNumber: i,
+        text,
+        dueDate: due ? new Date(due) : null,
+      })
+    );
+    // A saved order in the old format, deliberately not in file order.
+    const savedOrder = ["1812805701:0", "2078015980:1", "1757815861:0"];
+
+    const { taskOrder, changed } = migrateOrderFormat({ today: savedOrder }, tasks);
+    const current = computeOrderKeys(tasks);
+
+    expect(changed).toBe(true);
+    expect(taskOrder.today).toEqual([
+      current.get("t4"), // Ship it, Work/Notes.md
+      current.get("t1"), // the SECOND "Buy milk" in Inbox.md
+      current.get("t2"), // Call Bob
+    ]);
   });
 });
 

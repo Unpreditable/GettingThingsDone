@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "Väljaspool planeeritud ajavahemikku",
+    "recurringTooltip": "Kordub",
     "autoPlacedTooltip": "Paigutatud automaatselt tähtaja järgi — kinnita klõpsates",
     "subtaskTooltip": "Alamülesanne",
     "activeSubtasks_one": "{{count}} aktiivne alamülesanne",

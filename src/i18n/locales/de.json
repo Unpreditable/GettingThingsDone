@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "Außerhalb des geplanten Zeitfensters",
+    "recurringTooltip": "Wiederholt sich",
     "autoPlacedTooltip": "Automatisch anhand des Fälligkeitsdatums zugewiesen — klicken zum Bestätigen",
     "subtaskTooltip": "Unteraufgabe",
     "activeSubtasks_one": "{{count}} aktive Unteraufgabe",

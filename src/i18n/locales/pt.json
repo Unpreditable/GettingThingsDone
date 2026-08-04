@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "Fora da janela programada",
+    "recurringTooltip": "Repete-se",
     "autoPlacedTooltip": "Colocado automaticamente pela data de entrega — clique para confirmar",
     "subtaskTooltip": "Subtarefa",
     "activeSubtasks_one": "{{count}} subtarefa ativa",

@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "За межами запланованого періоду",
+    "recurringTooltip": "Повторюється",
     "autoPlacedTooltip": "Розміщено автоматично за датою — натисніть для підтвердження",
     "subtaskTooltip": "Підзавдання",
     "activeSubtasks_one": "{{count}} активне підзавдання",

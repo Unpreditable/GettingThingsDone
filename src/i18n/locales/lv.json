@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "Ārpus plānotā laika loga",
+    "recurringTooltip": "Atkārtojas",
     "autoPlacedTooltip": "Automātiski izvietots pēc izpildes datuma — noklikšķiniet, lai apstiprinātu",
     "subtaskTooltip": "Apakšuzdevums",
     "activeSubtasks_zero": "{{count}} aktīvu apakšuzdevumu",

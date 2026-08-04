@@ -1,7 +1,7 @@
 import { groupTasksIntoBuckets, regroupByHierarchy, TO_REVIEW_ID } from "../src/core/BucketManager";
 import { DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
-import { computeOrderKeys } from "../src/core/TaskOrder";
+import { computeOrderKeys, entryId } from "../src/core/TaskOrder";
 import type { OrderEntry } from "../src/core/TaskOrder";
 
 // Use a fixed Monday so calendar-aware week boundaries are predictable
@@ -585,5 +585,108 @@ describe("groupTasksIntoBuckets performance", () => {
     // regression (e.g. an O(n^2) lookup creeping into regroupByHierarchy or
     // applyManualOrder), not a tight budget tuned to one specific machine.
     expect(elapsed).toBeLessThan(500);
+  });
+});
+
+describe("agedCompletedTaskIds", () => {
+  // The suite's mocked `today()` is Mon Feb 23 2026 00:00.
+  const settings = { ...DEFAULT_SETTINGS, buckets: DEFAULT_BUCKETS };
+
+  it("does not mark an open task", () => {
+    const task = makeTask({ id: "a", text: "Open" });
+    const groups = groupTasksIntoBuckets([task], settings);
+    const review = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual([]);
+  });
+
+  it("marks a task whose ✅ date is today but whose completion this session never saw", () => {
+    // The ✅ date records the DAY, not the session. A task completed this
+    // morning and then reloaded must not come back on screen.
+    const task = makeTask({
+      id: "a",
+      text: "Done",
+      isCompleted: true,
+      completedAt: new Date("2026-02-23T00:00:00"),
+    });
+    const review = groupTasksIntoBuckets([task], settings).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual(["a"]);
+  });
+
+  it("does not mark a ✅-dated task whose completion this session witnessed", () => {
+    const task = makeTask({
+      id: "a",
+      text: "Done",
+      isCompleted: true,
+      completedAt: new Date("2026-02-23T00:00:00"),
+    });
+    const entry = computeOrderKeys([task]).get("a")!;
+    const witnessed = {
+      ...settings,
+      completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
+    };
+
+    const review = groupTasksIntoBuckets([task], witnessed).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual([]);
+  });
+
+  it("always marks a completed recurrence, even when witnessed this session", () => {
+    // Tasks has already inserted the next occurrence; showing the completed
+    // one too is a confusing near-duplicate row.
+    const task = makeTask({
+      id: "a",
+      text: "Water plants",
+      rawLine: "- [x] Water plants 🔁 every week ✅ 2026-02-23",
+      isCompleted: true,
+      completedAt: new Date("2026-02-23T00:00:00"),
+    });
+    const entry = computeOrderKeys([task]).get("a")!;
+    const witnessed = {
+      ...settings,
+      completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
+    };
+
+    const review = groupTasksIntoBuckets([task], witnessed).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual(["a"]);
+  });
+
+  it("marks a task whose ✅ date is before today", () => {
+    const task = makeTask({
+      id: "a",
+      text: "Done",
+      isCompleted: true,
+      completedAt: new Date("2026-02-22T00:00:00"),
+    });
+    const review = groupTasksIntoBuckets([task], settings).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual(["a"]);
+  });
+
+  it("marks a dateless completion with no witnessed record", () => {
+    const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: null });
+    const review = groupTasksIntoBuckets([task], settings).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual(["a"]);
+  });
+
+  it("does not mark a dateless completion witnessed today", () => {
+    const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: null });
+    const entry = computeOrderKeys([task]).get("a")!;
+    const withRecord = {
+      ...settings,
+      completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
+    };
+
+    const review = groupTasksIntoBuckets([task], withRecord).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual([]);
+  });
+
+  it("marks a dateless completion whose witnessed record is from before today", () => {
+    const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: null });
+    const entry = computeOrderKeys([task]).get("a")!;
+    const withRecord = {
+      ...settings,
+      completionSeen: { [entryId(entry)]: new Date("2026-02-22T09:00:00").getTime() },
+    };
+
+    const review = groupTasksIntoBuckets([task], withRecord).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual(["a"]);
   });
 });

@@ -5,11 +5,13 @@
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { t } from "../i18n/i18n";
+  import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
   export let isStale: boolean = false;
+  $: isRecurringTask = isRecurring(task);
   export let isAutoPlaced: boolean = false;
   /** True when the task is completed and visible until midnight. */
   export let showCompleted: boolean = false;
@@ -103,7 +105,16 @@
     showTooltip = false;
   }
 
-  function onCheckboxChange() {
+  /**
+   * The file is the source of truth, so undo the browser's own optimistic
+   * flip and let the re-render after the write set the real state. Without
+   * this the DOM can keep a tick Svelte never clears: `checked` is one-way,
+   * so if this row is reused for a task whose isCompleted is unchanged
+   * (a 🔁 recurrence puts a NEW open occurrence on the completed task's
+   * line), Svelte sees no value change and leaves the user's tick in place.
+   */
+  function onCheckboxChange(e: Event) {
+    (e.currentTarget as HTMLInputElement).checked = task.isCompleted;
     dispatch("toggle", { task });
   }
 
@@ -155,6 +166,10 @@
     checked={task.isCompleted}
     on:change={onCheckboxChange}
   />
+
+  {#if isRecurringTask}
+    <span class="gtd-recurring-badge" title={t("task.recurringTooltip")}>🔁</span>
+  {/if}
 
   {#if isStale}
     <span class="gtd-stale-badge" title={t("task.staleTooltip")}>!</span>
@@ -242,6 +257,14 @@
     font-size: 13px;
     line-height: 1;
     padding-right: 2px;
+  }
+
+  .gtd-recurring-badge {
+    flex-shrink: 0;
+    font-size: 10px;
+    line-height: 1;
+    padding-right: 2px;
+    opacity: 0.75;
   }
 
   .gtd-auto-badge {

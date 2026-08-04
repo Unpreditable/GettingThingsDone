@@ -9,7 +9,7 @@ import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
 import { t } from "../i18n/i18n";
-import { computeOrderKeys, applyManualOrder } from "./TaskOrder";
+import { computeOrderKeys, applyManualOrder, wasCompletionWitnessed, isRecurring } from "./TaskOrder";
 
 export const TO_REVIEW_ID = "to-review";
 
@@ -20,6 +20,9 @@ export interface BucketGroup {
   tasks: TaskRecord[];
   staleTaskIds: string[];
   autoPlacedTaskIds: string[];
+  /** Completed tasks the panel hides: anything whose completion this session
+   *  didn't witness, plus every completed recurrence (already replaced). */
+  agedCompletedTaskIds: string[];
   isSystem: boolean;
 }
 
@@ -38,6 +41,7 @@ export function groupTasksIntoBuckets(
     tasks: [],
     staleTaskIds: [],
     autoPlacedTaskIds: [],
+    agedCompletedTaskIds: [],
     isSystem: true,
   });
 
@@ -49,6 +53,7 @@ export function groupTasksIntoBuckets(
       tasks: [],
       staleTaskIds: [],
       autoPlacedTaskIds: [],
+      agedCompletedTaskIds: [],
       isSystem: false,
     });
   }
@@ -112,12 +117,22 @@ export function groupTasksIntoBuckets(
   }
 
   const orderKeys = computeOrderKeys(tasks);
+  const completionSeen = settings.completionSeen ?? {};
   for (const group of bucketMap.values()) {
     const saved = settings.taskOrder?.[group.bucketId];
     if (saved && saved.length > 0) {
       group.tasks = applyManualOrder(group.tasks, orderKeys, saved);
     }
     group.tasks = regroupByHierarchy(group.tasks);
+
+    for (const task of group.tasks) {
+      if (!task.isCompleted) continue;
+      // A completed recurrence is always hidden: Tasks has already put its
+      // next occurrence in the list, so showing both is a confusing duplicate.
+      if (isRecurring(task) || !wasCompletionWitnessed(orderKeys.get(task.id), completionSeen, now.getTime())) {
+        group.agedCompletedTaskIds.push(task.id);
+      }
+    }
   }
 
   const result: BucketGroup[] = [bucketMap.get(TO_REVIEW_ID)!];

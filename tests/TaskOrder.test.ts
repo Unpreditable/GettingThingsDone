@@ -6,7 +6,8 @@ import {
   purgeOrderEntry,
   entryId,
   isOrderEntry,
-  completionClock,
+  wasCompletionWitnessed,
+  isRecurring,
 } from "../src/core/TaskOrder";
 import type { OrderEntry } from "../src/core/TaskOrder";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -264,26 +265,39 @@ describe("purgeOrderEntry", () => {
   });
 });
 
-describe("completionClock", () => {
+describe("wasCompletionWitnessed", () => {
   const entry = { file: "a.md", key: "k:0" };
+  const MIDNIGHT = new Date("2026-08-02T00:00:00").getTime();
 
-  it("prefers the ✅ date on the line", () => {
-    const at = new Date("2026-08-02T00:00:00");
-    const task = makeTask({ isCompleted: true, completedAt: at });
-
-    expect(completionClock(task, entry, { "a.md::k:0": 111 })).toBe(at.getTime());
+  it("is true for a record from today", () => {
+    expect(wasCompletionWitnessed(entry, { "a.md::k:0": MIDNIGHT + 1000 }, MIDNIGHT)).toBe(true);
   });
 
-  it("falls back to the witnessed completionSeen record when there is no date", () => {
-    const task = makeTask({ isCompleted: true, completedAt: null });
-
-    expect(completionClock(task, entry, { "a.md::k:0": 999 })).toBe(999);
+  it("is false with no record — a reload drops them all, so nothing completed shows", () => {
+    expect(wasCompletionWitnessed(entry, {}, MIDNIGHT)).toBe(false);
   });
 
-  it("returns null when there is neither a date nor a record (unwitnessed → aged)", () => {
-    const task = makeTask({ isCompleted: true, completedAt: null });
+  it("is false for a record from before midnight (session left running overnight)", () => {
+    expect(wasCompletionWitnessed(entry, { "a.md::k:0": MIDNIGHT - 1000 }, MIDNIGHT)).toBe(false);
+  });
 
-    expect(completionClock(task, entry, {})).toBeNull();
-    expect(completionClock(task, undefined, { "a.md::k:0": 999 })).toBeNull();
+  it("is false when the task has no entry to look up", () => {
+    expect(wasCompletionWitnessed(undefined, { "a.md::k:0": MIDNIGHT + 1 }, MIDNIGHT)).toBe(false);
+  });
+
+  it("ignores the ✅ date entirely — it records the day, not the session", () => {
+    // Same entry, same map: the presence of a completedAt on the task cannot
+    // change the answer, because the task isn't even consulted.
+    expect(wasCompletionWitnessed(entry, {}, MIDNIGHT)).toBe(false);
+  });
+});
+
+describe("isRecurring", () => {
+  it("detects a Tasks recurrence rule on the line", () => {
+    expect(isRecurring(makeTask({ rawLine: "- [x] Water plants 🔁 every week ✅ 2026-08-02" }))).toBe(true);
+  });
+
+  it("is false for an ordinary task", () => {
+    expect(isRecurring(makeTask({ rawLine: "- [x] Water plants ✅ 2026-08-02" }))).toBe(false);
   });
 });

@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "Hors de la fenêtre planifiée",
+    "recurringTooltip": "Se répète",
     "autoPlacedTooltip": "Placé automatiquement selon la date d'échéance — cliquez pour confirmer",
     "subtaskTooltip": "Sous-tâche",
     "activeSubtasks_one": "{{count}} sous-tâche active",

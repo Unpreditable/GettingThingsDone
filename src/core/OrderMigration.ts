@@ -10,8 +10,8 @@ import type { OrderEntry } from "./TaskOrder";
 export interface TaskDiff {
   /** In-place edits: the task kept its position, its content key changed. */
   rekeys: Array<{ from: string; to: string }>;
-  /** Keys that went open → completed on a line carrying no ✅ date. */
-  completedWithoutDate: string[];
+  /** Keys that went open → completed, whether or not a ✅ date was written. */
+  completed: string[];
   /** Keys that went completed → open. */
   reopened: string[];
 }
@@ -28,7 +28,7 @@ export function diffFileTasks(oldTasks: TaskRecord[], newTasks: TaskRecord[]): T
   const oldByKey = keyTasks(oldTasks);
   const newByKey = keyTasks(newTasks);
 
-  const diff: TaskDiff = { rekeys: [], completedWithoutDate: [], reopened: [] };
+  const diff: TaskDiff = { rekeys: [], completed: [], reopened: [] };
 
   const unmatchedOld = new Map(oldByKey);
   const unmatchedNew = new Map(newByKey);
@@ -87,8 +87,8 @@ function recordCompletion(
   newTask: TaskRecord,
   key: string
 ): void {
-  if (!oldTask.isCompleted && newTask.isCompleted && newTask.completedAt === null) {
-    diff.completedWithoutDate.push(key);
+  if (!oldTask.isCompleted && newTask.isCompleted) {
+    diff.completed.push(key);
   } else if (oldTask.isCompleted && !newTask.isCompleted) {
     diff.reopened.push(key);
   }
@@ -135,7 +135,7 @@ export function applyTaskDiff(
       changed = true;
     }
   }
-  for (const key of diff.completedWithoutDate) {
+  for (const key of diff.completed) {
     completionSeen[`${filePath}::${key}`] = now;
     changed = true;
   }

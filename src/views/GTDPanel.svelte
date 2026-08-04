@@ -342,6 +342,7 @@
         tasks={group.tasks}
         staleTaskIds={group.staleTaskIds}
         autoPlacedTaskIds={group.autoPlacedTaskIds}
+        agedCompletedTaskIds={group.agedCompletedTaskIds}
         quickMoveTargets={getQuickMoveTargets(group.bucketId)}
         showCompletedUntilMidnight={settings.completedVisibilityUntilMidnight}
         {allTasksMap}

@@ -49,13 +49,34 @@ describe("purgeAgedEntries", () => {
     expect(after.taskOrder.today).toEqual([entry]);
   });
 
-  it("keeps a task completed today (✅ date is today)", () => {
+  it("keeps a task whose completion this session witnessed", () => {
     const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: new Date(TODAY_MIDNIGHT) });
     const entry = entryFor(task, [task]);
 
-    const { state: after } = purgeAgedEntries(state({ taskOrder: { today: [entry] } }), [task], NOW);
+    const { state: after } = purgeAgedEntries(
+      state({
+        taskOrder: { today: [entry] },
+        completionSeen: { [`a.md::${entry.key}`]: TODAY_MIDNIGHT + 1000 },
+      }),
+      [task],
+      NOW
+    );
 
     expect(after.taskOrder.today).toEqual([entry]);
+  });
+
+  it("purges a ✅-dated task this session never witnessed (a reload dropped the record)", () => {
+    const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: new Date(TODAY_MIDNIGHT) });
+    const entry = entryFor(task, [task]);
+
+    const { state: after, changed } = purgeAgedEntries(
+      state({ taskOrder: { today: [entry] } }),
+      [task],
+      NOW
+    );
+
+    expect(changed).toBe(true);
+    expect(after.taskOrder.today).toEqual([]);
   });
 
   it("purges a task completed before today (✅ date is yesterday)", () => {

@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "スケジュールの期間を過ぎています",
+    "recurringTooltip": "繰り返し",
     "autoPlacedTooltip": "期日から自動配置 — クリックして配置を確認",
     "subtaskTooltip": "サブタスク",
     "activeSubtasks_one": "アクティブなサブタスク {{count}} 件",

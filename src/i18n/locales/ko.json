@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "예약된 기간이 지났습니다",
+    "recurringTooltip": "반복",
     "autoPlacedTooltip": "마감일에서 자동 배치됨 — 클릭하여 배치 확인",
     "subtaskTooltip": "하위 작업",
     "activeSubtasks_one": "활성 하위 작업 {{count}}개",

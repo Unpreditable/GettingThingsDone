@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "Už planuoto laiko lango ribų",
+    "recurringTooltip": "Kartojasi",
     "autoPlacedTooltip": "Automatiškai patalpinta pagal terminą — spustelėkite patvirtinti",
     "subtaskTooltip": "Použduotis",
     "activeSubtasks_one": "{{count}} aktyvi použduotis",

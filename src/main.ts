@@ -116,6 +116,10 @@ export default class GtdTasksPlugin extends Plugin {
     // folderPaths/filePaths hold the shapes every downstream consumer
     // assumes, even if the file was hand-edited or corrupted.
     this.settings = normalizeSettingsShapes(this.settings);
+    // Always start a session with no witnessed completions, discarding any
+    // records an older build persisted — nothing completed before this run
+    // should be on screen.
+    this.settings.completionSeen = {};
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -128,7 +132,12 @@ export default class GtdTasksPlugin extends Plugin {
   }
 
   async saveSettings() {
-    await this.saveData(this.settings);
+    // completionSeen is session state, not user data: it records completions
+    // this run watched happen, so that a task the user just ticked doesn't
+    // vanish under them. Writing it would resurrect completed tasks after a
+    // reload, which is exactly what we don't want.
+    const { completionSeen: _sessionOnly, ...persisted } = this.settings;
+    await this.saveData(persisted);
     this.renderAll();
   }
 
@@ -161,12 +170,8 @@ export default class GtdTasksPlugin extends Plugin {
       const active = group.tasks.filter((t) => !t.isCompleted).length;
       let total = active;
       if (this.settings.completedVisibilityUntilMidnight) {
-        const midnight = new Date();
-        midnight.setHours(0, 0, 0, 0);
-        const visibleCompleted = group.tasks.filter(
-          (t) => t.isCompleted && (!t.completedAt || t.completedAt >= midnight)
-        ).length;
-        total = active + visibleCompleted;
+        const aged = new Set(group.agedCompletedTaskIds);
+        total = active + group.tasks.filter((t) => t.isCompleted && !aged.has(t.id)).length;
       }
 
       const label = active < total ? `${active}/${total}${group.emoji}` : `${total}${group.emoji}`;

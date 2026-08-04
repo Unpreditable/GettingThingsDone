@@ -46,6 +46,8 @@
   "task": {
     "staleTooltip_comment": "Tooltip on tasks that are past their bucket's scheduled date window (e.g. a 'This Week' task that was never moved and is now overdue for that window).",
     "staleTooltip": "Past scheduled window",
+    "recurringTooltip_comment": "Tooltip on the badge marking a task that repeats (Tasks plugin recurrence rule).",
+    "recurringTooltip": "Repeats",
     "autoPlacedTooltip_comment": "Tooltip on tasks automatically assigned to a bucket based on their 📅 due date (written by the Tasks plugin). The user can click the task's bucket badge to confirm the placement and lock it in.",
     "autoPlacedTooltip": "Auto-placed from due date — click to confirm placement",
     "subtaskTooltip_comment": "Tooltip on the indentation badge shown on tasks that are nested under a parent task in the source markdown.",

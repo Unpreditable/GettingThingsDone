@@ -14,6 +14,7 @@
   export let tasks: TaskRecord[];
   export let staleTaskIds: string[] = [];
   export let autoPlacedTaskIds: string[] = [];
+  export let agedCompletedTaskIds: string[] = [];
   export let quickMoveTargets: BucketConfig[];
   export let showCompletedUntilMidnight: boolean = true;
   export let allTasksMap: Map<string, TaskRecord> = new Map();
@@ -43,6 +44,7 @@
 
   $: staleSet = new Set(staleTaskIds);
   $: autoPlacedSet = new Set(autoPlacedTaskIds);
+  $: agedSet = new Set(agedCompletedTaskIds);
   $: {
     // When a task is unchecked, remove it from dismissedIds so it reappears
     let changed = false;
@@ -54,16 +56,12 @@
     }
     if (changed) dismissedIds = dismissedIds;
   }
-  $: visibleTasks = (() => {
-    const midnight = new Date();
-    midnight.setHours(0, 0, 0, 0);
-    return tasks.filter((t) => {
-      if (dismissedIds.has(t.id)) return false;
-      if (!t.isCompleted) return true;
-      if (!showCompletedUntilMidnight) return false;
-      return !t.completedAt || t.completedAt >= midnight;
-    });
-  })();
+  $: visibleTasks = tasks.filter((t) => {
+    if (dismissedIds.has(t.id)) return false;
+    if (!t.isCompleted) return true;
+    if (!showCompletedUntilMidnight) return false;
+    return !agedSet.has(t.id);
+  });
   $: activeCount = tasks.filter((t) => !t.isCompleted).length;
   $: totalCount = visibleTasks.length;
 

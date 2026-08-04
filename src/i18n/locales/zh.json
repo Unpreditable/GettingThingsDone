@@ -28,6 +28,7 @@
   },
   "task": {
     "staleTooltip": "已超出计划时间窗口",
+    "recurringTooltip": "重复",
     "autoPlacedTooltip": "根据截止日期自动放置——点击确认放置",
     "subtaskTooltip": "子任务",
     "activeSubtasks_one": "{{count}} 个活跃子任务",

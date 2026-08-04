@@ -185,20 +185,27 @@ export function purgeOrderEntry(
 }
 
 /**
- * When a completed task's completion happened, in epoch ms: the ✅ date if the
- * line carries one, else the timestamp recorded when the index witnessed the
- * transition. null means no evidence at all — the completion happened outside
- * this plugin's sight, and is treated as aged.
+ * Whether this plugin watched the task get completed during the running
+ * session. `completionSeen` is deliberately never written to data.json, so
+ * after a reload this is false for everything and no completed task shows.
+ *
+ * The ✅ date is NOT consulted: it records the day, not the session, so it
+ * cannot tell a completion the user just performed from one they performed
+ * this morning before restarting Obsidian.
  */
-export function completionClock(
-  task: TaskRecord,
+export function wasCompletionWitnessed(
   entry: OrderEntry | undefined,
-  completionSeen: Record<string, number>
-): number | null {
-  if (task.completedAt) return task.completedAt.getTime();
-  if (entry) {
-    const seen = completionSeen[entryId(entry)];
-    if (typeof seen === "number") return seen;
-  }
-  return null;
+  completionSeen: Record<string, number>,
+  midnight: number
+): boolean {
+  if (entry === undefined) return false;
+  const seen = completionSeen[entryId(entry)];
+  // The midnight bound still applies: a session left running overnight should
+  // let yesterday's completions go, not hold them until the app restarts.
+  return typeof seen === "number" && seen >= midnight;
+}
+
+/** A completed recurrence has already been replaced by its next occurrence. */
+export function isRecurring(task: TaskRecord): boolean {
+  return task.rawLine.includes("🔁");
 }
