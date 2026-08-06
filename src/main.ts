@@ -22,6 +22,7 @@ import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/Tas
 import { diffFileTasks, applyTaskDiff, renameFileInState, migrateOrderFormat } from "./core/OrderMigration";
 import type { OrderState } from "./core/OrderMigration";
 import { purgeAgedEntries, reconcileDanglingEntries } from "./core/OrderPurge";
+import { dayKey, msUntilNextMidnight } from "./core/DueStatus";
 import GTDPanel from "./views/GTDPanel.svelte";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
@@ -38,6 +39,9 @@ export default class GtdTasksPlugin extends Plugin {
   private orderStateDirty = false;
   /** False until startup reconciliation has run against a complete vault view. */
   private orderStateReady = false;
+  /** Calendar day the last renderAll() was computed for. */
+  private lastRenderedDay = "";
+  private midnightTimer?: number;
 
   async onload() {
     await this.loadSettings();
@@ -124,6 +128,22 @@ export default class GtdTasksPlugin extends Plugin {
 
       this.updateStatusBar();
     });
+
+    this.armMidnightTimer();
+
+    // Focus is the event that means "the user came back", and it is the only
+    // reliable signal after a system suspend: Chromium measures a setTimeout
+    // delay on a clock that generally does not advance while the machine
+    // sleeps, so a timer armed before the lid closed can fire hours late.
+    // Re-arming from wall-clock time here discards that drift.
+    this.registerDomEvent(window, "focus", () => {
+      this.maybeRolloverDay();
+      this.armMidnightTimer();
+    });
+  }
+
+  onunload() {
+    if (this.midnightTimer !== undefined) window.clearTimeout(this.midnightTimer);
   }
 
   async loadSettings() {
@@ -175,12 +195,29 @@ export default class GtdTasksPlugin extends Plugin {
    * so computing it twice doubled the cost of every vault edit.
    */
   private renderAll(): void {
+    this.lastRenderedDay = dayKey(new Date());
     const bucketGroups = groupTasksIntoBuckets(this.taskIndex.getAllTasks(), this.settings);
     // Every panel gets the update, not a single remembered one. Holding one
     // reference meant any second panel — whether the user opened it or Obsidian
     // restored it — was frozen forever at whatever mountSvelte seeded it with.
     for (const view of this.panelViews()) view.setBucketGroups(bucketGroups);
     this.renderStatusBar(bucketGroups);
+  }
+
+  /** (Re)arms the rollover timer, replacing any previously armed one. */
+  private armMidnightTimer(): void {
+    if (this.midnightTimer !== undefined) window.clearTimeout(this.midnightTimer);
+    this.midnightTimer = window.setTimeout(() => {
+      this.maybeRolloverDay();
+      this.armMidnightTimer();
+    }, msUntilNextMidnight(new Date()));
+  }
+
+  /** Re-renders only when the calendar day actually changed, so the frequent
+   *  focus events cost one string comparison each. */
+  private maybeRolloverDay(): void {
+    if (dayKey(new Date()) === this.lastRenderedDay) return;
+    this.renderAll();
   }
 
   /** Every live panel view belonging to this plugin instance. */

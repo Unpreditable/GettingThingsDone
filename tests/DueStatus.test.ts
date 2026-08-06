@@ -1,4 +1,4 @@
-import { computeDueStatus, diffInDays, matchesRule } from "../src/core/DueStatus";
+import { computeDueStatus, dayKey, diffInDays, matchesRule, msUntilNextMidnight } from "../src/core/DueStatus";
 import { DEFAULT_BUCKETS } from "../src/settings";
 import type { DateRangeRule } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -167,5 +167,37 @@ describe("computeDueStatus", () => {
   it("never flags a completed task", () => {
     expect(status(-10, "today", { isCompleted: true })).toEqual({ kind: "on-track", diffDays: -10 });
     expect(status(0, "this-week", { isCompleted: true })).toEqual({ kind: "on-track", diffDays: 0 });
+  });
+});
+
+describe("dayKey", () => {
+  it("formats the local calendar day", () => {
+    expect(dayKey(new Date(2026, 7, 5, 23, 59))).toBe("2026-08-05");
+  });
+
+  it("zero-pads month and day", () => {
+    expect(dayKey(new Date(2026, 0, 2, 0, 0))).toBe("2026-01-02");
+  });
+
+  it("differs across midnight", () => {
+    expect(dayKey(new Date(2026, 7, 5, 23, 59, 59))).not.toBe(dayKey(new Date(2026, 7, 6, 0, 0, 1)));
+  });
+});
+
+describe("msUntilNextMidnight", () => {
+  it("counts the remainder of the day plus a one-second skew", () => {
+    const now = new Date(2026, 7, 5, 23, 0, 0);
+    expect(msUntilNextMidnight(now)).toBe(60 * 60 * 1000 + 1000);
+  });
+
+  it("lands on the next local midnight even across a DST shift", () => {
+    // Constructed from wall-clock parts, so this holds in any timezone —
+    // including one where Mar 8 2026 is only 23 hours long. Naive
+    // now + 86_400_000 arithmetic fails this in a DST zone.
+    const now = new Date(2026, 2, 8, 0, 0, 30);
+    const landing = new Date(now.getTime() + msUntilNextMidnight(now));
+    expect(landing.getDate()).toBe(9);
+    expect(landing.getHours()).toBe(0);
+    expect(landing.getMinutes()).toBe(0);
   });
 });

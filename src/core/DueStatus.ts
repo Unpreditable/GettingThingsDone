@@ -104,3 +104,20 @@ export function computeDueStatus(
 
   return { kind: "on-track", diffDays };
 }
+
+/** Local calendar day as YYYY-MM-DD — the day a render is valid for. */
+export function dayKey(d: Date): string {
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
+/**
+ * Wall-clock milliseconds until one second past the next local midnight.
+ * Built from date parts rather than by adding 24h so it stays correct across
+ * DST transitions, where a local day can be 23 or 25 hours long.
+ */
+export function msUntilNextMidnight(now: Date): number {
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1, 0);
+  return next.getTime() - now.getTime();
+}
