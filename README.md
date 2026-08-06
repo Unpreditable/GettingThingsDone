@@ -21,7 +21,7 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 - **Tasks plugin integration** — reads 📅 due dates, auto-assigns tasks to the matching bucket, and hands completion toggles to the Tasks plugin when it's installed
 - **Two storage modes** — inline tag (`#gtd/today`) or inline field (`[gtd:: today]`)
 - **Scope filtering** — scan the entire vault, specific folders, or specific files
-- **Stale indicator** (!) on tasks that have passed their scheduled window
+- **Overdue and misfiled flags** (`❢` past due, `⚑` filed later than its date warrants) on task rows
 - **Status bar task count**
 - **Compact view** option
 - **Localized** into 13 languages, matching your Obsidian UI language automatically
@@ -135,9 +135,14 @@ Choose what plays when you check off a task:
 | **All** | Confetti burst + pixel creature |
 | **Off** | No animation |
 
-### Stale indicator
+### Overdue and misfiled flags
 
-When enabled, a `!` badge appears on tasks whose due date has passed the end of their assigned bucket's scheduled window — a reminder to reschedule or complete them.
+When enabled, two badges call out tasks whose due date needs attention:
+
+- **`❢`** (red) — the task's due date has passed.
+- **`⚑`** (amber) — a bucket earlier in your configured bucket list already claims this due date, so the task is filed later than its date warrants (e.g. due today but filed in This Week). Moving a task into a *sooner* bucket than its date warrants is deliberate and is never flagged.
+
+Neither badge appears on completed tasks, or in the To Review bucket.
 
 ### Status bar
 
