@@ -293,9 +293,6 @@ export class GtdSettingsTab extends PluginSettingTab {
   async setControlValue(key: string, value: unknown): Promise<void> {
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     await this.plugin.saveSettings();
-    if (key === "staleIndicatorEnabled") {
-      await this.plugin.refreshIndex();
-    }
   }
 
   getSettingDefinitions(): SettingDefinitionItem[] {
@@ -327,8 +324,8 @@ export class GtdSettingsTab extends PluginSettingTab {
             control: { type: "toggle", key: "completedVisibilityUntilMidnight" },
           },
           {
-            name: t("settings.behaviour.markOverdue.name"),
-            desc: t("settings.behaviour.markOverdue.description"),
+            name: t("settings.behaviour.markDueFlags.name"),
+            desc: t("settings.behaviour.markDueFlags.description"),
             control: { type: "toggle", key: "staleIndicatorEnabled" },
           },
           {
@@ -593,8 +590,8 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName(t("settings.behaviour.markOverdue.name"))
-      .setDesc(t("settings.behaviour.markOverdue.description"))
+      .setName(t("settings.behaviour.markDueFlags.name"))
+      .setDesc(t("settings.behaviour.markDueFlags.description"))
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.staleIndicatorEnabled);
         tog.onChange(async (val) => {

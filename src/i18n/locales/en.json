@@ -44,8 +44,6 @@
     }
   },
   "task": {
-    "staleTooltip_comment": "Tooltip on tasks that are past their bucket's scheduled date window (e.g. a 'This Week' task that was never moved and is now overdue for that window).",
-    "staleTooltip": "Past scheduled window",
     "recurringTooltip_comment": "Tooltip on the badge marking a task that repeats (Tasks plugin recurrence rule).",
     "recurringTooltip": "Repeats",
     "autoPlacedTooltip_comment": "Tooltip on tasks automatically assigned to a bucket based on their 📅 due date (written by the Tasks plugin). The user can click the task's bucket badge to confirm the placement and lock it in.",
@@ -60,7 +58,19 @@
     "moveTo_comment": "Label on quick-move buttons shown on each task row. {{name}} = the destination bucket's display name (e.g. 'Move to Today').",
     "moveTo": "Move to {{name}}",
     "emptyTask_comment": "Fallback text shown in the task row when the task's markdown text is completely blank.",
-    "emptyTask": "(empty task)"
+    "emptyTask": "(empty task)",
+    "due_comment": "Due-date line at the top of a task's hover popover. 'today' replaces the formatted date when the task is due today. 'withDetail' wraps a flagged task's line: main is the due phrase, detail is either the overdue count or the bucket the task belongs in. 'tomorrow' and 'inDays' are used only for tasks that are NOT flagged (on-track, due today or later); inDays is never called with a count below 2. i18next plural forms: _one for exactly 1, _other for all other counts.",
+    "due": {
+      "today": "Due today",
+      "date": "Due {{date}}",
+      "tomorrow": "Due tomorrow",
+      "inDays_one": "Due in {{count}} day",
+      "inDays_other": "Due in {{count}} days",
+      "overdue_one": "{{count}} day overdue",
+      "overdue_other": "{{count}} days overdue",
+      "belongsIn": "belongs in {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel_comment": "Label shown in Obsidian's command palette for the command that opens the GTD sidebar panel.",
@@ -147,17 +157,17 @@
       "noFilesSelected": "No files selected. The plugin won't scan anything for tasks."
     },
     "behaviour": {
-      "heading_comment": "Section heading for the Behaviour group of settings (completed-task visibility, overdue marking, compact view, celebration animations). Shown above the group and used as its search label in Obsidian 1.13.0+.",
+      "heading_comment": "Section heading for the Behaviour group of settings (completed-task visibility, due flags, compact view, celebration animations). Shown above the group and used as its search label in Obsidian 1.13.0+.",
       "heading": "Behaviour",
       "showCompleted": {
         "name": "Show completed tasks until midnight",
         "description_comment": "The 'strikethrough' refers to the visual style of completed tasks in the panel.",
         "description": "Completed tasks remain visible as strikethrough in the panel until midnight, then disappear on next load."
       },
-      "markOverdue": {
-        "name_comment": "The '!' is the literal character displayed as an overdue indicator badge on the task row.",
-        "name": "Mark overdue tasks with !",
-        "description": "Tasks that are past their bucket's scheduled window are marked with an overdue indicator."
+      "markDueFlags": {
+        "name_comment": "The '❢' and '⚑' are the literal characters displayed as indicator badges on the task row. ❢ = the due date has passed. ⚑ = a sooner bucket already claims that due date.",
+        "name": "Flag overdue and misfiled tasks",
+        "description": "❢ marks tasks whose due date has passed. ⚑ marks tasks a sooner bucket already claims — for example, due today but filed in This Week."
       },
       "compactView": {
         "name": "Compact view",

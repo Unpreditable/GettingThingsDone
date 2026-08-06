@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Fuera de la ventana programada",
     "recurringTooltip": "Se repite",
     "autoPlacedTooltip": "Colocado automáticamente por fecha de vencimiento — haz clic para confirmar",
     "subtaskTooltip": "Subtarea",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "{{count}} subtareas activas",
     "dismiss": "Descartar",
     "moveTo": "Mover a {{name}}",
-    "emptyTask": "(tarea vacía)"
+    "emptyTask": "(tarea vacía)",
+    "due": {
+      "today": "Vence hoy",
+      "date": "Vence {{date}}",
+      "tomorrow": "Vence mañana",
+      "inDays_one": "Vence en {{count}} día",
+      "inDays_other": "Vence en {{count}} días",
+      "overdue_one": "{{count}} día de retraso",
+      "overdue_other": "{{count}} días de retraso",
+      "belongsIn": "pertenece a {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Abrir panel"
@@ -95,9 +105,9 @@
         "name": "Mostrar tareas completadas hasta medianoche",
         "description": "Las tareas completadas permanecen visibles con tachado en el panel hasta medianoche, luego desaparecen al siguiente cargado."
       },
-      "markOverdue": {
-        "name": "Marcar tareas vencidas con !",
-        "description": "Las tareas que superaron la ventana programada de su categoría se marcan con un indicador de vencimiento."
+      "markDueFlags": {
+        "name": "Marcar tareas vencidas y mal clasificadas",
+        "description": "❢ marca las tareas cuya fecha de vencimiento ya pasó. ⚑ marca las tareas que reclama una categoría más cercana — por ejemplo, vencen hoy pero están en Esta semana."
       },
       "compactView": {
         "name": "Vista compacta",

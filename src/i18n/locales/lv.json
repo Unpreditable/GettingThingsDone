@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Ārpus plānotā laika loga",
     "recurringTooltip": "Atkārtojas",
     "autoPlacedTooltip": "Automātiski izvietots pēc izpildes datuma — noklikšķiniet, lai apstiprinātu",
     "subtaskTooltip": "Apakšuzdevums",
@@ -36,7 +35,20 @@
     "activeSubtasks_other": "{{count}} aktīvi apakšuzdevumi",
     "dismiss": "Paslēpt",
     "moveTo": "Pārvietot uz {{name}}",
-    "emptyTask": "(tukšs uzdevums)"
+    "emptyTask": "(tukšs uzdevums)",
+    "due": {
+      "today": "Termiņš šodien",
+      "date": "Termiņš {{date}}",
+      "tomorrow": "Termiņš rīt",
+      "inDays_zero": "Termiņš pēc {{count}} dienām",
+      "inDays_one": "Termiņš pēc {{count}} dienas",
+      "inDays_other": "Termiņš pēc {{count}} dienām",
+      "overdue_zero": "nokavēts par {{count}} dienām",
+      "overdue_one": "nokavēts par {{count}} dienu",
+      "overdue_other": "nokavēts par {{count}} dienām",
+      "belongsIn": "vieta ir {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Atvērt paneli"
@@ -97,9 +109,9 @@
         "name": "Rādīt paveiktos uzdevumus līdz pusnaktij",
         "description": "Paveiktie uzdevumi paliek redzami paneļa ar pārsvītrojumu līdz pusnaktij, pēc tam pazūd nākamajā ielādē."
       },
-      "markOverdue": {
-        "name": "Atzīmēt kavētos uzdevumus ar !",
-        "description": "Uzdevumi, kas pārsnieguši savas kategorijas plānoto laika logu, tiek atzīmēti ar kavēšanās indikatoru."
+      "markDueFlags": {
+        "name": "Atzīmēt nokavētos un nepareizi sakārtotos uzdevumus",
+        "description": "❢ atzīmē uzdevumus, kuriem termiņš ir pagājis. ⚑ atzīmē uzdevumus, kas pieder agrākai grupai — piemēram, termiņš ir šodien, bet uzdevums ir grupā Šonedēļ."
       },
       "compactView": {
         "name": "Kompakts skats",

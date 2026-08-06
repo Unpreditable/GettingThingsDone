@@ -6,6 +6,7 @@
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { TO_REVIEW_ID } from "../core/BucketManager";
+  import type { DueStatus } from "../core/DueStatus";
   import { isInsertionAllowed } from "../core/DragConstraints";
   import type { BucketTree } from "../core/DragConstraints";
   import { isDragging } from "./dragState";
@@ -14,7 +15,8 @@
   export let name: string;
   export let emoji: string = "";
   export let tasks: TaskRecord[];
-  export let staleTaskIds: string[] = [];
+  export let dueStatuses: Record<string, DueStatus> = {};
+  export let showDueFlags: boolean = true;
   export let autoPlacedTaskIds: string[] = [];
   export let agedCompletedTaskIds: string[] = [];
   export let quickMoveTargets: BucketConfig[];
@@ -44,7 +46,6 @@
   let taskListEl: HTMLElement;
   let sortable: Sortable;
 
-  $: staleSet = new Set(staleTaskIds);
   $: autoPlacedSet = new Set(autoPlacedTaskIds);
   $: agedSet = new Set(agedCompletedTaskIds);
   $: {
@@ -341,7 +342,8 @@
         <TaskItem
           {task}
           {quickMoveTargets}
-          isStale={staleSet.has(task.id)}
+          dueStatus={dueStatuses[task.id] ?? null}
+          {showDueFlags}
           isAutoPlaced={!task.isCompleted && autoPlacedSet.has(task.id)}
           showCompleted={task.isCompleted}
           {allTasksMap}

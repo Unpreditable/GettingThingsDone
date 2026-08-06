@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "예약된 기간이 지났습니다",
     "recurringTooltip": "반복",
     "autoPlacedTooltip": "마감일에서 자동 배치됨 — 클릭하여 배치 확인",
     "subtaskTooltip": "하위 작업",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "활성 하위 작업 {{count}}개",
     "dismiss": "숨기기",
     "moveTo": "{{name}}(으)로 이동",
-    "emptyTask": "(빈 작업)"
+    "emptyTask": "(빈 작업)",
+    "due": {
+      "today": "오늘 마감",
+      "date": "{{date}} 마감",
+      "tomorrow": "내일 마감",
+      "inDays_one": "{{count}}일 후 마감",
+      "inDays_other": "{{count}}일 후 마감",
+      "overdue_one": "{{count}}일 지남",
+      "overdue_other": "{{count}}일 지남",
+      "belongsIn": "{{bucket}}에 있어야 함",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "패널 열기"
@@ -95,9 +105,9 @@
         "name": "자정까지 완료된 작업 표시",
         "description": "완료된 작업은 자정까지 패널에 취소선으로 표시되며, 다음 로드 시 사라집니다."
       },
-      "markOverdue": {
-        "name": "기한 초과 작업에 ! 표시",
-        "description": "카테고리의 예약 기간이 지난 작업에 기한 초과 표시가 나타납니다."
+      "markDueFlags": {
+        "name": "기한 초과 및 잘못 분류된 작업 표시",
+        "description": "❢ 는 마감일이 지난 작업을 표시합니다. ⚑ 는 더 가까운 버킷에 속하는 작업을 표시합니다 — 예: 오늘 마감인데 '이번 주'에 있는 경우."
       },
       "compactView": {
         "name": "컴팩트 보기",

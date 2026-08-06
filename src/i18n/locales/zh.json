@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "已超出计划时间窗口",
     "recurringTooltip": "重复",
     "autoPlacedTooltip": "根据截止日期自动放置——点击确认放置",
     "subtaskTooltip": "子任务",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "{{count}} 个活跃子任务",
     "dismiss": "隐藏",
     "moveTo": "移动到 {{name}}",
-    "emptyTask": "（空任务）"
+    "emptyTask": "（空任务）",
+    "due": {
+      "today": "今天到期",
+      "date": "{{date}} 到期",
+      "tomorrow": "明天到期",
+      "inDays_one": "{{count}} 天后到期",
+      "inDays_other": "{{count}} 天后到期",
+      "overdue_one": "已逾期 {{count}} 天",
+      "overdue_other": "已逾期 {{count}} 天",
+      "belongsIn": "应放入 {{bucket}}",
+      "withDetail": "{{main}}（{{detail}}）"
+    }
   },
   "commands": {
     "openPanel": "打开面板"
@@ -95,9 +105,9 @@
         "name": "在午夜前显示已完成任务",
         "description": "已完成的任务将以删除线形式在面板中显示至午夜，之后在下次加载时消失。"
       },
-      "markOverdue": {
-        "name": "用 ! 标记逾期任务",
-        "description": "超过分类计划时间窗口的任务将标记逾期指示符。"
+      "markDueFlags": {
+        "name": "标记逾期和归类错误的任务",
+        "description": "❢ 标记已过期的任务。⚑ 标记应归入更近分组的任务——例如今天到期却放在「本周」。"
       },
       "compactView": {
         "name": "紧凑视图",

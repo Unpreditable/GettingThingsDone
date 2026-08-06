@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "",
     "recurringTooltip": "Repeats",
     "autoPlacedTooltip": "",
     "subtaskTooltip": "",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "",
     "dismiss": "",
     "moveTo": "",
-    "emptyTask": ""
+    "emptyTask": "",
+    "due": {
+      "today": "",
+      "date": "",
+      "tomorrow": "",
+      "inDays_one": "",
+      "inDays_other": "",
+      "overdue_one": "",
+      "overdue_other": "",
+      "belongsIn": "",
+      "withDetail": ""
+    }
   },
   "commands": {
     "openPanel": ""
@@ -93,7 +103,7 @@
         "name": "",
         "description": ""
       },
-      "markOverdue": {
+      "markDueFlags": {
         "name": "",
         "description": ""
       },

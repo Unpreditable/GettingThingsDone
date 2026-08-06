@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Hors de la fenêtre planifiée",
     "recurringTooltip": "Se répète",
     "autoPlacedTooltip": "Placé automatiquement selon la date d'échéance — cliquez pour confirmer",
     "subtaskTooltip": "Sous-tâche",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "{{count}} sous-tâches actives",
     "dismiss": "Ignorer",
     "moveTo": "Déplacer vers {{name}}",
-    "emptyTask": "(tâche vide)"
+    "emptyTask": "(tâche vide)",
+    "due": {
+      "today": "Échéance aujourd'hui",
+      "date": "Échéance {{date}}",
+      "tomorrow": "Échéance demain",
+      "inDays_one": "Échéance dans {{count}} jour",
+      "inDays_other": "Échéance dans {{count}} jours",
+      "overdue_one": "{{count}} jour de retard",
+      "overdue_other": "{{count}} jours de retard",
+      "belongsIn": "à classer dans {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Ouvrir le panneau"
@@ -95,9 +105,9 @@
         "name": "Afficher les tâches terminées jusqu'à minuit",
         "description": "Les tâches terminées restent visibles en barré dans le panneau jusqu'à minuit, puis disparaissent au prochain chargement."
       },
-      "markOverdue": {
-        "name": "Marquer les tâches en retard avec !",
-        "description": "Les tâches qui ont dépassé la fenêtre planifiée de leur catégorie sont marquées d'un indicateur de retard."
+      "markDueFlags": {
+        "name": "Signaler les tâches en retard et mal classées",
+        "description": "❢ signale les tâches dont l'échéance est passée. ⚑ signale les tâches qu'une catégorie plus proche revendique déjà — par exemple, dues aujourd'hui mais classées dans Cette semaine."
       },
       "compactView": {
         "name": "Vue compacte",

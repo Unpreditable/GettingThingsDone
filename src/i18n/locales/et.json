@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Väljaspool planeeritud ajavahemikku",
     "recurringTooltip": "Kordub",
     "autoPlacedTooltip": "Paigutatud automaatselt tähtaja järgi — kinnita klõpsates",
     "subtaskTooltip": "Alamülesanne",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "{{count}} aktiivset alamülesannet",
     "dismiss": "Peida",
     "moveTo": "Teisalda: {{name}}",
-    "emptyTask": "(tühi ülesanne)"
+    "emptyTask": "(tühi ülesanne)",
+    "due": {
+      "today": "Tähtaeg täna",
+      "date": "Tähtaeg {{date}}",
+      "tomorrow": "Tähtaeg homme",
+      "inDays_one": "Tähtaeg {{count}} päeva pärast",
+      "inDays_other": "Tähtaeg {{count}} päeva pärast",
+      "overdue_one": "{{count}} päev üle tähtaja",
+      "overdue_other": "{{count}} päeva üle tähtaja",
+      "belongsIn": "kuulub kategooriasse {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Ava paneel"
@@ -95,9 +105,9 @@
         "name": "Näita lõpetatud ülesandeid kuni südaööni",
         "description": "Lõpetatud ülesanded jäävad paneelile läbikriipsutuna nähtavaks kuni südaööni, seejärel kaovad järgmisel laadimisel."
       },
-      "markOverdue": {
-        "name": "Märgi hilinenud ülesanded !-ga",
-        "description": "Ülesanded, mis on kategooria planeeritud ajavahemikust väljas, märgitakse hilinemise indikaatoriga."
+      "markDueFlags": {
+        "name": "Märgi tähtaja ületanud ja valesti paigutatud ülesanded",
+        "description": "❢ märgib ülesanded, mille tähtaeg on möödas. ⚑ märgib ülesanded, mis kuuluvad varasemasse kategooriasse — näiteks tähtaeg on täna, aga ülesanne on kategoorias See nädal."
       },
       "compactView": {
         "name": "Kompaktne vaade",

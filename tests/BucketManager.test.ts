@@ -61,12 +61,12 @@ describe("groupTasksIntoBuckets", () => {
     expect(todayGroup.tasks).toHaveLength(1);
   });
 
-  it("puts task due yesterday into Today bucket (stale)", () => {
+  it("puts task due yesterday into Today bucket and marks it overdue", () => {
     const task = makeTask({ dueDate: daysFromMonday(-1) }); // Feb 22 = diffDays -1
     const groups = groupTasksIntoBuckets([task], settings);
     const todayGroup = groups.find((g) => g.bucketId === "today")!;
     expect(todayGroup.tasks).toHaveLength(1);
-    expect(todayGroup.staleTaskIds).toContain(task.id);
+    expect(todayGroup.dueStatuses[task.id]).toEqual({ kind: "overdue", diffDays: -1 });
   });
 
   it("puts task due Tuesday (Feb 24, diffDays=1) into This Week bucket", () => {
@@ -114,9 +114,7 @@ describe("groupTasksIntoBuckets", () => {
     expect(someday.tasks).toHaveLength(1);
   });
 
-  it("marks stale This Week task when date is today or past", () => {
-    // This Week requires diffDays >= 1; diffDays 0 = stale when explicitly in this-week
-    // Simulate explicit assignment to this-week with today's date (stale)
+  it("marks a This Week task due today as misfiled, not overdue", () => {
     const taskSettingsWithTag = {
       ...settings,
       storageMode: "inline-tag" as const,
@@ -130,7 +128,21 @@ describe("groupTasksIntoBuckets", () => {
     const groups = groupTasksIntoBuckets([task], taskSettingsWithTag);
     const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
     expect(thisWeek.tasks).toHaveLength(1);
-    expect(thisWeek.staleTaskIds).toContain(task.id);
+    expect(thisWeek.dueStatuses[task.id]).toMatchObject({ kind: "misfiled", diffDays: 0 });
+  });
+
+  it("records an on-track status for a dated task so the popover can show its date", () => {
+    const task = makeTask({ dueDate: daysFromMonday(1) }); // tomorrow = this-week
+    const groups = groupTasksIntoBuckets([task], settings);
+    const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
+    expect(thisWeek.dueStatuses[task.id]).toEqual({ kind: "on-track", diffDays: 1 });
+  });
+
+  it("records no status for a task with no due date", () => {
+    const task = makeTask({});
+    const groups = groupTasksIntoBuckets([task], settings);
+    const review = groups.find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.dueStatuses[task.id]).toBeUndefined();
   });
 
   it("tracks auto-placed tasks in autoPlacedTaskIds", () => {

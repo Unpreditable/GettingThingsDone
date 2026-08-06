@@ -4,13 +4,21 @@
   import { stripWikilinks, parseWikilinks } from "../core/TaskParser";
   import type { BucketConfig } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
+  import type { DueStatus } from "../core/DueStatus";
   import { t } from "../i18n/i18n";
   import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
+  import { formatDueLine } from "../core/DueStatusText";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
-  export let isStale: boolean = false;
+  export let dueStatus: DueStatus | null = null;
+  export let showDueFlags: boolean = true;
+
+  // The row glyphs obey the setting; the popover always tells the truth.
+  $: showOverdueBadge = showDueFlags && dueStatus?.kind === "overdue";
+  $: showMisfiledBadge = showDueFlags && dueStatus?.kind === "misfiled";
+  $: dueLine = dueStatus && task.dueDate ? formatDueLine(task.dueDate, dueStatus) : null;
   $: isRecurringTask = isRecurring(task);
   export let isAutoPlaced: boolean = false;
   /** True when the task is completed and visible until midnight. */
@@ -150,7 +158,6 @@
 <div
   class="gtd-task"
   class:is-completed={task.isCompleted && showCompleted}
-  class:is-stale={isStale}
   style="padding-left: {12 + visualIndentLevel * 16}px"
   on:mouseenter={onMouseEnter}
   on:mouseleave={onMouseLeave}
@@ -171,8 +178,12 @@
     <span class="gtd-recurring-badge" title={t("task.recurringTooltip")}>🔁</span>
   {/if}
 
-  {#if isStale}
-    <span class="gtd-stale-badge" title={t("task.staleTooltip")}>!</span>
+  {#if showOverdueBadge}
+    <span class="gtd-overdue-badge">❢</span>
+  {/if}
+
+  {#if showMisfiledBadge}
+    <span class="gtd-misfiled-badge">⚑</span>
   {/if}
 
   {#if isAutoPlaced}
@@ -212,6 +223,14 @@
 
   {#if showPopover}
     <div class="gtd-tooltip">
+      {#if dueLine}
+        <div class="gtd-tooltip-due">
+          {#if dueStatus?.kind === "overdue"}<span class="gtd-overdue-badge">❢</span>{/if}
+          {#if dueStatus?.kind === "misfiled"}<span class="gtd-misfiled-badge">⚑</span>{/if}
+          {dueLine}
+        </div>
+        <hr class="gtd-tooltip-divider" />
+      {/if}
       {#if task.text.length > 40}
         <div class="gtd-tooltip-text">{stripWikilinks(task.text)}</div>
       {/if}
@@ -250,9 +269,18 @@
 </div>
 
 <style>
-  .gtd-stale-badge {
+  .gtd-overdue-badge {
     flex-shrink: 0;
     color: var(--text-error);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1;
+    padding-right: 2px;
+  }
+
+  .gtd-misfiled-badge {
+    flex-shrink: 0;
+    color: var(--text-warning);
     font-weight: 700;
     font-size: 13px;
     line-height: 1;
@@ -317,6 +345,10 @@
   }
 
   .gtd-tooltip-text {
+    color: var(--text-normal);
+  }
+
+  .gtd-tooltip-due {
     color: var(--text-normal);
   }
 

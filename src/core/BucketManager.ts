@@ -10,6 +10,8 @@ import { BucketConfig, PluginSettings } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
 import { t } from "../i18n/i18n";
 import { computeOrderKeys, applyManualOrder, wasCompletionWitnessed, isRecurring } from "./TaskOrder";
+import { computeDueStatus, matchesRule } from "./DueStatus";
+import type { DueStatus } from "./DueStatus";
 
 export const TO_REVIEW_ID = "to-review";
 
@@ -18,7 +20,10 @@ export interface BucketGroup {
   name: string;
   emoji: string;
   tasks: TaskRecord[];
-  staleTaskIds: string[];
+  /** Due-date status for every DATED task in this group, keyed by task id.
+   *  On-track entries are included: the popover shows a due line for any
+   *  dated task, not only flagged ones. */
+  dueStatuses: Record<string, DueStatus>;
   autoPlacedTaskIds: string[];
   /** Completed tasks the panel hides: anything whose completion this session
    *  didn't witness, plus every completed recurrence (already replaced). */
@@ -39,7 +44,7 @@ export function groupTasksIntoBuckets(
     name: t("buckets.toReview"),
     emoji: settings.toReviewEmoji,
     tasks: [],
-    staleTaskIds: [],
+    dueStatuses: {},
     autoPlacedTaskIds: [],
     agedCompletedTaskIds: [],
     isSystem: true,
@@ -51,7 +56,7 @@ export function groupTasksIntoBuckets(
       name: b.name,
       emoji: b.emoji,
       tasks: [],
-      staleTaskIds: [],
+      dueStatuses: {},
       autoPlacedTaskIds: [],
       agedCompletedTaskIds: [],
       isSystem: false,
@@ -93,27 +98,18 @@ export function groupTasksIntoBuckets(
 
   for (const task of tasks) {
     const bucketId = effectiveBucket.get(task.id) ?? null;
+    const group =
+      (bucketId !== null ? bucketMap.get(bucketId) : undefined) ??
+      bucketMap.get(TO_REVIEW_ID)!;
 
-    if (bucketId !== null) {
-      const group = bucketMap.get(bucketId);
-      if (group) {
-        group.tasks.push(task);
+    group.tasks.push(task);
 
-        if (autoPlacedIds.has(task.id)) {
-          group.autoPlacedTaskIds.push(task.id);
-        }
-
-        if (settings.staleIndicatorEnabled && task.dueDate) {
-          const bucket = settings.buckets.find((b) => b.id === bucketId);
-          if (bucket && isStale(task.dueDate, bucket, now)) {
-            group.staleTaskIds.push(task.id);
-          }
-        }
-        continue;
-      }
+    if (autoPlacedIds.has(task.id)) {
+      group.autoPlacedTaskIds.push(task.id);
     }
 
-    bucketMap.get(TO_REVIEW_ID)!.tasks.push(task);
+    const status = computeDueStatus(task, group.bucketId, settings.buckets, now);
+    if (status) group.dueStatuses[task.id] = status;
   }
 
   const orderKeys = computeOrderKeys(tasks);
@@ -205,106 +201,9 @@ function autoAssign(
   buckets: BucketConfig[],
   now: Date
 ): string | null {
-  const diffDays = diffInDays(dueDate, now);
-  const day = now.getDay();
-
-  for (const b of buckets) {
-    if (!b.dateRangeRule) continue;
-
-    switch (b.dateRangeRule.type) {
-      case "today":
-        if (diffDays <= 0) return b.id;
-        break;
-
-      case "this-week": {
-        const daysToSunday = day === 0 ? 0 : 7 - day;
-        if (diffDays >= 1 && diffDays <= daysToSunday) return b.id;
-        break;
-      }
-
-      case "next-week": {
-        const daysToNextMonday = day === 0 ? 1 : 8 - day;
-        if (diffDays >= daysToNextMonday && diffDays <= daysToNextMonday + 6) return b.id;
-        break;
-      }
-
-      case "this-month": {
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const daysToEndOfMonth = diffInDays(endOfMonth, now);
-        if (diffDays >= 1 && diffDays <= daysToEndOfMonth) return b.id;
-        break;
-      }
-
-      case "next-month": {
-        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-        const daysToStart = diffInDays(startOfNextMonth, now);
-        const daysToEnd = diffInDays(endOfNextMonth, now);
-        if (diffDays >= daysToStart && diffDays <= daysToEnd) return b.id;
-        break;
-      }
-
-      case "within-days":
-        if (diffDays >= 1 && diffDays <= b.dateRangeRule.days) return b.id;
-        break;
-
-      case "within-days-range":
-        if (diffDays >= b.dateRangeRule.from && diffDays <= b.dateRangeRule.to)
-          return b.id;
-        break;
-
-      case "beyond-days":
-        if (diffDays > b.dateRangeRule.days) return b.id;
-        break;
-    }
-  }
-
-  return null;
+  const match = buckets.find(
+    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, dueDate, now)
+  );
+  return match ? match.id : null;
 }
 
-function diffInDays(date: Date, now: Date): number {
-  const d = new Date(date);
-  const n = new Date(now);
-  d.setHours(0, 0, 0, 0);
-  n.setHours(0, 0, 0, 0);
-  return Math.round((d.getTime() - n.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function isStale(dueDate: Date, bucket: BucketConfig, now: Date): boolean {
-  if (!bucket.dateRangeRule) return false;
-  const diff = diffInDays(dueDate, now);
-  const day = now.getDay();
-
-  switch (bucket.dateRangeRule.type) {
-    case "today":
-      return diff < 0;
-
-    case "this-week":
-      return diff < 1;
-
-    case "next-week": {
-      const daysToNextMonday = day === 0 ? 1 : 8 - day;
-      return diff < daysToNextMonday;
-    }
-
-    case "this-month":
-      return diff < 1;
-
-    case "next-month": {
-      const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-      return diff < diffInDays(startOfNextMonth, now);
-    }
-
-    case "within-days":
-      return diff < 1;
-
-    case "within-days-range":
-      return diff < bucket.dateRangeRule.from - 1;
-
-    case "beyond-days":
-      return diff <= bucket.dateRangeRule.days;
-
-    default:
-      return false;
-  }
-}

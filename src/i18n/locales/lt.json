@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Už planuoto laiko lango ribų",
     "recurringTooltip": "Kartojasi",
     "autoPlacedTooltip": "Automatiškai patalpinta pagal terminą — spustelėkite patvirtinti",
     "subtaskTooltip": "Použduotis",
@@ -37,7 +36,22 @@
     "activeSubtasks_other": "{{count}} aktyvių použduočių",
     "dismiss": "Slėpti",
     "moveTo": "Perkelti į {{name}}",
-    "emptyTask": "(tuščia užduotis)"
+    "emptyTask": "(tuščia užduotis)",
+    "due": {
+      "today": "Terminas šiandien",
+      "date": "Terminas {{date}}",
+      "tomorrow": "Terminas rytoj",
+      "inDays_one": "Terminas po {{count}} dienos",
+      "inDays_few": "Terminas po {{count}} dienų",
+      "inDays_many": "Terminas po {{count}} dienos",
+      "inDays_other": "Terminas po {{count}} dienų",
+      "overdue_one": "vėluoja {{count}} dieną",
+      "overdue_few": "vėluoja {{count}} dienas",
+      "overdue_many": "vėluoja {{count}} dienos",
+      "overdue_other": "vėluoja {{count}} dienų",
+      "belongsIn": "vieta yra {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Atidaryti skydelį"
@@ -99,9 +113,9 @@
         "name": "Rodyti atliktas užduotis iki vidurnakčio",
         "description": "Atliktos užduotys lieka matomos skydelyje su perbraukimu iki vidurnakčio, tada dingsta kitą kartą įkėlus."
       },
-      "markOverdue": {
-        "name": "Žymėti vėluojančias užduotis !",
-        "description": "Užduotys, viršijusios kategorijos planuotą laiko langą, žymimos vėlavimo indikatoriumi."
+      "markDueFlags": {
+        "name": "Žymėti vėluojančias ir netinkamai priskirtas užduotis",
+        "description": "❢ žymi užduotis, kurių terminas praėjo. ⚑ žymi užduotis, priklausančias ankstesnei grupei — pavyzdžiui, terminas šiandien, bet užduotis yra „Šią savaitę“."
       },
       "compactView": {
         "name": "Kompaktiškas rodinys",

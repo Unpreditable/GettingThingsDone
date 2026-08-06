@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Außerhalb des geplanten Zeitfensters",
     "recurringTooltip": "Wiederholt sich",
     "autoPlacedTooltip": "Automatisch anhand des Fälligkeitsdatums zugewiesen — klicken zum Bestätigen",
     "subtaskTooltip": "Unteraufgabe",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "{{count}} aktive Unteraufgaben",
     "dismiss": "Ausblenden",
     "moveTo": "Verschieben nach {{name}}",
-    "emptyTask": "(leere Aufgabe)"
+    "emptyTask": "(leere Aufgabe)",
+    "due": {
+      "today": "Fällig heute",
+      "date": "Fällig {{date}}",
+      "tomorrow": "Fällig morgen",
+      "inDays_one": "Fällig in {{count}} Tag",
+      "inDays_other": "Fällig in {{count}} Tagen",
+      "overdue_one": "{{count}} Tag überfällig",
+      "overdue_other": "{{count}} Tage überfällig",
+      "belongsIn": "gehört in {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Panel öffnen"
@@ -95,9 +105,9 @@
         "name": "Erledigte Aufgaben bis Mitternacht anzeigen",
         "description": "Erledigte Aufgaben bleiben bis Mitternacht durchgestrichen im Panel sichtbar und verschwinden beim nächsten Laden."
       },
-      "markOverdue": {
-        "name": "Überfällige Aufgaben mit ! markieren",
-        "description": "Aufgaben, die ihr geplantes Zeitfenster überschritten haben, werden mit einem Überfälligkeitsindikator markiert."
+      "markDueFlags": {
+        "name": "Überfällige und falsch einsortierte Aufgaben markieren",
+        "description": "❢ markiert Aufgaben, deren Fälligkeitsdatum verstrichen ist. ⚑ markiert Aufgaben, die in einen früheren Bereich gehören — zum Beispiel heute fällig, aber unter Diese Woche einsortiert."
       },
       "compactView": {
         "name": "Kompakte Ansicht",

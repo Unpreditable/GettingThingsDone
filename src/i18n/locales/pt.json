@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "Fora da janela programada",
     "recurringTooltip": "Repete-se",
     "autoPlacedTooltip": "Colocado automaticamente pela data de entrega — clique para confirmar",
     "subtaskTooltip": "Subtarefa",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "{{count}} subtarefas ativas",
     "dismiss": "Dispensar",
     "moveTo": "Mover para {{name}}",
-    "emptyTask": "(tarefa vazia)"
+    "emptyTask": "(tarefa vazia)",
+    "due": {
+      "today": "Vence hoje",
+      "date": "Vence {{date}}",
+      "tomorrow": "Vence amanhã",
+      "inDays_one": "Vence em {{count}} dia",
+      "inDays_other": "Vence em {{count}} dias",
+      "overdue_one": "{{count}} dia de atraso",
+      "overdue_other": "{{count}} dias de atraso",
+      "belongsIn": "pertence a {{bucket}}",
+      "withDetail": "{{main}} ({{detail}})"
+    }
   },
   "commands": {
     "openPanel": "Abrir painel"
@@ -95,9 +105,9 @@
         "name": "Mostrar tarefas concluídas até à meia-noite",
         "description": "As tarefas concluídas permanecem visíveis com riscado no painel até à meia-noite, desaparecendo no próximo carregamento."
       },
-      "markOverdue": {
-        "name": "Marcar tarefas em atraso com !",
-        "description": "As tarefas que ultrapassaram a janela programada da sua categoria são marcadas com um indicador de atraso."
+      "markDueFlags": {
+        "name": "Sinalizar tarefas atrasadas e mal classificadas",
+        "description": "❢ marca tarefas cuja data de vencimento já passou. ⚑ marca tarefas que uma categoria mais próxima já reivindica — por exemplo, vencem hoje mas estão em Esta semana."
       },
       "compactView": {
         "name": "Vista compacta",

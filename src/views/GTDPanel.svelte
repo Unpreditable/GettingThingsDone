@@ -340,7 +340,8 @@
         name={group.name}
         emoji={group.emoji}
         tasks={group.tasks}
-        staleTaskIds={group.staleTaskIds}
+        dueStatuses={group.dueStatuses}
+        showDueFlags={settings.staleIndicatorEnabled}
         autoPlacedTaskIds={group.autoPlacedTaskIds}
         agedCompletedTaskIds={group.agedCompletedTaskIds}
         quickMoveTargets={getQuickMoveTargets(group.bucketId)}

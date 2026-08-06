@@ -60,7 +60,9 @@ export interface PluginSettings {
   tagPrefix: string;
   /** Completed tasks remain visible (as strikethrough) until midnight. */
   completedVisibilityUntilMidnight: boolean;
-  /** Show a ! indicator on tasks that are past their bucket's scheduled window. */
+  /** Show the ! (overdue) and ⚑ (misfiled) badges on task rows. The field name
+   *  predates the two-state split; it stays because it is persisted in
+   *  data.json and renaming it would need a migration for no visible gain. */
   staleIndicatorEnabled: boolean;
   /** Emoji for the To Review system bucket. */
   toReviewEmoji: string;

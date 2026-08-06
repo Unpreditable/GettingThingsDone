@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "staleTooltip": "スケジュールの期間を過ぎています",
     "recurringTooltip": "繰り返し",
     "autoPlacedTooltip": "期日から自動配置 — クリックして配置を確認",
     "subtaskTooltip": "サブタスク",
@@ -35,7 +34,18 @@
     "activeSubtasks_other": "アクティブなサブタスク {{count}} 件",
     "dismiss": "非表示",
     "moveTo": "{{name}}に移動",
-    "emptyTask": "(空のタスク)"
+    "emptyTask": "(空のタスク)",
+    "due": {
+      "today": "期限は今日",
+      "date": "期限 {{date}}",
+      "tomorrow": "期限は明日",
+      "inDays_one": "期限まで {{count}} 日",
+      "inDays_other": "期限まで {{count}} 日",
+      "overdue_one": "{{count}} 日超過",
+      "overdue_other": "{{count}} 日超過",
+      "belongsIn": "{{bucket}} に入れるべき",
+      "withDetail": "{{main}}（{{detail}}）"
+    }
   },
   "commands": {
     "openPanel": "パネルを開く"
@@ -95,9 +105,9 @@
         "name": "完了タスクを深夜まで表示",
         "description": "完了したタスクは深夜まで取り消し線付きでパネルに表示され、次回読み込み時に消えます。"
       },
-      "markOverdue": {
-        "name": "期限切れタスクに ! を付ける",
-        "description": "カテゴリのスケジュール期間を過ぎたタスクに期限切れインジケーターが表示されます。"
+      "markDueFlags": {
+        "name": "期限切れ・分類ミスのタスクに印を付ける",
+        "description": "❢ は期限を過ぎたタスクに付きます。⚑ はより近いバケットに属するタスクに付きます（例：期限は今日なのに「今週」に入っている）。"
       },
       "compactView": {
         "name": "コンパクト表示",
