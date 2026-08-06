@@ -79,11 +79,11 @@ so placement and flagging can never disagree again.
 computeDueStatus:
   no due date                         → null   (no glyph, no popover due line)
   task.isCompleted                    → on-track
+  curIdx = index of currentBucketId in buckets
+  curIdx not found (To Review)        → on-track   ← the inbox never flags
   diffDays < 0                        → overdue
   autoIdx = index of first bucket whose rule matches the due date
   autoIdx not found                   → on-track
-  curIdx  = index of currentBucketId in buckets
-  curIdx not found (To Review)        → on-track
   autoIdx < curIdx                    → misfiled (belongsIn = buckets[autoIdx])
   otherwise                           → on-track
 ```
@@ -120,15 +120,22 @@ which bucket is tightest.
 ### Buckets with no date rule
 
 **Someday** and **To Review** have no `dateRangeRule`, so today's `isStale` returns
-`false` immediately and they never flag anything. Under the new model they flag `overdue`
-normally — a due date you set and blew past is worth knowing about wherever the task sits.
+`false` immediately and they never flag anything. They diverge under the new model.
 
-They can still be `misfiled`: Someday is last in the list, so a task there due in 2 weeks
-is claimed by This Month and gets `⚑`. A task in Someday due in 6 months is claimed by
-nobody and stays silent — which is exactly what Someday is for.
+**Someday flags both.** A due date you set and blew past is worth knowing about even in
+the parking lot, so `overdue` fires there. So does `misfiled`: Someday is last in the
+list, so a task there due in 2 weeks is claimed by This Month and gets `⚑`. A task in
+Someday due in 6 months is claimed by nobody and stays silent — which is exactly what
+Someday is for.
 
-To Review holds only dateless or unclaimed tasks by construction (a dated task matching
-any rule is auto-placed), so its `curIdx not found → on-track` branch is defensive.
+**To Review flags nothing.** The bucket's entire meaning is "needs attention"; a badge
+saying so inside it is redundant. This is a deliberate early-out rather than a
+consequence of the ordering rule, because `overdue` would otherwise fire there.
+
+The case is nearly unreachable in any event: a dated task reaches To Review only when no
+bucket's rule claims its date, and a `today`-rule bucket claims everything with
+`diffDays <= 0`. It takes a bucket list with no `today` rule at all to put an overdue task
+in To Review.
 
 ## Data flow
 
@@ -199,21 +206,25 @@ this feature.
 
 Two event-driven triggers, no polling:
 
-- **`setTimeout` to the next local midnight**, re-armed on each fire, cleared in
-  `onunload`. Computed as `new Date(y, m, d + 1, 0, 0, 1)` so it is DST-safe (wall-clock
-  arithmetic, plus a one-second skew).
-- **`registerDomEvent(window, "focus", …)`**, which fires exactly when the user returns
-  to the machine.
+- **`setTimeout` to the next local midnight** — the primary mechanism, and the only one
+  that matters during a long uninterrupted session. Its id is stored so it can be
+  cancelled; it is re-armed on each fire and cleared in `onunload`. The delay is computed
+  as `new Date(y, m, d + 1, 0, 0, 1) - now`, which is DST-safe (wall-clock arithmetic,
+  plus a one-second skew).
+- **`registerDomEvent(window, "focus", …)`** — fires whenever the Obsidian window gains
+  focus, which for most users is often. It does two cheap things: the day check, and
+  `clearTimeout` + re-arm of the midnight timer with a freshly computed delay.
 
-Both call the same cheap `maybeRolloverDay()`: compare `dayKey(today())` to the day
-`renderAll()` last ran on, and re-render only if it differs. `renderAll()` records the day
-each time it runs.
+Both call `maybeRolloverDay()`: compare `dayKey(today())` to the day `renderAll()` last
+ran on, and re-render only if it differs. `renderAll()` records the day each time it runs.
+Nothing re-renders on a focus that didn't cross midnight.
 
-The focus listener exists because a `setTimeout` alone is unreliable across system
-suspend: Chromium measures the delay on a clock that generally does not advance while the
-machine sleeps, so a timer armed at 4pm for midnight, with the lid closed 6pm–8am, may not
-fire until mid-afternoon. Background-window throttling (timers coalesced to roughly once a
-minute) is real but harmless for a midnight rollover.
+The re-arm on focus is what makes the timer trustworthy across system suspend. Chromium
+measures a `setTimeout` delay on a clock that generally does not advance while the machine
+sleeps, so a timer armed at 4pm for midnight, with the lid closed 6pm–8am, may not fire
+until mid-afternoon. Recomputing the delay from wall-clock time on focus discards that
+drift. Background-window throttling (timers coalesced to roughly once a minute) is real
+but harmless for a midnight rollover.
 
 Two pure helpers, unit-testable, live beside the status logic:
 
@@ -262,7 +273,8 @@ New `tests/DueStatus.test.ts`:
 - overdue at `diff === -1`, on-track at `diff === 0` in the Today bucket
 - misfiled: due today in This Week; due in 3 days in This Month; due in 2 weeks in Someday
 - pull-forward stays on-track: due Friday while in Today
-- Someday with a 6-month-out date stays on-track
+- Someday with a 6-month-out date stays on-track; Someday overdue still flags
+- To Review never flags, including a past-due task under a bucket list with no `today` rule
 - completed tasks never overdue or misfiled
 - `dayKey` and `msUntilNextMidnight`, including across a DST boundary
 
