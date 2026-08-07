@@ -4,6 +4,27 @@ import { BucketConfig, StorageMode, ScopeType, DEFAULT_BUCKETS } from "./setting
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { t } from "./i18n/i18n";
+
+/**
+ * Two lines, each led by its badge glyph in the colour that badge has on the task
+ * row. A fragment rather than a string because the glyphs need their own spans to
+ * be coloured; Obsidian searches the fragment's textContent, so this stays findable.
+ */
+function markDueFlagsDesc(): DocumentFragment {
+  return createFragment((frag) => {
+    const line = (cls: string, glyph: string, text: string) => {
+      const row = frag.createDiv();
+      row.createSpan({ cls, text: glyph });
+      row.appendText(" " + text);
+    };
+    line("gtd-flag-overdue", "❢", t("settings.behaviour.markDueFlags.descriptionOverdue"));
+    line("gtd-flag-misfiled", "⚑", t("settings.behaviour.markDueFlags.descriptionMisfiled", {
+      later: t("buckets.defaults.this-week.name"),
+      sooner: t("buckets.defaults.today.name"),
+    }));
+  });
+}
+
 const EMOJI_CATEGORIES: Array<{ icon: string; emojis: string[] }> = [
   {
     icon: "⚡",
@@ -325,7 +346,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           },
           {
             name: t("settings.behaviour.markDueFlags.name"),
-            desc: t("settings.behaviour.markDueFlags.description"),
+            desc: markDueFlagsDesc(),
             control: { type: "toggle", key: "staleIndicatorEnabled" },
           },
           {
@@ -591,7 +612,7 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName(t("settings.behaviour.markDueFlags.name"))
-      .setDesc(t("settings.behaviour.markDueFlags.description"))
+      .setDesc(markDueFlagsDesc())
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.staleIndicatorEnabled);
         tog.onChange(async (val) => {

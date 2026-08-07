@@ -105,7 +105,8 @@
       },
       "markDueFlags": {
         "name": "",
-        "description": ""
+        "descriptionOverdue": "",
+        "descriptionMisfiled": ""
       },
       "compactView": {
         "name": "",

@@ -107,7 +107,8 @@
       },
       "markDueFlags": {
         "name": "Überfällige und falsch einsortierte Aufgaben markieren",
-        "description": "❢ markiert Aufgaben, deren Fälligkeitsdatum verstrichen ist. ⚑ markiert Aufgaben, die in einen früheren Bereich gehören — zum Beispiel heute fällig, aber unter Diese Woche einsortiert."
+        "descriptionOverdue": "markiert Aufgaben, deren Fälligkeitsdatum verstrichen ist.",
+        "descriptionMisfiled": "schlägt einen besseren Bereich vor, damit keine Fälligkeit verpasst wird: eine heute fällige Aufgabe in {{later}} gehört in {{sooner}}."
       },
       "compactView": {
         "name": "Kompakte Ansicht",

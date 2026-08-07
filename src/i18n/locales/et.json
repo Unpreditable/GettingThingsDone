@@ -107,7 +107,8 @@
       },
       "markDueFlags": {
         "name": "Märgi tähtaja ületanud ja valesti paigutatud ülesanded",
-        "description": "❢ märgib ülesanded, mille tähtaeg on möödas. ⚑ märgib ülesanded, mis kuuluvad varasemasse kategooriasse — näiteks tähtaeg on täna, aga ülesanne on kategoorias See nädal."
+        "descriptionOverdue": "märgib ülesanded, mille tähtaeg on möödas.",
+        "descriptionMisfiled": "soovitab paremat kategooriat, et tähtaeg ei jääks märkamata: täna tähtaja saabuv ülesanne kategoorias {{later}} kuulub kategooriasse {{sooner}}."
       },
       "compactView": {
         "name": "Kompaktne vaade",

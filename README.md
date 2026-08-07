@@ -140,9 +140,11 @@ Choose what plays when you check off a task:
 When enabled, two badges call out tasks whose due date needs attention:
 
 - **`❢`** (red) — the task's due date has passed.
-- **`⚑`** (amber) — a bucket earlier in your configured bucket list already claims this due date, so the task is filed later than its date warrants (e.g. due today but filed in This Week). Moving a task into a *sooner* bucket than its date warrants is deliberate and is never flagged.
+- **`⚑`** (amber) — suggests a better bucket so you don't miss the due date: a task due today in `This Week` belongs in `Today`.
 
 Neither badge appears on completed tasks, or in the To Review bucket.
+
+Hover a task to see the reason: `❢ Due Sat, Aug 1 (3 days overdue)`, `⚑ Due today (belongs in Today)`.
 
 ### Status bar
 

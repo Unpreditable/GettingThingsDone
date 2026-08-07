@@ -107,7 +107,8 @@
       },
       "markDueFlags": {
         "name": "기한 초과 및 잘못 분류된 작업 표시",
-        "description": "❢ 는 마감일이 지난 작업을 표시합니다. ⚑ 는 더 가까운 버킷에 속하는 작업을 표시합니다 — 예: 오늘 마감인데 '이번 주'에 있는 경우."
+        "descriptionOverdue": "는 마감일이 지난 작업을 표시합니다.",
+        "descriptionMisfiled": "는 마감일을 놓치지 않도록 더 적합한 버킷을 제안합니다. 오늘 마감인데 '{{later}}'에 있는 작업은 '{{sooner}}'에 있어야 합니다."
       },
       "compactView": {
         "name": "컴팩트 보기",

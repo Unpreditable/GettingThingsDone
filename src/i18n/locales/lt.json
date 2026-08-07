@@ -115,7 +115,8 @@
       },
       "markDueFlags": {
         "name": "Žymėti vėluojančias ir netinkamai priskirtas užduotis",
-        "description": "❢ žymi užduotis, kurių terminas praėjo. ⚑ žymi užduotis, priklausančias ankstesnei grupei — pavyzdžiui, terminas šiandien, bet užduotis yra „Šią savaitę“."
+        "descriptionOverdue": "žymi užduotis, kurių terminas praėjo.",
+        "descriptionMisfiled": "siūlo tinkamesnę grupę, kad nepraleistumėte termino: šiandien pasibaigiančio termino užduotis grupėje {{later}} turi būti grupėje {{sooner}}."
       },
       "compactView": {
         "name": "Kompaktiškas rodinys",

@@ -165,9 +165,13 @@
         "description": "Completed tasks remain visible as strikethrough in the panel until midnight, then disappear on next load."
       },
       "markDueFlags": {
-        "name_comment": "The '❢' and '⚑' are the literal characters displayed as indicator badges on the task row. ❢ = the due date has passed. ⚑ = a sooner bucket already claims that due date.",
+        "_comment": "Toggle for the two due-date badges on task rows. Settings renders each badge character in its own coloured span, so neither description below contains its glyph. Each description must read as a continuation of the glyph that precedes it.",
+        "name_comment": "Setting name for the toggle that shows both due-date badges.",
         "name": "Flag overdue and misfiled tasks",
-        "description": "❢ marks tasks whose due date has passed. ⚑ marks tasks a sooner bucket already claims — for example, due today but filed in This Week."
+        "descriptionOverdue_comment": "Follows the red ❢ glyph on its own line.",
+        "descriptionOverdue": "marks tasks whose due date has passed.",
+        "descriptionMisfiled_comment": "Follows the amber ⚑ glyph on its own line. {{later}} and {{sooner}} are bucket display names injected by the plugin.",
+        "descriptionMisfiled": "suggests a better bucket so you don't miss the due date: a task due today in {{later}} belongs in {{sooner}}."
       },
       "compactView": {
         "name": "Compact view",

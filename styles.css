@@ -325,6 +325,16 @@
 
 /* ── Settings tab ───────────────────────────────────────────────────────── */
 
+.gtd-flag-overdue {
+  color: var(--text-error);
+  font-weight: 700;
+}
+
+.gtd-flag-misfiled {
+  color: var(--text-warning);
+  font-weight: 700;
+}
+
 /* Obsidian 1.13+'s declarative settings API wraps every getSettingDefinitions()
    item — including custom `render:` items — in a `.setting-item`, which is
    `display: flex` (row) for laying out a single name/desc/control row. Our

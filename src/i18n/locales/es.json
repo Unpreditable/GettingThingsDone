@@ -107,7 +107,8 @@
       },
       "markDueFlags": {
         "name": "Marcar tareas vencidas y mal clasificadas",
-        "description": "❢ marca las tareas cuya fecha de vencimiento ya pasó. ⚑ marca las tareas que reclama una categoría más cercana — por ejemplo, vencen hoy pero están en Esta semana."
+        "descriptionOverdue": "marca las tareas cuya fecha de vencimiento ya pasó.",
+        "descriptionMisfiled": "sugiere una categoría mejor para no perder la fecha: una tarea que vence hoy en {{later}} pertenece a {{sooner}}."
       },
       "compactView": {
         "name": "Vista compacta",

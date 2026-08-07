@@ -111,7 +111,8 @@
       },
       "markDueFlags": {
         "name": "Atzīmēt nokavētos un nepareizi sakārtotos uzdevumus",
-        "description": "❢ atzīmē uzdevumus, kuriem termiņš ir pagājis. ⚑ atzīmē uzdevumus, kas pieder agrākai grupai — piemēram, termiņš ir šodien, bet uzdevums ir grupā Šonedēļ."
+        "descriptionOverdue": "atzīmē uzdevumus, kuriem termiņš ir pagājis.",
+        "descriptionMisfiled": "iesaka piemērotāku grupu, lai nepalaistu garām termiņu: uzdevums ar šodienas termiņu grupā {{later}} pieder grupai {{sooner}}."
       },
       "compactView": {
         "name": "Kompakts skats",

@@ -107,7 +107,8 @@
       },
       "markDueFlags": {
         "name": "标记逾期和归类错误的任务",
-        "description": "❢ 标记已过期的任务。⚑ 标记应归入更近分组的任务——例如今天到期却放在「本周」。"
+        "descriptionOverdue": "标记已过期的任务。",
+        "descriptionMisfiled": "建议更合适的分组，避免错过到期日：今天到期却放在「{{later}}」的任务应放入「{{sooner}}」。"
       },
       "compactView": {
         "name": "紧凑视图",
