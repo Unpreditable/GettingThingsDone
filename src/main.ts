@@ -309,10 +309,7 @@ export default class GtdTasksPlugin extends Plugin {
     const tasks = this.taskIndex.getAllTasks();
     const scope = getActiveScope(this.settings);
 
-    const migrated = migrateOrderFormat(
-      this.settings.taskOrder as unknown as Record<string, unknown[]>,
-      tasks
-    );
+    const migrated = migrateOrderFormat(this.settings.taskOrder, tasks);
     const reconciled = reconcileDanglingEntries(
       { taskOrder: migrated.taskOrder, completionSeen: this.settings.completionSeen },
       tasks,
