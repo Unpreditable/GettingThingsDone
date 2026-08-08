@@ -9,22 +9,41 @@ export function hashString(s: string): string {
 }
 
 /**
- * Content used to distinguish tasks with identical visible text: due date,
- * but NOT tags/inlineField/isCompleted/completedAt. Tags and inlineField are
- * excluded deliberately, not just for parsimony: bucket assignment itself is
- * stored as a tag (inline-tag mode) or inline field (inline-field mode), so a
- * cross-bucket move rewrites exactly that data. computeOrderKeys is called
- * once right after the write (before TaskIndex's async reindex has caught
- * up, still seeing the old tag/field) and again on the next render (after
- * reindex, seeing the new one) — including them here made a moved task hash
- * differently between those two calls, so its freshly-saved order key never
- * matched on the next render and it fell back to "no saved key, append at
- * the end" every time. isCompleted/completedAt are excluded for the same
- * reason: they flip on every checkbox toggle and must not perturb order.
+ * Content used to distinguish tasks with identical visible text.
+ *
+ * HARD INVARIANT: only fields this plugin's own actions NEVER write may appear
+ * here. Every field below is read-only today — no GTD-Tasks action mutates a
+ * priority, a recurrence rule, or any date but 📅 — but that is incidental to
+ * current scope, not structural. Adding a write path for one of them (a "bump
+ * priority" quick action, say) reintroduces the bug fixed on 2026-07-22:
+ * `tags`/`inlineField` were in this hash while `moveTaskToBucket` writes
+ * exactly those, so computeOrderKeys — called once right after the write, with
+ * TaskIndex's async reindex not yet caught up, and again on the next render
+ * after it has — produced two different keys for the same task. Its
+ * freshly-saved key never matched, and every cross-bucket drop landed at the
+ * bucket's end. Check this invariant before adding anything here.
+ *
+ * isCompleted/completedAt are excluded for the same reason: they flip on every
+ * checkbox toggle and must not perturb order.
+ *
+ * Extras are appended only when present, so a task carrying none of them
+ * produces a byte-identical string to the pre-extras version and keeps its
+ * saved order across the upgrade. Each extra is key-prefixed so a priority of
+ * "high" cannot collide with a recurrence rule reading "high".
  */
 function disambiguator(task: TaskRecord): string {
   const due = task.dueDate ? task.dueDate.toISOString() : "";
-  return `${task.text}|${due}`;
+  const base = `${task.text}|${due}`;
+  const extras = [
+    task.priority && `p:${task.priority}`,
+    task.recurrence && `r:${task.recurrence}`,
+    task.scheduledDate && `s:${task.scheduledDate.toISOString()}`,
+    task.startDate && `b:${task.startDate.toISOString()}`,
+    task.createdDate && `c:${task.createdDate.toISOString()}`,
+    task.cancelledDate && `x:${task.cancelledDate.toISOString()}`,
+    task.blockId && `i:${task.blockId}`,
+  ].filter((e): e is string => Boolean(e));
+  return extras.length > 0 ? `${base}|${extras.join("|")}` : base;
 }
 
 /**

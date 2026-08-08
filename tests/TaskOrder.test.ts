@@ -301,6 +301,75 @@ describe("wasCompletionWitnessed", () => {
   });
 });
 
+describe("disambiguator back-compatibility", () => {
+  it("hashes a task with no Tasks fields to its pre-change key", () => {
+    // Captured from the pre-change implementation: hash("Buy milk|") + ":0".
+    // This literal is the whole guarantee that existing users keep their saved
+    // manual order — if it changes, every stored order entry is orphaned.
+    const tasks = parseFile("notes.md", "- [ ] Buy milk");
+    const keys = computeOrderKeys(tasks);
+    expect(keys.get(tasks[0].id)).toEqual({ file: "notes.md", key: "4046230919:0" });
+  });
+
+  it("distinguishes two identical-text tasks by priority", () => {
+    const tasks = parseFile("notes.md", "- [ ] Call Bob 🔺\n- [ ] Call Bob ⏫");
+    const keys = computeOrderKeys(tasks);
+    const a = keys.get(tasks[0].id)!;
+    const b = keys.get(tasks[1].id)!;
+    expect(a.key).not.toBe(b.key);
+    // Both are the FIRST occurrence of their own disambiguator. Were priority
+    // absent from the hash they would share one, and be :0 and :1 instead —
+    // which is why this assertion, not the inequality above, is what pins it.
+    expect(a.key).toMatch(/:0$/);
+    expect(b.key).toMatch(/:0$/);
+  });
+
+  it("distinguishes two identical-text tasks by recurrence", () => {
+    const tasks = parseFile("notes.md", "- [ ] Review 🔁 every week\n- [ ] Review 🔁 every month");
+    const keys = computeOrderKeys(tasks);
+    const a = keys.get(tasks[0].id)!;
+    const b = keys.get(tasks[1].id)!;
+    expect(a.key).not.toBe(b.key);
+    expect(a.key).toMatch(/:0$/);
+    expect(b.key).toMatch(/:0$/);
+  });
+
+  it("gives a recurring task the same order key regardless of its bucket tag", () => {
+    // moveTaskToBucket rewrites exactly this tag. If it can reach the
+    // recurrence value, every cross-bucket move orphans the saved order.
+    const a = parseFile("n.md", "- [ ] Water plants 🔁 every week #gtd/today");
+    const b = parseFile("n.md", "- [ ] Water plants 🔁 every week #gtd/week");
+    expect(computeOrderKeys(a).get(a[0].id)!.key)
+      .toBe(computeOrderKeys(b).get(b[0].id)!.key);
+  });
+
+  it("gives a recurring task the same order key regardless of its inline field", () => {
+    // The inline-field storage mode writes [horizon:: <bucket>] in the same
+    // end-of-line position, so it reaches the recurrence value the same way.
+    const a = parseFile("n.md", "- [ ] Water plants 🔁 every week [horizon:: today]");
+    const b = parseFile("n.md", "- [ ] Water plants 🔁 every week [horizon:: week]");
+    expect(computeOrderKeys(a).get(a[0].id)!.key)
+      .toBe(computeOrderKeys(b).get(b[0].id)!.key);
+  });
+
+  it("does not confuse a priority value with a recurrence rule of the same text", () => {
+    const tasks = parseFile("notes.md", "- [ ] T 🔁 high\n- [ ] T ⏫");
+    const keys = computeOrderKeys(tasks);
+    const a = keys.get(tasks[0].id)!;
+    const b = keys.get(tasks[1].id)!;
+    expect(a.key).not.toBe(b.key);
+    expect(a.key).toMatch(/:0$/);
+    expect(b.key).toMatch(/:0$/);
+  });
+
+  it("still falls back to occurrence index for genuinely identical tasks", () => {
+    const tasks = parseFile("notes.md", "- [ ] Same 🔺\n- [ ] Same 🔺");
+    const keys = computeOrderKeys(tasks);
+    expect(keys.get(tasks[0].id)!.key).toMatch(/:0$/);
+    expect(keys.get(tasks[1].id)!.key).toMatch(/:1$/);
+  });
+});
+
 describe("isRecurring", () => {
   it("detects a Tasks recurrence rule on the line", () => {
     expect(
