@@ -18,7 +18,7 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 - **Subtask-aware**: indented child tasks are tracked separately, with an active-subtask count badge and a prompt to move them along with their parent
 - **Search**: filter the panel down to matching tasks
 - **Checkbox completion** with optional celebration animations (confetti, pixel creature, both, or off)
-- **Tasks plugin integration** — reads 📅 due dates, auto-assigns tasks to the matching bucket, and hands completion toggles to the Tasks plugin when it's installed
+- **Tasks plugin integration** — reads 📅 due dates, auto-assigns tasks to the matching bucket, and hands completion toggles to the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin when it's installed
 - **Two storage modes** — inline tag (`#gtd/today`) or inline field (`[gtd:: today]`)
 - **Scope filtering** — scan the entire vault, specific folders, or specific files
 - **Overdue and misfiled flags** (`❢` past due, `⚑` filed later than its date warrants) on task rows
@@ -118,11 +118,11 @@ Limit which files are indexed:
 
 ### Tasks plugin integration
 
-The plugin always reads `📅 YYYY-MM-DD` due dates written by the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) community plugin and automatically assigns tasks to the matching time-horizon bucket. Manual assignments (tag/field) always take priority over date-based ones. To opt a bucket out of date-based assignment, clear its date rule in the bucket settings.
+A task with a `📅 YYYY-MM-DD` due date lands in the bucket whose date rule matches it. Move it yourself and it stays where you put it.
 
-When the Tasks plugin is installed, checking a task off in the panel runs Tasks' own toggle command, so the panel behaves exactly like the editor does — including its ✅-date setting, `🔁` recurrence and `🏁 delete` on-completion actions. Without the Tasks plugin, the panel flips the checkbox and writes no date.
+Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin's recurrence and completion-date setting.
 
-> **Behavior change:** earlier versions wrote a `✅` date on panel completions even without the Tasks plugin installed. They no longer do. Completed tasks still stay visible until midnight — the plugin remembers dateless completions it witnessed rather than relying on a date in the file.
+> **As of v0.2.0,** panel completions don't write a `✅` date. Install [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) if you want one.
 
 ### Celebration animations
 
@@ -145,6 +145,14 @@ When enabled, two badges call out tasks whose due date needs attention:
 Neither badge appears on completed tasks, or in the To Review bucket.
 
 Hover a task to see the reason: `❢ Due Sat, Aug 1 (3 days overdue)`, `⚑ Due today (belongs in Today)`.
+
+### Tasks plugin fields
+
+Control how the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin fields (priority, recurrence, scheduled/start/created/cancelled dates, on-completion action) show up in the panel:
+
+- **Show priority** (default all) — which priority levels get an emoji badge (🔺⏫🔼🔽⏬) on the task row.
+- **Show recurrence badge** (default on) — mark repeating tasks with `🔁` on the task row.
+- **Show Tasks fields in popover** (default on) — list due date, priority, recurrence and the other Tasks fields when hovering a task.
 
 ### Status bar
 

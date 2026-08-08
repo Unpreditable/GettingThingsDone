@@ -23,12 +23,13 @@ npm test -- --testPathPattern=BucketManager  # run a single test file
 Vault files (*.md)
   → TaskIndex       scans on load; watches vault modify/create/delete events
   → TaskParser      regex-parses checkbox lines → TaskRecord[]
-  → TasksPluginParser  reads 📅 / ✅ emoji dates from Tasks plugin syntax
+  → TasksPluginParser  single-pass scan of all Tasks-plugin tokens → structured fields
   → BucketManager   maps TaskRecords to BucketGroup[] using date range rules + tags
   → GTDPanel.svelte renders the grouped list
 
 User move action
-  → TaskWriter      locates line by rawLine match, writes new 📅 date / tag / field
+  → TaskWriter      locates line by lineNumber/rawLine, rewrites the bucket tag / inline field
+                    (it never writes a 📅 date — 📅 is read-only to this plugin)
   → vault.modify()  triggers vault event → TaskIndex re-indexes → UI refreshes
 ```
 
@@ -42,7 +43,8 @@ User move action
 | [src/core/TaskIndex.ts](src/core/TaskIndex.ts) | Live index; vault event registration |
 | [src/core/TaskWriter.ts](src/core/TaskWriter.ts) | File write-back; locates task by lineNumber/rawLine, delegates to storage adapters |
 | [src/core/StorageMigrator.ts](src/core/StorageMigrator.ts) | Rewrites bucket assignments when switching between storage modes |
-| [src/integrations/TasksPluginParser.ts](src/integrations/TasksPluginParser.ts) | Read/write `📅 YYYY-MM-DD` on task lines |
+| [src/integrations/TasksPluginParser.ts](src/integrations/TasksPluginParser.ts) | Token table + two-phase scanner for all Tasks-plugin metadata; sole owner of that syntax |
+| [src/core/TasksFieldText.ts](src/core/TasksFieldText.ts) | Formats a task's Tasks-plugin fields into ordered hover-popover rows |
 | [src/views/GTDPanel.svelte](src/views/GTDPanel.svelte) | Root sidebar; handles context menu and drag-drop coordination |
 | [src/views/BucketGroup.svelte](src/views/BucketGroup.svelte) | Collapsible bucket section; SortableJS drag-and-drop |
 | [src/views/TaskItem.svelte](src/views/TaskItem.svelte) | Task row; checkbox, truncated text (tooltip on hover), quick-move buttons |
