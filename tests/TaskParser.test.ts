@@ -243,19 +243,28 @@ describe("indentLevel and buildTaskHierarchy", () => {
     const t1 = {
       id: "a1", filePath: "a.md", lineNumber: 0, indentLevel: 0,
       rawLine: "- [ ] A root", text: "A root", isCompleted: false,
-      completedAt: null, dueDate: null, tags: [], inlineField: null,
+      completedAt: null, dueDate: null,
+      priority: null, recurrence: null, scheduledDate: null, startDate: null,
+      createdDate: null, cancelledDate: null, onCompletion: null, blockId: null,
+      tags: [], inlineField: null,
       parentId: null, childIds: [],
     };
     const t2 = {
       id: "a2", filePath: "a.md", lineNumber: 1, indentLevel: 1,
       rawLine: "  - [ ] A child", text: "A child", isCompleted: false,
-      completedAt: null, dueDate: null, tags: [], inlineField: null,
+      completedAt: null, dueDate: null,
+      priority: null, recurrence: null, scheduledDate: null, startDate: null,
+      createdDate: null, cancelledDate: null, onCompletion: null, blockId: null,
+      tags: [], inlineField: null,
       parentId: null, childIds: [],
     };
     const t3 = {
       id: "b1", filePath: "b.md", lineNumber: 0, indentLevel: 0,
       rawLine: "- [ ] B root", text: "B root", isCompleted: false,
-      completedAt: null, dueDate: null, tags: [], inlineField: null,
+      completedAt: null, dueDate: null,
+      priority: null, recurrence: null, scheduledDate: null, startDate: null,
+      createdDate: null, cancelledDate: null, onCompletion: null, blockId: null,
+      tags: [], inlineField: null,
       parentId: null, childIds: [],
     };
     buildTaskHierarchy([t1, t2, t3]);
@@ -382,5 +391,124 @@ describe("edge cases", () => {
     expect(result).toContain("#some.tag");
     const removed = setSimpleTag(result, "some.tag", false);
     expect(removed).not.toContain("#some.tag");
+  });
+});
+
+describe("stripMetadata via parseFile", () => {
+  const textOf = (line: string) => parseFile("test.md", line)[0].text;
+
+  it("strips scheduled and start dates, which the old regexes left visible", () => {
+    expect(textOf("- [ ] Pay rent 🛫 2026-10-11")).toBe("Pay rent");
+    expect(textOf("- [ ] Pay rent ⏳ 2026-10-11")).toBe("Pay rent");
+  });
+
+  it("strips highest priority, which the old regex omitted", () => {
+    expect(textOf("- [ ] Urgent 🔺")).toBe("Urgent");
+  });
+
+  it("strips id and depends-on markers", () => {
+    expect(textOf("- [ ] Ship it 🆔 ab12 ⛔ cd34")).toBe("Ship it");
+  });
+
+  it("strips created and cancelled dates", () => {
+    expect(textOf("- [ ] Old task ➕ 2026-01-01 ❌ 2026-02-02")).toBe("Old task");
+  });
+
+  it("strips every field on the TODO repro line", () => {
+    expect(
+      textOf("- [ ] Test 2 ⏫ 🔁 every week 🏁 delete 🛫 2026-10-11 ⏳ 2026-10-11")
+    ).toBe("Test 2");
+  });
+
+  it("leaves a rejected marker visible", () => {
+    expect(textOf("- [ ] Pay rent 📅 soon")).toBe("Pay rent 📅 soon");
+  });
+
+  it("merges Tasks spans with tag, inline-field and block-ref spans", () => {
+    expect(
+      textOf("- [ ] Buy milk 📅 2026-02-18 ⏫ #gtd/today [horizon:: today] ^abc123")
+    ).toBe("Buy milk");
+  });
+
+  it("keeps text that sits between two metadata tokens", () => {
+    expect(textOf("- [ ] Call ⏫ Bob 📅 2026-02-18")).toBe("Call Bob");
+  });
+
+  it("does not corrupt trailing text when a tag is nested inside a recurrence span", () => {
+    // The 🔁 free-text span runs from the marker up to the next marker (📅), so it
+    // strictly contains the #urgent tag span. A due-date span follows, with " Bob"
+    // surviving after it. If overlapping spans aren't merged before back-to-front
+    // removal, cutting the inner tag span shifts everything after it left, so the
+    // outer recurrence span's stale end index (computed pre-shift) overshoots into
+    // the surviving trailing text.
+    expect(
+      textOf("- [ ] Call 🔁 every #urgent week 📅 2026-01-01 Bob")
+    ).toBe("Call Bob");
+  });
+});
+
+describe("TaskRecord Tasks-plugin fields", () => {
+  it("populates every new field", () => {
+    const line =
+      "- [ ] Test 2 ⏫ 🔁 every week 🏁 delete 🛫 2026-10-11 ⏳ 2026-10-12 ➕ 2026-01-01 ^abc123";
+    const task = parseFile("test.md", line)[0];
+    expect(task.priority).toBe("high");
+    expect(task.recurrence).toBe("every week");
+    expect(task.onCompletion).toBe("delete");
+    expect(task.startDate!.getDate()).toBe(11);
+    expect(task.scheduledDate!.getDate()).toBe(12);
+    expect(task.createdDate!.getMonth()).toBe(0);
+    expect(task.cancelledDate).toBeNull();
+    expect(task.blockId).toBe("abc123");
+  });
+
+  it("leaves every new field null on a bare task", () => {
+    const task = parseFile("test.md", "- [ ] Buy milk")[0];
+    expect(task.priority).toBeNull();
+    expect(task.recurrence).toBeNull();
+    expect(task.scheduledDate).toBeNull();
+    expect(task.startDate).toBeNull();
+    expect(task.createdDate).toBeNull();
+    expect(task.cancelledDate).toBeNull();
+    expect(task.onCompletion).toBeNull();
+    expect(task.blockId).toBeNull();
+  });
+
+  it("keeps this plugin's own bucket tag out of a recurrence rule", () => {
+    const task = parseFile("test.md", "- [ ] Foo 🔁 every week #gtd/today")[0];
+    expect(task.recurrence).toBe("every week");
+    expect(task.text).toBe("Foo");
+  });
+
+  it("keeps an inline field out of a recurrence rule", () => {
+    const task = parseFile("test.md", "- [ ] Foo 🔁 every week [horizon:: today]")[0];
+    expect(task.recurrence).toBe("every week");
+    expect(task.text).toBe("Foo");
+  });
+
+  it("keeps this plugin's own bucket tag out of an on-completion action", () => {
+    const task = parseFile("test.md", "- [ ] Foo 🏁 delete #gtd/today")[0];
+    expect(task.onCompletion).toBe("delete");
+    expect(task.text).toBe("Foo");
+  });
+
+  it("rejects a free-text marker whose whole value was another module's syntax", () => {
+    // Nothing is left after the tag is excluded, so the marker is rejected by
+    // the existing empty-value rule: no span, so 🔁 stays visible in the text.
+    const task = parseFile("test.md", "- [ ] Foo 🔁 #gtd/today")[0];
+    expect(task.recurrence).toBeNull();
+    expect(task.text).toBe("Foo 🔁");
+  });
+
+  it("keeps a trailing block reference out of a recurrence rule", () => {
+    const task = parseFile("test.md", "- [ ] Foo 🔁 every week ^abc123")[0];
+    expect(task.recurrence).toBe("every week");
+    expect(task.blockId).toBe("abc123");
+  });
+
+  it("still populates dueDate and completedAt", () => {
+    const task = parseFile("test.md", "- [x] Done thing 📅 2026-02-18 ✅ 2026-02-19")[0];
+    expect(task.dueDate!.getDate()).toBe(18);
+    expect(task.completedAt!.getDate()).toBe(19);
   });
 });

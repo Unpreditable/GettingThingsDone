@@ -1,4 +1,9 @@
-import { parseDueDate, parseCompletionDate } from "../integrations/TasksPluginParser";
+import {
+  scanTasksMetadata,
+  foldTasksFields,
+} from "../integrations/TasksPluginParser";
+import type { TokenSpan, TaskPriority } from "../integrations/TasksPluginParser";
+export type { TaskPriority };
 
 export interface TaskRecord {
   /** Unique-ish identifier: hash of filePath + lineNumber + text. */
@@ -12,6 +17,18 @@ export interface TaskRecord {
   isCompleted: boolean;
   completedAt: Date | null;
   dueDate: Date | null;
+  /** Tasks-plugin priority level (🔺⏫🔼🔽⏬). Null if unset. */
+  priority: TaskPriority | null;
+  /** Tasks-plugin recurrence rule text, e.g. "every week". */
+  recurrence: string | null;
+  scheduledDate: Date | null;
+  startDate: Date | null;
+  createdDate: Date | null;
+  cancelledDate: Date | null;
+  /** Tasks-plugin on-completion action, e.g. "delete". */
+  onCompletion: string | null;
+  /** Trailing Obsidian block reference, without the leading ^. */
+  blockId: string | null;
   /** All tags found on this task line (without #). */
   tags: string[];
   /** Value of inline field, e.g. 'today' for [horizon:: today]. Null if absent. */
@@ -58,11 +75,19 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
     const rawRest = match[3];
 
     const isCompleted = checkMark === "x" || checkMark === "X";
-    const dueDate = parseDueDate(line);
-    const completedAt = isCompleted ? parseCompletionDate(line) : null;
+    // One scan per line: parseDueDate/parseCompletionDate each used to run
+    // their own regex over the same string, and stripMetadata a third set.
+    // Scanned first, and handed to the Tasks scanner as holes: a free-text
+    // Tasks value (🔁, 🏁) that is the last marker on the line would otherwise
+    // run to end of line and absorb this plugin's own bucket tag, making a
+    // read-only field transitively writable. See scanTasksMetadata's comment.
+    const obsidianSpans = scanObsidianMetadata(rawRest);
+    const tasksSpans = scanTasksMetadata(rawRest, obsidianSpans);
+    const fields = foldTasksFields(tasksSpans);
     const tags = extractTags(rawRest);
     const inlineField = extractInlineField(rawRest);
-    const text = stripMetadata(rawRest);
+    const text = stripMetadata(rawRest, tasksSpans, obsidianSpans);
+    const blockRef = rawRest.match(BLOCK_REF_REGEX);
 
     records.push({
       id: makeId(filePath, i, text),
@@ -71,8 +96,16 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
       rawLine: line,
       text,
       isCompleted,
-      completedAt,
-      dueDate,
+      completedAt: isCompleted ? fields.completedAt : null,
+      dueDate: fields.dueDate,
+      priority: fields.priority,
+      recurrence: fields.recurrence,
+      scheduledDate: fields.scheduledDate,
+      startDate: fields.startDate,
+      createdDate: fields.createdDate,
+      cancelledDate: fields.cancelledDate,
+      onCompletion: fields.onCompletion,
+      blockId: blockRef ? blockRef[1] : null,
       tags,
       inlineField,
       indentLevel: extractIndentLevel(line),
@@ -132,17 +165,66 @@ function extractInlineField(text: string): string | null {
   return match ? match[1].trim() : null;
 }
 
-function stripMetadata(text: string): string {
-  return text
-    .replace(/\s+\^[\w-]+\s*$/, "")
-    .replace(/📅\s*\d{4}-\d{2}-\d{2}/g, "")
-    .replace(/✅\s*\d{4}-\d{2}-\d{2}/g, "")
-    .replace(/🔁[^#[📅✅]*/gu, "")
-    .replace(/[⏫🔼🔽⏬]/gu, "")
-    .replace(/#[\w/-]+/g, "")
-    .replace(/\[[\w-]+::\s*[^\]]*\]/g, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+/** A half-open [start, end) range of `text` to remove. */
+interface Span {
+  start: number;
+  end: number;
+}
+
+const TAG_REGEX = /#[\w/-]+/g;
+const INLINE_FIELD_REGEX = /\[[\w-]+::\s*[^\]]*\]/g;
+const BLOCK_REF_REGEX = /\s+\^([\w-]+)\s*$/;
+
+/**
+ * Spans for the syntax this parser owns — Obsidian tags, Dataview inline
+ * fields, and a trailing block reference. Deliberately NOT in
+ * TasksPluginParser: none of these are Tasks-plugin syntax, and keeping the
+ * two token sets in separate modules is what stops either from growing a
+ * stop-list describing the other.
+ */
+function scanObsidianMetadata(text: string): Span[] {
+  const spans: Span[] = [];
+  for (const m of text.matchAll(TAG_REGEX)) {
+    spans.push({ start: m.index, end: m.index + m[0].length });
+  }
+  for (const m of text.matchAll(INLINE_FIELD_REGEX)) {
+    spans.push({ start: m.index, end: m.index + m[0].length });
+  }
+  const blockRef = text.match(BLOCK_REF_REGEX);
+  if (blockRef) {
+    spans.push({ start: blockRef.index!, end: blockRef.index! + blockRef[0].length });
+  }
+  return spans;
+}
+
+/** Sorts, merges overlaps, and removes back-to-front so earlier indices stay valid. */
+function cutSpans(text: string, spans: Span[]): string {
+  if (spans.length === 0) return text.replace(/\s{2,}/g, " ").trim();
+
+  const sorted = [...spans].sort((a, b) => a.start - b.start);
+  const merged: Span[] = [{ ...sorted[0] }];
+  for (const span of sorted.slice(1)) {
+    const last = merged[merged.length - 1];
+    if (span.start <= last.end) {
+      last.end = Math.max(last.end, span.end);
+    } else {
+      merged.push({ ...span });
+    }
+  }
+
+  let result = text;
+  for (let i = merged.length - 1; i >= 0; i--) {
+    result = result.slice(0, merged[i].start) + result.slice(merged[i].end);
+  }
+  return result.replace(/\s{2,}/g, " ").trim();
+}
+
+function stripMetadata(
+  text: string,
+  tasksSpans: TokenSpan[],
+  obsidianSpans: Span[]
+): string {
+  return cutSpans(text, [...tasksSpans, ...obsidianSpans]);
 }
 
 /** Strips all inline markup to plain text for tooltips/search. */

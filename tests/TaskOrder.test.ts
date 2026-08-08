@@ -10,6 +10,7 @@ import {
   isRecurring,
 } from "../src/core/TaskOrder";
 import type { OrderEntry } from "../src/core/TaskOrder";
+import { parseFile } from "../src/core/TaskParser";
 import type { TaskRecord } from "../src/core/TaskParser";
 
 function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
@@ -22,6 +23,14 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
     isCompleted: false,
     completedAt: null,
     dueDate: null,
+    priority: null,
+    recurrence: null,
+    scheduledDate: null,
+    startDate: null,
+    createdDate: null,
+    cancelledDate: null,
+    onCompletion: null,
+    blockId: null,
     tags: [],
     inlineField: null,
     indentLevel: 0,
@@ -294,10 +303,29 @@ describe("wasCompletionWitnessed", () => {
 
 describe("isRecurring", () => {
   it("detects a Tasks recurrence rule on the line", () => {
-    expect(isRecurring(makeTask({ rawLine: "- [x] Water plants 🔁 every week ✅ 2026-08-02" }))).toBe(true);
+    expect(
+      isRecurring(
+        makeTask({
+          rawLine: "- [x] Water plants 🔁 every week ✅ 2026-08-02",
+          recurrence: "every week",
+        })
+      )
+    ).toBe(true);
   });
 
   it("is false for an ordinary task", () => {
     expect(isRecurring(makeTask({ rawLine: "- [x] Water plants ✅ 2026-08-02" }))).toBe(false);
+  });
+
+  it("is true when the task has a recurrence rule", () => {
+    const task = parseFile("test.md", "- [ ] Weekly review 🔁 every week")[0];
+    expect(isRecurring(task)).toBe(true);
+  });
+
+  it("is false when a bare 🔁 has no rule after it", () => {
+    // The scanner rejects an empty free-text value, so this is not a
+    // recurrence — where the old rawLine.includes("🔁") test said it was.
+    const task = parseFile("test.md", "- [ ] Explain the 🔁")[0];
+    expect(isRecurring(task)).toBe(false);
   });
 });

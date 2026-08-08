@@ -207,5 +207,5 @@ export function wasCompletionWitnessed(
 
 /** A completed recurrence has already been replaced by its next occurrence. */
 export function isRecurring(task: TaskRecord): boolean {
-  return task.rawLine.includes("🔁");
+  return task.recurrence !== null;
 }
