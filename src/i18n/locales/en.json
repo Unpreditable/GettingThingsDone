@@ -44,8 +44,6 @@
     }
   },
   "task": {
-    "recurringTooltip_comment": "Tooltip on the badge marking a task that repeats (Tasks plugin recurrence rule).",
-    "recurringTooltip": "Repeats",
     "autoPlacedTooltip_comment": "Tooltip on tasks automatically assigned to a bucket based on their 📅 due date (written by the Tasks plugin). The user can click the task's bucket badge to confirm the placement and lock it in.",
     "autoPlacedTooltip": "Auto-placed from due date — click to confirm placement",
     "subtaskTooltip_comment": "Tooltip on the indentation badge shown on tasks that are nested under a parent task in the source markdown.",
@@ -70,6 +68,24 @@
       "overdue_other": "{{count}} days overdue",
       "belongsIn": "belongs in {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority_comment": "Labels for the five Tasks-plugin priority levels, shown beside their emoji in the hover popover. Use the Tasks plugin's own terms for these levels where your language has established ones.",
+    "priority": {
+      "highest": "Highest",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "lowest": "Lowest"
+    },
+    "fields_comment": "Rows in the hover popover, one per Tasks-plugin field present on the task. Each is preceded by its emoji, so the wording continues from a glyph rather than starting a sentence. {{date}} is a formatted date like 'Wed, Aug 5'; {{rule}} is a recurrence rule written by the user, e.g. 'every week'; {{action}} is an on-completion action, e.g. 'delete'.",
+    "fields": {
+      "recurrence": "Repeats {{rule}}",
+      "scheduled": "Scheduled {{date}}",
+      "start": "Starts {{date}}",
+      "created": "Created {{date}}",
+      "cancelled": "Cancelled {{date}}",
+      "done": "Done {{date}}",
+      "onCompletion": "On completion: {{action}}"
     }
   },
   "commands": {
@@ -280,6 +296,30 @@
         "button2Description": "Optional second quick-move target.",
         "none_comment": "Dropdown option meaning no bucket is assigned to this quick-move button slot (button hidden).",
         "none": "(None)"
+      }
+    },
+    "tasksIntegration_comment": "Section heading for settings that control how the plugin displays metadata written by the community Tasks plugin (priority, recurrence, dates). The blurb is deliberately generic so new settings can be added to this section without rewording it.",
+    "tasksIntegration": {
+      "heading": "Tasks plugin integration",
+      "blurb": "How this plugin treats the metadata the Tasks plugin writes on task lines.",
+      "priority": {
+        "name": "Show priority",
+        "description_comment": "Dropdown controlling which Tasks-plugin priority levels get an emoji badge on the task row. Levels, highest to lowest: 🔺 Highest, ⏫ High, 🔼 Medium, 🔽 Low, ⏬ Lowest. The hover popover always shows the priority regardless of this setting.",
+        "description": "Which priority levels show an emoji badge on the task row.",
+        "all": "All priorities",
+        "mediumUp": "Medium and above",
+        "highUp": "High and above",
+        "hidden": "Hidden"
+      },
+      "recurrence": {
+        "name": "Show recurrence badge",
+        "description_comment": "Toggle for the 🔁 badge on rows of tasks that repeat. The hover popover shows the recurrence rule regardless of this setting.",
+        "description": "Mark repeating tasks with 🔁 on the task row."
+      },
+      "popoverFields": {
+        "name": "Show Tasks fields in popover",
+        "description_comment": "Toggle for the block of Tasks-plugin metadata rows (due, priority, recurrence, scheduled, start, created, cancelled, done, on-completion) shown in the popover that appears after hovering a task row.",
+        "description": "List due date, priority, recurrence and the other Tasks fields when hovering a task."
       }
     }
   },

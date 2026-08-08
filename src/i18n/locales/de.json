@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Wiederholt sich",
     "autoPlacedTooltip": "Automatisch anhand des Fälligkeitsdatums zugewiesen — klicken zum Bestätigen",
     "subtaskTooltip": "Unteraufgabe",
     "activeSubtasks_one": "{{count}} aktive Unteraufgabe",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}} Tage überfällig",
       "belongsIn": "gehört in {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Höchste",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig",
+      "lowest": "Niedrigste"
+    },
+    "fields": {
+      "recurrence": "wiederholt sich {{rule}}",
+      "scheduled": "geplant {{date}}",
+      "start": "beginnt {{date}}",
+      "created": "erstellt {{date}}",
+      "cancelled": "storniert {{date}}",
+      "done": "erledigt {{date}}",
+      "onCompletion": "bei Abschluss: {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "Primäres Schnellverschiebungsziel auf jeder Aufgabenzeile.",
         "button2Description": "Optionales zweites Schnellverschiebungsziel.",
         "none": "(Keine)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasks-Plugin-Integration",
+      "blurb": "Wie dieses Plugin mit den Metadaten umgeht, die das Tasks-Plugin auf Aufgabenzeilen schreibt.",
+      "priority": {
+        "name": "Priorität anzeigen",
+        "description": "Welche Prioritätsstufen ein Emoji-Abzeichen in der Aufgabenzeile erhalten.",
+        "all": "Alle Prioritäten",
+        "mediumUp": "Mittel und höher",
+        "highUp": "Hoch und höher",
+        "hidden": "Ausgeblendet"
+      },
+      "recurrence": {
+        "name": "Wiederholungsabzeichen anzeigen",
+        "description": "Wiederkehrende Aufgaben mit 🔁 in der Aufgabenzeile markieren."
+      },
+      "popoverFields": {
+        "name": "Tasks-Felder im Popover anzeigen",
+        "description": "Fälligkeitsdatum, Priorität, Wiederholung und die anderen Tasks-Felder beim Überfahren einer Aufgabe auflisten."
       }
     }
   },

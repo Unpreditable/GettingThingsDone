@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "繰り返し",
     "autoPlacedTooltip": "期日から自動配置 — クリックして配置を確認",
     "subtaskTooltip": "サブタスク",
     "activeSubtasks_one": "アクティブなサブタスク {{count}} 件",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}} 日超過",
       "belongsIn": "{{bucket}} に入れるべき",
       "withDetail": "{{main}}（{{detail}}）"
+    },
+    "priority": {
+      "highest": "最高",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "lowest": "最低"
+    },
+    "fields": {
+      "recurrence": "繰り返し {{rule}}",
+      "scheduled": "予定日 {{date}}",
+      "start": "開始日 {{date}}",
+      "created": "作成日 {{date}}",
+      "cancelled": "キャンセル日 {{date}}",
+      "done": "完了日 {{date}}",
+      "onCompletion": "完了時: {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "各タスク行に表示されるメインのクイック移動先。",
         "button2Description": "オプションの2番目のクイック移動先。",
         "none": "(なし)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasksプラグイン連携",
+      "blurb": "Tasksプラグインがタスク行に書き込むメタデータをこのプラグインがどう扱うかの設定です。",
+      "priority": {
+        "name": "優先度を表示",
+        "description": "どの優先度レベルにタスク行の絵文字バッジを表示するか。",
+        "all": "すべての優先度",
+        "mediumUp": "中以上",
+        "highUp": "高以上",
+        "hidden": "非表示"
+      },
+      "recurrence": {
+        "name": "繰り返しバッジを表示",
+        "description": "繰り返しタスクのタスク行に🔁を付けます。"
+      },
+      "popoverFields": {
+        "name": "ポップオーバーにTasksのフィールドを表示",
+        "description": "タスクにカーソルを合わせたときに、期限、優先度、繰り返しなどのTasksフィールドを一覧表示します。"
       }
     }
   },

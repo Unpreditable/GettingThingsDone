@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Atkārtojas",
     "autoPlacedTooltip": "Automātiski izvietots pēc izpildes datuma — noklikšķiniet, lai apstiprinātu",
     "subtaskTooltip": "Apakšuzdevums",
     "activeSubtasks_zero": "{{count}} aktīvu apakšuzdevumu",
@@ -48,6 +47,22 @@
       "overdue_other": "nokavēts par {{count}} dienām",
       "belongsIn": "vieta ir {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Augstākā",
+      "high": "Augsta",
+      "medium": "Vidēja",
+      "low": "Zema",
+      "lowest": "Zemākā"
+    },
+    "fields": {
+      "recurrence": "atkārtojas {{rule}}",
+      "scheduled": "plānots {{date}}",
+      "start": "sākas {{date}}",
+      "created": "izveidots {{date}}",
+      "cancelled": "atcelts {{date}}",
+      "done": "pabeigts {{date}}",
+      "onCompletion": "pabeidzot: {{action}}"
     }
   },
   "commands": {
@@ -188,6 +203,26 @@
         "button1Description": "Primārais ātrās pārvietošanas mērķis katrā uzdevuma rindā.",
         "button2Description": "Neobligāts otrais ātrās pārvietošanas mērķis.",
         "none": "(Nav)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasks spraudņa integrācija",
+      "blurb": "Kā šis spraudnis apstrādā metadatus, ko Tasks spraudnis pievieno uzdevumu rindām.",
+      "priority": {
+        "name": "Rādīt prioritāti",
+        "description": "Kuri prioritātes līmeņi rāda emocijzīmes nozīmīti uzdevuma rindā.",
+        "all": "Visas prioritātes",
+        "mediumUp": "Vidēja un augstāka",
+        "highUp": "Augsta un augstāka",
+        "hidden": "Paslēpta"
+      },
+      "recurrence": {
+        "name": "Rādīt atkārtošanās nozīmīti",
+        "description": "Atzīmēt atkārtotus uzdevumus ar 🔁 uzdevuma rindā."
+      },
+      "popoverFields": {
+        "name": "Rādīt Tasks laukus uznirstošajā logā",
+        "description": "Uzrādīt izpildes termiņu, prioritāti, atkārtošanos un citus Tasks laukus, novietojot kursoru virs uzdevuma."
       }
     }
   },

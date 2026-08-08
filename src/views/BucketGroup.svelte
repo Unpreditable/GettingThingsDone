@@ -3,7 +3,7 @@
   import Sortable from "sortablejs";
   import TaskItem from "./TaskItem.svelte";
   import type { TaskRecord } from "../core/TaskParser";
-  import type { BucketConfig } from "../settings";
+  import type { BucketConfig, PriorityDisplay } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { TO_REVIEW_ID } from "../core/BucketManager";
   import type { DueStatus } from "../core/DueStatus";
@@ -17,6 +17,9 @@
   export let tasks: TaskRecord[];
   export let dueStatuses: Record<string, DueStatus> = {};
   export let showDueFlags: boolean = true;
+  export let priorityDisplay: PriorityDisplay = "all";
+  export let showRecurrenceBadge: boolean = true;
+  export let showTasksFieldsInPopover: boolean = true;
   export let autoPlacedTaskIds: string[] = [];
   export let agedCompletedTaskIds: string[] = [];
   export let quickMoveTargets: BucketConfig[];
@@ -344,6 +347,9 @@
           {quickMoveTargets}
           dueStatus={dueStatuses[task.id] ?? null}
           {showDueFlags}
+          {priorityDisplay}
+          {showRecurrenceBadge}
+          {showTasksFieldsInPopover}
           isAutoPlaced={!task.isCompleted && autoPlacedSet.has(task.id)}
           showCompleted={task.isCompleted}
           {allTasksMap}

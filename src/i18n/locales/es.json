@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Se repite",
     "autoPlacedTooltip": "Colocado automáticamente por fecha de vencimiento — haz clic para confirmar",
     "subtaskTooltip": "Subtarea",
     "activeSubtasks_one": "{{count}} subtarea activa",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}} días de retraso",
       "belongsIn": "pertenece a {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Máxima",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja",
+      "lowest": "Mínima"
+    },
+    "fields": {
+      "recurrence": "se repite {{rule}}",
+      "scheduled": "programada {{date}}",
+      "start": "comienza {{date}}",
+      "created": "creada {{date}}",
+      "cancelled": "cancelada {{date}}",
+      "done": "completada {{date}}",
+      "onCompletion": "al completarse: {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "Destino primario de movimiento rápido en cada fila de tarea.",
         "button2Description": "Segundo destino de movimiento rápido opcional.",
         "none": "(Ninguno)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Integración con el plugin Tasks",
+      "blurb": "Cómo trata este plugin los metadatos que el plugin Tasks escribe en las líneas de tarea.",
+      "priority": {
+        "name": "Mostrar prioridad",
+        "description": "Qué niveles de prioridad muestran una insignia de emoji en la fila de la tarea.",
+        "all": "Todas las prioridades",
+        "mediumUp": "Media y superior",
+        "highUp": "Alta y superior",
+        "hidden": "Oculta"
+      },
+      "recurrence": {
+        "name": "Mostrar insignia de repetición",
+        "description": "Marcar las tareas repetidas con 🔁 en la fila de la tarea."
+      },
+      "popoverFields": {
+        "name": "Mostrar campos de Tasks en la ventana emergente",
+        "description": "Mostrar la fecha de vencimiento, prioridad, repetición y los demás campos de Tasks al pasar el cursor sobre una tarea."
       }
     }
   },

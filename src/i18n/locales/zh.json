@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "重复",
     "autoPlacedTooltip": "根据截止日期自动放置——点击确认放置",
     "subtaskTooltip": "子任务",
     "activeSubtasks_one": "{{count}} 个活跃子任务",
@@ -45,6 +44,22 @@
       "overdue_other": "已逾期 {{count}} 天",
       "belongsIn": "应放入 {{bucket}}",
       "withDetail": "{{main}}（{{detail}}）"
+    },
+    "priority": {
+      "highest": "最高",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "lowest": "最低"
+    },
+    "fields": {
+      "recurrence": "重复 {{rule}}",
+      "scheduled": "计划于 {{date}}",
+      "start": "开始于 {{date}}",
+      "created": "创建于 {{date}}",
+      "cancelled": "取消于 {{date}}",
+      "done": "完成于 {{date}}",
+      "onCompletion": "完成时：{{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "每行任务上显示的主要快速移动目标。",
         "button2Description": "可选的第二个快速移动目标。",
         "none": "（无）"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasks 插件集成",
+      "blurb": "本插件如何处理 Tasks 插件写入任务行的元数据。",
+      "priority": {
+        "name": "显示优先级",
+        "description": "哪些优先级在任务行显示表情符号徽章。",
+        "all": "所有优先级",
+        "mediumUp": "中及以上",
+        "highUp": "高及以上",
+        "hidden": "隐藏"
+      },
+      "recurrence": {
+        "name": "显示重复徽章",
+        "description": "在任务行用 🔁 标记重复任务。"
+      },
+      "popoverFields": {
+        "name": "在弹出窗口中显示 Tasks 字段",
+        "description": "将鼠标悬停在任务上时列出到期日期、优先级、重复等 Tasks 字段。"
       }
     }
   },

@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Kordub",
     "autoPlacedTooltip": "Paigutatud automaatselt tähtaja järgi — kinnita klõpsates",
     "subtaskTooltip": "Alamülesanne",
     "activeSubtasks_one": "{{count}} aktiivne alamülesanne",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}} päeva üle tähtaja",
       "belongsIn": "kuulub kategooriasse {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Kõrgeim",
+      "high": "Kõrge",
+      "medium": "Keskmine",
+      "low": "Madal",
+      "lowest": "Madalaim"
+    },
+    "fields": {
+      "recurrence": "kordub {{rule}}",
+      "scheduled": "planeeritud {{date}}",
+      "start": "algab {{date}}",
+      "created": "loodud {{date}}",
+      "cancelled": "tühistatud {{date}}",
+      "done": "valmis {{date}}",
+      "onCompletion": "lõpetamisel: {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "Esmane kiirteisalduse sihtkoht igal ülesande real.",
         "button2Description": "Valikuline teine kiirteisalduse sihtkoht.",
         "none": "(Puudub)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasks pistikprogrammi integratsioon",
+      "blurb": "Kuidas see plugin kohtleb metaandmeid, mida Tasks plugin ülesannete ridadele kirjutab.",
+      "priority": {
+        "name": "Näita prioriteeti",
+        "description": "Millised prioriteeditasemed saavad ülesande reale emoji märgise.",
+        "all": "Kõik prioriteedid",
+        "mediumUp": "Keskmine ja kõrgem",
+        "highUp": "Kõrge ja kõrgem",
+        "hidden": "Peidetud"
+      },
+      "recurrence": {
+        "name": "Näita kordumise märgist",
+        "description": "Märgi korduvad ülesanded 🔁 sümboliga ülesande real."
+      },
+      "popoverFields": {
+        "name": "Näita Tasks välju hüpikaknas",
+        "description": "Kuva tähtaeg, prioriteet, kordumine ja teised Tasks väljad, kui hõljutad hiirt ülesande kohal."
       }
     }
   },

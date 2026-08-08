@@ -289,6 +289,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     this.renderBanner(containerEl);
     this.renderGeneralSection(containerEl);
     this.renderLegacyBehaviourFallback(containerEl);
+    this.renderLegacyTasksIntegrationFallback(containerEl);
     this.renderBucketsSection(containerEl);
   }
 
@@ -367,6 +368,47 @@ export class GtdSettingsTab extends PluginSettingTab {
                 all: t("settings.behaviour.celebration.both"),
               },
             },
+          },
+        ],
+      },
+      {
+        type: "group",
+        heading: t("settings.tasksIntegration.heading"),
+        items: [
+          {
+            // SettingDefinitionGroup has no description field, so the section
+            // blurb rides in as a control-less item.
+            name: "",
+            desc: t("settings.tasksIntegration.blurb"),
+            searchable: false,
+          },
+          // If the empty name column renders with awkward spacing in Obsidian
+          // 1.13+, swap that item for a `render:` one following the banner
+          // pattern already in this file: add the `gtd-settings-escape-hatch`
+          // class, `empty()` the element, and write the blurb into it.
+          {
+            name: t("settings.tasksIntegration.priority.name"),
+            desc: t("settings.tasksIntegration.priority.description"),
+            control: {
+              type: "dropdown",
+              key: "priorityDisplay",
+              options: {
+                all: t("settings.tasksIntegration.priority.all"),
+                "medium-up": t("settings.tasksIntegration.priority.mediumUp"),
+                "high-up": t("settings.tasksIntegration.priority.highUp"),
+                hidden: t("settings.tasksIntegration.priority.hidden"),
+              },
+            },
+          },
+          {
+            name: t("settings.tasksIntegration.recurrence.name"),
+            desc: t("settings.tasksIntegration.recurrence.description"),
+            control: { type: "toggle", key: "showRecurrenceBadge" },
+          },
+          {
+            name: t("settings.tasksIntegration.popoverFields.name"),
+            desc: t("settings.tasksIntegration.popoverFields.description"),
+            control: { type: "toggle", key: "showTasksFieldsInPopover" },
           },
         ],
       },
@@ -641,6 +683,52 @@ export class GtdSettingsTab extends PluginSettingTab {
         dd.setValue(this.plugin.settings.celebrationMode ?? "confetti");
         dd.onChange(async (val) => {
           await this.setControlValue("celebrationMode", val);
+        });
+      });
+  }
+
+  /**
+   * Imperative mirror of the Tasks integration group, for Obsidian below
+   * 1.13.0. Those versions never call getSettingDefinitions(), so without this
+   * the section would not exist for them at all.
+   */
+  private renderLegacyTasksIntegrationFallback(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName(t("settings.tasksIntegration.heading"))
+      .setDesc(t("settings.tasksIntegration.blurb"))
+      .setHeading();
+
+    new Setting(containerEl)
+      .setName(t("settings.tasksIntegration.priority.name"))
+      .setDesc(t("settings.tasksIntegration.priority.description"))
+      .addDropdown((dd) => {
+        dd.addOption("all", t("settings.tasksIntegration.priority.all"));
+        dd.addOption("medium-up", t("settings.tasksIntegration.priority.mediumUp"));
+        dd.addOption("high-up", t("settings.tasksIntegration.priority.highUp"));
+        dd.addOption("hidden", t("settings.tasksIntegration.priority.hidden"));
+        dd.setValue(this.plugin.settings.priorityDisplay ?? "all");
+        dd.onChange(async (val) => {
+          await this.setControlValue("priorityDisplay", val);
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(t("settings.tasksIntegration.recurrence.name"))
+      .setDesc(t("settings.tasksIntegration.recurrence.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.showRecurrenceBadge);
+        tog.onChange(async (val) => {
+          await this.setControlValue("showRecurrenceBadge", val);
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(t("settings.tasksIntegration.popoverFields.name"))
+      .setDesc(t("settings.tasksIntegration.popoverFields.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.showTasksFieldsInPopover);
+        tog.onChange(async (val) => {
+          await this.setControlValue("showTasksFieldsInPopover", val);
         });
       });
   }

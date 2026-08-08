@@ -342,6 +342,9 @@
         tasks={group.tasks}
         dueStatuses={group.dueStatuses}
         showDueFlags={settings.staleIndicatorEnabled}
+        priorityDisplay={settings.priorityDisplay}
+        showRecurrenceBadge={settings.showRecurrenceBadge}
+        showTasksFieldsInPopover={settings.showTasksFieldsInPopover}
         autoPlacedTaskIds={group.autoPlacedTaskIds}
         agedCompletedTaskIds={group.agedCompletedTaskIds}
         quickMoveTargets={getQuickMoveTargets(group.bucketId)}

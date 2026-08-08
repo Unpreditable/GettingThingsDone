@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Repete-se",
     "autoPlacedTooltip": "Colocado automaticamente pela data de entrega — clique para confirmar",
     "subtaskTooltip": "Subtarefa",
     "activeSubtasks_one": "{{count}} subtarefa ativa",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}} dias de atraso",
       "belongsIn": "pertence a {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Máxima",
+      "high": "Alta",
+      "medium": "Média",
+      "low": "Baixa",
+      "lowest": "Mínima"
+    },
+    "fields": {
+      "recurrence": "repete-se {{rule}}",
+      "scheduled": "agendada {{date}}",
+      "start": "começa {{date}}",
+      "created": "criada {{date}}",
+      "cancelled": "cancelada {{date}}",
+      "done": "concluída {{date}}",
+      "onCompletion": "ao concluir: {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "Destino principal de movimento rápido mostrado em cada linha de tarefa.",
         "button2Description": "Segundo destino de movimento rápido opcional.",
         "none": "(Nenhum)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Integração com o plugin Tasks",
+      "blurb": "Como este plugin trata os metadados que o plugin Tasks escreve nas linhas de tarefa.",
+      "priority": {
+        "name": "Mostrar prioridade",
+        "description": "Que níveis de prioridade mostram um emblema de emoji na linha da tarefa.",
+        "all": "Todas as prioridades",
+        "mediumUp": "Média e superior",
+        "highUp": "Alta e superior",
+        "hidden": "Oculta"
+      },
+      "recurrence": {
+        "name": "Mostrar emblema de repetição",
+        "description": "Assinalar tarefas repetidas com 🔁 na linha da tarefa."
+      },
+      "popoverFields": {
+        "name": "Mostrar campos do Tasks na janela sobreposta",
+        "description": "Listar data de vencimento, prioridade, repetição e os outros campos do Tasks ao pairar sobre uma tarefa."
       }
     }
   },

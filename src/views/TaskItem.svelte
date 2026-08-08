@@ -1,25 +1,44 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { TaskRecord } from "../core/TaskParser";
+  import type { TaskRecord, TaskPriority } from "../core/TaskParser";
   import { stripWikilinks, parseWikilinks } from "../core/TaskParser";
-  import type { BucketConfig } from "../settings";
+  import type { BucketConfig, PriorityDisplay } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { DueStatus } from "../core/DueStatus";
   import { t } from "../i18n/i18n";
   import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
-  import { formatDueLine } from "../core/DueStatusText";
+  import { formatTasksFields } from "../core/TasksFieldText";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
   export let dueStatus: DueStatus | null = null;
   export let showDueFlags: boolean = true;
+  export let priorityDisplay: PriorityDisplay = "all";
+  export let showRecurrenceBadge: boolean = true;
+  export let showTasksFieldsInPopover: boolean = true;
 
-  // The row glyphs obey the setting; the popover always tells the truth.
   $: showOverdueBadge = showDueFlags && dueStatus?.kind === "overdue";
   $: showMisfiledBadge = showDueFlags && dueStatus?.kind === "misfiled";
-  $: dueLine = dueStatus && task.dueDate ? formatDueLine(task.dueDate, dueStatus) : null;
+  // The row glyphs obey their settings; the popover always tells the truth,
+  // so it is gated only by its own toggle.
+  $: fieldRows = showTasksFieldsInPopover ? formatTasksFields(task, dueStatus) : [];
   $: isRecurringTask = isRecurring(task);
+
+  const PRIORITY_EMOJI: Record<TaskPriority, string> = {
+    highest: "🔺", high: "⏫", medium: "🔼", low: "🔽", lowest: "⏬",
+  };
+  /** Levels each dropdown entry admits, highest first. */
+  const PRIORITY_VISIBLE: Record<PriorityDisplay, TaskPriority[]> = {
+    all: ["highest", "high", "medium", "low", "lowest"],
+    "medium-up": ["highest", "high", "medium"],
+    "high-up": ["highest", "high"],
+    hidden: [],
+  };
+  $: priorityEmoji =
+    task.priority && PRIORITY_VISIBLE[priorityDisplay].includes(task.priority)
+      ? PRIORITY_EMOJI[task.priority]
+      : null;
   export let isAutoPlaced: boolean = false;
   /** True when the task is completed and visible until midnight. */
   export let showCompleted: boolean = false;
@@ -174,8 +193,12 @@
     on:change={onCheckboxChange}
   />
 
-  {#if isRecurringTask}
-    <span class="gtd-recurring-badge" title={t("task.recurringTooltip")}>🔁</span>
+  {#if priorityEmoji}
+    <span class="gtd-priority-badge">{priorityEmoji}</span>
+  {/if}
+
+  {#if isRecurringTask && showRecurrenceBadge}
+    <span class="gtd-recurring-badge">🔁</span>
   {/if}
 
   {#if showOverdueBadge}
@@ -223,11 +246,18 @@
 
   {#if showPopover}
     <div class="gtd-tooltip">
-      {#if dueLine}
-        <div class="gtd-tooltip-due">
-          {#if dueStatus?.kind === "overdue"}<span class="gtd-overdue-badge">❢</span>{/if}
-          {#if dueStatus?.kind === "misfiled"}<span class="gtd-misfiled-badge">⚑</span>{/if}
-          {dueLine}
+      {#if fieldRows.length > 0}
+        <div class="gtd-tooltip-fields">
+          {#each fieldRows as row}
+            <div class="gtd-tooltip-field">
+              <span
+                class="gtd-tooltip-field-emoji"
+                class:is-overdue={row.emoji === "❢"}
+                class:is-misfiled={row.emoji === "⚑"}
+              >{row.emoji}</span>
+              <span class="gtd-tooltip-field-text">{row.text}</span>
+            </div>
+          {/each}
         </div>
         <hr class="gtd-tooltip-divider" />
       {/if}
@@ -287,12 +317,19 @@
     padding-right: 2px;
   }
 
-  .gtd-recurring-badge {
+  .gtd-priority-badge {
     flex-shrink: 0;
-    font-size: 10px;
+    font-size: 13px;
     line-height: 1;
     padding-right: 2px;
-    opacity: 0.75;
+    cursor: default;
+  }
+
+  .gtd-recurring-badge {
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 1;
+    padding-right: 2px;
   }
 
   .gtd-auto-badge {
@@ -310,7 +347,7 @@
 
   .gtd-parent-badge {
     flex-shrink: 0;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1;
     padding-right: 2px;
     color: var(--text-muted);
@@ -348,8 +385,25 @@
     color: var(--text-normal);
   }
 
-  .gtd-tooltip-due {
+  div.gtd-tooltip-field {
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
     color: var(--text-normal);
+  }
+
+  .gtd-tooltip-field-emoji {
+    flex-shrink: 0;
+  }
+
+  .gtd-tooltip-field-emoji.is-overdue {
+    color: var(--text-error);
+    font-weight: 700;
+  }
+
+  .gtd-tooltip-field-emoji.is-misfiled {
+    color: var(--text-warning);
+    font-weight: 700;
   }
 
   .gtd-tooltip-divider {

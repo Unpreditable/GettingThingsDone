@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "반복",
     "autoPlacedTooltip": "마감일에서 자동 배치됨 — 클릭하여 배치 확인",
     "subtaskTooltip": "하위 작업",
     "activeSubtasks_one": "활성 하위 작업 {{count}}개",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}}일 지남",
       "belongsIn": "{{bucket}}에 있어야 함",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "최고",
+      "high": "높음",
+      "medium": "보통",
+      "low": "낮음",
+      "lowest": "최저"
+    },
+    "fields": {
+      "recurrence": "{{rule}} 반복",
+      "scheduled": "{{date}} 예정",
+      "start": "{{date}} 시작",
+      "created": "{{date}} 생성",
+      "cancelled": "{{date}} 취소",
+      "done": "{{date}} 완료",
+      "onCompletion": "완료 시: {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "각 작업 행에 표시되는 기본 빠른 이동 대상.",
         "button2Description": "선택적인 두 번째 빠른 이동 대상.",
         "none": "(없음)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasks 플러그인 연동",
+      "blurb": "Tasks 플러그인이 작업 줄에 기록하는 메타데이터를 이 플러그인이 처리하는 방식입니다.",
+      "priority": {
+        "name": "우선순위 표시",
+        "description": "작업 행에 이모지 배지로 표시할 우선순위 수준입니다.",
+        "all": "모든 우선순위",
+        "mediumUp": "보통 이상",
+        "highUp": "높음 이상",
+        "hidden": "숨김"
+      },
+      "recurrence": {
+        "name": "반복 배지 표시",
+        "description": "반복되는 작업의 작업 행에 🔁를 표시합니다."
+      },
+      "popoverFields": {
+        "name": "팝오버에 Tasks 필드 표시",
+        "description": "작업에 마우스를 올렸을 때 마감일, 우선순위, 반복 등의 Tasks 필드를 나열합니다."
       }
     }
   },

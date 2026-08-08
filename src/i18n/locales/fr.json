@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Se répète",
     "autoPlacedTooltip": "Placé automatiquement selon la date d'échéance — cliquez pour confirmer",
     "subtaskTooltip": "Sous-tâche",
     "activeSubtasks_one": "{{count}} sous-tâche active",
@@ -45,6 +44,22 @@
       "overdue_other": "{{count}} jours de retard",
       "belongsIn": "à classer dans {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Très haute",
+      "high": "Haute",
+      "medium": "Moyenne",
+      "low": "Basse",
+      "lowest": "Très basse"
+    },
+    "fields": {
+      "recurrence": "se répète {{rule}}",
+      "scheduled": "prévue {{date}}",
+      "start": "débute {{date}}",
+      "created": "créée {{date}}",
+      "cancelled": "annulée {{date}}",
+      "done": "terminée {{date}}",
+      "onCompletion": "à l'achèvement : {{action}}"
     }
   },
   "commands": {
@@ -184,6 +199,26 @@
         "button1Description": "Cible principale de déplacement rapide affichée sur chaque ligne de tâche.",
         "button2Description": "Deuxième cible de déplacement rapide optionnelle.",
         "none": "(Aucun)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Intégration du plugin Tasks",
+      "blurb": "Comment ce plugin traite les métadonnées que le plugin Tasks écrit sur les lignes de tâche.",
+      "priority": {
+        "name": "Afficher la priorité",
+        "description": "Quels niveaux de priorité affichent un badge emoji sur la ligne de tâche.",
+        "all": "Toutes les priorités",
+        "mediumUp": "Moyenne et plus",
+        "highUp": "Haute et plus",
+        "hidden": "Masquée"
+      },
+      "recurrence": {
+        "name": "Afficher le badge de récurrence",
+        "description": "Marquer les tâches récurrentes avec 🔁 sur la ligne de tâche."
+      },
+      "popoverFields": {
+        "name": "Afficher les champs Tasks dans l'infobulle",
+        "description": "Lister l'échéance, la priorité, la récurrence et les autres champs Tasks au survol d'une tâche."
       }
     }
   },

@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Repeats",
     "autoPlacedTooltip": "",
     "subtaskTooltip": "",
     "activeSubtasks_one": "",

@@ -29,6 +29,9 @@ export type StorageMode = "inline-tag" | "inline-field";
 
 export type CelebrationMode = "off" | "confetti" | "creature" | "all";
 
+/** Which Tasks-plugin priority levels get an emoji badge on the task row. */
+export type PriorityDisplay = "all" | "medium-up" | "high-up" | "hidden";
+
 export type TaskScope =
   | { type: "vault" }
   | { type: "folders"; paths: string[] }
@@ -72,6 +75,12 @@ export interface PluginSettings {
   toReviewShowInStatusBar: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
   compactView: boolean;
+  /** Which priority levels show a badge on the row. The popover is unaffected. */
+  priorityDisplay: PriorityDisplay;
+  /** Show the 🔁 badge on rows of repeating tasks. The popover is unaffected. */
+  showRecurrenceBadge: boolean;
+  /** Show the Tasks-plugin metadata block in the hover popover. */
+  showTasksFieldsInPopover: boolean;
   /** Controls which celebration animations play on task completion. */
   celebrationMode: CelebrationMode;
   /**
@@ -149,6 +158,9 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewQuickMoveTargets: ["today", "this-week"],
   toReviewShowInStatusBar: false,
   compactView: false,
+  priorityDisplay: "all",
+  showRecurrenceBadge: true,
+  showTasksFieldsInPopover: true,
   celebrationMode: "confetti",
   taskOrder: {},
   completionSeen: {},

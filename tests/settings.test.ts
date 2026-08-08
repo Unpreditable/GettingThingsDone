@@ -128,3 +128,14 @@ describe("isPathInScope", () => {
     expect(isPathInScope("Tasks/b.md", { type: "files", paths: ["Tasks/a.md"] })).toBe(false);
   });
 });
+
+describe("Tasks integration defaults", () => {
+  it("shows all priority levels by default", () => {
+    expect(DEFAULT_SETTINGS.priorityDisplay).toBe("all");
+  });
+
+  it("keeps the recurrence badge and popover fields on, matching current behaviour", () => {
+    expect(DEFAULT_SETTINGS.showRecurrenceBadge).toBe(true);
+    expect(DEFAULT_SETTINGS.showTasksFieldsInPopover).toBe(true);
+  });
+});

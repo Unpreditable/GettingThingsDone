@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "recurringTooltip": "Kartojasi",
     "autoPlacedTooltip": "Automatiškai patalpinta pagal terminą — spustelėkite patvirtinti",
     "subtaskTooltip": "Použduotis",
     "activeSubtasks_one": "{{count}} aktyvi použduotis",
@@ -51,6 +50,22 @@
       "overdue_other": "vėluoja {{count}} dienų",
       "belongsIn": "vieta yra {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
+    },
+    "priority": {
+      "highest": "Aukščiausias",
+      "high": "Aukštas",
+      "medium": "Vidutinis",
+      "low": "Žemas",
+      "lowest": "Žemiausias"
+    },
+    "fields": {
+      "recurrence": "kartojasi {{rule}}",
+      "scheduled": "suplanuota {{date}}",
+      "start": "prasideda {{date}}",
+      "created": "sukurta {{date}}",
+      "cancelled": "atšaukta {{date}}",
+      "done": "atlikta {{date}}",
+      "onCompletion": "užbaigus: {{action}}"
     }
   },
   "commands": {
@@ -192,6 +207,26 @@
         "button1Description": "Pagrindinis greito perkėlimo tikslas kiekvienoje užduoties eilutėje.",
         "button2Description": "Neprivalomas antras greito perkėlimo tikslas.",
         "none": "(Nėra)"
+      }
+    },
+    "tasksIntegration": {
+      "heading": "Tasks įskiepio integracija",
+      "blurb": "Kaip šis įskiepis apdoroja metaduomenis, kuriuos Tasks įskiepis įrašo užduočių eilutėse.",
+      "priority": {
+        "name": "Rodyti prioritetą",
+        "description": "Kurie prioriteto lygiai rodomi kaip emoji ženkliukas užduoties eilutėje.",
+        "all": "Visi prioritetai",
+        "mediumUp": "Vidutinis ir aukštesnis",
+        "highUp": "Aukštas ir aukštesnis",
+        "hidden": "Paslėptas"
+      },
+      "recurrence": {
+        "name": "Rodyti pasikartojimo ženkliuką",
+        "description": "Pažymėti pasikartojančias užduotis 🔁 užduoties eilutėje."
+      },
+      "popoverFields": {
+        "name": "Rodyti Tasks laukus iššokančiajame lange",
+        "description": "Užvedus pelę ant užduoties, rodyti terminą, prioritetą, pasikartojimą ir kitus Tasks laukus."
       }
     }
   },
