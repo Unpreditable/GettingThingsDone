@@ -58,6 +58,19 @@ jobs:
           jq --arg v "$TAG" '.version = $v' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
           echo "Updated manifest.json to version $TAG"
 
+      - name: Record version in versions.json
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          MIN=$(jq -r '.minAppVersion' manifest.json)
+          jq --arg v "$TAG" --arg m "$MIN" '.[$v] = $m' versions.json > versions.tmp && mv versions.tmp versions.json
+          echo "Recorded $TAG → minAppVersion $MIN in versions.json"
+
+      - name: Sync package.json version
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          npm version "$TAG" --no-git-tag-version --allow-same-version
+          echo "Synced package.json and package-lock.json to $TAG"
+
       - name: Install dependencies
         run: npm ci
 
@@ -76,7 +89,7 @@ jobs:
           TAG="${{ steps.version.outputs.new }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json
+          git add manifest.json versions.json package.json package-lock.json
           git commit -m "chore: release $TAG"
           git tag "$TAG"
           git push origin HEAD --tags
