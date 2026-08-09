@@ -1,8 +1,13 @@
 # GTD Tasks
 
-An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks using the **Getting Things Done** methodology. Tasks are grouped into time-horizon buckets (Today, This Week, Someday…) in a sidebar panel, with one-click moves between buckets.
+Your tasks are scattered across hundreds of notes. This [Obsidian](https://obsidian.md) plugin gathers them into one sidebar panel, sorted by when you'll actually do them: Today, This Week, Next Week, This Month, Someday (the Getting Things Done time horizons).
 
-![Obsidian minimum version](https://img.shields.io/badge/Obsidian-1.8.7%2B-7c3aed)
+Your notes stay the source of truth. A bucket is just a tag on the task line, like `#gtd/today`.
+
+Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin? The two work together. This panel reads the fields Tasks writes on your task lines and puts them to use.
+
+[![Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%237c3aed&label=downloads&query=%24%5B%22gtd-tasks%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)](https://obsidian.md/plugins?id=gtd-tasks) ![Obsidian](https://img.shields.io/badge/dynamic/json?query=%24.minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2FUnpreditable%2FGettingThingsDone%2Fmain%2Fmanifest.json&label=Obsidian&color=7c3aed&prefix=v)
+[Report a bug](https://github.com/Unpreditable/GettingThingsDone/issues/new?template=bug-report.yml) · [Request a feature](https://github.com/Unpreditable/GettingThingsDone/issues/new?template=feature-request.yml) · [Ask a question](https://github.com/Unpreditable/GettingThingsDone/discussions/new?category=q-a)
 
 ![Demo](assets/demo.gif)
 
@@ -10,22 +15,34 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 
 ## Features
 
-- **GTD time-horizon buckets** — Today ⚡, This Week 📌, Next Week 🔭, This Month 📅, Someday / Maybe 💭
-- **To Review inbox** 📥 — catches all unassigned tasks so nothing slips through
-- **One-click quick-move buttons** on every task row
-- **Drag-and-drop** reordering and cross-bucket moves
-- **Context menu** (right-click) for moving tasks
-- **Subtask-aware**: indented child tasks are tracked separately, with an active-subtask count badge and a prompt to move them along with their parent
-- **Search**: filter the panel down to matching tasks
-- **Checkbox completion** with optional celebration animations (confetti, pixel creature, both, or off)
-- **Tasks plugin integration** — reads 📅 due dates, auto-assigns tasks to the matching bucket, and hands completion toggles to the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin when it's installed
-- **Two storage modes** — inline tag (`#gtd/today`) or inline field (`[gtd:: today]`)
-- **Scope filtering** — scan the entire vault, specific folders, or specific files
-- **Overdue and misfiled flags** (`❢` past due, `⚑` filed later than its date warrants) on task rows
-- **Status bar task count**
-- **Compact view** option
-- **Localized** into 13 languages, matching your Obsidian UI language automatically
-- Fully **customizable buckets** — name, emoji, date range rule, quick-move targets
+- **Time-horizon buckets** — Today ⚡, This Week 📌, Next Week 🔭, This Month 📅, Someday / Maybe 💭. Rename them, swap the emoji, reorder them, or write your own date rules.
+- **To Review inbox** 📥 — every task without a bucket lands here, so nothing slips through.
+- **Three ways to move a task** — quick-move buttons on the row, drag-and-drop between buckets, or right-click.
+- **Subtask-aware** — indented tasks track with their parent, with a count badge and a prompt to move them along.
+- **Overdue and misfiled flags** — `❢` once a due date has passed, `⚑` when a task sits in a bucket that will make you miss it.
+- **Reads Tasks plugin fields** — due dates, priority, recurrence and the rest show up as badges and on hover.
+- **Celebration animations** — confetti, a pixel creature, both, or nothing.
+- **13 languages**, matching your Obsidian UI language.
+
+Also: search, scoping to folders or files, Dataview-friendly inline fields, per-bucket status bar counts, and a compact view. See [Configuration](#configuration).
+
+---
+
+## Works with the Tasks plugin
+
+Run both, since they solve different problems.
+
+The [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin adds structure to a task: a due date, a priority, a repeat rule. It also searches your vault and lists the matching tasks inside a note.
+
+This plugin is for one view you keep open all day. Drag tasks between buckets, or reorder them inside one, and your plan for the day changes in seconds.
+
+### How they work together
+
+A task with a `📅 YYYY-MM-DD` due date lands in the bucket whose date rule matches it. Move it yourself and it stays where you put it.
+
+Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin's recurrence and completion-date setting.
+
+> **As of v0.2.0,** panel completions don't write a `✅` date. Install [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) if you want one.
 
 ---
 
@@ -44,20 +61,18 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 
 ## Installation
 
-### Community Plugins (once listed)
+Open **Settings → Community plugins → Browse**, search for **GTD Tasks**, then click **Install** and **Enable**.
 
-1. Open Obsidian → **Settings → Community plugins → Browse**
-2. Search for **GTD Tasks**
-3. Click **Install**, then **Enable**
+Or add via [Obsidian community plugin page](https://community.obsidian.md/plugins/gtd-tasks).
 
-### BRAT (beta / pre-release)
+<details>
+<summary>Beta releases via BRAT</summary>
 
-1. Install the [BRAT](https://github.com/TfTHacker/obsidian42-brat) community plugin
-2. In BRAT settings, click **Add Beta Plugin** and enter:
-   ```
-   Unpreditable/GettingThingsDone
-   ```
-3. Enable GTD Tasks in **Community plugins**
+1. Install the <a href=https://github.com/TfTHacker/obsidian42-brat>BRAT</a> community<br/>
+2. In BRAT settings, click <b>Add Beta Plugin</b> and enter: <code> Unpreditable/GettingThingsDone </code><br/>
+3. Enable GTD Tasks in <b>Community plugins</b>
+
+</details>
 
 ---
 
@@ -66,10 +81,6 @@ An [Obsidian](https://obsidian.md) plugin that organizes your markdown tasks usi
 ### Open the panel
 
 Click the checklist icon in the left ribbon, or run **Open GTD Panel** from the Command Palette (`Ctrl/Cmd + P`).
-
-### Complete a task
-
-Click the checkbox on any task row. A celebration animation plays (if enabled). The task is struck through and stays visible until midnight by default (adjustable in settings), then disappears on next load. You can also dismiss all completed tasks early with the broom icon in the panel header.
 
 ### Move a task
 
@@ -91,9 +102,7 @@ Type in the search box at the top of the panel to filter down to matching tasks.
 
 ## Configuration
 
-Open **Settings → GTD Tasks** to configure the plugin.
-
-### Storage mode
+### Annotation style
 
 Controls how bucket assignments are stored on the task line:
 
@@ -101,14 +110,13 @@ Controls how bucket assignments are stored on the task line:
 |---|---|
 | **Inline tag** (default) | `- [ ] Buy milk #gtd/today` |
 | **Inline field** | `- [ ] Buy milk [gtd:: today]` |
-
 You can migrate all existing assignments between modes from the settings tab.
 
-### Tag prefix
+### Tag / field name
 
 The prefix used in both storage modes. Default: `gtd`. Changing this also changes the tag/field name written to your files.
 
-### Task scope
+### Files to scan
 
 Limit which files are indexed:
 
@@ -116,13 +124,26 @@ Limit which files are indexed:
 - **Specific folders** — enter one or more folder paths
 - **Specific files** — enter one or more file paths
 
-### Tasks plugin integration
+### Show completed tasks until midnight
 
-A task with a `📅 YYYY-MM-DD` due date lands in the bucket whose date rule matches it. Move it yourself and it stays where you put it.
+Keeps a checked-off task in the panel, struck through, until midnight or until you reload Obsidian, whichever comes first. Clear them sooner with the broom icon in the panel header. Turn the setting off and each task disappears the moment you check it.
 
-Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin's recurrence and completion-date setting.
+Repeating tasks are the exception. Checking one off hides it right away, because its next occurrence is already in the list.
 
-> **As of v0.2.0,** panel completions don't write a `✅` date. Install [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) if you want one.
+### Flag overdue and misfiled tasks
+
+When enabled, two badges call out tasks whose due date needs attention:
+
+- **`❢`** (red) — the task's due date has passed.
+- **`⚑`** (amber) — suggests a better bucket so you don't miss the due date: a task due today in `This Week` belongs in `Today`.
+
+Neither badge appears on completed tasks, or in the To Review bucket.
+
+Hover a task to see the reason: `❢ Due Sat, Aug 1 (3 days overdue)`, `⚑ Due today (belongs in Today)`.
+
+### Compact view
+
+Reduces padding on bucket headers and task rows for a denser layout.
 
 ### Celebration animations
 
@@ -135,20 +156,9 @@ Choose what plays when you check off a task:
 | **All** | Confetti burst + pixel creature |
 | **Off** | No animation |
 
-### Overdue and misfiled flags
-
-When enabled, two badges call out tasks whose due date needs attention:
-
-- **`❢`** (red) — the task's due date has passed.
-- **`⚑`** (amber) — suggests a better bucket so you don't miss the due date: a task due today in `This Week` belongs in `Today`.
-
-Neither badge appears on completed tasks, or in the To Review bucket.
-
-Hover a task to see the reason: `❢ Due Sat, Aug 1 (3 days overdue)`, `⚑ Due today (belongs in Today)`.
-
 ### Tasks plugin fields
 
-Control how the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin fields (priority, recurrence, scheduled/start/created/cancelled dates, on-completion action) show up in the panel:
+Control how the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin fields show up in the panel:
 
 - **Show priority** (default all) — which priority levels get an emoji badge (🔺⏫🔼🔽⏬) on the task row.
 - **Show recurrence badge** (default on) — mark repeating tasks with `🔁` on the task row.
@@ -157,10 +167,6 @@ Control how the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) 
 ### Status bar
 
 Each bucket can optionally show its task count in Obsidian's status bar. Toggle per bucket in the bucket list at the bottom of settings.
-
-### Compact view
-
-Reduces padding on bucket headers and task rows for a denser layout.
 
 ---
 
