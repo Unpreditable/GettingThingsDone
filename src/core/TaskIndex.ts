@@ -22,6 +22,8 @@ export class TaskIndex {
   private listeners: ChangeCallback[] = [];
   private fileReplacedListeners: FileReplacedCallback[] = [];
   private renameListeners: RenameCallback[] = [];
+  /** Whether initialScan has run. Gates the "create" handler — see below. */
+  private hasScanned = false;
 
   constructor(
     private app: App,
@@ -34,6 +36,7 @@ export class TaskIndex {
     this.contentHashes.clear();
     const files = this.getScopedFiles();
     await Promise.all(files.map((f) => this.indexFile(f)));
+    this.hasScanned = true;
     this.emit();
   }
 
@@ -93,6 +96,19 @@ export class TaskIndex {
           this.notifyFileReplaced(file.path, oldTasks, tasks);
           this.emit();
         }
+      })
+    );
+    this.plugin.registerEvent(
+      this.app.vault.on("create", async (file) => {
+        if (!(file instanceof TFile)) return;
+        // Obsidian replays "create" for every existing file when the vault
+        // loads, and registerVaultEvents runs before the first scan. Waiting
+        // for the scan avoids indexing the whole vault one emit at a time —
+        // the scan itself covers everything that existed before it.
+        if (!this.hasScanned) return;
+        if (!this.isInScope(file)) return;
+        await this.indexFile(file);
+        this.emit();
       })
     );
     this.plugin.registerEvent(

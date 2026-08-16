@@ -54,6 +54,13 @@ function makeMockEnv(initialFiles: Record<string, string>) {
     setContentSilently(path: string, content: string) {
       contents.set(path, content);
     },
+    /** Simulates a file appearing in the vault with content already in it —
+     *  copied in from outside, synced, or written by another plugin. */
+    async fireCreated(path: string, content: string) {
+      contents.set(path, content);
+      tfiles.set(path, makeTFile(path));
+      await (vaultCbs.get("create") as any)?.(tfiles.get(path)!);
+    },
     async fireRename(oldPath: string, newPath: string) {
       const content = contents.get(oldPath) ?? "";
       contents.delete(oldPath);
@@ -79,6 +86,57 @@ describe("TaskIndex", () => {
 
     expect(index.getAllTasks().map((t) => t.text).sort()).toEqual(["Task A", "Task B"]);
     expect(notifyCount).toBe(1);
+  });
+
+  it("indexes a file that appears in the vault after the initial scan", async () => {
+    const { app, plugin, fireCreated } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    let notifyCount = 0;
+    index.onChange(() => notifyCount++);
+
+    await fireCreated("copied-in.md", "- [ ] Task B");
+
+    expect(index.getAllTasks().map((t) => t.text).sort()).toEqual(["Task A", "Task B"]);
+    expect(notifyCount).toBe(1);
+  });
+
+  it("ignores create events fired before the first scan", async () => {
+    // Obsidian replays "create" for every existing file at vault load, and
+    // registration happens before the first scan. Acting on those would index
+    // the whole vault one emit at a time.
+    const { app, plugin, fireCreated } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => vaultScope);
+    index.registerVaultEvents();
+
+    let notifyCount = 0;
+    index.onChange(() => notifyCount++);
+
+    await fireCreated("b.md", "- [ ] Task B");
+    expect(notifyCount).toBe(0);
+
+    // The scan that follows still picks it up, so nothing is lost.
+    await index.initialScan();
+    expect(index.getAllTasks().map((t) => t.text).sort()).toEqual(["Task A", "Task B"]);
+    expect(notifyCount).toBe(1);
+  });
+
+  it("ignores a created file that is out of scope", async () => {
+    const scope: TaskScope = { type: "files", paths: ["a.md"] };
+    const { app, plugin, fireCreated } = makeMockEnv({ "a.md": "- [ ] Task A" });
+    const index = new TaskIndex(app, plugin, () => scope);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    let notifyCount = 0;
+    index.onChange(() => notifyCount++);
+
+    await fireCreated("elsewhere.md", "- [ ] Task B");
+
+    expect(index.getAllTasks().map((t) => t.text)).toEqual(["Task A"]);
+    expect(notifyCount).toBe(0);
   });
 
   it("reindexFileSilently updates the index WITHOUT notifying listeners", async () => {
