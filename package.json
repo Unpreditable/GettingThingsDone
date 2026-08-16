@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "validate-translations": "node scripts/validate-translations.mjs",
-    "build": "npm run validate-translations && tsc -noEmit -skipLibCheck && npm run lint && node esbuild.config.mjs production",
+    "check-icons": "node scripts/check-icons.mjs",
+    "build": "tsc -noEmit -skipLibCheck && npm run lint && node esbuild.config.mjs production",
+    "release-check": "npm run validate-translations && npm run build && npm test",
     "lint": "eslint src/",
     "test": "jest --passWithNoTests"
   },

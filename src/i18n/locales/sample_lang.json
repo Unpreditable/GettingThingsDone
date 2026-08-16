@@ -27,7 +27,6 @@
     }
   },
   "task": {
-    "autoPlacedTooltip": "",
     "subtaskTooltip": "",
     "activeSubtasks_one": "",
     "activeSubtasks_other": "",
@@ -42,7 +41,6 @@
       "inDays_other": "",
       "overdue_one": "",
       "overdue_other": "",
-      "belongsIn": "",
       "withDetail": ""
     }
   },

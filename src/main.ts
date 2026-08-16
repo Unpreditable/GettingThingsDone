@@ -11,12 +11,12 @@ import {
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
-import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, getActiveScope, isPathInScope, migrateSettingsData, normalizeSettingsShapes } from "./settings";
+import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, getActiveScope, isPathInScope, migrateSettingsData, normalizeSettingsShapes, shouldAdoptCatchAll, shouldRecommendCatchAll } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
-import { moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement } from "./core/TaskWriter";
+import { moveTaskToBucket, toggleTaskCompletion } from "./core/TaskWriter";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
 import { diffFileTasks, applyTaskDiff, renameFileInState, migrateOrderFormat } from "./core/OrderMigration";
@@ -167,6 +167,16 @@ export default class GtdTasksPlugin extends Plugin {
     // records an older build persisted — nothing completed before this run
     // should be on screen.
     this.settings.completionSeen = {};
+    // Untouched date rules get the catch-all silently; a customised config is
+    // left alone and shown a recommendation instead.
+    if (shouldAdoptCatchAll(this.settings.buckets)) {
+      this.settings.buckets[this.settings.buckets.length - 1].dateRangeRule = { type: "catch-all" };
+    }
+    // Settled once, after the silent adoption above, so only a config we
+    // genuinely left alone stays unseen.
+    if (migrated.catchAllNoticeSeen === undefined) {
+      this.settings.catchAllNoticeSeen = !shouldRecommendCatchAll(this.settings.buckets);
+    }
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -418,9 +428,14 @@ class GtdPanelView extends ItemView {
         onMove: this.handleMove.bind(this),
         onToggle: this.handleToggle.bind(this),
         onNavigate: this.handleNavigate.bind(this),
-        onConfirm: this.handleConfirmPlacement.bind(this),
         onReorder: this.handleReorder.bind(this),
         onOpenSettings: openSettings,
+        // Only an explicit dismiss sets this. Opening settings settles nothing;
+        // actually fixing the rule hides the banner on its own.
+        onDismissCatchAllNotice: async () => {
+          this.plugin.settings.catchAllNoticeSeen = true;
+          await this.plugin.saveSettings();
+        },
         onDismissLanguageBanner: () => {
           this.plugin.languageChangeNotice = false;
           this.languageChangeNotice$.set(false);
@@ -501,19 +516,6 @@ class GtdPanelView extends ItemView {
     // fails to locate its line. Reindexing here also re-runs the diff, so a
     // dateless completion still gets its completionSeen record.
     await this.plugin.taskIndex.reindexFile(task.filePath);
-  }
-
-  private async handleConfirmPlacement(task: TaskRecord, bucketId: string) {
-    const result = await confirmTaskPlacement(
-      this.app,
-      task,
-      bucketId,
-      this.plugin.settings
-    );
-    if (!result.success) {
-      new Notice(t("notices.confirmFailed", { error: result.error }));
-      await this.plugin.taskIndex.reindexFile(task.filePath);
-    }
   }
 
   scrollToBucket(bucketId: string) {

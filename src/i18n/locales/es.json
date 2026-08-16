@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "Mover a: {{name}}",
-      "openFile": "Abrir archivo"
+      "openFile": "Abrir archivo",
+      "pinTo": "Fijar en {{name}}",
+      "unpin": "Desfijar (→ {{name}})",
+      "unpinHere": "Desfijar"
     },
     "languageBanner": {
       "message": "Tu idioma de Obsidian ha cambiado. Los nombres de las categorías se han actualizado donde fue posible — revisa los ajustes si es necesario.",
       "openSettings": "Abrir ajustes",
       "dismiss": "Descartar"
+    },
+    "catchAllBanner": {
+      "message": "Las categorías ahora admiten el rango de fechas «Todo». Las tuyas no se modificaron, así que aplícalo a la última categoría para recoger cualquier fecha que las demás no cubran.",
+      "openSettings": "Abrir ajustes",
+      "dismiss": "Descartar"
     }
   },
   "task": {
-    "autoPlacedTooltip": "Colocado automáticamente por fecha de vencimiento — haz clic para confirmar",
+    "autoPlacedMarker": "Esta fecha determina la categoría",
     "subtaskTooltip": "Subtarea",
     "activeSubtasks_one": "{{count}} subtarea activa",
     "activeSubtasks_other": "{{count}} subtareas activas",
@@ -42,7 +50,6 @@
       "inDays_other": "Vence en {{count}} días",
       "overdue_one": "{{count}} día de retraso",
       "overdue_other": "{{count}} días de retraso",
-      "belongsIn": "pertenece a {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -59,7 +66,9 @@
       "created": "creada {{date}}",
       "cancelled": "cancelada {{date}}",
       "done": "completada {{date}}",
-      "onCompletion": "al completarse: {{action}}"
+      "onCompletion": "al completarse: {{action}}",
+      "pinnedTo": "Fijada en {{bucket}}",
+      "belongsIn": "Pertenece a {{bucket}}"
     }
   },
   "commands": {
@@ -74,7 +83,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "¡Gracias por usar GTD Tasks! Lo creé para organizar mi propio trabajo cada día, y espero que también haga el tuyo un poco más fácil. Me encantaría saber qué funciona bien, qué no, y qué te gustaría que hiciera.",
+      "message": "Las categorías ahora admiten el rango de fechas «Todo (comodín)», que recoge cualquier fecha que las demás no cubran. Aplícalo a la última categoría si lo deseas.",
       "buttonText": "Compartir comentarios e ideas",
       "confirmMessage": "Esto abrirá github.com en tu navegador predeterminado para crear una nueva incidencia.",
       "confirmButton": "Continuar",
@@ -176,6 +185,7 @@
         "withinDays": "Dentro de N días",
         "withinRange": "Dentro del rango de días (desde–hasta)",
         "beyondDays": "Más de N días (comodín)",
+        "everything": "Todo (comodín)",
         "days": {
           "name": "Días",
           "description": "Las tareas vencidas en este número de días desde hoy se asignan aquí."
@@ -204,6 +214,17 @@
     "tasksIntegration": {
       "heading": "Integración con el plugin Tasks",
       "blurb": "Cómo trata este plugin los metadatos que el plugin Tasks escribe en las líneas de tarea.",
+      "planBy": {
+        "name": "Fecha de la tarea",
+        "description": "Qué fecha del plugin Tasks determina la categoría de una tarea y su orden dentro de ella.",
+        "descriptionPinned": "Las tareas fijadas ignoran este ajuste.",
+        "manual": "Ignorar fechas",
+        "dueOnly": "Vencimiento",
+        "dueFirst": "Vencimiento, si no programada",
+        "scheduledFirst": "Programada, si no vencimiento",
+        "scheduledOnly": "Programada",
+        "earliest": "La más temprana de las dos"
+      },
       "priority": {
         "name": "Mostrar prioridad",
         "description": "Qué niveles de prioridad muestran una insignia de emoji en la fila de la tarea.",

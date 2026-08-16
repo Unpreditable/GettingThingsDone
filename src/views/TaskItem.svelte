@@ -9,6 +9,7 @@
   import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
   import { formatTasksFields } from "../core/TasksFieldText";
+  import { icon } from "./icon";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
@@ -17,12 +18,22 @@
   export let priorityDisplay: PriorityDisplay = "all";
   export let showRecurrenceBadge: boolean = true;
   export let showTasksFieldsInPopover: boolean = true;
+  /** Which date field placed this task, or null when it is pinned or dateless. */
+  export let autoPlacedFrom: "due" | "scheduled" | null = null;
+  /** Set when the task is filed later than its planning date warrants. */
+  export let misfiledIn: BucketConfig | null = null;
+  /** The bucket this task is pinned to, or null when it follows its dates. */
+  export let pinnedIn: BucketConfig | null = null;
 
+  // Both can be true at once. The row has space for one signal, so the more
+  // serious wins; the popover below carries both.
   $: showOverdueBadge = showDueFlags && dueStatus?.kind === "overdue";
-  $: showMisfiledBadge = showDueFlags && dueStatus?.kind === "misfiled";
+  $: showMisfiledBadge = showDueFlags && misfiledIn !== null && !showOverdueBadge;
   // The row glyphs obey their settings; the popover always tells the truth,
   // so it is gated only by its own toggle.
-  $: fieldRows = showTasksFieldsInPopover ? formatTasksFields(task, dueStatus) : [];
+  $: fieldRows = showTasksFieldsInPopover
+    ? formatTasksFields(task, dueStatus, { autoPlacedFrom, pinnedIn, misfiledIn })
+    : [];
   $: isRecurringTask = isRecurring(task);
 
   const PRIORITY_EMOJI: Record<TaskPriority, string> = {
@@ -39,7 +50,6 @@
     task.priority && PRIORITY_VISIBLE[priorityDisplay].includes(task.priority)
       ? PRIORITY_EMOJI[task.priority]
       : null;
-  export let isAutoPlaced: boolean = false;
   /** True when the task is completed and visible until midnight. */
   export let showCompleted: boolean = false;
   export let allTasksMap: Map<string, TaskRecord> = new Map();
@@ -51,7 +61,6 @@
     move: { task: TaskRecord; targetBucketId: string | null };
     toggle: { task: TaskRecord };
     navigate: { task: TaskRecord };
-    confirm: { task: TaskRecord; bucketId: string };
     dismiss: { task: TaskRecord };
   }>();
 
@@ -160,13 +169,6 @@
     dispatch("dismiss", { task });
   }
 
-  function onConfirmClick(e: MouseEvent) {
-    e.stopPropagation();
-    const bucketEl = (e.target as HTMLElement).closest("[data-bucket-id]");
-    const bucketId = (bucketEl as HTMLElement | null)?.dataset.bucketId ?? "";
-    if (bucketId) dispatch("confirm", { task, bucketId });
-  }
-
   function onContextMenu(e: MouseEvent) {
     e.preventDefault();
     dispatch("move", { task, targetBucketId: "__context_menu__" });
@@ -193,29 +195,22 @@
     on:change={onCheckboxChange}
   />
 
+  <!-- Flags lead: they are the reason to look at this row at all, whereas
+       priority and recurrence are standing attributes of the task. -->
+  {#if showOverdueBadge}
+    <span class="gtd-overdue-badge" use:icon={"alert-triangle"}></span>
+  {/if}
+
+  {#if showMisfiledBadge}
+    <span class="gtd-misfiled-badge" use:icon={"flag"}></span>
+  {/if}
+
   {#if priorityEmoji}
     <span class="gtd-priority-badge">{priorityEmoji}</span>
   {/if}
 
   {#if isRecurringTask && showRecurrenceBadge}
     <span class="gtd-recurring-badge">🔁</span>
-  {/if}
-
-  {#if showOverdueBadge}
-    <span class="gtd-overdue-badge">❢</span>
-  {/if}
-
-  {#if showMisfiledBadge}
-    <span class="gtd-misfiled-badge">⚑</span>
-  {/if}
-
-  {#if isAutoPlaced}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <span
-      class="gtd-auto-badge"
-      title={t("task.autoPlacedTooltip")}
-      on:click={onConfirmClick}
-    >👁</span>
   {/if}
 
   {#if showParentArrow}
@@ -250,12 +245,24 @@
         <div class="gtd-tooltip-fields">
           {#each fieldRows as row}
             <div class="gtd-tooltip-field">
-              <span
-                class="gtd-tooltip-field-emoji"
-                class:is-overdue={row.emoji === "❢"}
-                class:is-misfiled={row.emoji === "⚑"}
-              >{row.emoji}</span>
+              {#if row.icon}
+                <span
+                  class="gtd-tooltip-field-emoji"
+                  class:is-overdue={row.tone === "overdue"}
+                  class:is-misfiled={row.tone === "misfiled"}
+                  use:icon={row.icon}
+                ></span>
+              {:else}
+                <span class="gtd-tooltip-field-emoji">{row.emoji}</span>
+              {/if}
               <span class="gtd-tooltip-field-text">{row.text}</span>
+              {#if row.marker}
+                <span
+                  class="gtd-tooltip-field-marker"
+                  title={t("task.autoPlacedMarker")}
+                  use:icon={row.marker}
+                ></span>
+              {/if}
             </div>
           {/each}
         </div>
@@ -299,22 +306,24 @@
 </div>
 
 <style>
-  .gtd-overdue-badge {
+  /* Sizing lives in styles.css: the injected SVG carries no Svelte scope class
+     and is out of reach here. This block owns the span around it. */
+  .gtd-overdue-badge,
+  .gtd-misfiled-badge {
     flex-shrink: 0;
-    color: var(--text-error);
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
     font-size: 13px;
     line-height: 1;
     padding-right: 2px;
   }
 
+  .gtd-overdue-badge {
+    color: var(--gtd-flag-overdue);
+  }
+
   .gtd-misfiled-badge {
-    flex-shrink: 0;
-    color: var(--text-warning);
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 1;
-    padding-right: 2px;
+    color: var(--gtd-flag-misfiled);
   }
 
   .gtd-priority-badge {
@@ -330,19 +339,6 @@
     font-size: 13px;
     line-height: 1;
     padding-right: 2px;
-  }
-
-  .gtd-auto-badge {
-    flex-shrink: 0;
-    font-size: 13px;
-    line-height: 1;
-    padding-right: 2px;
-    cursor: pointer;
-    opacity: 0.7;
-  }
-
-  .gtd-auto-badge:hover {
-    opacity: 1;
   }
 
   .gtd-parent-badge {
@@ -388,22 +384,36 @@
   div.gtd-tooltip-field {
     display: flex;
     gap: 4px;
-    align-items: baseline;
+    /* Centred, not baseline: an SVG has no baseline to align a glyph row
+       against, and rows lead with either kind. */
+    align-items: center;
     color: var(--text-normal);
   }
 
   .gtd-tooltip-field-emoji {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Fixed width so glyph rows and icon rows share one left rail. */
+    width: 1.15em;
+    height: 1.15em;
   }
 
   .gtd-tooltip-field-emoji.is-overdue {
-    color: var(--text-error);
-    font-weight: 700;
+    color: var(--gtd-flag-overdue);
   }
 
   .gtd-tooltip-field-emoji.is-misfiled {
-    color: var(--text-warning);
-    font-weight: 700;
+    color: var(--gtd-flag-misfiled);
+  }
+
+  .gtd-tooltip-field-marker {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    --icon-size: 12px;
+    color: var(--text-accent);
   }
 
   .gtd-tooltip-divider {

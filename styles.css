@@ -25,6 +25,67 @@
   gap: 4px;
 }
 
+/* Flag colours.
+   --text-error and --text-warning are tuned for body text, so as a small icon
+   they read as dull. These lift them without leaving the theme's palette: the
+   hue stays whatever the theme chose, only lightness moves, and it moves in
+   opposite directions per theme so the flag gains contrast against the actual
+   background rather than always going pale.
+
+   color-mix is safe here — Obsidian's own app.css uses it in 85 places. */
+.gtd-task,
+.gtd-tooltip {
+  --gtd-flag-overdue: var(--text-error);
+  --gtd-flag-misfiled: var(--text-warning);
+}
+
+/* Saturation, not lightness. Mixing toward white raises brightness but drains
+   chroma, so the flag ends up paler rather than louder — the opposite of the
+   intent. A filter lifts the colour itself and leaves the theme's hue alone. */
+.gtd-overdue-badge .svg-icon,
+.gtd-misfiled-badge .svg-icon,
+.gtd-tooltip-field-emoji.is-overdue .svg-icon,
+.gtd-tooltip-field-emoji.is-misfiled .svg-icon {
+  filter: saturate(1.8) brightness(1.15);
+}
+
+/* Lucide icon tuning.
+   setIcon() injects <svg class="svg-icon"> imperatively, so Svelte's scoped
+   styles never reach it — every rule touching the SVG has to live here.
+
+   Obsidian's own base rules are:
+     svg.svg-icon { width/height: var(--icon-size); stroke-width: var(--icon-stroke) }
+     .svg-icon    { --icon-size: var(--icon-xs);  opacity: .7;  margin-right: var(--size-2-2) }
+   The second sets --icon-size ON the svg, so setting that variable on a parent
+   does nothing; overriding needs a selector that reaches the svg itself. */
+.gtd-task .svg-icon,
+.gtd-tooltip .svg-icon {
+  --icon-size: 1em;
+  opacity: 1;
+  margin-right: 0;
+}
+
+/* The marker beside the date driving placement is deliberately smaller than the
+   field glyph it trails — it annotates that row rather than labelling it. */
+.gtd-tooltip .gtd-tooltip-field-marker .svg-icon {
+  --icon-size: 0.85em;
+}
+
+/* These two were colour emoji (🧹, ⚙) before becoming Lucide icons. Obsidian
+   styles .clickable-icon's own hover/active states at higher specificity than a
+   bare class, so the colour is set on the svg to keep it across every state.
+
+   Both header buttons deliberately share ONE class rather than having a rule
+   each: separate rules let their pressed behaviour drift apart, which is how
+   one ended up reacting to a press and the other not. */
+.gtd-header-icon .svg-icon {
+  color: var(--text-muted);
+}
+
+.gtd-header-icon:active .svg-icon {
+  color: var(--color-purple);
+}
+
 .gtd-panel-header h3 {
   margin: 0;
   font-size: var(--font-ui-medium);
@@ -325,14 +386,33 @@
 
 /* ── Settings tab ───────────────────────────────────────────────────────── */
 
+/* The flag preview in the settings description. Shares the row's colours via
+   the same custom properties, so the two can't drift apart. */
+.gtd-flag-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  --gtd-flag-overdue: var(--text-error);
+  --gtd-flag-misfiled: var(--text-warning);
+}
+
+.gtd-flag-preview-row .svg-icon {
+  --icon-size: 1em;
+  opacity: 1;
+  margin-right: 0;
+  filter: saturate(1.8) brightness(1.15);
+}
+
 .gtd-flag-overdue {
-  color: var(--text-error);
-  font-weight: 700;
+  color: var(--gtd-flag-overdue);
+  display: inline-flex;
+  align-items: center;
 }
 
 .gtd-flag-misfiled {
-  color: var(--text-warning);
-  font-weight: 700;
+  color: var(--gtd-flag-misfiled);
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Obsidian 1.13+'s declarative settings API wraps every getSettingDefinitions()

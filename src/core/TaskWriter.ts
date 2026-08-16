@@ -104,16 +104,6 @@ export async function moveTaskToBucket(
   }
 }
 
-export async function confirmTaskPlacement(
-  app: App,
-  task: TaskRecord,
-  bucketId: string,
-  settings: PluginSettings
-): Promise<MoveResult> {
-  const bucket = settings.buckets.find((b) => b.id === bucketId) ?? null;
-  return moveTaskToBucket(app, task, bucket, settings);
-}
-
 export async function toggleTaskCompletion(
   app: App,
   task: TaskRecord

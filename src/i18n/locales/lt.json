@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "Perkelti į: {{name}}",
-      "openFile": "Atidaryti failą"
+      "openFile": "Atidaryti failą",
+      "pinTo": "Prisegti prie {{name}}",
+      "unpin": "Atsegti (→ {{name}})",
+      "unpinHere": "Atsegti"
     },
     "languageBanner": {
       "message": "Obsidian kalba pasikeitė. Kategorijų pavadinimai atnaujinti ten, kur buvo įmanoma — patikrinkite nustatymus, jei reikia.",
       "openSettings": "Atidaryti nustatymus",
       "dismiss": "Gerai"
+    },
+    "catchAllBanner": {
+      "message": "Kategorijos dabar palaiko datų intervalą „Viskas“. Jūsų taisyklės liko nepakeistos, tad nustatykite jį paskutinei kategorijai, kad pagautų bet kurią kitų praleistą datą.",
+      "openSettings": "Atidaryti nustatymus",
+      "dismiss": "Gerai"
     }
   },
   "task": {
-    "autoPlacedTooltip": "Automatiškai patalpinta pagal terminą — spustelėkite patvirtinti",
+    "autoPlacedMarker": "Ši data nustato kategoriją",
     "subtaskTooltip": "Použduotis",
     "activeSubtasks_one": "{{count}} aktyvi použduotis",
     "activeSubtasks_few": "{{count}} aktyvios použduotys",
@@ -48,7 +56,6 @@
       "overdue_few": "vėluoja {{count}} dienas",
       "overdue_many": "vėluoja {{count}} dienos",
       "overdue_other": "vėluoja {{count}} dienų",
-      "belongsIn": "vieta yra {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -65,7 +72,9 @@
       "created": "sukurta {{date}}",
       "cancelled": "atšaukta {{date}}",
       "done": "atlikta {{date}}",
-      "onCompletion": "užbaigus: {{action}}"
+      "onCompletion": "užbaigus: {{action}}",
+      "pinnedTo": "Prisegta prie {{bucket}}",
+      "belongsIn": "Priklauso {{bucket}}"
     }
   },
   "commands": {
@@ -80,7 +89,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "Ačiū, kad naudojatės GTD Tasks! Sukūriau jį savo kasdieniam darbui tvarkyti ir tikiuosi, kad jis palengvins ir jūsų darbą. Man tikrai įdomu išgirsti, kas veikia gerai, kas ne, ir ko jums trūksta.",
+      "message": "Kategorijos dabar palaiko datų intervalą „Viskas (visa kita)“, kuris pagauna bet kurią kitų praleistą datą. Jei norite, nustatykite jį paskutinei kategorijai.",
       "buttonText": "Dalintis atsiliepimais ir idėjomis",
       "confirmMessage": "Tai atvers github.com jūsų numatytojoje naršyklėje, kad galėtumėte pranešti apie naują problemą.",
       "confirmButton": "Tęsti",
@@ -184,6 +193,7 @@
         "withinDays": "Per N dienų",
         "withinRange": "Dienų diapazone (nuo–iki)",
         "beyondDays": "Daugiau nei N dienų (visi kiti)",
+        "everything": "Viskas (visa kita)",
         "days": {
           "name": "Dienos",
           "description": "Užduotys, kurių terminas yra per nurodytą dienų skaičių nuo šiandien, priskiriamos čia."
@@ -212,6 +222,17 @@
     "tasksIntegration": {
       "heading": "Tasks įskiepio integracija",
       "blurb": "Kaip šis įskiepis apdoroja metaduomenis, kuriuos Tasks įskiepis įrašo užduočių eilutėse.",
+      "planBy": {
+        "name": "Užduoties data",
+        "description": "Kuri Tasks papildinio data nustato užduoties kategoriją ir jos vietą joje.",
+        "descriptionPinned": "Prisegtos užduotys šio nustatymo nepaiso.",
+        "manual": "Nepaisyti datų",
+        "dueOnly": "Terminas",
+        "dueFirst": "Terminas, kitu atveju suplanuota",
+        "scheduledFirst": "Suplanuota, kitu atveju terminas",
+        "scheduledOnly": "Suplanuota",
+        "earliest": "Ankstesnė iš dviejų"
+      },
       "priority": {
         "name": "Rodyti prioritetą",
         "description": "Kurie prioriteto lygiai rodomi kaip emoji ženkliukas užduoties eilutėje.",

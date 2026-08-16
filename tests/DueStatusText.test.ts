@@ -1,4 +1,4 @@
-import { formatDueLine } from "../src/core/DueStatusText";
+import { formatDueLine, formatMisfiledLine } from "../src/core/DueStatusText";
 import { DEFAULT_BUCKETS } from "../src/settings";
 
 const today = DEFAULT_BUCKETS.find((b) => b.id === "today")!;
@@ -37,13 +37,11 @@ describe("formatDueLine", () => {
       .toBe("Due Mon, Aug 3 (1 day overdue)");
   });
 
-  it("names the destination bucket for a misfiled task due today", () => {
-    expect(formatDueLine(new Date(2026, 7, 4), { kind: "misfiled", diffDays: 0, belongsIn: today }))
-      .toBe("Due today (belongs in Today)");
-  });
+});
 
-  it("names the destination bucket for a misfiled task due later", () => {
-    expect(formatDueLine(new Date(2026, 7, 8), { kind: "misfiled", diffDays: 4, belongsIn: thisWeek }))
-      .toBe("Due Sat, Aug 8 (belongs in This Week)");
+describe("formatMisfiledLine", () => {
+  it("names the bucket the task belongs in", () => {
+    expect(formatMisfiledLine(today)).toBe("Belongs in Today");
+    expect(formatMisfiledLine(thisWeek)).toBe("Belongs in This Week");
   });
 });

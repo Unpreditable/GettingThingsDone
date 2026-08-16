@@ -1,5 +1,6 @@
 import { groupTasksIntoBuckets, regroupByHierarchy, TO_REVIEW_ID } from "../src/core/BucketManager";
 import { DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "../src/settings";
+import type { PlanBy } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
 import { computeOrderKeys, entryId } from "../src/core/TaskOrder";
 import type { OrderEntry } from "../src/core/TaskOrder";
@@ -50,6 +51,83 @@ function daysFromMonday(days: number): Date {
   d.setHours(0, 0, 0, 0);
   return d;
 }
+
+describe("placement by planBy", () => {
+  const base = { ...DEFAULT_SETTINGS, buckets: DEFAULT_BUCKETS };
+
+  /** Which bucket this task lands in under `planBy`. */
+  function bucketOf(overrides: Partial<TaskRecord>, planBy: PlanBy): string {
+    const task = makeTask(overrides);
+    const groups = groupTasksIntoBuckets([task], { ...base, planBy });
+    return groups.find((g) => g.tasks.some((t) => t.id === task.id))!.bucketId;
+  }
+
+  // Monday Feb 23. Today ≤ Feb 23 · This Week Feb 24–Mar 1 · Next Week Mar 2–8 ·
+  // This Month Feb 24–28 (first match wins, so This Week takes Feb 24–28) ·
+  // Someday = the catch-all.
+  const TODAY = daysFromMonday(0);
+  const SOON = daysFromMonday(2);
+  const FAR = daysFromMonday(300);
+
+  const shapes = {
+    "both, scheduled earlier": { dueDate: FAR, scheduledDate: TODAY },
+    "both, scheduled later": { dueDate: SOON, scheduledDate: FAR },
+    "due only": { dueDate: SOON },
+    "scheduled only": { scheduledDate: SOON },
+    dateless: {},
+  };
+
+  // Only the first two shapes separate the modes; the rest confirm nothing else
+  // shifted.
+  const expected: Record<PlanBy, Record<keyof typeof shapes, string>> = {
+    manual: {
+      "both, scheduled earlier": TO_REVIEW_ID, "both, scheduled later": TO_REVIEW_ID,
+      "due only": TO_REVIEW_ID, "scheduled only": TO_REVIEW_ID, dateless: TO_REVIEW_ID,
+    },
+    "due-only": {
+      "both, scheduled earlier": "someday", "both, scheduled later": "this-week",
+      "due only": "this-week", "scheduled only": TO_REVIEW_ID, dateless: TO_REVIEW_ID,
+    },
+    "due-first": {
+      "both, scheduled earlier": "someday", "both, scheduled later": "this-week",
+      "due only": "this-week", "scheduled only": "this-week", dateless: TO_REVIEW_ID,
+    },
+    "scheduled-first": {
+      "both, scheduled earlier": "today", "both, scheduled later": "someday",
+      "due only": "this-week", "scheduled only": "this-week", dateless: TO_REVIEW_ID,
+    },
+    "scheduled-only": {
+      "both, scheduled earlier": "today", "both, scheduled later": "someday",
+      "due only": TO_REVIEW_ID, "scheduled only": "this-week", dateless: TO_REVIEW_ID,
+    },
+    earliest: {
+      "both, scheduled earlier": "today", "both, scheduled later": "this-week",
+      "due only": "this-week", "scheduled only": "this-week", dateless: TO_REVIEW_ID,
+    },
+  };
+
+  for (const [planBy, row] of Object.entries(expected) as [PlanBy, Record<keyof typeof shapes, string>][]) {
+    describe(planBy, () => {
+      for (const [shape, want] of Object.entries(row) as [keyof typeof shapes, string][]) {
+        it(`puts a ${shape} task in ${want}`, () => {
+          expect(bucketOf(shapes[shape], planBy)).toBe(want);
+        });
+      }
+    });
+  }
+
+  it("sends a far-future task to Someday, not To Review, via the catch-all", () => {
+    expect(bucketOf({ dueDate: FAR }, "due-only")).toBe("someday");
+  });
+
+  it("strands a far-future task in To Review when the last bucket has no rule", () => {
+    const legacy = DEFAULT_BUCKETS.map((b) => ({ ...b }));
+    legacy[legacy.length - 1].dateRangeRule = null;
+    const task = makeTask({ dueDate: FAR });
+    const groups = groupTasksIntoBuckets([task], { ...base, buckets: legacy, planBy: "due-only" });
+    expect(groups.find((g) => g.tasks.some((t) => t.id === task.id))!.bucketId).toBe(TO_REVIEW_ID);
+  });
+});
 
 describe("groupTasksIntoBuckets", () => {
   const settings = { ...DEFAULT_SETTINGS, buckets: DEFAULT_BUCKETS };
@@ -122,7 +200,7 @@ describe("groupTasksIntoBuckets", () => {
     expect(someday.tasks).toHaveLength(1);
   });
 
-  it("marks a This Week task due today as misfiled, not overdue", () => {
+  it("records misfiling separately from the due status, since both can apply", () => {
     const taskSettingsWithTag = {
       ...settings,
       storageMode: "inline-tag" as const,
@@ -136,7 +214,10 @@ describe("groupTasksIntoBuckets", () => {
     const groups = groupTasksIntoBuckets([task], taskSettingsWithTag);
     const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
     expect(thisWeek.tasks).toHaveLength(1);
-    expect(thisWeek.dueStatuses[task.id]).toMatchObject({ kind: "misfiled", diffDays: 0 });
+    expect(thisWeek.misfiledIn[task.id]?.id).toBe("today");
+    // Due today is not past due, so the 📅 story stays on-track while the
+    // planning date independently says the task is filed too far out.
+    expect(thisWeek.dueStatuses[task.id]).toEqual({ kind: "on-track", diffDays: 0 });
   });
 
   it("records an on-track status for a dated task so the popover can show its date", () => {
@@ -153,11 +234,19 @@ describe("groupTasksIntoBuckets", () => {
     expect(review.dueStatuses[task.id]).toBeUndefined();
   });
 
-  it("tracks auto-placed tasks in autoPlacedTaskIds", () => {
+  it("records which date field auto-placed each task", () => {
     const task = makeTask({ dueDate: daysFromMonday(1) }); // tomorrow = this-week
     const groups = groupTasksIntoBuckets([task], settings);
     const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
-    expect(thisWeek.autoPlacedTaskIds).toContain(task.id);
+    // The popover marks the winning date row, so it needs the field, not a flag.
+    expect(thisWeek.autoPlacedFrom[task.id]).toBe("due");
+  });
+
+  it("reports the scheduled date as the source when it is the one planning the task", () => {
+    const task = makeTask({ dueDate: daysFromMonday(30), scheduledDate: daysFromMonday(1) });
+    const groups = groupTasksIntoBuckets([task], { ...settings, planBy: "scheduled-first" });
+    const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
+    expect(thisWeek.autoPlacedFrom[task.id]).toBe("scheduled");
   });
 
   it("does not mark explicitly assigned tasks as auto-placed", () => {
@@ -174,7 +263,7 @@ describe("groupTasksIntoBuckets", () => {
     const groups = groupTasksIntoBuckets([task], taskSettingsWithTag);
     const thisWeek = groups.find((g) => g.bucketId === "this-week")!;
     expect(thisWeek.tasks).toHaveLength(1);
-    expect(thisWeek.autoPlacedTaskIds).not.toContain(task.id);
+    expect(thisWeek.autoPlacedFrom[task.id]).toBeUndefined();
   });
 
   it("returns groups in correct order (To Review first)", () => {

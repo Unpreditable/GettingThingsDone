@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "Pārvietot uz: {{name}}",
-      "openFile": "Atvērt failu"
+      "openFile": "Atvērt failu",
+      "pinTo": "Piespraust {{name}}",
+      "unpin": "Atspraust (→ {{name}})",
+      "unpinHere": "Atspraust"
     },
     "languageBanner": {
       "message": "Obsidian valoda ir mainīta. Kategoriju nosaukumi atjaunināti, kur iespējams — pārbaudiet iestatījumus, ja nepieciešams.",
       "openSettings": "Atvērt iestatījumus",
       "dismiss": "Aizvērt"
+    },
+    "catchAllBanner": {
+      "message": "Kategorijas tagad atbalsta datumu diapazonu “Viss”. Jūsu noteikumi palika nemainīti, tāpēc iestatiet to pēdējai kategorijai, lai notvertu jebkuru datumu, ko pārējās izlaiž.",
+      "openSettings": "Atvērt iestatījumus",
+      "dismiss": "Aizvērt"
     }
   },
   "task": {
-    "autoPlacedTooltip": "Automātiski izvietots pēc izpildes datuma — noklikšķiniet, lai apstiprinātu",
+    "autoPlacedMarker": "Šis datums nosaka kategoriju",
     "subtaskTooltip": "Apakšuzdevums",
     "activeSubtasks_zero": "{{count}} aktīvu apakšuzdevumu",
     "activeSubtasks_one": "{{count}} aktīvs apakšuzdevums",
@@ -45,7 +53,6 @@
       "overdue_zero": "nokavēts par {{count}} dienām",
       "overdue_one": "nokavēts par {{count}} dienu",
       "overdue_other": "nokavēts par {{count}} dienām",
-      "belongsIn": "vieta ir {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -62,7 +69,9 @@
       "created": "izveidots {{date}}",
       "cancelled": "atcelts {{date}}",
       "done": "pabeigts {{date}}",
-      "onCompletion": "pabeidzot: {{action}}"
+      "onCompletion": "pabeidzot: {{action}}",
+      "pinnedTo": "Piesprausts: {{bucket}}",
+      "belongsIn": "Pieder {{bucket}}"
     }
   },
   "commands": {
@@ -77,7 +86,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "Paldies, ka izmantojat GTD Tasks! Es to izveidoju, lai organizētu savu ikdienas darbu, un ceru, ka tas atvieglos arī jūsējo. Man tiešām būtu interesanti uzzināt, kas darbojas labi, kas ne, un ko jūs vēlētos, lai tas dara.",
+      "message": "Kategorijas tagad atbalsta datumu diapazonu “Viss (viss pārējais)”, kas notver jebkuru datumu, ko pārējās izlaiž. Ja vēlaties, iestatiet to pēdējai kategorijai.",
       "buttonText": "Dalīties atsauksmēs un idejās",
       "confirmMessage": "Tas atvērs github.com jūsu noklusējuma pārlūkprogrammā, lai izveidotu jaunu problēmu.",
       "confirmButton": "Turpināt",
@@ -180,6 +189,7 @@
         "withinDays": "N dienu laikā",
         "withinRange": "Dienu diapazonā (no–līdz)",
         "beyondDays": "Vairāk par N dienām (visi pārējie)",
+        "everything": "Viss (viss pārējais)",
         "days": {
           "name": "Dienas",
           "description": "Uzdevumi ar izpildes termiņu norādītajā dienu skaitā no šodienas tiek piešķirti šeit."
@@ -208,6 +218,17 @@
     "tasksIntegration": {
       "heading": "Tasks spraudņa integrācija",
       "blurb": "Kā šis spraudnis apstrādā metadatus, ko Tasks spraudnis pievieno uzdevumu rindām.",
+      "planBy": {
+        "name": "Uzdevuma datums",
+        "description": "Kurš Tasks spraudņa datums nosaka uzdevuma kategoriju un tā secību tajā.",
+        "descriptionPinned": "Piespraustie uzdevumi ignorē šo iestatījumu.",
+        "manual": "Ignorēt datumus",
+        "dueOnly": "Termiņš",
+        "dueFirst": "Termiņš, citādi plānotais",
+        "scheduledFirst": "Plānotais, citādi termiņš",
+        "scheduledOnly": "Plānotais",
+        "earliest": "Agrākais no abiem"
+      },
       "priority": {
         "name": "Rādīt prioritāti",
         "description": "Kuri prioritātes līmeņi rāda emocijzīmes nozīmīti uzdevuma rindā.",

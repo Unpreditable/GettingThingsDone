@@ -8,7 +8,9 @@
   import type { TaskRecord } from "../core/TaskParser";
   import { getTagValue, getInlineFieldValue } from "../core/TaskParser";
   import type { BucketConfig, PluginSettings } from "../settings";
-  import { TO_REVIEW_ID } from "../core/BucketManager";
+  import { shouldRecommendCatchAll } from "../settings";
+  import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
+  import { icon } from "./icon";
   import { t } from "../i18n/i18n";
 
   export let bucketGroups$: Readable<BucketGroupData[]>;
@@ -27,10 +29,15 @@
   ) => Promise<void>;
   export let onToggle: (task: TaskRecord) => Promise<void>;
   export let onNavigate: (task: TaskRecord) => void;
-  export let onConfirm: (task: TaskRecord, bucketId: string) => Promise<void>;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onOpenSettings: () => void;
   export let onDismissLanguageBanner: () => void;
+  export let onDismissCatchAllNotice: () => void;
+
+  // Keyed off the shape of the rules rather than tasks actually piling up in To
+  // Review, so the warning arrives before the mess does.
+  $: showCatchAllBanner =
+    !settings.catchAllNoticeSeen && shouldRecommendCatchAll(settings.buckets);
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
@@ -41,6 +48,16 @@
   );
   $: taskBucketMap = new Map<string, string>(
     bucketGroups.flatMap((g) => g.tasks.map((t) => [t.id, g.bucketId]))
+  );
+  /** Task id → the bucket its tag pins it to. Membership follows the same test
+   *  resolveManualAssignment applies, so a tag naming a deleted bucket is out. */
+  $: pinnedIn = new Map<string, BucketConfig>(
+    bucketGroups
+      .flatMap((g) => g.tasks)
+      .flatMap((task) => {
+        const bucket = hasExplicitAssignment(task) ? bucketConfigMap.get(taskBucketMap.get(task.id) ?? "") : undefined;
+        return bucket ? [[task.id, bucket] as [string, BucketConfig]] : [];
+      })
   );
 
   let searchQuery = '';
@@ -164,21 +181,39 @@
 
   function showContextMenu(task: TaskRecord) {
     const menu = new Menu();
+    const currentBucketId = taskBucketMap.get(task.id) ?? TO_REVIEW_ID;
+    const autoTarget = autoBucketFor(task, settings);
 
-    menu.addItem((item) =>
-      item
-        .setTitle(`${settings.toReviewEmoji} ${t("panel.contextMenu.moveTo", { name: t("buckets.toReview") })}`)
-        .setIcon("inbox")
-        .onClick(() => onMove(task, null))
-    );
-
-    menu.addSeparator();
+    if (hasExplicitAssignment(task)) {
+      if (autoTarget) {
+        // The arrow promises the task will land elsewhere, so it is dropped when
+        // the dates point at the bucket it already sits in.
+        const title =
+          autoTarget.id === currentBucketId
+            ? t("panel.contextMenu.unpinHere")
+            : t("panel.contextMenu.unpin", { name: autoTarget.name });
+        menu.addItem((item) => item.setTitle(title).setIcon("pin-off").onClick(() => onMove(task, null)));
+        menu.addSeparator();
+      }
+    } else {
+      const here = bucketConfigMap.get(currentBucketId);
+      if (here) {
+        menu.addItem((item) =>
+          item
+            .setTitle(t("panel.contextMenu.pinTo", { name: here.name }))
+            .setIcon("pin")
+            .onClick(() => onMove(task, here.id))
+        );
+        menu.addSeparator();
+      }
+    }
 
     for (const bucket of settings.buckets) {
       const b = bucket;
+      if (b.id === currentBucketId) continue;
       menu.addItem((item) =>
         item
-          .setTitle(`${b.emoji} ${t("panel.contextMenu.moveTo", { name: b.name })}`)
+          .setTitle(t("panel.contextMenu.moveTo", { name: `${b.emoji} ${b.name}` }))
           .onClick(() => onMove(task, b.id))
       );
     }
@@ -298,17 +333,19 @@
       {#if settings.completedVisibilityUntilMidnight}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
         <span
-          class="clickable-icon gtd-dismiss-all-icon"
+          class="clickable-icon gtd-header-icon"
           title={t("panel.dismissAll")}
           on:click={dismissAllCompleted}
-        >🧹</span>
+          use:icon={"check-check"}
+        ></span>
       {/if}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <span
-        class="clickable-icon gtd-settings-icon"
+        class="clickable-icon gtd-header-icon"
         title={t("panel.openSettings")}
         on:click={onOpenSettings}
-      >⚙</span>
+        use:icon={"settings"}
+      ></span>
     </div>
   </div>
 
@@ -320,6 +357,18 @@
         <span class="gtd-language-banner-btn" on:click={() => { onOpenSettings(); onDismissLanguageBanner(); }}>{t("panel.languageBanner.openSettings")}</span>
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
         <span class="gtd-language-banner-btn" on:click={onDismissLanguageBanner}>{t("panel.languageBanner.dismiss")}</span>
+      </div>
+    </div>
+  {/if}
+
+  {#if showCatchAllBanner}
+    <div class="gtd-language-banner">
+      <span class="gtd-language-banner-message">{t("panel.catchAllBanner.message")}</span>
+      <div class="gtd-language-banner-actions">
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={onOpenSettings}>{t("panel.catchAllBanner.openSettings")}</span>
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={onDismissCatchAllNotice}>{t("panel.catchAllBanner.dismiss")}</span>
       </div>
     </div>
   {/if}
@@ -345,7 +394,9 @@
         priorityDisplay={settings.priorityDisplay}
         showRecurrenceBadge={settings.showRecurrenceBadge}
         showTasksFieldsInPopover={settings.showTasksFieldsInPopover}
-        autoPlacedTaskIds={group.autoPlacedTaskIds}
+        autoPlacedFrom={group.autoPlacedFrom}
+        misfiledIn={group.misfiledIn}
+        {pinnedIn}
         agedCompletedTaskIds={group.agedCompletedTaskIds}
         quickMoveTargets={getQuickMoveTargets(group.bucketId)}
         showCompletedUntilMidnight={settings.completedVisibilityUntilMidnight}
@@ -355,7 +406,6 @@
         on:move={(e) => handleMove(e.detail.task, e.detail.targetBucketId)}
         on:toggle={(e) => handleToggle(e.detail.task)}
         on:navigate={(e) => onNavigate(e.detail.task)}
-        on:confirm={(e) => onConfirm(e.detail.task, e.detail.bucketId)}
         on:drop={handleDrop}
         on:reorder={handleReorderEvent}
       />

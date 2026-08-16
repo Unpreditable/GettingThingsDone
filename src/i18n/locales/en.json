@@ -31,8 +31,14 @@
     "contextMenu": {
       "moveTo_comment": "Right-click context menu item on a task. {{name}} = the destination bucket's display name.",
       "moveTo": "Move to: {{name}}",
-      "openFile_comment": "Right-click context menu item on a task. Opens the source markdown file in the editor.",
-      "openFile": "Open file"
+      "openFile_comment": "Right-click context menu item on a task. Opens the markdown file at that task's line. Phrased like Obsidian's own 'Show in system explorer'.",
+      "openFile": "Show in file",
+      "pinTo_comment": "Context menu item shown on a task that is currently placed automatically by its date. Choosing it pins the task to the bucket it is already in, so it stops following the date. {{name}} = that bucket's display name.",
+      "pinTo": "Pin to {{name}}",
+      "unpin_comment": "Context menu item shown on a pinned task. Choosing it removes the pin so the task follows its dates again. {{name}} = the bucket its dates will send it to. The arrow means 'goes to'.",
+      "unpin": "Unpin (→ {{name}})",
+      "unpinHere_comment": "Same action as 'unpin', shown when the task's dates point at the bucket it is already in — nothing moves, only the pin is removed. Keep it identical to 'unpin' minus the destination.",
+      "unpinHere": "Unpin"
     },
     "languageBanner": {
       "message_comment": "Dismissable info banner shown once after the user changes their Obsidian interface language and restarts. 'Bucket names' are the GTD time-horizon categories (Today, This Week, etc.) — their display names may have been auto-renamed to match the new language.",
@@ -41,11 +47,17 @@
       "openSettings": "Open Settings",
       "dismiss_comment": "Button in the language banner. Closes the banner without opening settings.",
       "dismiss": "Dismiss"
+    },
+    "catchAllBanner": {
+      "_comment": "Dismissable banner shown once when an update added the 'Everything' catch-all date range but the user's bucket rules were customised, so they were left alone. Without a catch-all, tasks dated beyond every bucket's range collect in To Review. Dismissal is permanent. Reuse the languageBanner button wording.",
+      "message": "Buckets now support an 'Everything (catch-all)' date range to handle any date the others miss. Set it on your last bucket, if desired.",
+      "openSettings": "Open Settings",
+      "dismiss": "Dismiss"
     }
   },
   "task": {
-    "autoPlacedTooltip_comment": "Tooltip on tasks automatically assigned to a bucket based on their 📅 due date (written by the Tasks plugin). The user can click the task's bucket badge to confirm the placement and lock it in.",
-    "autoPlacedTooltip": "Auto-placed from due date — click to confirm placement",
+    "autoPlacedMarker_comment": "Tooltip on the small marker beside whichever date is currently deciding a task's bucket. Only one date row per task carries it.",
+    "autoPlacedMarker": "This date sets the bucket",
     "subtaskTooltip_comment": "Tooltip on the indentation badge shown on tasks that are nested under a parent task in the source markdown.",
     "subtaskTooltip": "Subtask",
     "activeSubtasks_comment": "Tooltip on the subtask count badge shown on parent tasks. i18next plural forms: _one for exactly 1, _other for all other counts. {{count}} is injected automatically by i18next.",
@@ -66,7 +78,6 @@
       "inDays_other": "Due in {{count}} days",
       "overdue_one": "{{count}} day overdue",
       "overdue_other": "{{count}} days overdue",
-      "belongsIn": "belongs in {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority_comment": "Labels for the five Tasks-plugin priority levels, shown beside their emoji in the hover popover. Use the Tasks plugin's own terms for these levels where your language has established ones.",
@@ -85,7 +96,11 @@
       "created": "Created {{date}}",
       "cancelled": "Cancelled {{date}}",
       "done": "Done {{date}}",
-      "onCompletion": "On completion: {{action}}"
+      "onCompletion": "On completion: {{action}}",
+      "pinnedTo_comment": "Popover row on a task that is pinned to a bucket. It stays there regardless of its dates until unpinned. {{bucket}} = that bucket's display name.",
+      "pinnedTo": "Pinned to {{bucket}}",
+      "belongsIn_comment": "Popover row on a task filed further out than its date warrants. {{bucket}} = the earlier bucket its date points to.",
+      "belongsIn": "Belongs in {{bucket}}"
     }
   },
   "commands": {
@@ -253,12 +268,12 @@
         "deleteButton": "Delete"
       },
       "dateRule": {
-        "_comment": "Date range rules auto-assign tasks to a bucket based on their 📅 due date. The dropdown option labels below describe the rule type. Calendar weeks run Monday–Sunday.",
+        "_comment": "Date range rules auto-assign tasks to a bucket. Which date they read is chosen by the 'Task date' setting under Tasks plugin integration — it is not always the due date, so avoid wording these as though it were. Calendar weeks run Monday–Sunday.",
         "name": "Date range rule",
-        "description": "Auto-assign tasks based on their 📅 due date. If multiple buckets have overlapping rules, the first matching bucket (top to bottom) wins.",
+        "description": "Auto-assign tasks whose date falls in this range. If rules overlap, the first bucket from the top wins.",
         "none_comment": "Dropdown option: no automatic date-based assignment; tasks are only placed by manual tag/field.",
         "none": "None (manual/tag only)",
-        "today": "Today (due today or overdue)",
+        "today": "Today (on or before today)",
         "thisWeek": "This week (tomorrow – end of current Sunday)",
         "nextWeek": "Next week (next Monday – following Sunday)",
         "thisMonth": "This month (1 day out – end of current month)",
@@ -267,11 +282,13 @@
         "withinDays": "Within N days",
         "withinRange_comment": "Dropdown option: tasks due within a user-configured day range (from day X to day Y from today).",
         "withinRange": "Within day range (from–to)",
-        "beyondDays_comment": "Dropdown option: catch-all rule for tasks due further out than a user-configured number of days.",
-        "beyondDays": "Beyond N days (catch-all)",
+        "beyondDays_comment": "Dropdown option: tasks dated further out than a user-configured number of days. NOT a catch-all — set it to 180 and a task 90 days out matches nothing. Use 'Everything' for that.",
+        "beyondDays": "Beyond N days",
+        "everything_comment": "Dropdown option: claims every dated task the buckets above did not. Takes no number, and is the exact opposite of 'None'. Only meaningful on the last bucket, since the first matching rule from the top wins.",
+        "everything": "Everything (catch-all)",
         "days": {
           "name": "Days",
-          "description": "Tasks due within this many days from today are assigned here."
+          "description": "Tasks dated within this many days from today are assigned here."
         },
         "fromDay": {
           "name": "From day",
@@ -283,7 +300,7 @@
         },
         "beyondThreshold": {
           "name": "Days threshold",
-          "description": "Tasks due more than this many days from today are assigned here."
+          "description": "Tasks dated more than this many days from today are assigned here."
         }
       },
       "quickMove": {
@@ -302,6 +319,23 @@
     "tasksIntegration": {
       "heading": "Tasks plugin integration",
       "blurb": "How this plugin treats the metadata the Tasks plugin writes on task lines.",
+      "planBy": {
+        "name_comment": "Dropdown choosing which Tasks-plugin date the plugin treats as a task's own date. That one date does two jobs: it decides the bucket a task lands in, and its position within that bucket. Deliberately names the thing being chosen rather than its effects — the description carries those.",
+        "name": "Auto-assignment date",
+        "description_comment": "The emoji live here rather than in the option labels, so 📅 and ⏳ are introduced once and the list below stays plain words. Both are Tasks-plugin syntax and must stay as emoji in every language. 'Pinned' tasks are ones the user filed by hand; they carry a tag and ignore their dates.",
+        "description": "Which Tasks plugin date determines a task's bucket and its order within that bucket.",
+        "descriptionPinned_comment": "Second line of the same description, rendered as its own row. Kept separate so the caveat reads as a caveat instead of trailing off the end of the sentence above it.",
+        "descriptionPinned": "Pinned tasks ignore this setting.",
+        "manual_comment": "Option: dates play no part at all — neither choosing the bucket nor ordering within it. The user files everything by hand.",
+        "manual": "Ignore dates",
+        "dueFirst_comment": "Options read as 'use this date; if the task has not got one, fall back to the other'. 'Due' and 'Scheduled' alone mean that field only, with no fallback — a task lacking it goes to To Review.",
+        "dueOnly": "Due",
+        "dueFirst": "Due, else scheduled",
+        "scheduledFirst": "Scheduled, else due",
+        "scheduledOnly": "Scheduled",
+        "earliest_comment": "Option: whichever of the two dates comes first. Avoids filing a task past its own due date.",
+        "earliest": "Earliest of the two"
+      },
       "priority": {
         "name": "Show priority",
         "description_comment": "Dropdown controlling which Tasks-plugin priority levels get an emoji badge on the task row. Levels, highest to lowest: 🔺 Highest, ⏫ High, 🔼 Medium, 🔽 Low, ⏬ Lowest. The hover popover always shows the priority regardless of this setting.",

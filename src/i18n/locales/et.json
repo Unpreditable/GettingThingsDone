@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "Teisalda: {{name}}",
-      "openFile": "Ava fail"
+      "openFile": "Ava fail",
+      "pinTo": "Kinnita kategooriasse {{name}}",
+      "unpin": "Vabasta (→ {{name}})",
+      "unpinHere": "Vabasta"
     },
     "languageBanner": {
       "message": "Obsidiani keel on muutunud. Kategooriate nimed uuendati võimalusel — vaata vajadusel seadetest üle.",
       "openSettings": "Ava seaded",
       "dismiss": "OK"
+    },
+    "catchAllBanner": {
+      "message": "Kategooriad toetavad nüüd kuupäevavahemikku „Kõik“. Sinu reeglid jäid muutmata, seega määra see viimasele kategooriale, et püüda kuupäevad, mille teised vahele jätavad.",
+      "openSettings": "Ava seaded",
+      "dismiss": "OK"
     }
   },
   "task": {
-    "autoPlacedTooltip": "Paigutatud automaatselt tähtaja järgi — kinnita klõpsates",
+    "autoPlacedMarker": "See kuupäev määrab kategooria",
     "subtaskTooltip": "Alamülesanne",
     "activeSubtasks_one": "{{count}} aktiivne alamülesanne",
     "activeSubtasks_other": "{{count}} aktiivset alamülesannet",
@@ -42,7 +50,6 @@
       "inDays_other": "Tähtaeg {{count}} päeva pärast",
       "overdue_one": "{{count}} päev üle tähtaja",
       "overdue_other": "{{count}} päeva üle tähtaja",
-      "belongsIn": "kuulub kategooriasse {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -59,7 +66,9 @@
       "created": "loodud {{date}}",
       "cancelled": "tühistatud {{date}}",
       "done": "valmis {{date}}",
-      "onCompletion": "lõpetamisel: {{action}}"
+      "onCompletion": "lõpetamisel: {{action}}",
+      "pinnedTo": "Kinnitatud: {{bucket}}",
+      "belongsIn": "Kuulub kategooriasse {{bucket}}"
     }
   },
   "commands": {
@@ -74,7 +83,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "Täname, et kasutate GTD Tasksit! Ehitasin selle oma igapäevase töö korraldamiseks ja loodan, et see teeb ka teie oma pisut lihtsamaks. Mul on hea meel kuulda, mis toimib, mis mitte, ja mida te sooviksite, et see teeks.",
+      "message": "Kategooriad toetavad nüüd kuupäevavahemikku „Kõik (püüab ülejäänu)“, mis püüab kinni kuupäevad, mille teised vahele jätavad. Soovi korral määra see viimasele kategooriale.",
       "buttonText": "Jaga tagasisidet ja ideid",
       "confirmMessage": "See avab github.com teie vaikebrauseris, et luua uus probleem.",
       "confirmButton": "Jätka",
@@ -176,6 +185,7 @@
         "withinDays": "N päeva jooksul",
         "withinRange": "Päevavahemikus (alates–kuni)",
         "beyondDays": "Rohkem kui N päeva (kõik muud)",
+        "everything": "Kõik (püüab ülejäänu)",
         "days": {
           "name": "Päevad",
           "description": "Ülesanded, mille tähtaeg on määratud päevade arvu jooksul tänasest, määratakse siia."
@@ -204,6 +214,17 @@
     "tasksIntegration": {
       "heading": "Tasks pistikprogrammi integratsioon",
       "blurb": "Kuidas see plugin kohtleb metaandmeid, mida Tasks plugin ülesannete ridadele kirjutab.",
+      "planBy": {
+        "name": "Ülesande kuupäev",
+        "description": "Milline Tasks pistikprogrammi kuupäev määrab ülesande kategooria ja järjekorra selle sees.",
+        "descriptionPinned": "Kinnitatud ülesanded eiravad seda seadet.",
+        "manual": "Eira kuupäevi",
+        "dueOnly": "Tähtaeg",
+        "dueFirst": "Tähtaeg, muidu planeeritud",
+        "scheduledFirst": "Planeeritud, muidu tähtaeg",
+        "scheduledOnly": "Planeeritud",
+        "earliest": "Neist varasem"
+      },
       "priority": {
         "name": "Näita prioriteeti",
         "description": "Millised prioriteeditasemed saavad ülesande reale emoji märgise.",

@@ -1,5 +1,6 @@
 import { t, i18next } from "../i18n/i18n";
 import type { DueStatus } from "./DueStatus";
+import type { BucketConfig } from "../settings";
 
 /** Locale-aware short date, e.g. "Fri, Aug 7". */
 function formatDate(date: Date): string {
@@ -29,9 +30,9 @@ function onTrackLine(dueDate: Date, diffDays: number): string {
 }
 
 /**
- * The due line shown at the top of a task's hover popover. Returns text only:
- * the ! / ⚑ glyph is rendered by the caller as its own span so it can carry
- * the same theme color as the badge on the row.
+ * The due line shown in a task's hover popover. Returns text only: the glyph is
+ * rendered by the caller as its own span so it can carry the same theme color
+ * as the badge on the row.
  */
 export function formatDueLine(dueDate: Date, status: DueStatus): string {
   if (status.kind === "overdue") {
@@ -41,12 +42,9 @@ export function formatDueLine(dueDate: Date, status: DueStatus): string {
     });
   }
 
-  if (status.kind === "misfiled") {
-    return t("task.due.withDetail", {
-      main: flaggedLine(dueDate, status.diffDays),
-      detail: t("task.due.belongsIn", { bucket: status.belongsIn.name }),
-    });
-  }
-
   return onTrackLine(dueDate, status.diffDays);
+}
+
+export function formatMisfiledLine(belongsIn: BucketConfig): string {
+  return t("task.fields.belongsIn", { bucket: belongsIn.name });
 }

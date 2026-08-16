@@ -8,7 +8,8 @@ export type DateRangeRule =
   | { type: "next-month" }              // 1st of next month → last day of next month
   | { type: "within-days"; days: number }
   | { type: "within-days-range"; from: number; to: number }
-  | { type: "beyond-days"; days: number }; // for catch-all buckets (e.g. Someday)
+  | { type: "beyond-days"; days: number }
+  | { type: "catch-all" };              // matches any date; only useful on the last bucket
 
 
 export interface BucketConfig {
@@ -27,6 +28,18 @@ export interface BucketConfig {
 
 export type StorageMode = "inline-tag" | "inline-field";
 
+/**
+ * Which Tasks-plugin date decides a task's bucket and its order within it.
+ * core/PlanningDate.ts is the only place the precedence rules live.
+ */
+export type PlanBy =
+  | "manual"
+  | "due-only"
+  | "due-first"
+  | "scheduled-first"
+  | "scheduled-only"
+  | "earliest";
+
 export type CelebrationMode = "off" | "confetti" | "creature" | "all";
 
 /** Which Tasks-plugin priority levels get an emoji badge on the task row. */
@@ -41,6 +54,7 @@ export type ScopeType = "vault" | "folders" | "files";
 
 export interface PluginSettings {
   storageMode: StorageMode;
+  planBy: PlanBy;
   /** Which scope mode is active. Path lists below persist independently of this. */
   scopeType: ScopeType;
   /** Folder paths for "folders" scope. Preserved even while a different scope mode is active. */
@@ -73,6 +87,11 @@ export interface PluginSettings {
   toReviewQuickMoveTargets: [string?, string?];
   /** Show the To Review bucket's task count in Obsidian's status bar. */
   toReviewShowInStatusBar: boolean;
+  /** Whether the catch-all recommendation has been settled for this install.
+   *  Written once on first load and never revisited, so customising a bucket
+   *  rule months later cannot resurrect a banner about a migration that never
+   *  applied here. */
+  catchAllNoticeSeen: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
   compactView: boolean;
   /** Which priority levels show a badge on the row. The popover is unaffected. */
@@ -137,7 +156,9 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
     id: "someday",
     name: "Someday / Maybe",
     emoji: "💭",
-    dateRangeRule: null,
+    // Without a catch-all here, anything dated past the end of the calendar
+    // month matches no rule and pools in To Review.
+    dateRangeRule: { type: "catch-all" },
     quickMoveTargets: ["today", "this-week"],
     showInStatusBar: false,
   },
@@ -145,6 +166,7 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
 
 export const DEFAULT_SETTINGS: PluginSettings = {
   storageMode: "inline-tag",
+  planBy: "scheduled-first",
   scopeType: "vault",
   folderPaths: [],
   filePaths: [],
@@ -157,6 +179,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewEmoji: "📥",
   toReviewQuickMoveTargets: ["today", "this-week"],
   toReviewShowInStatusBar: false,
+  catchAllNoticeSeen: false,
   compactView: false,
   priorityDisplay: "all",
   showRecurrenceBadge: true,
@@ -186,16 +209,22 @@ interface LegacyTaskScope {
 }
 
 /**
- * Normalizes raw loaded plugin data. Two migrations live here:
+ * Normalizes raw loaded plugin data. Three migrations live here:
  * the pre-persistence `taskScope: {type, paths}` object is split into
  * scopeType/folderPaths/filePaths (seeded once, without losing the user's
- * existing selections), and the removed `readTasksPlugin` field is dropped —
- * 📅/✅ parsing and due-date auto-assign are unconditional now.
+ * existing selections), the removed `readTasksPlugin` field is dropped —
+ * 📅/✅ parsing and due-date auto-assign are unconditional now — and an install
+ * that predates `planBy` is pinned to "due-only" — DEFAULT_SETTINGS ships
+ * "scheduled-first", which would rearrange the board of every existing user
+ * with a ⏳ anywhere. Reaching this function at all means a data.json existed,
+ * which is exactly the "existing install" test.
  */
 export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
   if (!raw || typeof raw !== "object") return {};
   const data = { ...(raw as Record<string, unknown> & { taskScope?: LegacyTaskScope }) };
   delete data.readTasksPlugin;
+
+  if (data.planBy === undefined) data.planBy = "due-only";
 
   if (!data.taskScope || "scopeType" in data) return data as Partial<PluginSettings>;
 
@@ -204,6 +233,46 @@ export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
   if (taskScope.type === "folders") migrated.folderPaths = taskScope.paths ?? [];
   if (taskScope.type === "files") migrated.filePaths = taskScope.paths ?? [];
   return migrated;
+}
+
+function sameRule(a: DateRangeRule | null, b: DateRangeRule | null): boolean {
+  if (a === null || b === null) return a === b;
+  if (a.type !== b.type) return false;
+  switch (a.type) {
+    case "within-days":
+    case "beyond-days":
+      return a.days === (b as typeof a).days;
+    case "within-days-range":
+      return a.from === (b as typeof a).from && a.to === (b as typeof a).to;
+    default:
+      return true;
+  }
+}
+
+/**
+ * Whether the catch-all can be given to the last bucket without overwriting a
+ * deliberate choice. Names, emoji and quick-move targets are ignored: they are
+ * cosmetic and cannot move a task.
+ *
+ * The last bucket is compared against `null`, not DEFAULT_BUCKETS, because null
+ * is the rule it shipped with before the catch-all existed.
+ */
+export function shouldAdoptCatchAll(buckets: BucketConfig[]): boolean {
+  if (buckets.length !== DEFAULT_BUCKETS.length) return false;
+  const lastIdx = buckets.length - 1;
+  return buckets.every((b, i) => {
+    if (b.id !== DEFAULT_BUCKETS[i].id) return false;
+    return i === lastIdx ? b.dateRangeRule === null : sameRule(b.dateRangeRule, DEFAULT_BUCKETS[i].dateRangeRule);
+  });
+}
+
+/**
+ * A customised config whose last bucket still can't catch far-future dates. The
+ * panel recommends a fix rather than rewriting rules the user chose themselves.
+ */
+export function shouldRecommendCatchAll(buckets: BucketConfig[]): boolean {
+  const last = buckets[buckets.length - 1];
+  return last !== undefined && last.dateRangeRule === null && !shouldAdoptCatchAll(buckets);
 }
 
 /**

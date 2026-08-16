@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "Déplacer vers : {{name}}",
-      "openFile": "Ouvrir le fichier"
+      "openFile": "Ouvrir le fichier",
+      "pinTo": "Épingler à {{name}}",
+      "unpin": "Détacher (→ {{name}})",
+      "unpinHere": "Détacher"
     },
     "languageBanner": {
       "message": "Votre langue Obsidian a changé. Les noms des catégories ont été mis à jour si possible — vérifiez les paramètres si nécessaire.",
       "openSettings": "Ouvrir les paramètres",
       "dismiss": "Ignorer"
+    },
+    "catchAllBanner": {
+      "message": "Les catégories acceptent désormais la plage de dates « Tout ». Les vôtres n'ont pas été modifiées : appliquez-la à la dernière catégorie pour récupérer toute date que les autres laissent passer.",
+      "openSettings": "Ouvrir les paramètres",
+      "dismiss": "Ignorer"
     }
   },
   "task": {
-    "autoPlacedTooltip": "Placé automatiquement selon la date d'échéance — cliquez pour confirmer",
+    "autoPlacedMarker": "Cette date détermine la catégorie",
     "subtaskTooltip": "Sous-tâche",
     "activeSubtasks_one": "{{count}} sous-tâche active",
     "activeSubtasks_other": "{{count}} sous-tâches actives",
@@ -42,7 +50,6 @@
       "inDays_other": "Échéance dans {{count}} jours",
       "overdue_one": "{{count}} jour de retard",
       "overdue_other": "{{count}} jours de retard",
-      "belongsIn": "à classer dans {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -59,7 +66,9 @@
       "created": "créée {{date}}",
       "cancelled": "annulée {{date}}",
       "done": "terminée {{date}}",
-      "onCompletion": "à l'achèvement : {{action}}"
+      "onCompletion": "à l'achèvement : {{action}}",
+      "pinnedTo": "Épinglée à {{bucket}}",
+      "belongsIn": "Appartient à {{bucket}}"
     }
   },
   "commands": {
@@ -74,7 +83,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "Merci d'utiliser GTD Tasks ! Je l'ai créé pour organiser mon propre travail au quotidien, et j'espère qu'il facilitera aussi le vôtre. J'aimerais vraiment savoir ce qui fonctionne, ce qui ne fonctionne pas, et ce que vous aimeriez qu'il fasse.",
+      "message": "Les catégories acceptent désormais la plage de dates « Tout (règle fourre-tout) », qui récupère toute date que les autres laissent passer. Appliquez-la à la dernière catégorie si vous le souhaitez.",
       "buttonText": "Partager vos retours et idées",
       "confirmMessage": "Cela ouvrira github.com dans votre navigateur par défaut pour créer un nouveau ticket.",
       "confirmButton": "Continuer",
@@ -176,6 +185,7 @@
         "withinDays": "Dans N jours",
         "withinRange": "Dans une plage de jours (de–à)",
         "beyondDays": "Au-delà de N jours (fourre-tout)",
+        "everything": "Tout (règle fourre-tout)",
         "days": {
           "name": "Jours",
           "description": "Les tâches dues dans ce nombre de jours à partir d'aujourd'hui sont assignées ici."
@@ -204,6 +214,17 @@
     "tasksIntegration": {
       "heading": "Intégration du plugin Tasks",
       "blurb": "Comment ce plugin traite les métadonnées que le plugin Tasks écrit sur les lignes de tâche.",
+      "planBy": {
+        "name": "Date de la tâche",
+        "description": "Quelle date du plugin Tasks détermine la catégorie d'une tâche et son ordre à l'intérieur.",
+        "descriptionPinned": "Les tâches épinglées ignorent ce réglage.",
+        "manual": "Ignorer les dates",
+        "dueOnly": "Échéance",
+        "dueFirst": "Échéance, sinon date prévue",
+        "scheduledFirst": "Date prévue, sinon échéance",
+        "scheduledOnly": "Date prévue",
+        "earliest": "La plus proche des deux"
+      },
       "priority": {
         "name": "Afficher la priorité",
         "description": "Quels niveaux de priorité affichent un badge emoji sur la ligne de tâche.",

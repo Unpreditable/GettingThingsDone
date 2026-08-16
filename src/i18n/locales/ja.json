@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "移動先: {{name}}",
-      "openFile": "ファイルを開く"
+      "openFile": "ファイルを開く",
+      "pinTo": "{{name}} に固定",
+      "unpin": "固定を解除（→ {{name}}）",
+      "unpinHere": "固定を解除"
     },
     "languageBanner": {
       "message": "Obsidianの言語が変更されました。可能な場合はカテゴリ名を更新しました — 必要に応じて設定を確認してください。",
       "openSettings": "設定を開く",
       "dismiss": "閉じる"
+    },
+    "catchAllBanner": {
+      "message": "カテゴリで日付範囲「すべて」が使えるようになりました。設定は変更していないので、他のカテゴリが拾わない日付を受け止めるには最後のカテゴリに設定してください。",
+      "openSettings": "設定を開く",
+      "dismiss": "閉じる"
     }
   },
   "task": {
-    "autoPlacedTooltip": "期日から自動配置 — クリックして配置を確認",
+    "autoPlacedMarker": "この日付がカテゴリを決めます",
     "subtaskTooltip": "サブタスク",
     "activeSubtasks_one": "アクティブなサブタスク {{count}} 件",
     "activeSubtasks_other": "アクティブなサブタスク {{count}} 件",
@@ -42,7 +50,6 @@
       "inDays_other": "期限まで {{count}} 日",
       "overdue_one": "{{count}} 日超過",
       "overdue_other": "{{count}} 日超過",
-      "belongsIn": "{{bucket}} に入れるべき",
       "withDetail": "{{main}}（{{detail}}）"
     },
     "priority": {
@@ -59,7 +66,9 @@
       "created": "作成日 {{date}}",
       "cancelled": "キャンセル日 {{date}}",
       "done": "完了日 {{date}}",
-      "onCompletion": "完了時: {{action}}"
+      "onCompletion": "完了時: {{action}}",
+      "pinnedTo": "{{bucket}} に固定中",
+      "belongsIn": "{{bucket}} に該当"
     }
   },
   "commands": {
@@ -74,7 +83,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "GTD Tasksをご利用いただきありがとうございます!このプラグインは私自身の日々の仕事を整理するために作りました。あなたの仕事にも役立てば嬉しいです。何がうまくいっているか、何がうまくいっていないか、どんな機能が欲しいか、ぜひ教えてください。",
+      "message": "カテゴリで日付範囲「すべて（残り全部）」が使えるようになりました。他のカテゴリが拾わない日付を受け止めるので、必要に応じて最後のカテゴリに設定してください。",
       "buttonText": "フィードバック・要望を送る",
       "confirmMessage": "既定のブラウザで github.com が開き、新しい課題を作成します。",
       "confirmButton": "続ける",
@@ -176,6 +185,7 @@
         "withinDays": "N日以内",
         "withinRange": "日付範囲内（開始〜終了）",
         "beyondDays": "N日超（キャッチオール）",
+        "everything": "すべて（残り全部）",
         "days": {
           "name": "日数",
           "description": "今日から指定した日数以内に期日があるタスクがここに割り当てられます。"
@@ -204,6 +214,17 @@
     "tasksIntegration": {
       "heading": "Tasksプラグイン連携",
       "blurb": "Tasksプラグインがタスク行に書き込むメタデータをこのプラグインがどう扱うかの設定です。",
+      "planBy": {
+        "name": "タスクの日付",
+        "description": "Tasks プラグインのどの日付がタスクのカテゴリと、その中での並び順を決めるか。",
+        "descriptionPinned": "固定したタスクはこの設定を無視します。",
+        "manual": "日付を使わない",
+        "dueOnly": "期限",
+        "dueFirst": "期限、なければ予定日",
+        "scheduledFirst": "予定日、なければ期限",
+        "scheduledOnly": "予定日",
+        "earliest": "早いほうの日付"
+      },
       "priority": {
         "name": "優先度を表示",
         "description": "どの優先度レベルにタスク行の絵文字バッジを表示するか。",

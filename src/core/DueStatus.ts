@@ -1,5 +1,6 @@
-import type { BucketConfig, DateRangeRule } from "../settings";
+import type { BucketConfig, DateRangeRule, PlanBy } from "../settings";
 import type { TaskRecord } from "./TaskParser";
+import { planningDate } from "./PlanningDate";
 
 /** Whole-day difference between two dates, ignoring clock time. */
 export function diffInDays(date: Date, now: Date): number {
@@ -53,56 +54,64 @@ export function matchesRule(rule: DateRangeRule, dueDate: Date, now: Date): bool
 
     case "beyond-days":
       return diff > rule.days;
+
+    // Only meaningful on the last bucket, autoAssign being first-match-wins.
+    case "catch-all":
+      return true;
   }
 }
 
 export type DueStatus =
   | { kind: "overdue"; diffDays: number }
-  | { kind: "misfiled"; diffDays: number; belongsIn: BucketConfig }
   | { kind: "on-track"; diffDays: number };
 
 /**
- * Which flag, if any, a dated task earns in the bucket it currently sits in.
- * Returns null for a task with no due date — there is nothing to say about it.
- *
- * "Misfiled" means a bucket EARLIER in the user's list already claims this
- * due date, so the task is filed later than the date warrants. Deliberately
- * pulling a task forward into a sooner bucket is a choice, not a mistake, so
- * the comparison is `autoIdx < curIdx` rather than `autoIdx !== curIdx`.
- *
- * Bucket order is the tie-break because ranges deliberately overlap (This
- * Month's range contains This Week's). Reusing autoAssign's own first-match
- * ordering is what guarantees this flag can never contradict the auto-placed
- * badge on the same row.
+ * How a task stands against its 📅 due date, ignoring `planBy` on purpose: a ⏳
+ * that has come and gone means the task is being handled early, which is what
+ * scheduling it was for.
  */
-export function computeDueStatus(
-  task: TaskRecord,
-  currentBucketId: string,
-  buckets: BucketConfig[],
-  now: Date
-): DueStatus | null {
+export function computeDueStatus(task: TaskRecord, now: Date): DueStatus | null {
   const dueDate = task.dueDate;
   if (!dueDate) return null;
 
   const diffDays = diffInDays(dueDate, now);
   if (task.isCompleted) return { kind: "on-track", diffDays };
 
+  return diffDays < 0 ? { kind: "overdue", diffDays } : { kind: "on-track", diffDays };
+}
+
+/**
+ * The bucket a task should be in but isn't.
+ *
+ * Walks the buckets in the same first-match order autoAssign does, over the same
+ * planning date. Bucket ranges overlap (This Month's contains This Week's), so
+ * any second ordering here would contradict where the task was actually placed.
+ *
+ * `autoIdx < curIdx` rather than `!==`: pulling a task forward into a sooner
+ * bucket is a choice, not a mistake.
+ */
+export function computeMisplacement(
+  task: TaskRecord,
+  currentBucketId: string,
+  buckets: BucketConfig[],
+  planBy: PlanBy,
+  now: Date
+): BucketConfig | null {
+  if (task.isCompleted) return null;
+
+  const plan = planningDate(task, planBy);
+  if (!plan) return null;
+
   // To Review already means "needs attention", so a badge saying so inside it
   // is redundant. It isn't in settings.buckets, which also makes this the
   // catch-all for a bucket id that no longer exists.
   const curIdx = buckets.findIndex((b) => b.id === currentBucketId);
-  if (curIdx === -1) return { kind: "on-track", diffDays };
-
-  if (diffDays < 0) return { kind: "overdue", diffDays };
+  if (curIdx === -1) return null;
 
   const autoIdx = buckets.findIndex(
-    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, dueDate, now)
+    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, plan.date, now)
   );
-  if (autoIdx !== -1 && autoIdx < curIdx) {
-    return { kind: "misfiled", diffDays, belongsIn: buckets[autoIdx] };
-  }
-
-  return { kind: "on-track", diffDays };
+  return autoIdx !== -1 && autoIdx < curIdx ? buckets[autoIdx] : null;
 }
 
 /** Local calendar day as YYYY-MM-DD — the day a render is valid for. */

@@ -20,7 +20,12 @@
   export let priorityDisplay: PriorityDisplay = "all";
   export let showRecurrenceBadge: boolean = true;
   export let showTasksFieldsInPopover: boolean = true;
-  export let autoPlacedTaskIds: string[] = [];
+  /** Which date field auto-placed each task here, keyed by task id. */
+  export let autoPlacedFrom: Record<string, "due" | "scheduled"> = {};
+  /** For tasks filed later than their planning date warrants: where they belong. */
+  export let misfiledIn: Record<string, BucketConfig> = {};
+  /** Task id → the bucket it is pinned to. Vault-wide, not per-group. */
+  export let pinnedIn: Map<string, BucketConfig> = new Map();
   export let agedCompletedTaskIds: string[] = [];
   export let quickMoveTargets: BucketConfig[];
   export let showCompletedUntilMidnight: boolean = true;
@@ -32,7 +37,6 @@
     move: { task: TaskRecord; targetBucketId: string | null };
     toggle: { task: TaskRecord };
     navigate: { task: TaskRecord };
-    confirm: { task: TaskRecord; bucketId: string };
     drop: {
       taskId: string;
       sourceBucketId: string;
@@ -49,7 +53,6 @@
   let taskListEl: HTMLElement;
   let sortable: Sortable;
 
-  $: autoPlacedSet = new Set(autoPlacedTaskIds);
   $: agedSet = new Set(agedCompletedTaskIds);
   $: {
     // When a task is unchecked, remove it from dismissedIds so it reappears
@@ -350,7 +353,9 @@
           {priorityDisplay}
           {showRecurrenceBadge}
           {showTasksFieldsInPopover}
-          isAutoPlaced={!task.isCompleted && autoPlacedSet.has(task.id)}
+          autoPlacedFrom={task.isCompleted ? null : autoPlacedFrom[task.id] ?? null}
+          misfiledIn={misfiledIn[task.id] ?? null}
+          pinnedIn={pinnedIn.get(task.id) ?? null}
           showCompleted={task.isCompleted}
           {allTasksMap}
           {taskBucketMap}
@@ -359,7 +364,6 @@
           on:move={(e) => dispatch("move", e.detail)}
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}
-          on:confirm={(e) => dispatch("confirm", e.detail)}
           on:dismiss={(e) => { dismissedIds.add(e.detail.task.id); dismissedIds = dismissedIds; }}
         />
       {/each}

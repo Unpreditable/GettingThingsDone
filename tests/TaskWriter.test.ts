@@ -1,4 +1,4 @@
-import { findTaskLine, moveTaskToBucket, toggleTaskCompletion, confirmTaskPlacement, toggleTaskLine } from "../src/core/TaskWriter";
+import { findTaskLine, moveTaskToBucket, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
 import { DEFAULT_SETTINGS } from "../src/settings";
 import { TFile } from "obsidian";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -260,22 +260,3 @@ describe("toggleTaskCompletion", () => {
   });
 });
 
-describe("confirmTaskPlacement", () => {
-  const settings = { ...DEFAULT_SETTINGS, storageMode: "inline-tag" as const, tagPrefix: "gtd" };
-
-  it("writes explicit bucket marker", async () => {
-    const { app, getContent } = makeMockApp("- [ ] Task");
-    const task = makeTask({ rawLine: "- [ ] Task" });
-    const result = await confirmTaskPlacement(app, task, "today", settings);
-    expect(result.success).toBe(true);
-    expect(getContent()).toContain("#gtd/today");
-  });
-
-  it("falls back to null when bucket ID not found", async () => {
-    const { app, getContent } = makeMockApp("- [ ] Task #gtd/today");
-    const task = makeTask({ rawLine: "- [ ] Task #gtd/today" });
-    const result = await confirmTaskPlacement(app, task, "nonexistent", settings);
-    expect(result.success).toBe(true);
-    expect(getContent()).not.toContain("#gtd");
-  });
-});

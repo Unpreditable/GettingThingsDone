@@ -3,25 +3,38 @@ import type GtdTasksPlugin from "./main";
 import { BucketConfig, StorageMode, ScopeType, DEFAULT_BUCKETS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
+import { renderIcon } from "./views/icon";
 import { t } from "./i18n/i18n";
 
 /**
- * Two lines, each led by its badge glyph in the colour that badge has on the task
- * row. A fragment rather than a string because the glyphs need their own spans to
- * be coloured; Obsidian searches the fragment's textContent, so this stays findable.
+ * Two lines, each led by the badge itself in the colour it has on the task row.
+ * A fragment rather than a string because the badges need their own spans to be
+ * coloured; Obsidian searches the fragment's textContent, so this stays findable.
+ *
+ * Must render the same icon names the task rows do, or the preview stops
+ * depicting reality without anything failing.
  */
 function markDueFlagsDesc(): DocumentFragment {
   return createFragment((frag) => {
-    const line = (cls: string, glyph: string, text: string) => {
-      const row = frag.createDiv();
-      row.createSpan({ cls, text: glyph });
+    const line = (cls: string, iconName: string, text: string) => {
+      const row = frag.createDiv({ cls: "gtd-flag-preview-row" });
+      renderIcon(row.createSpan({ cls }), iconName);
       row.appendText(" " + text);
     };
-    line("gtd-flag-overdue", "❢", t("settings.behaviour.markDueFlags.descriptionOverdue"));
-    line("gtd-flag-misfiled", "⚑", t("settings.behaviour.markDueFlags.descriptionMisfiled", {
+    line("gtd-flag-overdue", "alert-triangle", t("settings.behaviour.markDueFlags.descriptionOverdue"));
+    line("gtd-flag-misfiled", "flag", t("settings.behaviour.markDueFlags.descriptionMisfiled", {
       later: t("buckets.defaults.this-week.name"),
       sooner: t("buckets.defaults.today.name"),
     }));
+  });
+}
+
+/** Two rows, so the caveat reads as its own statement rather than trailing off
+ *  the end of the sentence above it. */
+function autoAssignmentDateDesc(): DocumentFragment {
+  return createFragment((frag) => {
+    frag.createDiv({ text: t("settings.tasksIntegration.planBy.description") });
+    frag.createDiv({ text: t("settings.tasksIntegration.planBy.descriptionPinned") });
   });
 }
 
@@ -386,6 +399,22 @@ export class GtdSettingsTab extends PluginSettingTab {
           // 1.13+, swap that item for a `render:` one following the banner
           // pattern already in this file: add the `gtd-settings-escape-hatch`
           // class, `empty()` the element, and write the blurb into it.
+          {
+            name: t("settings.tasksIntegration.planBy.name"),
+            desc: autoAssignmentDateDesc(),
+            control: {
+              type: "dropdown",
+              key: "planBy",
+              options: {
+                manual: t("settings.tasksIntegration.planBy.manual"),
+                "due-only": t("settings.tasksIntegration.planBy.dueOnly"),
+                "due-first": t("settings.tasksIntegration.planBy.dueFirst"),
+                "scheduled-first": t("settings.tasksIntegration.planBy.scheduledFirst"),
+                "scheduled-only": t("settings.tasksIntegration.planBy.scheduledOnly"),
+                earliest: t("settings.tasksIntegration.planBy.earliest"),
+              },
+            },
+          },
           {
             name: t("settings.tasksIntegration.priority.name"),
             desc: t("settings.tasksIntegration.priority.description"),
@@ -1040,6 +1069,9 @@ export class GtdSettingsTab extends PluginSettingTab {
       { value: "within-days",       label: t("settings.buckets.dateRule.withinDays") },
       { value: "within-days-range", label: t("settings.buckets.dateRule.withinRange") },
       { value: "beyond-days",       label: t("settings.buckets.dateRule.beyondDays") },
+      // "Beyond N days" is not a substitute: set it to 180 and anything 90 days
+      // out matches nothing and falls through to To Review.
+      { value: "catch-all",         label: t("settings.buckets.dateRule.everything") },
     ];
 
     const getCurrentType = () => bucket.dateRangeRule?.type ?? "none";
@@ -1120,7 +1152,10 @@ export class GtdSettingsTab extends PluginSettingTab {
       dd.onChange(async (val) => {
         if (val === "none") {
           bucket.dateRangeRule = null;
-        } else if (val === "today" || val === "this-week" || val === "next-week" || val === "this-month" || val === "next-month") {
+        } else if (
+          val === "today" || val === "this-week" || val === "next-week" ||
+          val === "this-month" || val === "next-month" || val === "catch-all"
+        ) {
           bucket.dateRangeRule = { type: val };
         } else if (val === "within-days") {
           bucket.dateRangeRule = { type: "within-days", days: 7 };

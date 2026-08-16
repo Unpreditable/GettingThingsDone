@@ -74,6 +74,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Hard gate, and deliberately here rather than in `npm run build`: during
+      # development wording is in flux and translating every draft string is
+      # wasted work, but a release must never ship a key some locale is missing.
+      # The CI workflow's own check only posts a PR comment — it cannot fail.
+      - name: Validate translations
+        run: npm run validate-translations
+
       - name: Build
         run: npm run build
 

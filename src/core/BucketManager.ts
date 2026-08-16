@@ -1,8 +1,12 @@
 /**
  * Assignment priority (highest first):
- *   1. Storage-mode assignment (inline-tag or inline-field)
- *   2. Auto-assignment from 📅 due date matching a bucket's dateRangeRule
+ *   1. Storage-mode assignment (inline-tag or inline-field) — a "pinned" task
+ *   2. Auto-assignment from the task's planning date (see core/PlanningDate.ts)
+ *      matching a bucket's dateRangeRule
  *   3. No assignment → "to-review" system bucket
+ *
+ * Only a pin writes to the file. Auto-assignment is re-derived every pass, which
+ * is what lets a dated task migrate between buckets as its date approaches.
  */
 
 import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
@@ -10,8 +14,9 @@ import { BucketConfig, PluginSettings } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
 import { t } from "../i18n/i18n";
 import { computeOrderKeys, applyManualOrder, wasCompletionWitnessed, isRecurring } from "./TaskOrder";
-import { computeDueStatus, matchesRule } from "./DueStatus";
+import { computeDueStatus, computeMisplacement, matchesRule } from "./DueStatus";
 import type { DueStatus } from "./DueStatus";
+import { planningDate } from "./PlanningDate";
 
 export const TO_REVIEW_ID = "to-review";
 
@@ -20,11 +25,15 @@ export interface BucketGroup {
   name: string;
   emoji: string;
   tasks: TaskRecord[];
-  /** Due-date status for every DATED task in this group, keyed by task id.
-   *  On-track entries are included: the popover shows a due line for any
+  /** 📅 status for every task in this group carrying a due date, keyed by task
+   *  id. On-track entries are included: the popover shows a due line for any
    *  dated task, not only flagged ones. */
   dueStatuses: Record<string, DueStatus>;
-  autoPlacedTaskIds: string[];
+  /** For tasks filed later than their planning date warrants: the bucket they
+   *  belong in. Separate from dueStatuses because both can apply to one task. */
+  misfiledIn: Record<string, BucketConfig>;
+  /** Which date field placed each auto-placed task, keyed by task id. */
+  autoPlacedFrom: Record<string, "due" | "scheduled">;
   /** Completed tasks the panel hides: anything whose completion this session
    *  didn't witness, plus every completed recurrence (already replaced). */
   agedCompletedTaskIds: string[];
@@ -45,7 +54,8 @@ export function groupTasksIntoBuckets(
     emoji: settings.toReviewEmoji,
     tasks: [],
     dueStatuses: {},
-    autoPlacedTaskIds: [],
+    misfiledIn: {},
+    autoPlacedFrom: {},
     agedCompletedTaskIds: [],
     isSystem: true,
   });
@@ -57,7 +67,8 @@ export function groupTasksIntoBuckets(
       emoji: b.emoji,
       tasks: [],
       dueStatuses: {},
-      autoPlacedTaskIds: [],
+      misfiledIn: {},
+      autoPlacedFrom: {},
       agedCompletedTaskIds: [],
       isSystem: false,
     });
@@ -71,7 +82,7 @@ export function groupTasksIntoBuckets(
   });
 
   const effectiveBucket = new Map<string, string | null>();
-  const autoPlacedIds = new Set<string>();
+  const autoPlacedFrom = new Map<string, "due" | "scheduled">();
 
   for (const task of sorted) {
     const manualId = resolveManualAssignment(task, settings);
@@ -80,11 +91,12 @@ export function groupTasksIntoBuckets(
       continue;
     }
 
-    if (task.dueDate) {
-      const autoId = autoAssign(task.dueDate, settings.buckets, now);
+    const plan = planningDate(task, settings.planBy);
+    if (plan) {
+      const autoId = autoAssign(plan.date, settings.buckets, now);
       if (autoId) {
         effectiveBucket.set(task.id, autoId);
-        autoPlacedIds.add(task.id);
+        autoPlacedFrom.set(task.id, plan.source);
         continue;
       }
     }
@@ -104,12 +116,14 @@ export function groupTasksIntoBuckets(
 
     group.tasks.push(task);
 
-    if (autoPlacedIds.has(task.id)) {
-      group.autoPlacedTaskIds.push(task.id);
-    }
+    const source = autoPlacedFrom.get(task.id);
+    if (source) group.autoPlacedFrom[task.id] = source;
 
-    const status = computeDueStatus(task, group.bucketId, settings.buckets, now);
+    const status = computeDueStatus(task, now);
     if (status) group.dueStatuses[task.id] = status;
+
+    const belongsIn = computeMisplacement(task, group.bucketId, settings.buckets, settings.planBy, now);
+    if (belongsIn) group.misfiledIn[task.id] = belongsIn;
   }
 
   const orderKeys = computeOrderKeys(tasks);
@@ -196,13 +210,28 @@ function resolveManualAssignment(
   return null;
 }
 
+/**
+ * Where a task's planning date would put it right now. Null means unpinning
+ * would do nothing, so the panel offers no unpin item at all.
+ */
+export function autoBucketFor(
+  task: TaskRecord,
+  settings: PluginSettings,
+  now: Date = today()
+): BucketConfig | null {
+  const plan = planningDate(task, settings.planBy);
+  if (!plan) return null;
+  const id = autoAssign(plan.date, settings.buckets, now);
+  return id ? settings.buckets.find((b) => b.id === id) ?? null : null;
+}
+
 function autoAssign(
-  dueDate: Date,
+  date: Date,
   buckets: BucketConfig[],
   now: Date
 ): string | null {
   const match = buckets.find(
-    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, dueDate, now)
+    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, date, now)
   );
   return match ? match.id : null;
 }

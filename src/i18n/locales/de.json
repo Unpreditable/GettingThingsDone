@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "Verschieben nach: {{name}}",
-      "openFile": "Datei öffnen"
+      "openFile": "Datei öffnen",
+      "pinTo": "An {{name}} anheften",
+      "unpin": "Lösen (→ {{name}})",
+      "unpinHere": "Lösen"
     },
     "languageBanner": {
       "message": "Deine Obsidian-Sprache hat sich geändert. Kategorienamen wurden wenn möglich aktualisiert — überprüfe die Einstellungen falls nötig.",
       "openSettings": "Einstellungen öffnen",
       "dismiss": "OK"
+    },
+    "catchAllBanner": {
+      "message": "Kategorien unterstützen jetzt den Datumsbereich „Alles“. Ihre Regeln blieben unverändert – setzen Sie ihn auf die letzte Kategorie, um jedes Datum zu erfassen, das die anderen auslassen.",
+      "openSettings": "Einstellungen öffnen",
+      "dismiss": "OK"
     }
   },
   "task": {
-    "autoPlacedTooltip": "Automatisch anhand des Fälligkeitsdatums zugewiesen — klicken zum Bestätigen",
+    "autoPlacedMarker": "Dieses Datum bestimmt die Kategorie",
     "subtaskTooltip": "Unteraufgabe",
     "activeSubtasks_one": "{{count}} aktive Unteraufgabe",
     "activeSubtasks_other": "{{count}} aktive Unteraufgaben",
@@ -42,7 +50,6 @@
       "inDays_other": "Fällig in {{count}} Tagen",
       "overdue_one": "{{count}} Tag überfällig",
       "overdue_other": "{{count}} Tage überfällig",
-      "belongsIn": "gehört in {{bucket}}",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -59,7 +66,9 @@
       "created": "erstellt {{date}}",
       "cancelled": "storniert {{date}}",
       "done": "erledigt {{date}}",
-      "onCompletion": "bei Abschluss: {{action}}"
+      "onCompletion": "bei Abschluss: {{action}}",
+      "pinnedTo": "An {{bucket}} angeheftet",
+      "belongsIn": "Gehört zu {{bucket}}"
     }
   },
   "commands": {
@@ -74,7 +83,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "Danke, dass du GTD Tasks verwendest! Ich habe es gebaut, um meine eigene Arbeit jeden Tag zu organisieren, und ich hoffe, es macht deine auch ein bisschen leichter. Ich freue mich wirklich zu hören, was gut funktioniert, was nicht, und was du dir noch wünschst.",
+      "message": "Kategorien unterstützen jetzt den Datumsbereich „Alles (Auffangregel)“, der jedes Datum abfängt, das die anderen auslassen. Setze ihn bei Bedarf auf deine letzte Kategorie.",
       "buttonText": "Feedback & Ideen teilen",
       "confirmMessage": "Dadurch wird github.com in deinem Standardbrowser geöffnet, um ein neues Ticket zu erstellen.",
       "confirmButton": "Fortfahren",
@@ -176,6 +185,7 @@
         "withinDays": "Innerhalb von N Tagen",
         "withinRange": "Innerhalb des Tagesbereichs (von–bis)",
         "beyondDays": "Mehr als N Tage (Sammelbecken)",
+        "everything": "Alles (Auffangregel)",
         "days": {
           "name": "Tage",
           "description": "Aufgaben, die innerhalb dieser Anzahl von Tagen ab heute fällig sind, werden hier zugewiesen."
@@ -204,6 +214,17 @@
     "tasksIntegration": {
       "heading": "Tasks-Plugin-Integration",
       "blurb": "Wie dieses Plugin mit den Metadaten umgeht, die das Tasks-Plugin auf Aufgabenzeilen schreibt.",
+      "planBy": {
+        "name": "Aufgabendatum",
+        "description": "Welches Datum des Tasks-Plugins die Kategorie einer Aufgabe und ihre Position darin bestimmt.",
+        "descriptionPinned": "Angeheftete Aufgaben ignorieren diese Einstellung.",
+        "manual": "Daten ignorieren",
+        "dueOnly": "Fälligkeit",
+        "dueFirst": "Fälligkeit, sonst geplant",
+        "scheduledFirst": "Geplant, sonst Fälligkeit",
+        "scheduledOnly": "Geplant",
+        "earliest": "Das frühere der beiden"
+      },
       "priority": {
         "name": "Priorität anzeigen",
         "description": "Welche Prioritätsstufen ein Emoji-Abzeichen in der Aufgabenzeile erhalten.",

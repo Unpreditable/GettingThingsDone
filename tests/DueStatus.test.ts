@@ -1,6 +1,13 @@
-import { computeDueStatus, dayKey, diffInDays, matchesRule, msUntilNextMidnight } from "../src/core/DueStatus";
+import {
+  computeDueStatus,
+  computeMisplacement,
+  dayKey,
+  diffInDays,
+  matchesRule,
+  msUntilNextMidnight,
+} from "../src/core/DueStatus";
 import { DEFAULT_BUCKETS } from "../src/settings";
-import type { DateRangeRule } from "../src/settings";
+import type { DateRangeRule, PlanBy } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
 
 // Monday Feb 23, 2026. Feb 2026 has 28 days, so Feb 28 is 5 days out,
@@ -118,63 +125,103 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
   };
 }
 
-function status(days: number, bucketId: string, overrides: Partial<TaskRecord> = {}) {
-  const task = makeTask({ dueDate: due(days), ...overrides });
-  return computeDueStatus(task, bucketId, DEFAULT_BUCKETS, MONDAY);
+function status(days: number, overrides: Partial<TaskRecord> = {}) {
+  return computeDueStatus(makeTask({ dueDate: due(days), ...overrides }), MONDAY);
+}
+
+/** Misplacement against the default buckets, planning by 📅 unless told otherwise. */
+function misplaced(
+  bucketId: string,
+  overrides: Partial<TaskRecord>,
+  planBy: PlanBy = "due-only"
+) {
+  return computeMisplacement(makeTask(overrides), bucketId, DEFAULT_BUCKETS, planBy, MONDAY);
 }
 
 describe("computeDueStatus", () => {
   it("returns null for a task with no due date", () => {
-    expect(computeDueStatus(makeTask({}), "today", DEFAULT_BUCKETS, MONDAY)).toBeNull();
+    expect(computeDueStatus(makeTask({}), MONDAY)).toBeNull();
   });
 
   it("flags a past due date as overdue", () => {
-    expect(status(-3, "today")).toEqual({ kind: "overdue", diffDays: -3 });
+    expect(status(-3)).toEqual({ kind: "overdue", diffDays: -3 });
   });
 
-  it("leaves a task due today in Today on track", () => {
-    expect(status(0, "today")).toEqual({ kind: "on-track", diffDays: 0 });
-  });
-
-  it("flags a task due today but filed in This Week as misfiled", () => {
-    const result = status(0, "this-week");
-    expect(result).toMatchObject({ kind: "misfiled", diffDays: 0 });
-    expect(result && "belongsIn" in result && result.belongsIn.id).toBe("today");
-  });
-
-  it("flags a task due in 3 days filed in This Month, even though This Month's own range covers it", () => {
-    const result = status(3, "this-month");
-    expect(result).toMatchObject({ kind: "misfiled", diffDays: 3 });
-    expect(result && "belongsIn" in result && result.belongsIn.id).toBe("this-week");
-  });
-
-  it("flags a dated Someday task that a real bucket claims", () => {
-    const result = status(4, "someday");
-    expect(result).toMatchObject({ kind: "misfiled" });
-    expect(result && "belongsIn" in result && result.belongsIn.id).toBe("this-week");
-  });
-
-  it("leaves a Someday task no bucket claims on track", () => {
-    expect(status(200, "someday")).toEqual({ kind: "on-track", diffDays: 200 });
-  });
-
-  it("still flags an overdue Someday task", () => {
-    expect(status(-10, "someday")).toEqual({ kind: "overdue", diffDays: -10 });
-  });
-
-  it("stays silent when a task is pulled forward into a sooner bucket", () => {
-    // Due Thursday (this-week's range), deliberately moved to Today.
-    expect(status(4, "today")).toEqual({ kind: "on-track", diffDays: 4 });
-  });
-
-  it("never flags anything in To Review", () => {
-    expect(status(-10, "to-review")).toEqual({ kind: "on-track", diffDays: -10 });
-    expect(status(0, "to-review")).toEqual({ kind: "on-track", diffDays: 0 });
+  it("leaves a task due today on track", () => {
+    expect(status(0)).toEqual({ kind: "on-track", diffDays: 0 });
   });
 
   it("never flags a completed task", () => {
-    expect(status(-10, "today", { isCompleted: true })).toEqual({ kind: "on-track", diffDays: -10 });
-    expect(status(0, "this-week", { isCompleted: true })).toEqual({ kind: "on-track", diffDays: 0 });
+    expect(status(-10, { isCompleted: true })).toEqual({ kind: "on-track", diffDays: -10 });
+  });
+
+  it("ignores the scheduled date entirely", () => {
+    const scheduledLongPast = makeTask({ dueDate: due(5), scheduledDate: due(-30) });
+    expect(computeDueStatus(scheduledLongPast, MONDAY)).toEqual({ kind: "on-track", diffDays: 5 });
+  });
+
+  it("reports overdue from 📅 even when a later ⏳ is driving placement", () => {
+    const task = makeTask({ dueDate: due(-2), scheduledDate: due(9) });
+    expect(computeDueStatus(task, MONDAY)).toEqual({ kind: "overdue", diffDays: -2 });
+  });
+});
+
+describe("computeMisplacement", () => {
+  it("returns null for a task with no planning date", () => {
+    expect(misplaced("this-week", {})).toBeNull();
+    expect(misplaced("this-week", { dueDate: due(0) }, "manual")).toBeNull();
+  });
+
+  it("says nothing about a task sitting where its date puts it", () => {
+    expect(misplaced("today", { dueDate: due(0) })).toBeNull();
+  });
+
+  it("flags a task due today but filed in This Week", () => {
+    expect(misplaced("this-week", { dueDate: due(0) })?.id).toBe("today");
+  });
+
+  it("flags a task filed in This Month that an earlier bucket claims", () => {
+    // This Month's own range covers day 3, but This Week claims it first, and
+    // first-match order is what autoAssign uses too.
+    expect(misplaced("this-month", { dueDate: due(3) })?.id).toBe("this-week");
+  });
+
+  it("flags a dated Someday task that a real bucket claims", () => {
+    expect(misplaced("someday", { dueDate: due(4) })?.id).toBe("this-week");
+  });
+
+  it("leaves a far-future Someday task alone, since the catch-all claims it there", () => {
+    expect(misplaced("someday", { dueDate: due(200) })).toBeNull();
+  });
+
+  it("stays silent when a task is pulled forward into a sooner bucket", () => {
+    // Due Thursday (this-week's range), deliberately moved to Today. That is a
+    // choice, not a mistake — hence autoIdx < curIdx rather than !==.
+    expect(misplaced("today", { dueDate: due(4) })).toBeNull();
+  });
+
+  it("never flags anything in To Review", () => {
+    expect(misplaced("to-review", { dueDate: due(0) })).toBeNull();
+  });
+
+  it("never flags a completed task", () => {
+    expect(misplaced("this-week", { dueDate: due(0), isCompleted: true })).toBeNull();
+  });
+
+  it("follows the planning date, not the due date", () => {
+    // ⏳ today, 📅 far out, filed in Someday. Planning by ⏳ this is misfiled;
+    // planning by 📅 the catch-all claims Someday and it is fine where it is.
+    const task = { dueDate: due(200), scheduledDate: due(0) };
+    expect(misplaced("someday", task, "scheduled-first")?.id).toBe("today");
+    expect(misplaced("someday", task, "due-only")).toBeNull();
+  });
+
+  it("can be true at the same time as overdue", () => {
+    // 📅 passed (overdue) while ⏳ places it in Today, but it is pinned to
+    // Someday (misfiled). The row shows only ❢; the popover shows both.
+    const task = makeTask({ dueDate: due(-4), scheduledDate: due(0) });
+    expect(computeDueStatus(task, MONDAY)).toEqual({ kind: "overdue", diffDays: -4 });
+    expect(computeMisplacement(task, "someday", DEFAULT_BUCKETS, "scheduled-first", MONDAY)?.id).toBe("today");
   });
 });
 

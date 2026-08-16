@@ -18,16 +18,24 @@
     },
     "contextMenu": {
       "moveTo": "이동: {{name}}",
-      "openFile": "파일 열기"
+      "openFile": "파일 열기",
+      "pinTo": "{{name}}에 고정",
+      "unpin": "고정 해제 (→ {{name}})",
+      "unpinHere": "고정 해제"
     },
     "languageBanner": {
       "message": "Obsidian 언어가 변경되었습니다. 가능한 경우 카테고리 이름이 업데이트되었습니다 — 필요하면 설정을 확인하세요.",
       "openSettings": "설정 열기",
       "dismiss": "닫기"
+    },
+    "catchAllBanner": {
+      "message": "카테고리에서 '전체' 날짜 범위를 사용할 수 있습니다. 기존 설정은 그대로 두었으니, 다른 카테고리가 놓치는 날짜를 담으려면 마지막 카테고리에 적용하세요.",
+      "openSettings": "설정 열기",
+      "dismiss": "닫기"
     }
   },
   "task": {
-    "autoPlacedTooltip": "마감일에서 자동 배치됨 — 클릭하여 배치 확인",
+    "autoPlacedMarker": "이 날짜가 카테고리를 결정합니다",
     "subtaskTooltip": "하위 작업",
     "activeSubtasks_one": "활성 하위 작업 {{count}}개",
     "activeSubtasks_other": "활성 하위 작업 {{count}}개",
@@ -42,7 +50,6 @@
       "inDays_other": "{{count}}일 후 마감",
       "overdue_one": "{{count}}일 지남",
       "overdue_other": "{{count}}일 지남",
-      "belongsIn": "{{bucket}}에 있어야 함",
       "withDetail": "{{main}} ({{detail}})"
     },
     "priority": {
@@ -59,7 +66,9 @@
       "created": "{{date}} 생성",
       "cancelled": "{{date}} 취소",
       "done": "{{date}} 완료",
-      "onCompletion": "완료 시: {{action}}"
+      "onCompletion": "완료 시: {{action}}",
+      "pinnedTo": "{{bucket}}에 고정됨",
+      "belongsIn": "{{bucket}}에 속함"
     }
   },
   "commands": {
@@ -74,7 +83,7 @@
   "settings": {
     "heading": "Getting Things Done",
     "banner": {
-      "message": "GTD Tasks를 사용해 주셔서 감사합니다! 저의 일상 업무를 정리하기 위해 만들었는데, 여러분의 일에도 조금이나마 도움이 되길 바랍니다. 무엇이 잘 되고 있는지, 무엇이 아쉬운지, 어떤 기능을 원하시는지 진심으로 듣고 싶습니다.",
+      "message": "카테고리에서 다른 카테고리가 놓치는 모든 날짜를 담는 '전체 (나머지 모두)' 날짜 범위를 사용할 수 있습니다. 원하면 마지막 카테고리에 적용하세요.",
       "buttonText": "피드백 및 아이디어 공유",
       "confirmMessage": "기본 브라우저에서 github.com이 열리고 새 이슈를 만듭니다.",
       "confirmButton": "계속",
@@ -176,6 +185,7 @@
         "withinDays": "N일 이내",
         "withinRange": "날짜 범위 내 (시작~끝)",
         "beyondDays": "N일 초과 (포괄)",
+        "everything": "전체 (나머지 모두)",
         "days": {
           "name": "일수",
           "description": "오늘부터 지정한 일수 이내에 마감인 작업이 여기에 할당됩니다."
@@ -204,6 +214,17 @@
     "tasksIntegration": {
       "heading": "Tasks 플러그인 연동",
       "blurb": "Tasks 플러그인이 작업 줄에 기록하는 메타데이터를 이 플러그인이 처리하는 방식입니다.",
+      "planBy": {
+        "name": "작업 날짜",
+        "description": "Tasks 플러그인의 어떤 날짜가 작업의 카테고리와 그 안에서의 순서를 결정하는지.",
+        "descriptionPinned": "고정된 작업은 이 설정을 무시합니다.",
+        "manual": "날짜 무시",
+        "dueOnly": "마감일",
+        "dueFirst": "마감일, 없으면 예정일",
+        "scheduledFirst": "예정일, 없으면 마감일",
+        "scheduledOnly": "예정일",
+        "earliest": "둘 중 이른 날짜"
+      },
       "priority": {
         "name": "우선순위 표시",
         "description": "작업 행에 이모지 배지로 표시할 우선순위 수준입니다.",
