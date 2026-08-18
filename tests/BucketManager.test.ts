@@ -521,7 +521,7 @@ describe("groupTasksIntoBuckets manual order", () => {
     const review = unordered.find((g) => g.bucketId === TO_REVIEW_ID)!;
     expect(review.tasks.map((t) => t.id)).toEqual(["a", "b", "c"]);
 
-    const keys = computeOrderKeys([a, b, c]);
+    const keys = computeOrderKeys([a, b, c], "due-only");
     const withOrder = {
       ...settings,
       taskOrder: { [TO_REVIEW_ID]: [keys.get("c")!, keys.get("a")!, keys.get("b")!] },
@@ -536,7 +536,7 @@ describe("groupTasksIntoBuckets manual order", () => {
     const a = makeTask({ id: "a", filePath: "x.md", lineNumber: 0, text: "A" });
     const b = makeTask({ id: "b", filePath: "x.md", lineNumber: 1, text: "B" });
 
-    const keys = computeOrderKeys([a]);
+    const keys = computeOrderKeys([a], "due-only");
     const withOrder = {
       ...settings,
       taskOrder: { [TO_REVIEW_ID]: [keys.get("a")!] },
@@ -557,7 +557,7 @@ describe("groupTasksIntoBuckets manual order", () => {
     // Only the parent has an explicit saved order key (simulating: it was
     // dragged into this bucket, children auto-inherited with no saved
     // position of their own).
-    const keys = computeOrderKeys([parent, child1, child2, other]);
+    const keys = computeOrderKeys([parent, child1, child2, other], "due-only");
     const withOrder = {
       ...settings,
       taskOrder: { [TO_REVIEW_ID]: [keys.get("p")!] },
@@ -678,7 +678,7 @@ describe("groupTasksIntoBuckets performance", () => {
       buckets: DEFAULT_BUCKETS,
       taskOrder: {} as Record<string, OrderEntry[]>,
     };
-    const orderKeys = computeOrderKeys(tasks);
+    const orderKeys = computeOrderKeys(tasks, "due-only");
     // A long-lived file accumulates a large manual order over months of use.
     bigSettings.taskOrder[TO_REVIEW_ID] = tasks
       .slice(0, 1000)
@@ -728,7 +728,7 @@ describe("agedCompletedTaskIds", () => {
       isCompleted: true,
       completedAt: new Date("2026-02-23T00:00:00"),
     });
-    const entry = computeOrderKeys([task]).get("a")!;
+    const entry = computeOrderKeys([task], "due-only").get("a")!;
     const witnessed = {
       ...settings,
       completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
@@ -749,7 +749,7 @@ describe("agedCompletedTaskIds", () => {
       isCompleted: true,
       completedAt: new Date("2026-02-23T00:00:00"),
     });
-    const entry = computeOrderKeys([task]).get("a")!;
+    const entry = computeOrderKeys([task], "due-only").get("a")!;
     const witnessed = {
       ...settings,
       completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
@@ -778,7 +778,7 @@ describe("agedCompletedTaskIds", () => {
 
   it("does not mark a dateless completion witnessed today", () => {
     const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: null });
-    const entry = computeOrderKeys([task]).get("a")!;
+    const entry = computeOrderKeys([task], "due-only").get("a")!;
     const withRecord = {
       ...settings,
       completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
@@ -790,7 +790,7 @@ describe("agedCompletedTaskIds", () => {
 
   it("marks a dateless completion whose witnessed record is from before today", () => {
     const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: null });
-    const entry = computeOrderKeys([task]).get("a")!;
+    const entry = computeOrderKeys([task], "due-only").get("a")!;
     const withRecord = {
       ...settings,
       completionSeen: { [entryId(entry)]: new Date("2026-02-22T09:00:00").getTime() },
@@ -798,5 +798,76 @@ describe("agedCompletedTaskIds", () => {
 
     const review = groupTasksIntoBuckets([task], withRecord).find((g) => g.bucketId === TO_REVIEW_ID)!;
     expect(review.agedCompletedTaskIds).toEqual(["a"]);
+  });
+});
+
+describe("in-bucket ordering by planning date", () => {
+  const settings = {
+    ...DEFAULT_SETTINGS,
+    buckets: DEFAULT_BUCKETS,
+    planBy: "scheduled-first" as PlanBy,
+    orderKeyScheme: "scheduled-first" as PlanBy,
+  };
+
+  // Next Week is Mar 2–8 against the fixed Monday Feb 23.
+  const scheduled = (id: string, lineNumber: number, day: number | null) =>
+    makeTask({
+      id,
+      text: id,
+      lineNumber,
+      scheduledDate: day === null ? null : new Date(2026, 2, day),
+    });
+
+  const pinnedUndated = makeTask({
+    id: "o04",
+    text: "o04",
+    lineNumber: 3,
+    rawLine: "- [ ] o04 #gtd/next-week",
+    tags: ["gtd/next-week"],
+  });
+
+  function nextWeek(tasks: TaskRecord[], overrides: Partial<typeof settings> = {}) {
+    const groups = groupTasksIntoBuckets(tasks, { ...settings, ...overrides });
+    return groups.find((g) => g.bucketId === "next-week")!.tasks.map((t) => t.id);
+  }
+
+  it("renders a never-dragged bucket in date order, undated last, ties by file order", () => {
+    const tasks = [
+      scheduled("o01", 0, 6),
+      scheduled("o02", 1, 3),
+      scheduled("o03", 2, 8),
+      pinnedUndated,
+      scheduled("o05", 4, 3),
+    ];
+
+    expect(nextWeek(tasks)).toEqual(["o02", "o05", "o01", "o03", "o04"]);
+  });
+
+  it("leaves taskOrder alone for a bucket nobody has dragged", () => {
+    const taskOrder = {};
+    groupTasksIntoBuckets([scheduled("o01", 0, 6)], { ...settings, taskOrder });
+
+    expect(taskOrder).toEqual({});
+  });
+
+  it("keeps a dragged bucket's hand order and merges an arrival in by date", () => {
+    const dragged = [scheduled("o01", 0, 6), scheduled("o02", 1, 3)];
+    const arrival = scheduled("o05", 2, 4);
+    const all = [...dragged, arrival];
+    const keys = computeOrderKeys(all, "scheduled-first");
+
+    // Hand-dragged into Mar 6 before Mar 3 — the arrival dated Mar 4 must land
+    // after both rather than jumping above the Mar 6 it postdates.
+    const taskOrder = { "next-week": dragged.map((t) => keys.get(t.id)!) };
+
+    expect(nextWeek(all, { taskOrder })).toEqual(["o01", "o02", "o05"]);
+  });
+
+  it("orders by the due date instead once planBy says so", () => {
+    const a = makeTask({ id: "a", text: "a", lineNumber: 0, dueDate: new Date(2026, 2, 6), scheduledDate: new Date(2026, 2, 3) });
+    const b = makeTask({ id: "b", text: "b", lineNumber: 1, dueDate: new Date(2026, 2, 3), scheduledDate: new Date(2026, 2, 6) });
+
+    expect(nextWeek([a, b], { planBy: "due-only", orderKeyScheme: "due-only" })).toEqual(["b", "a"]);
+    expect(nextWeek([a, b])).toEqual(["a", "b"]);
   });
 });

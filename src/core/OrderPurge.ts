@@ -1,6 +1,6 @@
 import { TaskRecord } from "./TaskParser";
 import { computeOrderKeys, entryId, isOrderEntry, isRecurring, wasCompletionWitnessed } from "./TaskOrder";
-import type { OrderEntry } from "./TaskOrder";
+import type { OrderEntry, OrderKeyScheme } from "./TaskOrder";
 import type { OrderState } from "./OrderMigration";
 
 function startOfDay(now: Date): number {
@@ -9,8 +9,11 @@ function startOfDay(now: Date): number {
   return d.getTime();
 }
 
-function indexByEntryId(tasks: TaskRecord[]): Map<string, { task: TaskRecord; entry: OrderEntry }> {
-  const entries = computeOrderKeys(tasks);
+function indexByEntryId(
+  tasks: TaskRecord[],
+  scheme: OrderKeyScheme
+): Map<string, { task: TaskRecord; entry: OrderEntry }> {
+  const entries = computeOrderKeys(tasks, scheme);
   const result = new Map<string, { task: TaskRecord; entry: OrderEntry }>();
   for (const task of tasks) {
     const entry = entries.get(task.id);
@@ -30,10 +33,11 @@ function indexByEntryId(tasks: TaskRecord[]): Map<string, { task: TaskRecord; en
 export function purgeAgedEntries(
   state: OrderState,
   tasks: TaskRecord[],
-  now: Date
+  now: Date,
+  scheme: OrderKeyScheme
 ): { state: OrderState; changed: boolean } {
   const midnight = startOfDay(now);
-  const byId = indexByEntryId(tasks);
+  const byId = indexByEntryId(tasks, scheme);
   let changed = false;
 
   const taskOrder: Record<string, OrderEntry[]> = {};
@@ -70,9 +74,10 @@ export function reconcileDanglingEntries(
   state: OrderState,
   tasks: TaskRecord[],
   fileExists: (path: string) => boolean,
-  inScope: (path: string) => boolean
+  inScope: (path: string) => boolean,
+  scheme: OrderKeyScheme
 ): { state: OrderState; changed: boolean } {
-  const byId = indexByEntryId(tasks);
+  const byId = indexByEntryId(tasks, scheme);
   let changed = false;
 
   const isDangling = (file: string, id: string): boolean => {

@@ -11,7 +11,7 @@ import {
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
-import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, getActiveScope, isPathInScope, migrateSettingsData, normalizeSettingsShapes, shouldAdoptCatchAll, shouldRecommendCatchAll } from "./settings";
+import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, activeOrderKeyScheme, getActiveScope, isPathInScope, migrateSettingsData, normalizeSettingsShapes, shouldAdoptCatchAll, shouldRecommendCatchAll } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
@@ -19,7 +19,13 @@ import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { moveTaskToBucket, toggleTaskCompletion } from "./core/TaskWriter";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
-import { diffFileTasks, applyTaskDiff, renameFileInState, migrateOrderFormat } from "./core/OrderMigration";
+import {
+  diffFileTasks,
+  applyTaskDiff,
+  renameFileInState,
+  migrateOrderFormat,
+  migrateOrderKeys,
+} from "./core/OrderMigration";
 import type { OrderState } from "./core/OrderMigration";
 import { purgeAgedEntries, reconcileDanglingEntries } from "./core/OrderPurge";
 import { dayKey, msUntilNextMidnight } from "./core/DueStatus";
@@ -81,7 +87,7 @@ export default class GtdTasksPlugin extends Plugin {
     this.taskIndex.registerVaultEvents();
 
     this.taskIndex.onFileReplaced((filePath, oldTasks, newTasks) => {
-      const diff = diffFileTasks(oldTasks, newTasks);
+      const diff = diffFileTasks(oldTasks, newTasks, activeOrderKeyScheme(this.settings));
       const applied = applyTaskDiff(this.orderState(), filePath, diff, Date.now());
       if (applied.changed) {
         this.applyOrderState(applied.state);
@@ -189,6 +195,7 @@ export default class GtdTasksPlugin extends Plugin {
   }
 
   async saveSettings() {
+    this.rekeyOrderForPlanBy();
     // completionSeen is session state, not user data: it records completions
     // this run watched happen, so that a task the user just ticked doesn't
     // vanish under them. Writing it would resurrect completed tasks after a
@@ -280,6 +287,29 @@ export default class GtdTasksPlugin extends Plugin {
     };
   }
 
+  /**
+   * The planning date is part of every order key, so switching planBy would
+   * otherwise strand every saved position at once. Gated on orderStateReady
+   * for the same reason the startup migrations are — mapping keys against a
+   * half-scanned vault would drop positions for files that hadn't loaded.
+   * A flip made before then is picked up by reconcileOrderState instead,
+   * since orderKeyScheme is persisted.
+   */
+  private rekeyOrderForPlanBy(): void {
+    if (!this.orderStateReady) return;
+    const stored = activeOrderKeyScheme(this.settings);
+    if (stored === this.settings.planBy) return;
+
+    const rekeyed = migrateOrderKeys(
+      this.orderState(),
+      this.taskIndex.getAllTasks(),
+      stored,
+      this.settings.planBy
+    );
+    this.applyOrderState(rekeyed.state);
+    this.settings.orderKeyScheme = this.settings.planBy;
+  }
+
   private applyOrderState(state: OrderState): void {
     this.settings.taskOrder = state.taskOrder;
     this.settings.completionSeen = state.completionSeen;
@@ -293,7 +323,12 @@ export default class GtdTasksPlugin extends Plugin {
    */
   private async handleIndexChanged(): Promise<void> {
     if (this.orderStateReady) {
-      const purged = purgeAgedEntries(this.orderState(), this.taskIndex.getAllTasks(), new Date());
+      const purged = purgeAgedEntries(
+        this.orderState(),
+        this.taskIndex.getAllTasks(),
+        new Date(),
+        activeOrderKeyScheme(this.settings)
+      );
       if (purged.changed) {
         this.applyOrderState(purged.state);
         this.orderStateDirty = true;
@@ -319,19 +354,35 @@ export default class GtdTasksPlugin extends Plugin {
     const tasks = this.taskIndex.getAllTasks();
     const scope = getActiveScope(this.settings);
 
-    const migrated = migrateOrderFormat(this.settings.taskOrder, tasks);
-    const reconciled = reconcileDanglingEntries(
+    const stored = activeOrderKeyScheme(this.settings);
+    const migrated = migrateOrderFormat(this.settings.taskOrder, tasks, stored);
+    const rekeyed = migrateOrderKeys(
       { taskOrder: migrated.taskOrder, completionSeen: this.settings.completionSeen },
       tasks,
-      (path) => this.app.vault.getAbstractFileByPath(path) instanceof TFile,
-      (path) => isPathInScope(path, scope)
+      stored,
+      this.settings.planBy
     );
-    const purged = purgeAgedEntries(reconciled.state, tasks, new Date());
+    this.settings.orderKeyScheme = this.settings.planBy;
+    const reconciled = reconcileDanglingEntries(
+      rekeyed.state,
+      tasks,
+      (path) => this.app.vault.getAbstractFileByPath(path) instanceof TFile,
+      (path) => isPathInScope(path, scope),
+      this.settings.planBy
+    );
+    const purged = purgeAgedEntries(reconciled.state, tasks, new Date(), this.settings.planBy);
 
     this.applyOrderState(purged.state);
     this.orderStateReady = true;
 
-    if (migrated.changed || reconciled.changed || purged.changed || this.orderStateDirty) {
+    if (
+      stored !== this.settings.planBy ||
+      migrated.changed ||
+      rekeyed.changed ||
+      reconciled.changed ||
+      purged.changed ||
+      this.orderStateDirty
+    ) {
       this.orderStateDirty = false;
       await this.saveSettings();
     } else {
@@ -445,7 +496,10 @@ class GtdPanelView extends ItemView {
   }
 
   private async handleReorder(bucketId: string, orderedTaskIds: string[]) {
-    const orderEntries = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
+    const orderEntries = computeOrderKeys(
+      this.plugin.taskIndex.getAllTasks(),
+      activeOrderKeyScheme(this.plugin.settings)
+    );
     this.plugin.settings.taskOrder[bucketId] = mapToOrderEntries(orderedTaskIds, orderEntries);
     await this.plugin.saveSettings();
   }
@@ -484,7 +538,10 @@ class GtdPanelView extends ItemView {
 
     await this.plugin.taskIndex.reindexFileSilently(task.filePath);
 
-    const orderEntries = computeOrderKeys(this.plugin.taskIndex.getAllTasks());
+    const orderEntries = computeOrderKeys(
+      this.plugin.taskIndex.getAllTasks(),
+      activeOrderKeyScheme(this.plugin.settings)
+    );
     const entry = orderEntries.get(task.id);
     if (entry) {
       const purged = purgeOrderEntry(this.plugin.settings.taskOrder, entry);

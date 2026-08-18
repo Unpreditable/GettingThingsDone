@@ -1,4 +1,4 @@
-import type { OrderEntry } from "./core/TaskOrder";
+import type { OrderEntry, OrderKeyScheme } from "./core/TaskOrder";
 
 export type DateRangeRule =
   | { type: "today" }
@@ -116,6 +116,13 @@ export interface PluginSettings {
    * record at all, so this map cannot accumulate history.
    */
   completionSeen: Record<string, number>;
+  /**
+   * Which scheme the keys in taskOrder were hashed under, since the planning
+   * date is part of a key and planBy chooses it. Null means a data.json
+   * written before this release, whose keys are in the "dual-date" scheme.
+   * reconcileOrderState re-keys and then keeps this in step.
+   */
+  orderKeyScheme: OrderKeyScheme | null;
 }
 
 
@@ -187,7 +194,21 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   celebrationMode: "confetti",
   taskOrder: {},
   completionSeen: {},
+  orderKeyScheme: null,
 };
+
+/**
+ * The scheme the keys currently sitting in taskOrder are hashed under — which
+ * is NOT necessarily planBy, since a data.json predating this field holds
+ * dual-date keys until reconcileOrderState re-keys them. Everything that reads
+ * or writes a stored entry must go through this; only the date merge itself
+ * reads planBy directly.
+ */
+export function activeOrderKeyScheme(
+  settings: Pick<PluginSettings, "orderKeyScheme">
+): OrderKeyScheme {
+  return settings.orderKeyScheme ?? "dual-date";
+}
 
 /** Builds the scope TaskIndex scans with, from the active scopeType and its matching persistent path list. */
 export function getActiveScope(
@@ -301,10 +322,25 @@ export function normalizeSettingsShapes(settings: PluginSettings): PluginSetting
     }
   }
 
+  // An unrecognised scheme reads as "unknown", which re-keys from dual-date —
+  // the same safe path a data.json predating the field takes.
+  const knownSchemes: OrderKeyScheme[] = [
+    "dual-date",
+    "manual",
+    "due-only",
+    "due-first",
+    "scheduled-first",
+    "scheduled-only",
+    "earliest",
+  ];
+  const scheme = settings.orderKeyScheme;
+
   return {
     ...settings,
     taskOrder,
     completionSeen,
+    orderKeyScheme:
+      scheme !== null && knownSchemes.includes(scheme) ? scheme : null,
     folderPaths: Array.isArray(settings.folderPaths) ? settings.folderPaths : [],
     filePaths: Array.isArray(settings.filePaths) ? settings.filePaths : [],
   };

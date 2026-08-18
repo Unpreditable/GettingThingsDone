@@ -1,6 +1,6 @@
 import { TaskRecord } from "./TaskParser";
-import { computeOrderKeys, computeLegacyOrderKeys, isOrderEntry } from "./TaskOrder";
-import type { OrderEntry } from "./TaskOrder";
+import { computeOrderKeys, computeLegacyOrderKeys, entryId, isOrderEntry } from "./TaskOrder";
+import type { OrderEntry, OrderKeyScheme } from "./TaskOrder";
 
 /**
  * What changed in one file between two parses. All values are bare order
@@ -24,9 +24,13 @@ export interface TaskDiff {
  * ambiguous degrades to add/delete — a wrong pairing would silently move
  * someone else's task, which is worse than losing one position.
  */
-export function diffFileTasks(oldTasks: TaskRecord[], newTasks: TaskRecord[]): TaskDiff {
-  const oldByKey = keyTasks(oldTasks);
-  const newByKey = keyTasks(newTasks);
+export function diffFileTasks(
+  oldTasks: TaskRecord[],
+  newTasks: TaskRecord[],
+  scheme: OrderKeyScheme
+): TaskDiff {
+  const oldByKey = keyTasks(oldTasks, scheme);
+  const newByKey = keyTasks(newTasks, scheme);
 
   const diff: TaskDiff = { rekeys: [], completed: [], reopened: [] };
 
@@ -60,8 +64,8 @@ export function diffFileTasks(oldTasks: TaskRecord[], newTasks: TaskRecord[]): T
   return diff;
 }
 
-function keyTasks(tasks: TaskRecord[]): Map<string, TaskRecord> {
-  const entries = computeOrderKeys(tasks);
+function keyTasks(tasks: TaskRecord[], scheme: OrderKeyScheme): Map<string, TaskRecord> {
+  const entries = computeOrderKeys(tasks, scheme);
   const result = new Map<string, TaskRecord>();
   for (const task of tasks) {
     const entry = entries.get(task.id);
@@ -192,13 +196,17 @@ export function renameFileInState(
  * is lossless for every task still in the vault; genuine orphans are dropped.
  * Must run only after initialScan resolves, or in-scope files that hadn't
  * loaded yet would look like orphans.
+ *
+ * `scheme` is whichever one the already-structured entries alongside them use,
+ * so the array comes out uniform and migrateOrderKeys can convert it in one go.
  */
 export function migrateOrderFormat(
   taskOrder: Record<string, unknown[]>,
-  tasks: TaskRecord[]
+  tasks: TaskRecord[],
+  scheme: OrderKeyScheme
 ): { taskOrder: Record<string, OrderEntry[]>; changed: boolean } {
   const legacy = computeLegacyOrderKeys(tasks);
-  const current = computeOrderKeys(tasks);
+  const current = computeOrderKeys(tasks, scheme);
 
   const byLegacyKey = new Map<string, OrderEntry>();
   for (const task of tasks) {
@@ -225,4 +233,60 @@ export function migrateOrderFormat(
   }
 
   return { taskOrder: result, changed };
+}
+
+/**
+ * Re-keys saved positions when the scheme the keys were hashed under changes —
+ * at upgrade from the pre-release dual-date scheme, and whenever the user
+ * switches planBy, since the planning date is part of the key.
+ *
+ * Recomputing both schemes over the indexed tasks gives an exact old→new map,
+ * so this is lossless for everything in the vault. An entry that maps to
+ * nothing is KEPT, not dropped: out-of-scope files hold dormant entries on
+ * purpose, and inert is better than deleted. Like migrateOrderFormat, it needs
+ * a complete vault view, so it must run behind the same initialScan gate.
+ */
+export function migrateOrderKeys(
+  state: OrderState,
+  tasks: TaskRecord[],
+  from: OrderKeyScheme,
+  to: OrderKeyScheme
+): { state: OrderState; changed: boolean } {
+  if (from === to) return { state, changed: false };
+
+  const before = computeOrderKeys(tasks, from);
+  const after = computeOrderKeys(tasks, to);
+
+  const remap = new Map<string, OrderEntry>();
+  for (const task of tasks) {
+    const oldEntry = before.get(task.id);
+    const newEntry = after.get(task.id);
+    if (oldEntry && newEntry) remap.set(entryId(oldEntry), newEntry);
+  }
+
+  let changed = false;
+
+  const taskOrder: Record<string, OrderEntry[]> = {};
+  for (const [bucketId, entries] of Object.entries(state.taskOrder)) {
+    taskOrder[bucketId] = entries.map((entry) => {
+      if (!isOrderEntry(entry)) return entry;
+      const mapped = remap.get(entryId(entry));
+      if (!mapped || mapped.key === entry.key) return entry;
+      changed = true;
+      return mapped;
+    });
+  }
+
+  const completionSeen: Record<string, number> = {};
+  for (const [id, at] of Object.entries(state.completionSeen)) {
+    const mapped = remap.get(id);
+    if (mapped && entryId(mapped) !== id) {
+      completionSeen[entryId(mapped)] = at;
+      changed = true;
+    } else {
+      completionSeen[id] = at;
+    }
+  }
+
+  return { state: { taskOrder, completionSeen }, changed };
 }

@@ -10,10 +10,16 @@
  */
 
 import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
-import { BucketConfig, PluginSettings } from "../settings";
+import { BucketConfig, PluginSettings, activeOrderKeyScheme } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
 import { t } from "../i18n/i18n";
-import { computeOrderKeys, applyManualOrder, wasCompletionWitnessed, isRecurring } from "./TaskOrder";
+import {
+  computeOrderKeys,
+  computeArrivalRanks,
+  applyManualOrder,
+  wasCompletionWitnessed,
+  isRecurring,
+} from "./TaskOrder";
 import { computeDueStatus, computeMisplacement, matchesRule } from "./DueStatus";
 import type { DueStatus } from "./DueStatus";
 import { planningDate } from "./PlanningDate";
@@ -126,13 +132,20 @@ export function groupTasksIntoBuckets(
     if (belongsIn) group.misfiledIn[task.id] = belongsIn;
   }
 
-  const orderKeys = computeOrderKeys(tasks);
+  const orderKeys = computeOrderKeys(tasks, activeOrderKeyScheme(settings));
+  const savedOrder = settings.taskOrder ?? {};
+  const arrivalRanks = computeArrivalRanks(orderKeys, savedOrder);
   const completionSeen = settings.completionSeen ?? {};
   for (const group of bucketMap.values()) {
-    const saved = settings.taskOrder?.[group.bucketId];
-    if (saved && saved.length > 0) {
-      group.tasks = applyManualOrder(group.tasks, orderKeys, saved);
-    }
+    // Always merged, never guarded on a non-empty saved array: with none, the
+    // merge is what produces plain date order.
+    group.tasks = applyManualOrder(
+      group.tasks,
+      orderKeys,
+      savedOrder[group.bucketId] ?? [],
+      settings.planBy,
+      arrivalRanks
+    );
     group.tasks = regroupByHierarchy(group.tasks);
 
     for (const task of group.tasks) {

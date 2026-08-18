@@ -214,6 +214,19 @@ describe("normalizeSettingsShapes", () => {
     expect(normalizeSettingsShapes(settings).completionSeen).toEqual({ d: 42 });
   });
 
+  it("rejects an order key scheme that is not one this build knows", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      orderKeyScheme: "by-vibes",
+    } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(settings).orderKeyScheme).toBeNull();
+  });
+
+  it("keeps a recognised order key scheme", () => {
+    const settings: PluginSettings = { ...DEFAULT_SETTINGS, orderKeyScheme: "due-only" };
+    expect(normalizeSettingsShapes(settings).orderKeyScheme).toBe("due-only");
+  });
+
   it("forces folderPaths/filePaths to an array if they are not one", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

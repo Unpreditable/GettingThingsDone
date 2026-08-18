@@ -31,14 +31,14 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
 }
 
 function keyOf(task: TaskRecord): string {
-  return computeOrderKeys([task]).get(task.id)!.key;
+  return computeOrderKeys([task], "due-only").get(task.id)!.key;
 }
 
 describe("diffFileTasks", () => {
   it("reports nothing when the file is unchanged (tier 1)", () => {
     const task = makeTask({ id: "a", text: "Buy milk" });
 
-    expect(diffFileTasks([task], [task])).toEqual({
+    expect(diffFileTasks([task], [task], "due-only")).toEqual({
       rekeys: [],
       completed: [],
       reopened: [],
@@ -49,7 +49,7 @@ describe("diffFileTasks", () => {
     const before = makeTask({ id: "a", lineNumber: 3, text: "Buy milk" });
     const after = makeTask({ id: "a2", lineNumber: 3, text: "Buy oat milk" });
 
-    const diff = diffFileTasks([before], [after]);
+    const diff = diffFileTasks([before], [after], "due-only");
 
     expect(diff.rekeys).toEqual([{ from: keyOf(before), to: keyOf(after) }]);
   });
@@ -58,7 +58,7 @@ describe("diffFileTasks", () => {
     const before = makeTask({ id: "a", lineNumber: 0, text: "Ship it", dueDate: new Date("2026-08-01") });
     const after = makeTask({ id: "a2", lineNumber: 0, text: "Ship it", dueDate: new Date("2026-08-09") });
 
-    const diff = diffFileTasks([before], [after]);
+    const diff = diffFileTasks([before], [after], "due-only");
 
     expect(diff.rekeys).toEqual([{ from: keyOf(before), to: keyOf(after) }]);
   });
@@ -68,7 +68,7 @@ describe("diffFileTasks", () => {
     const before = makeTask({ id: "a", lineNumber: 1, text: "Old" });
     const after = makeTask({ id: "a2", lineNumber: 1, text: "New" });
 
-    const diff = diffFileTasks([keep, before], [keep, after]);
+    const diff = diffFileTasks([keep, before], [keep, after], "due-only");
 
     expect(diff.rekeys).toEqual([{ from: keyOf(before), to: keyOf(after) }]);
   });
@@ -77,7 +77,7 @@ describe("diffFileTasks", () => {
     const before = makeTask({ id: "a", lineNumber: 1, text: "Buy milk" });
     const after = makeTask({ id: "a2", lineNumber: 7, text: "Buy oat milk" });
 
-    const diff = diffFileTasks([before], [after]);
+    const diff = diffFileTasks([before], [after], "due-only");
 
     expect(diff.rekeys).toEqual([{ from: keyOf(before), to: keyOf(after) }]);
   });
@@ -88,7 +88,7 @@ describe("diffFileTasks", () => {
     const newA = makeTask({ id: "c", lineNumber: 5, text: "New A" });
     const newB = makeTask({ id: "d", lineNumber: 9, text: "New B" });
 
-    const diff = diffFileTasks([oldA, oldB], [newA, newB]);
+    const diff = diffFileTasks([oldA, oldB], [newA, newB], "due-only");
 
     expect(diff.rekeys).toEqual([]);
   });
@@ -97,21 +97,21 @@ describe("diffFileTasks", () => {
     const existing = makeTask({ id: "a", lineNumber: 0, text: "Existing" });
     const added = makeTask({ id: "b", lineNumber: 1, text: "Added" });
 
-    expect(diffFileTasks([existing], [existing, added]).rekeys).toEqual([]);
+    expect(diffFileTasks([existing], [existing, added], "due-only").rekeys).toEqual([]);
   });
 
   it("treats a pure deletion as gone, with no rekey", () => {
     const kept = makeTask({ id: "a", lineNumber: 0, text: "Kept" });
     const removed = makeTask({ id: "b", lineNumber: 1, text: "Removed" });
 
-    expect(diffFileTasks([kept, removed], [kept]).rekeys).toEqual([]);
+    expect(diffFileTasks([kept, removed], [kept], "due-only").rekeys).toEqual([]);
   });
 
   it("records a dateless open → completed transition", () => {
     const before = makeTask({ id: "a", text: "Foo", isCompleted: false });
     const after = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: null });
 
-    const diff = diffFileTasks([before], [after]);
+    const diff = diffFileTasks([before], [after], "due-only");
 
     expect(diff.completed).toEqual([keyOf(after)]);
     expect(diff.reopened).toEqual([]);
@@ -123,14 +123,14 @@ describe("diffFileTasks", () => {
     const before = makeTask({ id: "a", text: "Foo", isCompleted: false });
     const after = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: new Date("2026-08-02") });
 
-    expect(diffFileTasks([before], [after]).completed).toEqual([keyOf(after)]);
+    expect(diffFileTasks([before], [after], "due-only").completed).toEqual([keyOf(after)]);
   });
 
   it("records a completed → open transition", () => {
     const before = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: null });
     const after = makeTask({ id: "a", text: "Foo", isCompleted: false });
 
-    const diff = diffFileTasks([before], [after]);
+    const diff = diffFileTasks([before], [after], "due-only");
 
     expect(diff.reopened).toEqual([keyOf(after)]);
     expect(diff.completed).toEqual([]);
@@ -140,7 +140,7 @@ describe("diffFileTasks", () => {
     const before = makeTask({ id: "a", lineNumber: 2, text: "Old text", isCompleted: false });
     const after = makeTask({ id: "b", lineNumber: 2, text: "New text", isCompleted: true, completedAt: null });
 
-    const diff = diffFileTasks([before], [after]);
+    const diff = diffFileTasks([before], [after], "due-only");
 
     expect(diff.rekeys).toEqual([{ from: keyOf(before), to: keyOf(after) }]);
     expect(diff.completed).toEqual([keyOf(after)]);
@@ -149,7 +149,7 @@ describe("diffFileTasks", () => {
   it("does not record a completion for a task that was already completed when first seen", () => {
     const done = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: null });
 
-    expect(diffFileTasks([], [done]).completed).toEqual([]);
+    expect(diffFileTasks([], [done], "due-only").completed).toEqual([]);
   });
 });
 
@@ -356,8 +356,8 @@ describe("legacy key format (pinned against the shipped pre-upgrade build)", () 
     // A saved order in the old format, deliberately not in file order.
     const savedOrder = ["1812805701:0", "2078015980:1", "1757815861:0"];
 
-    const { taskOrder, changed } = migrateOrderFormat({ today: savedOrder }, tasks);
-    const current = computeOrderKeys(tasks);
+    const { taskOrder, changed } = migrateOrderFormat({ today: savedOrder }, tasks, "due-only");
+    const current = computeOrderKeys(tasks, "due-only");
 
     expect(changed).toBe(true);
     expect(taskOrder.today).toEqual([
@@ -378,13 +378,14 @@ describe("migrateOrderFormat", () => {
   }
 
   function entryFor(task: TaskRecord) {
-    return computeOrderKeys(tasks).get(task.id)!;
+    return computeOrderKeys(tasks, "due-only").get(task.id)!;
   }
 
   it("rewrites matching flat keys to structured entries at the same positions", () => {
     const { taskOrder, changed } = migrateOrderFormat(
       { today: [legacyKey(taskB), legacyKey(taskA)] },
-      tasks
+      tasks,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -394,7 +395,8 @@ describe("migrateOrderFormat", () => {
   it("drops flat keys that match no task in the vault", () => {
     const { taskOrder } = migrateOrderFormat(
       { today: ["9999999:0", legacyKey(taskA)] },
-      tasks
+      tasks,
+      "due-only"
     );
 
     expect(taskOrder.today).toEqual([entryFor(taskA)]);
@@ -403,7 +405,8 @@ describe("migrateOrderFormat", () => {
   it("leaves already-migrated entries untouched and reports changed: false", () => {
     const { taskOrder, changed } = migrateOrderFormat(
       { today: [entryFor(taskA), entryFor(taskB)] },
-      tasks
+      tasks,
+      "due-only"
     );
 
     expect(changed).toBe(false);
@@ -413,7 +416,8 @@ describe("migrateOrderFormat", () => {
   it("handles a mixed bucket, migrating only the flat keys", () => {
     const { taskOrder, changed } = migrateOrderFormat(
       { today: [entryFor(taskA), legacyKey(taskB)] },
-      tasks
+      tasks,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -421,7 +425,7 @@ describe("migrateOrderFormat", () => {
   });
 
   it("preserves empty buckets", () => {
-    const { taskOrder } = migrateOrderFormat({ today: [], someday: [] }, tasks);
+    const { taskOrder } = migrateOrderFormat({ today: [], someday: [] }, tasks, "due-only");
     expect(taskOrder).toEqual({ today: [], someday: [] });
   });
 });

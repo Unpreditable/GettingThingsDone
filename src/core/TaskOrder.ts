@@ -1,4 +1,12 @@
 import { TaskRecord } from "./TaskParser";
+import type { PlanBy } from "../settings";
+import { planningDate } from "./PlanningDate";
+
+/**
+ * Which date the key hashes. "dual-date" is the pre-planBy scheme, kept so
+ * migrateOrderKeys can recognise entries written before this release.
+ */
+export type OrderKeyScheme = PlanBy | "dual-date";
 
 export function hashString(s: string): string {
   let h = 0;
@@ -26,18 +34,21 @@ export function hashString(s: string): string {
  * isCompleted/completedAt are excluded for the same reason: they flip on every
  * checkbox toggle and must not perturb order.
  *
- * Extras are appended only when present, so a task carrying none of them
- * produces a byte-identical string to the pre-extras version and keeps its
- * saved order across the upgrade. Each extra is key-prefixed so a priority of
- * "high" cannot collide with a recurrence rule reading "high".
+ * Each extra is key-prefixed so a priority of "high" cannot collide with a
+ * recurrence rule reading "high".
+ *
+ * Only the PLANNING date is hashed, so editing a date the active planBy
+ * ignores leaves the key alone. The cost is that under a mode yielding no
+ * planning date, tasks sharing text fall through to the occurrence index.
  */
-function disambiguator(task: TaskRecord): string {
-  const due = task.dueDate ? task.dueDate.toISOString() : "";
-  const base = `${task.text}|${due}`;
+function disambiguator(task: TaskRecord, scheme: OrderKeyScheme): string {
+  const dual = scheme === "dual-date";
+  const keyDate = dual ? task.dueDate : planningDate(task, scheme)?.date ?? null;
+  const base = `${task.text}|${keyDate ? keyDate.toISOString() : ""}`;
   const extras = [
     task.priority && `p:${task.priority}`,
     task.recurrence && `r:${task.recurrence}`,
-    task.scheduledDate && `s:${task.scheduledDate.toISOString()}`,
+    dual && task.scheduledDate && `s:${task.scheduledDate.toISOString()}`,
     task.startDate && `b:${task.startDate.toISOString()}`,
     task.createdDate && `c:${task.createdDate.toISOString()}`,
     task.cancelledDate && `x:${task.cancelledDate.toISOString()}`,
@@ -88,6 +99,7 @@ export function isOrderEntry(value: unknown): value is OrderEntry {
  */
 function forEachWithOccurrence(
   tasks: TaskRecord[],
+  scheme: OrderKeyScheme,
   cb: (task: TaskRecord, disambig: string, occurrence: number) => void
 ): void {
   const byFile = new Map<string, TaskRecord[]>();
@@ -100,7 +112,7 @@ function forEachWithOccurrence(
     const sorted = [...fileTasks].sort((a, b) => a.lineNumber - b.lineNumber);
     const occurrenceCount = new Map<string, number>();
     for (const task of sorted) {
-      const disambig = disambiguator(task);
+      const disambig = disambiguator(task, scheme);
       const count = occurrenceCount.get(disambig) ?? 0;
       occurrenceCount.set(disambig, count + 1);
       cb(task, disambig, count);
@@ -115,9 +127,12 @@ function forEachWithOccurrence(
  * that still collide (genuinely identical content in one file) are
  * disambiguated by their occurrence order (first gets :0, second :1, ...).
  */
-export function computeOrderKeys(tasks: TaskRecord[]): Map<string, OrderEntry> {
+export function computeOrderKeys(
+  tasks: TaskRecord[],
+  scheme: OrderKeyScheme
+): Map<string, OrderEntry> {
   const result = new Map<string, OrderEntry>();
-  forEachWithOccurrence(tasks, (task, disambig, occurrence) => {
+  forEachWithOccurrence(tasks, scheme, (task, disambig, occurrence) => {
     result.set(task.id, {
       file: task.filePath,
       key: `${hashString(disambig)}:${occurrence}`,
@@ -133,21 +148,57 @@ export function computeOrderKeys(tasks: TaskRecord[]): Map<string, OrderEntry> {
  */
 export function computeLegacyOrderKeys(tasks: TaskRecord[]): Map<string, string> {
   const result = new Map<string, string>();
-  forEachWithOccurrence(tasks, (task, disambig, occurrence) => {
+  forEachWithOccurrence(tasks, "dual-date", (task, disambig, occurrence) => {
     result.set(task.id, `${hashString(`${task.filePath}:${disambig}`)}:${occurrence}`);
   });
   return result;
 }
 
 /**
- * Sorts `tasks` to match `savedOrder`. Tasks with no match — new tasks, or
- * stale/unmatched entries — are appended at the end in their original
- * relative order.
+ * Where each task sits in the first saved array that mentions it, as one
+ * ascending sequence across all buckets. Same-dated arrivals sort by this, so
+ * a group dragged into an order in one bucket reaches the next one intact.
+ *
+ * The sequence is global rather than per-bucket to keep the comparator
+ * transitive: ranking each task independently by (bucket, position) would not
+ * be a total order once a task appears in two arrays.
+ */
+export function computeArrivalRanks(
+  orderEntries: Map<string, OrderEntry>,
+  taskOrder: Record<string, OrderEntry[]>
+): Map<string, number> {
+  const taskIdByEntry = new Map<string, string>();
+  for (const [taskId, entry] of orderEntries) taskIdByEntry.set(entryId(entry), taskId);
+
+  const ranks = new Map<string, number>();
+  let next = 0;
+  for (const saved of Object.values(taskOrder)) {
+    for (const entry of saved) {
+      if (!isOrderEntry(entry)) continue;
+      const taskId = taskIdByEntry.get(entryId(entry));
+      if (taskId === undefined || ranks.has(taskId)) continue;
+      ranks.set(taskId, next++);
+    }
+  }
+  return ranks;
+}
+
+/**
+ * Places the tasks `savedOrder` names, then merges the rest in by planning
+ * date: an arrival lands after the last SLOT holding a date on or before its
+ * own. On a date-sorted list that is "before the first later task"; on a
+ * hand-dragged one it degrades to an append, rather than hoisting the arrival
+ * above a later task it postdates. Undated tasks go last.
+ *
+ * Nothing here writes. A bucket nobody has dragged holds no saved order at
+ * all, and stays that way — it is re-merged from dates on every render.
  */
 export function applyManualOrder(
   tasks: TaskRecord[],
   orderEntries: Map<string, OrderEntry>,
-  savedOrder: OrderEntry[]
+  savedOrder: OrderEntry[],
+  planBy: PlanBy,
+  arrivalRanks: Map<string, number> = new Map()
 ): TaskRecord[] {
   const byEntry = new Map<string, TaskRecord>();
   for (const task of tasks) {
@@ -155,19 +206,82 @@ export function applyManualOrder(
     if (entry) byEntry.set(entryId(entry), task);
   }
 
-  const result: TaskRecord[] = [];
+  const placed: TaskRecord[] = [];
   const used = new Set<string>();
   for (const entry of savedOrder) {
     if (!isOrderEntry(entry)) continue;
     const task = byEntry.get(entryId(entry));
     if (task && !used.has(task.id)) {
-      result.push(task);
+      placed.push(task);
       used.add(task.id);
     }
   }
-  for (const task of tasks) {
-    if (!used.has(task.id)) result.push(task);
+
+  const dateOf = (task: TaskRecord): number | null =>
+    planningDate(task, planBy)?.date.getTime() ?? null;
+
+  // Sorted by date, each carrying the running maximum slot seen so far — that
+  // running maximum is what makes a scrambled list append.
+  const anchors: Array<{ date: number; upTo: number }> = [];
+  for (let i = 0; i < placed.length; i++) {
+    const date = dateOf(placed[i]);
+    if (date !== null) anchors.push({ date, upTo: i });
   }
+  anchors.sort((a, b) => a.date - b.date);
+  let running = -1;
+  for (const anchor of anchors) {
+    running = Math.max(running, anchor.upTo);
+    anchor.upTo = running;
+  }
+
+  const slotFor = (date: number): number => {
+    let lo = 0;
+    let hi = anchors.length - 1;
+    let found = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (anchors[mid].date <= date) {
+        found = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return found === -1 ? 0 : anchors[found].upTo + 1;
+  };
+
+  const arriving = tasks
+    .map((task, index) => ({ task, index }))
+    .filter(({ task }) => !used.has(task.id))
+    .map(({ task, index }) => {
+      const date = dateOf(task);
+      return { task, index, date, slot: date === null ? placed.length : slotFor(date) };
+    });
+
+  arriving.sort((a, b) => {
+    if (a.slot !== b.slot) return a.slot - b.slot;
+    if (a.date === null || b.date === null) {
+      if (a.date !== b.date) return a.date === null ? 1 : -1;
+    } else if (a.date !== b.date) {
+      return a.date - b.date;
+    }
+    const rankA = arrivalRanks.get(a.task.id);
+    const rankB = arrivalRanks.get(b.task.id);
+    if (rankA === undefined || rankB === undefined) {
+      if (rankA !== rankB) return rankA === undefined ? 1 : -1;
+    } else if (rankA !== rankB) {
+      return rankA - rankB;
+    }
+    return a.index - b.index;
+  });
+
+  const result: TaskRecord[] = [];
+  let cursor = 0;
+  for (const arrival of arriving) {
+    while (cursor < arrival.slot && cursor < placed.length) result.push(placed[cursor++]);
+    result.push(arrival.task);
+  }
+  while (cursor < placed.length) result.push(placed[cursor++]);
   return result;
 }
 

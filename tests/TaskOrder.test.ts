@@ -45,8 +45,8 @@ describe("computeOrderKeys", () => {
     const before = makeTask({ id: "a", lineNumber: 2, text: "Buy milk" });
     const after = makeTask({ id: "a-shifted", lineNumber: 5, text: "Buy milk" });
 
-    expect(computeOrderKeys([before]).get("a")).toEqual(
-      computeOrderKeys([after]).get("a-shifted")
+    expect(computeOrderKeys([before], "due-only").get("a")).toEqual(
+      computeOrderKeys([after], "due-only").get("a-shifted")
     );
   });
 
@@ -54,7 +54,7 @@ describe("computeOrderKeys", () => {
     const first = makeTask({ id: "a", lineNumber: 0, text: "Buy milk" });
     const second = makeTask({ id: "b", lineNumber: 3, text: "Buy milk" });
 
-    const keys = computeOrderKeys([first, second]);
+    const keys = computeOrderKeys([first, second], "due-only");
 
     expect(keys.get("a")!.key).not.toBe(keys.get("b")!.key);
   });
@@ -65,7 +65,7 @@ describe("computeOrderKeys", () => {
     const a = makeTask({ id: "a", filePath: "one.md", text: "Buy milk" });
     const b = makeTask({ id: "b", filePath: "two.md", text: "Buy milk" });
 
-    const keys = computeOrderKeys([a, b]);
+    const keys = computeOrderKeys([a, b], "due-only");
 
     expect(keys.get("a")!.key).toBe(keys.get("b")!.key);
     expect(keys.get("a")!.file).toBe("one.md");
@@ -78,7 +78,7 @@ describe("computeOrderKeys", () => {
     const b = makeTask({ id: "b", filePath: "two.md", lineNumber: 0, text: "Foo" });
     const c = makeTask({ id: "c", filePath: "two.md", lineNumber: 1, text: "Foo" });
 
-    const keys = computeOrderKeys([a, b, c]);
+    const keys = computeOrderKeys([a, b, c], "due-only");
 
     expect(keys.get("a")!.key).toBe(keys.get("b")!.key);
     expect(keys.get("c")!.key).not.toBe(keys.get("b")!.key);
@@ -88,11 +88,11 @@ describe("computeOrderKeys", () => {
     const withDate = makeTask({ id: "a", lineNumber: 0, text: "Foo", dueDate: new Date("2026-08-01") });
     const noDate = makeTask({ id: "b", lineNumber: 1, text: "Foo" });
 
-    const savedForB = computeOrderKeys([noDate, withDate]).get("b")!;
+    const savedForB = computeOrderKeys([noDate, withDate], "due-only").get("b")!;
 
     const withDateShifted = makeTask({ id: "a", lineNumber: 0, text: "Foo", dueDate: new Date("2026-08-01") });
     const noDateShifted = makeTask({ id: "b", lineNumber: 5, text: "Foo" });
-    const keysAfter = computeOrderKeys([withDateShifted, noDateShifted]);
+    const keysAfter = computeOrderKeys([withDateShifted, noDateShifted], "due-only");
 
     expect(keysAfter.get("b")).toEqual(savedForB);
     expect(keysAfter.get("a")).not.toEqual(savedForB);
@@ -102,21 +102,21 @@ describe("computeOrderKeys", () => {
     const before = makeTask({ id: "a", text: "Foo", tags: ["gtd/today"] });
     const after = makeTask({ id: "a", text: "Foo", tags: ["gtd/someday"] });
 
-    expect(computeOrderKeys([before]).get("a")).toEqual(computeOrderKeys([after]).get("a"));
+    expect(computeOrderKeys([before], "due-only").get("a")).toEqual(computeOrderKeys([after], "due-only").get("a"));
   });
 
   it("keeps the same entry across an inline field change (bucket assignment in inline-field mode)", () => {
     const before = makeTask({ id: "a", text: "Foo", inlineField: "today" });
     const after = makeTask({ id: "a", text: "Foo", inlineField: "someday" });
 
-    expect(computeOrderKeys([before]).get("a")).toEqual(computeOrderKeys([after]).get("a"));
+    expect(computeOrderKeys([before], "due-only").get("a")).toEqual(computeOrderKeys([after], "due-only").get("a"));
   });
 
   it("keeps the same entry across a completion toggle (isCompleted/completedAt excluded)", () => {
     const open = makeTask({ id: "a", text: "Foo", isCompleted: false, completedAt: null });
     const done = makeTask({ id: "a", text: "Foo", isCompleted: true, completedAt: new Date("2026-07-22") });
 
-    expect(computeOrderKeys([open]).get("a")).toEqual(computeOrderKeys([done]).get("a"));
+    expect(computeOrderKeys([open], "due-only").get("a")).toEqual(computeOrderKeys([done], "due-only").get("a"));
   });
 });
 
@@ -140,7 +140,7 @@ describe("computeLegacyOrderKeys", () => {
     const second = makeTask({ id: "b", lineNumber: 1, text: "Foo" });
 
     const legacy = computeLegacyOrderKeys([first, second]);
-    const current = computeOrderKeys([first, second]);
+    const current = computeOrderKeys([first, second], "due-only");
 
     expect(legacy.get("a")!.endsWith(":0")).toBe(true);
     expect(legacy.get("b")!.endsWith(":1")).toBe(true);
@@ -167,10 +167,10 @@ describe("applyManualOrder", () => {
     const a = makeTask({ id: "a", text: "A" });
     const b = makeTask({ id: "b", text: "B" });
     const c = makeTask({ id: "c", text: "C" });
-    const entries = computeOrderKeys([a, b, c]);
+    const entries = computeOrderKeys([a, b, c], "due-only");
     const savedOrder = [entries.get("c")!, entries.get("a")!, entries.get("b")!];
 
-    const result = applyManualOrder([a, b, c], entries, savedOrder);
+    const result = applyManualOrder([a, b, c], entries, savedOrder, "due-only");
 
     expect(result.map((t) => t.id)).toEqual(["c", "a", "b"]);
   });
@@ -179,36 +179,36 @@ describe("applyManualOrder", () => {
     const a = makeTask({ id: "a", text: "A" });
     const b = makeTask({ id: "b", text: "B" });
     const c = makeTask({ id: "c", text: "C" });
-    const entries = computeOrderKeys([a, b, c]);
+    const entries = computeOrderKeys([a, b, c], "due-only");
 
-    const result = applyManualOrder([a, b, c], entries, [entries.get("b")!]);
+    const result = applyManualOrder([a, b, c], entries, [entries.get("b")!], "due-only");
 
     expect(result.map((t) => t.id)).toEqual(["b", "a", "c"]);
   });
 
   it("ignores stale entries that no longer match any task", () => {
     const a = makeTask({ id: "a", text: "A" });
-    const entries = computeOrderKeys([a]);
+    const entries = computeOrderKeys([a], "due-only");
     const savedOrder = [{ file: "gone.md", key: "stale:0" }, entries.get("a")!];
 
-    expect(applyManualOrder([a], entries, savedOrder).map((t) => t.id)).toEqual(["a"]);
+    expect(applyManualOrder([a], entries, savedOrder, "due-only").map((t) => t.id)).toEqual(["a"]);
   });
 
   it("does not match an entry whose key is right but whose file is wrong", () => {
     const a = makeTask({ id: "a", filePath: "one.md", text: "A" });
-    const entries = computeOrderKeys([a]);
+    const entries = computeOrderKeys([a], "due-only");
     const wrongFile = { file: "two.md", key: entries.get("a")!.key };
 
-    expect(applyManualOrder([a], entries, [wrongFile]).map((t) => t.id)).toEqual(["a"]);
+    expect(applyManualOrder([a], entries, [wrongFile], "due-only").map((t) => t.id)).toEqual(["a"]);
   });
 
   it("skips legacy flat-string entries without throwing (pre-migration data.json)", () => {
     const a = makeTask({ id: "a", text: "A" });
     const b = makeTask({ id: "b", text: "B" });
-    const entries = computeOrderKeys([a, b]);
+    const entries = computeOrderKeys([a, b], "due-only");
     const legacy = "1234:0" as unknown as OrderEntry;
 
-    const result = applyManualOrder([a, b], entries, [legacy, entries.get("b")!]);
+    const result = applyManualOrder([a, b], entries, [legacy, entries.get("b")!], "due-only");
 
     expect(result.map((t) => t.id)).toEqual(["b", "a"]);
   });
@@ -218,14 +218,14 @@ describe("mapToOrderEntries", () => {
   it("resolves task ids to their entries", () => {
     const a = makeTask({ id: "a", text: "A" });
     const b = makeTask({ id: "b", text: "B" });
-    const entries = computeOrderKeys([a, b]);
+    const entries = computeOrderKeys([a, b], "due-only");
 
     expect(mapToOrderEntries(["b", "a"], entries)).toEqual([entries.get("b"), entries.get("a")]);
   });
 
   it("drops ids that don't resolve to an entry", () => {
     const a = makeTask({ id: "a", text: "A" });
-    const entries = computeOrderKeys([a]);
+    const entries = computeOrderKeys([a], "due-only");
 
     expect(mapToOrderEntries(["a", "unknown-id"], entries)).toEqual([entries.get("a")]);
   });
@@ -307,13 +307,13 @@ describe("disambiguator back-compatibility", () => {
     // This literal is the whole guarantee that existing users keep their saved
     // manual order — if it changes, every stored order entry is orphaned.
     const tasks = parseFile("notes.md", "- [ ] Buy milk");
-    const keys = computeOrderKeys(tasks);
+    const keys = computeOrderKeys(tasks, "due-only");
     expect(keys.get(tasks[0].id)).toEqual({ file: "notes.md", key: "4046230919:0" });
   });
 
   it("distinguishes two identical-text tasks by priority", () => {
     const tasks = parseFile("notes.md", "- [ ] Call Bob 🔺\n- [ ] Call Bob ⏫");
-    const keys = computeOrderKeys(tasks);
+    const keys = computeOrderKeys(tasks, "due-only");
     const a = keys.get(tasks[0].id)!;
     const b = keys.get(tasks[1].id)!;
     expect(a.key).not.toBe(b.key);
@@ -326,7 +326,7 @@ describe("disambiguator back-compatibility", () => {
 
   it("distinguishes two identical-text tasks by recurrence", () => {
     const tasks = parseFile("notes.md", "- [ ] Review 🔁 every week\n- [ ] Review 🔁 every month");
-    const keys = computeOrderKeys(tasks);
+    const keys = computeOrderKeys(tasks, "due-only");
     const a = keys.get(tasks[0].id)!;
     const b = keys.get(tasks[1].id)!;
     expect(a.key).not.toBe(b.key);
@@ -339,8 +339,8 @@ describe("disambiguator back-compatibility", () => {
     // recurrence value, every cross-bucket move orphans the saved order.
     const a = parseFile("n.md", "- [ ] Water plants 🔁 every week #gtd/today");
     const b = parseFile("n.md", "- [ ] Water plants 🔁 every week #gtd/week");
-    expect(computeOrderKeys(a).get(a[0].id)!.key)
-      .toBe(computeOrderKeys(b).get(b[0].id)!.key);
+    expect(computeOrderKeys(a, "due-only").get(a[0].id)!.key)
+      .toBe(computeOrderKeys(b, "due-only").get(b[0].id)!.key);
   });
 
   it("gives a recurring task the same order key regardless of its inline field", () => {
@@ -348,13 +348,13 @@ describe("disambiguator back-compatibility", () => {
     // end-of-line position, so it reaches the recurrence value the same way.
     const a = parseFile("n.md", "- [ ] Water plants 🔁 every week [horizon:: today]");
     const b = parseFile("n.md", "- [ ] Water plants 🔁 every week [horizon:: week]");
-    expect(computeOrderKeys(a).get(a[0].id)!.key)
-      .toBe(computeOrderKeys(b).get(b[0].id)!.key);
+    expect(computeOrderKeys(a, "due-only").get(a[0].id)!.key)
+      .toBe(computeOrderKeys(b, "due-only").get(b[0].id)!.key);
   });
 
   it("does not confuse a priority value with a recurrence rule of the same text", () => {
     const tasks = parseFile("notes.md", "- [ ] T 🔁 high\n- [ ] T ⏫");
-    const keys = computeOrderKeys(tasks);
+    const keys = computeOrderKeys(tasks, "due-only");
     const a = keys.get(tasks[0].id)!;
     const b = keys.get(tasks[1].id)!;
     expect(a.key).not.toBe(b.key);
@@ -364,7 +364,7 @@ describe("disambiguator back-compatibility", () => {
 
   it("still falls back to occurrence index for genuinely identical tasks", () => {
     const tasks = parseFile("notes.md", "- [ ] Same 🔺\n- [ ] Same 🔺");
-    const keys = computeOrderKeys(tasks);
+    const keys = computeOrderKeys(tasks, "due-only");
     expect(keys.get(tasks[0].id)!.key).toMatch(/:0$/);
     expect(keys.get(tasks[1].id)!.key).toMatch(/:1$/);
   });

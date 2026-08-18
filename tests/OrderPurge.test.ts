@@ -35,7 +35,7 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
 }
 
 function entryFor(task: TaskRecord, tasks: TaskRecord[]) {
-  return computeOrderKeys(tasks).get(task.id)!;
+  return computeOrderKeys(tasks, "due-only").get(task.id)!;
 }
 
 function state(partial: Partial<OrderState> = {}): OrderState {
@@ -50,7 +50,8 @@ describe("purgeAgedEntries", () => {
     const { state: after, changed } = purgeAgedEntries(
       state({ taskOrder: { today: [entry] } }),
       [task],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(false);
@@ -67,7 +68,8 @@ describe("purgeAgedEntries", () => {
         completionSeen: { [`a.md::${entry.key}`]: TODAY_MIDNIGHT + 1000 },
       }),
       [task],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(after.taskOrder.today).toEqual([entry]);
@@ -80,7 +82,8 @@ describe("purgeAgedEntries", () => {
     const { state: after, changed } = purgeAgedEntries(
       state({ taskOrder: { today: [entry] } }),
       [task],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -99,7 +102,8 @@ describe("purgeAgedEntries", () => {
     const { state: after, changed } = purgeAgedEntries(
       state({ taskOrder: { today: [entry] } }),
       [task],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -116,7 +120,8 @@ describe("purgeAgedEntries", () => {
         completionSeen: { [`a.md::${entry.key}`]: TODAY_MIDNIGHT + 1000 },
       }),
       [task],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(false);
@@ -130,7 +135,8 @@ describe("purgeAgedEntries", () => {
     const { state: after, changed } = purgeAgedEntries(
       state({ taskOrder: { today: [entry] } }),
       [task],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -143,7 +149,8 @@ describe("purgeAgedEntries", () => {
     const { state: after, changed } = purgeAgedEntries(
       state({ taskOrder: { today: [entry] } }),
       [],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(false);
@@ -154,7 +161,8 @@ describe("purgeAgedEntries", () => {
     const { state: after, changed } = purgeAgedEntries(
       state({ completionSeen: { "a.md::old:0": YESTERDAY, "a.md::new:0": TODAY_MIDNIGHT } }),
       [],
-      NOW
+      NOW,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -164,7 +172,7 @@ describe("purgeAgedEntries", () => {
   it("leaves legacy flat-string entries untouched", () => {
     const before = state({ taskOrder: { today: ["legacy:0" as unknown as never] } });
 
-    const { state: after, changed } = purgeAgedEntries(before, [], NOW);
+    const { state: after, changed } = purgeAgedEntries(before, [], NOW, "due-only");
 
     expect(changed).toBe(false);
     expect(after.taskOrder.today).toEqual(["legacy:0"]);
@@ -182,7 +190,8 @@ describe("reconcileDanglingEntries", () => {
       state({ taskOrder: { today: [entry] }, completionSeen: { "gone.md::k:0": 1 } }),
       [],
       never,
-      always
+      always,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -198,7 +207,8 @@ describe("reconcileDanglingEntries", () => {
       state({ taskOrder: { today: [entryFor(task, [task]), stale] } }),
       [task],
       always,
-      always
+      always,
+      "due-only"
     );
 
     expect(changed).toBe(true);
@@ -212,7 +222,8 @@ describe("reconcileDanglingEntries", () => {
       state({ taskOrder: { today: [entry] }, completionSeen: { "excluded.md::k:0": 1 } }),
       [],
       always,
-      never
+      never,
+      "due-only"
     );
 
     expect(changed).toBe(false);
@@ -227,7 +238,8 @@ describe("reconcileDanglingEntries", () => {
       state({ taskOrder: { today: [entry] } }),
       [],
       never,
-      never
+      never,
+      "due-only"
     );
 
     expect(after.taskOrder.today).toEqual([]);
@@ -236,7 +248,7 @@ describe("reconcileDanglingEntries", () => {
   it("leaves legacy flat-string entries untouched", () => {
     const before = state({ taskOrder: { today: ["legacy:0" as unknown as never] } });
 
-    const { state: after, changed } = reconcileDanglingEntries(before, [], never, always);
+    const { state: after, changed } = reconcileDanglingEntries(before, [], never, always, "due-only");
 
     expect(changed).toBe(false);
     expect(after.taskOrder.today).toEqual(["legacy:0"]);
