@@ -11,7 +11,7 @@ export interface PlanningDate {
 }
 
 /**
- * Which date governs a task. Placement, the ⚑ misfiled flag, ordering and the
+ * Which date governs a task. Placement, the misfiled flag, ordering and the
  * order key must all read this rather than re-derive it, or they drift apart on
  * the overlapping bucket ranges.
  *

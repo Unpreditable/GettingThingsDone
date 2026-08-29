@@ -19,7 +19,7 @@ Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) pl
 - **To Review inbox** 📥 — every task without a bucket lands here, so nothing slips through.
 - **Three ways to move a task** — quick-move buttons on the row, drag-and-drop between buckets, or right-click.
 - **Subtask-aware** — indented tasks track with their parent, with a count badge and a prompt to move them along.
-- **Overdue and misfiled flags** — `❢` once a due date has passed, `⚑` when a task sits in a bucket that will make you miss it.
+- **Overdue and misfiled flags** — <img src="assets/icons/overdue.svg" width="16" height="16" alt="overdue"> once a due date has passed, <img src="assets/icons/misfiled.svg" width="16" height="16" alt="misfiled"> when a task sits in a bucket that will make you miss it.
 - **Reads Tasks plugin fields** — due dates, priority, recurrence and the rest show up as badges and on hover.
 - **Celebration animations** — confetti, a pixel creature, both, or nothing.
 - **13 languages**, matching your Obsidian UI language.
@@ -38,7 +38,9 @@ This plugin is for one view you keep open all day. Drag tasks between buckets, o
 
 ### How they work together
 
-A task with a `📅 YYYY-MM-DD` due date lands in the bucket whose date rule matches it. Move it yourself and it stays where you put it.
+The plugin assigns each task to a bucket based on its `📅` due date or `⏳` scheduled date, depending on the **Auto-assignment date** setting. Defaults to scheduled date first, with fallback to due date.
+
+Pin a task (via the right-click menu, a quick-move button, or dragging it to another bucket) to keep it in that bucket and ignore the dates. Unpin (via the right-click menu) to let automatic assignment take over again.
 
 Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin's recurrence and completion-date setting.
 
@@ -50,12 +52,16 @@ Checking a task off in the panel does what checking it off in the editor does, i
 
 | Bucket | Emoji | Date rule |
 |---|---|---|
-| To Review | 📥 | Unassigned tasks (system bucket) |
-| Today | ⚡ | Due today |
+| To Review | 📥 | Tasks with no date and no pin (system bucket) |
+| Today | ⚡ | Today or earlier |
 | This Week | 📌 | Tomorrow → end of this week |
-| Next Week | 🔭 | Next Monday → following Sunday |
-| This Month | 📅 | This week → end of this calendar month |
-| Someday / Maybe | 💭 | No date rule (manual only) |
+| Next Week | 🔭 | All of next week |
+| This Month | 📅 | Tomorrow → end of this calendar month |
+| Someday / Maybe | 💭 | Everything the buckets above didn't claim |
+
+Weeks run Monday through Sunday by default. Set **First day of the week** in settings if yours starts on another day — it moves the This Week and Next Week boundaries and leaves the other rules alone.
+
+Ranges overlap on purpose — This Month contains This Week. The first bucket from the top whose rule matches wins.
 
 ---
 
@@ -93,6 +99,13 @@ Three ways to move a task to a different bucket:
 | **Context menu** | Right-click a task row → **Move to…** |
 
 The plugin writes the assignment back to the source markdown file immediately. If the task has subtasks that each have their own bucket assigned, you'll be asked whether to move them along with it.
+
+### Pin a task
+
+Moving a task by hand pins it to that bucket, so its dates no longer move it.
+
+- Right-click → **Pin to Today** to pin a task where it already sits.
+- Right-click → **Unpin** to let the task follow its date again.
 
 ### Search
 
@@ -132,14 +145,12 @@ Repeating tasks are the exception. Checking one off hides it right away, because
 
 ### Flag overdue and misfiled tasks
 
-When enabled, two badges call out tasks whose due date needs attention:
+When enabled, two badges call out tasks that need attention:
 
-- **`❢`** (red) — the task's due date has passed.
-- **`⚑`** (amber) — suggests a better bucket so you don't miss the due date: a task due today in `This Week` belongs in `Today`.
+- <img src="assets/icons/overdue.svg" width="16" height="16" alt="overdue"> — the task's `📅` due date has passed.
+- <img src="assets/icons/misfiled.svg" width="16" height="16" alt="misfiled"> — a bucket higher up is a better placement, and leaving this task as is risks missing it. A task due today but sitting in `This Week` belongs in `Today`.
 
-Neither badge appears on completed tasks, or in the To Review bucket.
-
-Hover a task to see the reason: `❢ Due Sat, Aug 1 (3 days overdue)`, `⚑ Due today (belongs in Today)`.
+Neither badge appears on a completed task. Only a `📅` due date makes a task overdue. A `⏳` scheduled date that has passed doesn't. Both can apply at once. The row shows the overdue badge, the more urgent of the two, and hovering the task spells out both reasons along with the bucket the misfiled badge points at.
 
 ### Compact view
 
@@ -155,6 +166,21 @@ Choose what plays when you check off a task:
 | **Creature** | Pixel creature only |
 | **All** | Confetti burst + pixel creature |
 | **Off** | No animation |
+
+### Auto-assignment date
+
+Controls which date drives bucket assignment and ordering within a bucket.
+
+| Option | Uses |
+|---|---|
+| **Ignore dates** | Nothing. Every task waits in To Review until you file it |
+| **Due** | `📅` only. A task without one stays in To Review |
+| **Due, else scheduled** | `📅`, falling back to `⏳` |
+| **Scheduled, else due** | `⏳`, falling back to `📅`. The default |
+| **Scheduled** | `⏳` only. A task without one stays in To Review |
+| **Earliest of the two** | Whichever comes first |
+
+Pinned tasks ignore this setting.
 
 ### Tasks plugin fields
 
@@ -172,20 +198,26 @@ Each bucket can optionally show its task count in Obsidian's status bar. Toggle 
 
 ## Bucket Date Rules
 
-Each bucket can have an optional date range rule that auto-assigns tasks based on their `📅` due date:
+Each bucket can have an optional date range rule that files tasks by whichever date **Auto-assignment date** selects:
 
 | Rule | Covers |
 |---|---|
-| `today` | Today only |
-| `this-week` | Tomorrow through end of this week (Sunday) |
-| `next-week` | Next Monday through the following Sunday |
-| `this-month` | Remaining days through end of this calendar month |
-| `next-month` | First through last day of next calendar month |
-| `within-days` | Due within the next N days |
-| `within-days-range` | Due between day M and day N from today |
-| `beyond-days` | Due more than N days from today (useful for Someday) |
+| **None** | Nothing. The bucket collects pinned tasks only |
+| **Today** | Today or earlier |
+| **This week** | Tomorrow through end of this week |
+| **Next week** | All of next week |
+| **This month** | Tomorrow through end of this calendar month |
+| **Next month** | First through last day of next calendar month |
+| **Within N days** | The next N days |
+| **Within day range** | Between day M and day N from today |
+| **Beyond N days** | More than N days from today |
+| **Everything** | Every date the buckets above it didn't claim |
 
-Tasks with no due date and no manual assignment land in **To Review**.
+**Note:** **Beyond N days** is not a catch-all. Set it to 180 and a task 90 days out matches nothing.
+
+**Everything** only makes sense on the last bucket, since the first matching rule from the top wins.
+
+A task lands in **To Review** when it has no date and no pin, or when its date matches no rule at all.
 
 ---
 
