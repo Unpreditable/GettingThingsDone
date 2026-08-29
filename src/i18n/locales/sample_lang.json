@@ -20,6 +20,11 @@
       "moveTo": "",
       "openFile": ""
     },
+    "weekStartBanner": {
+      "message": "",
+      "openSettings": "",
+      "dismiss": ""
+    },
     "languageBanner": {
       "message": "",
       "openSettings": "",
@@ -96,6 +101,10 @@
     },
     "behaviour": {
       "heading": "",
+      "weekStart": {
+        "name": "",
+        "description": ""
+      },
       "showCompleted": {
         "name": "",
         "description": ""

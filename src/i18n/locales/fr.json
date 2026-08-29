@@ -28,6 +28,11 @@
       "openSettings": "Ouvrir les paramètres",
       "dismiss": "Ignorer"
     },
+    "weekStartBanner": {
+      "message": "Le premier jour de la semaine est désormais configurable et vaut lundi par défaut. Modifiez-le dans les paramètres.",
+      "openSettings": "Ouvrir les paramètres",
+      "dismiss": "Ignorer"
+    },
     "catchAllBanner": {
       "message": "Les catégories acceptent désormais la plage de dates « Tout ». Les vôtres n'ont pas été modifiées : appliquez-la à la dernière catégorie pour récupérer toute date que les autres laissent passer.",
       "openSettings": "Ouvrir les paramètres",
@@ -125,6 +130,10 @@
     },
     "behaviour": {
       "heading": "Comportement",
+      "weekStart": {
+        "name": "Premier jour de la semaine",
+        "description": "S'applique uniquement aux règles de date « Cette semaine » et « Semaine prochaine »."
+      },
       "showCompleted": {
         "name": "Afficher les tâches terminées jusqu'à minuit",
         "description": "Les tâches terminées restent visibles en barré dans le panneau jusqu'à minuit, puis disparaissent au prochain chargement."
@@ -178,8 +187,8 @@
         "description": "Assignation automatique des tâches selon leur date d'échéance 📅. En cas de règles chevauchantes, la première catégorie correspondante (de haut en bas) l'emporte.",
         "none": "Aucune (manuel/étiquette uniquement)",
         "today": "Aujourd'hui (échéance aujourd'hui ou en retard)",
-        "thisWeek": "Cette semaine (demain – fin du dimanche courant)",
-        "nextWeek": "Semaine prochaine (lundi prochain – dimanche suivant)",
+        "thisWeek": "Cette semaine (demain – fin de la semaine)",
+        "nextWeek": "Semaine prochaine (toute la semaine suivante)",
         "thisMonth": "Ce mois (1 jour – fin du mois courant)",
         "nextMonth": "Mois prochain (1er – dernier jour du mois prochain)",
         "withinDays": "Dans N jours",

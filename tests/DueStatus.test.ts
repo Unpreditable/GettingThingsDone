@@ -6,8 +6,8 @@ import {
   matchesRule,
   msUntilNextMidnight,
 } from "../src/core/DueStatus";
-import { DEFAULT_BUCKETS } from "../src/settings";
-import type { DateRangeRule, PlanBy } from "../src/settings";
+import { DEFAULT_BUCKETS, WEEK_STARTS } from "../src/settings";
+import type { DateRangeRule, PlanBy, WeekStart } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
 
 // Monday Feb 23, 2026. Feb 2026 has 28 days, so Feb 28 is 5 days out,
@@ -20,8 +20,8 @@ function due(days: number): Date {
   return d;
 }
 
-function match(rule: DateRangeRule, days: number): boolean {
-  return matchesRule(rule, due(days), MONDAY);
+function match(rule: DateRangeRule, days: number, weekStart: WeekStart = "monday"): boolean {
+  return matchesRule(rule, due(days), MONDAY, weekStart);
 }
 
 describe("diffInDays", () => {
@@ -98,6 +98,70 @@ describe("matchesRule", () => {
   });
 });
 
+// Feb 22–28 2026 is a full Sunday–Saturday week, so `new Date(2026, 1, 22 + dow)`
+// is a day whose getDay() is exactly `dow`.
+const WEEK_OF_FEB_22 = 22;
+
+function dayWithDow(dow: number): Date {
+  return new Date(2026, 1, WEEK_OF_FEB_22 + dow);
+}
+
+function matchOn(rule: DateRangeRule, days: number, now: Date, weekStart: WeekStart): boolean {
+  const target = new Date(now);
+  target.setDate(target.getDate() + days);
+  return matchesRule(rule, target, now, weekStart);
+}
+
+describe("matchesRule week boundaries", () => {
+  const thisWeek: DateRangeRule = { type: "this-week" };
+  const nextWeek: DateRangeRule = { type: "next-week" };
+
+  describe.each(WEEK_STARTS)("with the week starting on %s", (weekStart) => {
+    const startIdx = WEEK_STARTS.indexOf(weekStart);
+
+    it.each([0, 1, 2, 3, 4, 5, 6])("bounds both week rules when today is day %i", (dow) => {
+      const now = dayWithDow(dow);
+      const daysToWeekEnd = 6 - ((dow - startIdx + 7) % 7);
+
+      // this-week runs tomorrow through the last day of the current week.
+      expect(matchOn(thisWeek, 0, now, weekStart)).toBe(false);
+      expect(matchOn(thisWeek, daysToWeekEnd, now, weekStart)).toBe(daysToWeekEnd >= 1);
+      expect(matchOn(thisWeek, daysToWeekEnd + 1, now, weekStart)).toBe(false);
+
+      // next-week picks up exactly where this-week stops, and spans seven days.
+      expect(matchOn(nextWeek, daysToWeekEnd, now, weekStart)).toBe(false);
+      expect(matchOn(nextWeek, daysToWeekEnd + 1, now, weekStart)).toBe(true);
+      expect(matchOn(nextWeek, daysToWeekEnd + 7, now, weekStart)).toBe(true);
+      expect(matchOn(nextWeek, daysToWeekEnd + 8, now, weekStart)).toBe(false);
+    });
+
+    it("claims nothing for this-week on the last day of the week", () => {
+      // The day before the start day is the week's last day.
+      const now = dayWithDow((startIdx + 6) % 7);
+      for (let diff = 1; diff <= 7; diff++) {
+        expect(matchOn(thisWeek, diff, now, weekStart)).toBe(false);
+      }
+      // Tomorrow is the first day of the next week, so next-week takes it.
+      expect(matchOn(nextWeek, 1, now, weekStart)).toBe(true);
+    });
+  });
+
+  // The rules were hardcoded to a Monday-start week before the setting existed.
+  // This pins the new arithmetic to the old formula so the default cannot drift.
+  it.each([0, 1, 2, 3, 4, 5, 6])("reproduces the old Monday-only formula on day %i", (dow) => {
+    const now = dayWithDow(dow);
+    const daysToSunday = dow === 0 ? 0 : 7 - dow;
+    const daysToNextMonday = dow === 0 ? 1 : 8 - dow;
+
+    for (let diff = -2; diff <= 20; diff++) {
+      expect(matchOn(thisWeek, diff, now, "monday")).toBe(diff >= 1 && diff <= daysToSunday);
+      expect(matchOn(nextWeek, diff, now, "monday")).toBe(
+        diff >= daysToNextMonday && diff <= daysToNextMonday + 6
+      );
+    }
+  });
+});
+
 function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
   return {
     id: "1",
@@ -135,7 +199,9 @@ function misplaced(
   overrides: Partial<TaskRecord>,
   planBy: PlanBy = "due-only"
 ) {
-  return computeMisplacement(makeTask(overrides), bucketId, DEFAULT_BUCKETS, planBy, MONDAY);
+  return computeMisplacement(
+    makeTask(overrides), bucketId, DEFAULT_BUCKETS, planBy, MONDAY, "monday"
+  );
 }
 
 describe("computeDueStatus", () => {
@@ -221,7 +287,7 @@ describe("computeMisplacement", () => {
     // Someday (misfiled). The row shows only ❢; the popover shows both.
     const task = makeTask({ dueDate: due(-4), scheduledDate: due(0) });
     expect(computeDueStatus(task, MONDAY)).toEqual({ kind: "overdue", diffDays: -4 });
-    expect(computeMisplacement(task, "someday", DEFAULT_BUCKETS, "scheduled-first", MONDAY)?.id).toBe("today");
+    expect(computeMisplacement(task, "someday", DEFAULT_BUCKETS, "scheduled-first", MONDAY, "monday")?.id).toBe("today");
   });
 });
 

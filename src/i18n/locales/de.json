@@ -28,6 +28,11 @@
       "openSettings": "Einstellungen öffnen",
       "dismiss": "OK"
     },
+    "weekStartBanner": {
+      "message": "Der erste Tag der Woche lässt sich jetzt einstellen und ist standardmäßig Montag. Ändere ihn in den Einstellungen.",
+      "openSettings": "Einstellungen öffnen",
+      "dismiss": "OK"
+    },
     "catchAllBanner": {
       "message": "Kategorien unterstützen jetzt den Datumsbereich „Alles“. Ihre Regeln blieben unverändert – setzen Sie ihn auf die letzte Kategorie, um jedes Datum zu erfassen, das die anderen auslassen.",
       "openSettings": "Einstellungen öffnen",
@@ -125,6 +130,10 @@
     },
     "behaviour": {
       "heading": "Verhalten",
+      "weekStart": {
+        "name": "Erster Tag der Woche",
+        "description": "Gilt nur für die Datumsregeln „Diese Woche“ und „Nächste Woche“."
+      },
       "showCompleted": {
         "name": "Erledigte Aufgaben bis Mitternacht anzeigen",
         "description": "Erledigte Aufgaben bleiben bis Mitternacht durchgestrichen im Panel sichtbar und verschwinden beim nächsten Laden."
@@ -178,8 +187,8 @@
         "description": "Aufgaben automatisch anhand ihres 📅 Fälligkeitsdatums zuweisen. Bei überlappenden Regeln gewinnt die erste passende Kategorie (von oben nach unten).",
         "none": "Keine (nur manuell/Tag)",
         "today": "Heute (heute fällig oder überfällig)",
-        "thisWeek": "Diese Woche (morgen – Ende des aktuellen Sonntags)",
-        "nextWeek": "Nächste Woche (nächster Montag – folgender Sonntag)",
+        "thisWeek": "Diese Woche (morgen – Ende der Woche)",
+        "nextWeek": "Nächste Woche (die gesamte Folgewoche)",
         "thisMonth": "Dieser Monat (1 Tag bis Ende des aktuellen Monats)",
         "nextMonth": "Nächster Monat (1. – letzter Tag des nächsten Monats)",
         "withinDays": "Innerhalb von N Tagen",

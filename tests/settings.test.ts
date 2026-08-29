@@ -188,6 +188,14 @@ describe("normalizeSettingsShapes", () => {
     expect(normalizeSettingsShapes(settings)).toEqual(settings);
   });
 
+  it("keeps a recognised week start and falls back to Monday otherwise", () => {
+    const sunday = { ...DEFAULT_SETTINGS, weekStartsOn: "sunday" as const };
+    expect(normalizeSettingsShapes(sunday).weekStartsOn).toBe("sunday");
+
+    const junk = { ...DEFAULT_SETTINGS, weekStartsOn: "caturday" } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(junk).weekStartsOn).toBe("monday");
+  });
+
   it("drops taskOrder bucket values that are not arrays", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

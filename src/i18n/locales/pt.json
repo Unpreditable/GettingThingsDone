@@ -28,6 +28,11 @@
       "openSettings": "Abrir definições",
       "dismiss": "Dispensar"
     },
+    "weekStartBanner": {
+      "message": "O primeiro dia da semana já pode ser configurado e é segunda-feira por predefinição. Altere-o nas definições.",
+      "openSettings": "Abrir definições",
+      "dismiss": "Dispensar"
+    },
     "catchAllBanner": {
       "message": "As categorias já suportam o intervalo de datas «Tudo». As suas ficaram inalteradas, por isso defina-o na última categoria para apanhar qualquer data que as outras deixem passar.",
       "openSettings": "Abrir definições",
@@ -125,6 +130,10 @@
     },
     "behaviour": {
       "heading": "Comportamento",
+      "weekStart": {
+        "name": "Primeiro dia da semana",
+        "description": "Aplica-se apenas às regras de data «Esta semana» e «Próxima semana»."
+      },
       "showCompleted": {
         "name": "Mostrar tarefas concluídas até à meia-noite",
         "description": "As tarefas concluídas permanecem visíveis com riscado no painel até à meia-noite, desaparecendo no próximo carregamento."
@@ -178,8 +187,8 @@
         "description": "Atribuir tarefas automaticamente com base na sua data de entrega 📅. Se várias categorias tiverem regras sobrepostas, a primeira categoria correspondente (de cima para baixo) tem prioridade.",
         "none": "Nenhuma (apenas manual/etiqueta)",
         "today": "Hoje (entrega hoje ou em atraso)",
-        "thisWeek": "Esta semana (amanhã – fim do domingo atual)",
-        "nextWeek": "Próxima semana (próxima segunda – domingo seguinte)",
+        "thisWeek": "Esta semana (amanhã – fim da semana)",
+        "nextWeek": "Próxima semana (toda a semana seguinte)",
         "thisMonth": "Este mês (1 dia – fim do mês atual)",
         "nextMonth": "Próximo mês (1.º – último dia do próximo mês)",
         "withinDays": "Dentro de N dias",

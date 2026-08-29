@@ -1,4 +1,5 @@
-import type { BucketConfig, DateRangeRule, PlanBy } from "../settings";
+import type { BucketConfig, DateRangeRule, PlanBy, WeekStart } from "../settings";
+import { weekStartIndex } from "../settings";
 import type { TaskRecord } from "./TaskParser";
 import { planningDate } from "./PlanningDate";
 
@@ -17,23 +18,30 @@ export function diffInDays(date: Date, now: Date): number {
  * switches over the same eight rule types, maintained by hand, and they
  * drifted: a task due today filed in This Week was reported as "overdue".
  */
-export function matchesRule(rule: DateRangeRule, dueDate: Date, now: Date): boolean {
+export function matchesRule(
+  rule: DateRangeRule,
+  dueDate: Date,
+  now: Date,
+  weekStart: WeekStart
+): boolean {
   const diff = diffInDays(dueDate, now);
   const day = now.getDay();
+
+  // Days already elapsed in the current week, so daysToWeekEnd is 0 on its last
+  // day. That zero is load-bearing: this-week then matches nothing (diff >= 1 &&
+  // diff <= 0) and tomorrow falls through to next-week, which is correct.
+  const sinceWeekStart = (day - weekStartIndex(weekStart) + 7) % 7;
+  const daysToWeekEnd = 6 - sinceWeekStart;
 
   switch (rule.type) {
     case "today":
       return diff <= 0;
 
-    case "this-week": {
-      const daysToSunday = day === 0 ? 0 : 7 - day;
-      return diff >= 1 && diff <= daysToSunday;
-    }
+    case "this-week":
+      return diff >= 1 && diff <= daysToWeekEnd;
 
-    case "next-week": {
-      const daysToNextMonday = day === 0 ? 1 : 8 - day;
-      return diff >= daysToNextMonday && diff <= daysToNextMonday + 6;
-    }
+    case "next-week":
+      return diff >= daysToWeekEnd + 1 && diff <= daysToWeekEnd + 7;
 
     case "this-month": {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -95,7 +103,8 @@ export function computeMisplacement(
   currentBucketId: string,
   buckets: BucketConfig[],
   planBy: PlanBy,
-  now: Date
+  now: Date,
+  weekStart: WeekStart
 ): BucketConfig | null {
   if (task.isCompleted) return null;
 
@@ -109,7 +118,7 @@ export function computeMisplacement(
   if (curIdx === -1) return null;
 
   const autoIdx = buckets.findIndex(
-    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, plan.date, now)
+    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, plan.date, now, weekStart)
   );
   return autoIdx !== -1 && autoIdx < curIdx ? buckets[autoIdx] : null;
 }

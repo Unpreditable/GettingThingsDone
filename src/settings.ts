@@ -2,8 +2,8 @@ import type { OrderEntry, OrderKeyScheme } from "./core/TaskOrder";
 
 export type DateRangeRule =
   | { type: "today" }
-  | { type: "this-week" }               // tomorrow → end of current Sunday
-  | { type: "next-week" }               // next Monday → following Sunday
+  | { type: "this-week" }               // tomorrow → last day of the current week
+  | { type: "next-week" }               // the seven days of the following week
   | { type: "this-month" }              // 1 day out → end of current calendar month
   | { type: "next-month" }              // 1st of next month → last day of next month
   | { type: "within-days"; days: number }
@@ -44,6 +44,34 @@ export type CelebrationMode = "off" | "confetti" | "creature" | "all";
 
 /** Which Tasks-plugin priority levels get an emoji badge on the task row. */
 export type PriorityDisplay = "all" | "medium-up" | "high-up" | "hidden";
+
+export type WeekStart =
+  | "sunday"
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday";
+
+/**
+ * Sunday first, so an entry's index is its JS `Date.getDay()` value. Both the
+ * settings dropdown and weekStartIndex() read the order from here.
+ */
+export const WEEK_STARTS: readonly WeekStart[] = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+];
+
+/** A WeekStart as the 0–6 day number `Date.getDay()` uses. */
+export function weekStartIndex(weekStart: WeekStart): number {
+  return WEEK_STARTS.indexOf(weekStart);
+}
 
 export type TaskScope =
   | { type: "vault" }
@@ -92,6 +120,12 @@ export interface PluginSettings {
    *  rule months later cannot resurrect a banner about a migration that never
    *  applied here. */
   catchAllNoticeSeen: boolean;
+  /** First day of the week, for the this-week and next-week date rules only. */
+  weekStartsOn: WeekStart;
+  /** Whether the one-off "the week start is configurable now" panel notice has
+   *  been settled for this install. Seeded once on load, like catchAllNoticeSeen:
+   *  fresh installs never see the notice, since the setting is right there. */
+  weekStartNoticeSeen: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
   compactView: boolean;
   /** Which priority levels show a badge on the row. The popover is unaffected. */
@@ -187,6 +221,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   toReviewQuickMoveTargets: ["today", "this-week"],
   toReviewShowInStatusBar: false,
   catchAllNoticeSeen: false,
+  weekStartsOn: "monday",
+  weekStartNoticeSeen: false,
   compactView: false,
   priorityDisplay: "all",
   showRecurrenceBadge: true,
@@ -335,12 +371,17 @@ export function normalizeSettingsShapes(settings: PluginSettings): PluginSetting
   ];
   const scheme = settings.orderKeyScheme;
 
+  // An unrecognised week start reads as Monday, which is what every install
+  // predating the setting was hardcoded to.
+  const weekStart = settings.weekStartsOn;
+
   return {
     ...settings,
     taskOrder,
     completionSeen,
     orderKeyScheme:
       scheme !== null && knownSchemes.includes(scheme) ? scheme : null,
+    weekStartsOn: WEEK_STARTS.includes(weekStart) ? weekStart : "monday",
     folderPaths: Array.isArray(settings.folderPaths) ? settings.folderPaths : [],
     filePaths: Array.isArray(settings.filePaths) ? settings.filePaths : [],
   };

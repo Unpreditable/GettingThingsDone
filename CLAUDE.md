@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Working agreement
+
+**Only explicit acceptance is acceptance.** Nothing else counts — not a correction, not a question,
+not feedback on a draft, not silence, not "that reads better". If the user critiques a proposal and
+you incorporate the critique, the result is a *new proposal* that also needs acceptance. Two rounds
+of feedback are still zero approvals.
+
+**Show, don't write.** When asked to show, propose, draft, or explain a change, put it in the reply
+as text. Do not touch a file. An instruction to show something is never also an instruction to
+apply it, however clear the resulting change seems.
+
+**One asked-for thing at a time.** Do what was requested, not the adjacent work you noticed while
+doing it. Surface the rest as a list and let the user pick. Finding a real problem is a reason to
+mention it, never a licence to fix it uninvited.
+
+**Ask when uncertain, before acting.** If a request could mean two things, say so and wait. Do not
+pick the likelier reading and proceed. Guessing wrong wastes more of the user's time than asking.
+
 ## Commands
 
 ```bash

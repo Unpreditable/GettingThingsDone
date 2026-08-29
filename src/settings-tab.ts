@@ -1,10 +1,25 @@
 import { App, PluginSettingTab, Setting, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, ScopeType, DEFAULT_BUCKETS } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, DEFAULT_BUCKETS, WEEK_STARTS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { renderIcon } from "./views/icon";
-import { t } from "./i18n/i18n";
+import { t, i18next } from "./i18n/i18n";
+
+/**
+ * Localized long weekday names, keyed by WeekStart. Feb 22 2026 is a Sunday, so
+ * `22 + index` walks WEEK_STARTS' Sunday-first order — which keeps seven day
+ * names per language out of the locale files entirely, and stays right for a
+ * language the plugin has no translation for.
+ */
+function weekStartOptions(): Record<string, string> {
+  const format = new Intl.DateTimeFormat(i18next.language, { weekday: "long" });
+  const options: Record<string, string> = {};
+  WEEK_STARTS.forEach((day, index) => {
+    options[day] = format.format(new Date(2026, 1, 22 + index));
+  });
+  return options;
+}
 
 /**
  * Two lines, each led by the badge itself in the colour it has on the task row.
@@ -327,6 +342,10 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   async setControlValue(key: string, value: unknown): Promise<void> {
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+    // Picking a first day answers the one-off notice, whichever day is picked.
+    // Without this the banner would blink out and back as the value moved off
+    // and onto Monday, since Monday is also what it exists to talk about.
+    if (key === "weekStartsOn") this.plugin.settings.weekStartNoticeSeen = true;
     await this.plugin.saveSettings();
   }
 
@@ -353,6 +372,15 @@ export class GtdSettingsTab extends PluginSettingTab {
         type: "group",
         heading: t("settings.behaviour.heading"),
         items: [
+          {
+            name: t("settings.behaviour.weekStart.name"),
+            desc: t("settings.behaviour.weekStart.description"),
+            control: {
+              type: "dropdown",
+              key: "weekStartsOn",
+              options: weekStartOptions(),
+            },
+          },
           {
             name: t("settings.behaviour.showCompleted.name"),
             desc: t("settings.behaviour.showCompleted.description"),
@@ -670,6 +698,19 @@ export class GtdSettingsTab extends PluginSettingTab {
    */
   private renderLegacyBehaviourFallback(containerEl: HTMLElement) {
     new Setting(containerEl).setName(t("settings.behaviour.heading")).setHeading();
+
+    new Setting(containerEl)
+      .setName(t("settings.behaviour.weekStart.name"))
+      .setDesc(t("settings.behaviour.weekStart.description"))
+      .addDropdown((dd) => {
+        for (const [value, label] of Object.entries(weekStartOptions())) {
+          dd.addOption(value, label);
+        }
+        dd.setValue(this.plugin.settings.weekStartsOn ?? "monday");
+        dd.onChange(async (val) => {
+          await this.setControlValue("weekStartsOn", val);
+        });
+      });
 
     new Setting(containerEl)
       .setName(t("settings.behaviour.showCompleted.name"))

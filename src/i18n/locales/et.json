@@ -28,6 +28,11 @@
       "openSettings": "Ava seaded",
       "dismiss": "OK"
     },
+    "weekStartBanner": {
+      "message": "Nädala esimest päeva saab nüüd valida ja vaikimisi on see esmaspäev. Muuda seda seadetes.",
+      "openSettings": "Ava seaded",
+      "dismiss": "OK"
+    },
     "catchAllBanner": {
       "message": "Kategooriad toetavad nüüd kuupäevavahemikku „Kõik“. Sinu reeglid jäid muutmata, seega määra see viimasele kategooriale, et püüda kuupäevad, mille teised vahele jätavad.",
       "openSettings": "Ava seaded",
@@ -125,6 +130,10 @@
     },
     "behaviour": {
       "heading": "Käitumine",
+      "weekStart": {
+        "name": "Nädala esimene päev",
+        "description": "Kehtib ainult kuupäevareeglitele „See nädal“ ja „Järgmine nädal“."
+      },
       "showCompleted": {
         "name": "Näita lõpetatud ülesandeid kuni südaööni",
         "description": "Lõpetatud ülesanded jäävad paneelile läbikriipsutuna nähtavaks kuni südaööni, seejärel kaovad järgmisel laadimisel."
@@ -178,8 +187,8 @@
         "description": "Määra ülesanded automaatselt nende tähtpäeva 📅 järgi. Kui mitmel kategoorial on kattuvad reeglid, võidab esimene sobiv (ülalt alla).",
         "none": "Puudub (ainult käsitsi/silt)",
         "today": "Täna (tähtaeg täna või hilinenud)",
-        "thisWeek": "See nädal (homme – praeguse pühapäeva lõpp)",
-        "nextWeek": "Järgmine nädal (järgmine esmaspäev – järgmine pühapäev)",
+        "thisWeek": "See nädal (homme – nädala lõpp)",
+        "nextWeek": "Järgmine nädal (kogu järgmine nädal)",
         "thisMonth": "See kuu (1 päev – praeguse kuu lõpp)",
         "nextMonth": "Järgmine kuu (1. – järgmise kuu viimane päev)",
         "withinDays": "N päeva jooksul",

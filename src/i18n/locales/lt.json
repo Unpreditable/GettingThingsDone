@@ -28,6 +28,11 @@
       "openSettings": "Atidaryti nustatymus",
       "dismiss": "Gerai"
     },
+    "weekStartBanner": {
+      "message": "Pirmąją savaitės dieną dabar galima pasirinkti, numatytoji diena yra pirmadienis. Pakeiskite ją nustatymuose.",
+      "openSettings": "Atidaryti nustatymus",
+      "dismiss": "Gerai"
+    },
     "catchAllBanner": {
       "message": "Kategorijos dabar palaiko datų intervalą „Viskas“. Jūsų taisyklės liko nepakeistos, tad nustatykite jį paskutinei kategorijai, kad pagautų bet kurią kitų praleistą datą.",
       "openSettings": "Atidaryti nustatymus",
@@ -133,6 +138,10 @@
     },
     "behaviour": {
       "heading": "Elgsena",
+      "weekStart": {
+        "name": "Pirmoji savaitės diena",
+        "description": "Taikoma tik datų taisyklėms „Šią savaitę“ ir „Kitą savaitę“."
+      },
       "showCompleted": {
         "name": "Rodyti atliktas užduotis iki vidurnakčio",
         "description": "Atliktos užduotys lieka matomos skydelyje su perbraukimu iki vidurnakčio, tada dingsta kitą kartą įkėlus."
@@ -186,8 +195,8 @@
         "description": "Automatiškai priskirti užduotis pagal jų termino datą 📅. Jei kelios kategorijos turi persidengančias taisykles, laimi pirmoji tinkama (iš viršaus į apačią).",
         "none": "Nėra (tik rankiniu būdu/žyma)",
         "today": "Šiandien (terminas šiandien arba vėluoja)",
-        "thisWeek": "Šią savaitę (rytoj – einamojo sekmadienio pabaiga)",
-        "nextWeek": "Kitą savaitę (kitas pirmadienis – kitas sekmadienis)",
+        "thisWeek": "Šią savaitę (rytoj – savaitės pabaiga)",
+        "nextWeek": "Kitą savaitę (visa kita savaitė)",
         "thisMonth": "Šį mėnesį (1 diena – einamojo mėnesio pabaiga)",
         "nextMonth": "Kitą mėnesį (1-a – paskutinė kito mėnesio diena)",
         "withinDays": "Per N dienų",

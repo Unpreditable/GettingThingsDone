@@ -11,6 +11,7 @@
 
 import { TaskRecord, getTagValue, getInlineFieldValue } from "./TaskParser";
 import { BucketConfig, PluginSettings, activeOrderKeyScheme } from "../settings";
+import type { WeekStart } from "../settings";
 import { today } from "../integrations/TasksPluginParser";
 import { t } from "../i18n/i18n";
 import {
@@ -99,7 +100,7 @@ export function groupTasksIntoBuckets(
 
     const plan = planningDate(task, settings.planBy);
     if (plan) {
-      const autoId = autoAssign(plan.date, settings.buckets, now);
+      const autoId = autoAssign(plan.date, settings.buckets, now, settings.weekStartsOn);
       if (autoId) {
         effectiveBucket.set(task.id, autoId);
         autoPlacedFrom.set(task.id, plan.source);
@@ -128,7 +129,9 @@ export function groupTasksIntoBuckets(
     const status = computeDueStatus(task, now);
     if (status) group.dueStatuses[task.id] = status;
 
-    const belongsIn = computeMisplacement(task, group.bucketId, settings.buckets, settings.planBy, now);
+    const belongsIn = computeMisplacement(
+      task, group.bucketId, settings.buckets, settings.planBy, now, settings.weekStartsOn
+    );
     if (belongsIn) group.misfiledIn[task.id] = belongsIn;
   }
 
@@ -234,17 +237,18 @@ export function autoBucketFor(
 ): BucketConfig | null {
   const plan = planningDate(task, settings.planBy);
   if (!plan) return null;
-  const id = autoAssign(plan.date, settings.buckets, now);
+  const id = autoAssign(plan.date, settings.buckets, now, settings.weekStartsOn);
   return id ? settings.buckets.find((b) => b.id === id) ?? null : null;
 }
 
 function autoAssign(
   date: Date,
   buckets: BucketConfig[],
-  now: Date
+  now: Date,
+  weekStart: WeekStart
 ): string | null {
   const match = buckets.find(
-    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, date, now)
+    (b) => b.dateRangeRule && matchesRule(b.dateRangeRule, date, now, weekStart)
   );
   return match ? match.id : null;
 }

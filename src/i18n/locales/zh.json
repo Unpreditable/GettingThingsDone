@@ -28,6 +28,11 @@
       "openSettings": "打开设置",
       "dismiss": "好的"
     },
+    "weekStartBanner": {
+      "message": "现在可以设置每周的第一天，默认为周一。请在设置中更改。",
+      "openSettings": "打开设置",
+      "dismiss": "好的"
+    },
     "catchAllBanner": {
       "message": "分类现在支持“全部”日期范围。你的规则未被更改，可将它设置到最后一个分类，以接住其他分类漏掉的日期。",
       "openSettings": "打开设置",
@@ -125,6 +130,10 @@
     },
     "behaviour": {
       "heading": "行为",
+      "weekStart": {
+        "name": "每周的第一天",
+        "description": "仅适用于「本周」和「下周」日期规则。"
+      },
       "showCompleted": {
         "name": "在午夜前显示已完成任务",
         "description": "已完成的任务将以删除线形式在面板中显示至午夜，之后在下次加载时消失。"
@@ -178,8 +187,8 @@
         "description": "根据 📅 截止日期自动分配任务。如果多个分类有重叠规则，第一个匹配的分类（从上到下）优先。",
         "none": "无（仅手动/标签）",
         "today": "今天（今天到期或已逾期）",
-        "thisWeek": "本周（明天至本周日结束）",
-        "nextWeek": "下周（下周一至下周日）",
+        "thisWeek": "本周（明天至本周最后一天）",
+        "nextWeek": "下周（整个下一周）",
         "thisMonth": "本月（1天后至本月底）",
         "nextMonth": "下月（下月1日至末日）",
         "withinDays": "N天内",

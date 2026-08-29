@@ -185,6 +185,16 @@ describe("groupTasksIntoBuckets", () => {
     expect(nextWeek.tasks).toHaveLength(1);
   });
 
+  it("moves the Sunday task to Next Week when the week starts on Sunday", () => {
+    // Sun Mar 1 is the last day of a Monday-start week but the FIRST day of a
+    // Sunday-start one, so it is the placement that flips with the setting.
+    const sundayStart = { ...settings, weekStartsOn: "sunday" as const };
+    const task = makeTask({ dueDate: daysFromMonday(6) });
+    const groups = groupTasksIntoBuckets([task], sundayStart);
+    expect(groups.find((g) => g.bucketId === "this-week")!.tasks).toHaveLength(0);
+    expect(groups.find((g) => g.bucketId === "next-week")!.tasks).toHaveLength(1);
+  });
+
   it("puts task with #gtd/someday tag into Someday bucket", () => {
     const taskSettingsWithTag = {
       ...settings,

@@ -28,6 +28,11 @@
       "openSettings": "Abrir ajustes",
       "dismiss": "Descartar"
     },
+    "weekStartBanner": {
+      "message": "El primer día de la semana ya se puede configurar y es lunes por defecto. Cámbialo en los ajustes.",
+      "openSettings": "Abrir ajustes",
+      "dismiss": "Descartar"
+    },
     "catchAllBanner": {
       "message": "Las categorías ahora admiten el rango de fechas «Todo». Las tuyas no se modificaron, así que aplícalo a la última categoría para recoger cualquier fecha que las demás no cubran.",
       "openSettings": "Abrir ajustes",
@@ -125,6 +130,10 @@
     },
     "behaviour": {
       "heading": "Comportamiento",
+      "weekStart": {
+        "name": "Primer día de la semana",
+        "description": "Se aplica solo a las reglas de fecha «Esta semana» y «Próxima semana»."
+      },
       "showCompleted": {
         "name": "Mostrar tareas completadas hasta medianoche",
         "description": "Las tareas completadas permanecen visibles con tachado en el panel hasta medianoche, luego desaparecen al siguiente cargado."
@@ -178,8 +187,8 @@
         "description": "Asignar tareas automáticamente según su fecha de vencimiento 📅. Si varias categorías tienen reglas superpuestas, la primera coincidente (de arriba a abajo) tiene prioridad.",
         "none": "Ninguna (solo manual/etiqueta)",
         "today": "Hoy (vence hoy o vencido)",
-        "thisWeek": "Esta semana (mañana – fin del domingo actual)",
-        "nextWeek": "Próxima semana (próximo lunes – siguiente domingo)",
+        "thisWeek": "Esta semana (mañana – fin de la semana)",
+        "nextWeek": "Próxima semana (toda la semana siguiente)",
         "thisMonth": "Este mes (1 día – fin del mes actual)",
         "nextMonth": "Próximo mes (1.° – último día del próximo mes)",
         "withinDays": "Dentro de N días",

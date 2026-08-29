@@ -183,6 +183,12 @@ export default class GtdTasksPlugin extends Plugin {
     if (migrated.catchAllNoticeSeen === undefined) {
       this.settings.catchAllNoticeSeen = !shouldRecommendCatchAll(this.settings.buckets);
     }
+    // A fresh install has the week-start dropdown sitting in settings from the
+    // start, so there is nothing to announce; only an existing install, whose
+    // weeks were hardcoded to Monday until now, gets the notice.
+    if (migrated.weekStartNoticeSeen === undefined) {
+      this.settings.weekStartNoticeSeen = raw == null;
+    }
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -490,6 +496,10 @@ class GtdPanelView extends ItemView {
         onDismissLanguageBanner: () => {
           this.plugin.languageChangeNotice = false;
           this.languageChangeNotice$.set(false);
+        },
+        onDismissWeekStartNotice: async () => {
+          this.plugin.settings.weekStartNoticeSeen = true;
+          await this.plugin.saveSettings();
         },
       },
     });

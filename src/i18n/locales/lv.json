@@ -28,6 +28,11 @@
       "openSettings": "Atvērt iestatījumus",
       "dismiss": "Aizvērt"
     },
+    "weekStartBanner": {
+      "message": "Nedēļas pirmo dienu tagad var izvēlēties, un pēc noklusējuma tā ir pirmdiena. Nomainiet to iestatījumos.",
+      "openSettings": "Atvērt iestatījumus",
+      "dismiss": "Aizvērt"
+    },
     "catchAllBanner": {
       "message": "Kategorijas tagad atbalsta datumu diapazonu “Viss”. Jūsu noteikumi palika nemainīti, tāpēc iestatiet to pēdējai kategorijai, lai notvertu jebkuru datumu, ko pārējās izlaiž.",
       "openSettings": "Atvērt iestatījumus",
@@ -129,6 +134,10 @@
     },
     "behaviour": {
       "heading": "Uzvedība",
+      "weekStart": {
+        "name": "Nedēļas pirmā diena",
+        "description": "Attiecas tikai uz datumu kārtulām “Šī nedēļa” un “Nākamā nedēļa”."
+      },
       "showCompleted": {
         "name": "Rādīt paveiktos uzdevumus līdz pusnaktij",
         "description": "Paveiktie uzdevumi paliek redzami paneļa ar pārsvītrojumu līdz pusnaktij, pēc tam pazūd nākamajā ielādē."
@@ -182,8 +191,8 @@
         "description": "Automātiski piešķirt uzdevumus pēc to izpildes datuma 📅. Ja vairākām kategorijām ir pārklājošās kārtulas, uzvar pirmā atbilstošā (no augšas uz leju).",
         "none": "Nav (tikai manuāli/birka)",
         "today": "Šodien (izpilde šodien vai kavēts)",
-        "thisWeek": "Šī nedēļa (rīt – pašreizējās svētdienas beigas)",
-        "nextWeek": "Nākamā nedēļa (nākamais pirmdiena – nākamā svētdiena)",
+        "thisWeek": "Šī nedēļa (rīt – nedēļas beigas)",
+        "nextWeek": "Nākamā nedēļa (visa nākamā nedēļa)",
         "thisMonth": "Šis mēnesis (1 diena – pašreizējā mēneša beigas)",
         "nextMonth": "Nākamais mēnesis (1. – nākamā mēneša pēdējā diena)",
         "withinDays": "N dienu laikā",

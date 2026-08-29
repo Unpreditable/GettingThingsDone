@@ -33,11 +33,17 @@
   export let onOpenSettings: () => void;
   export let onDismissLanguageBanner: () => void;
   export let onDismissCatchAllNotice: () => void;
+  export let onDismissWeekStartNotice: () => void;
 
   // Keyed off the shape of the rules rather than tasks actually piling up in To
   // Review, so the warning arrives before the mess does.
   $: showCatchAllBanner =
     !settings.catchAllNoticeSeen && shouldRecommendCatchAll(settings.buckets);
+
+  // Announced once to installs whose weeks were hardcoded to Monday. Dismissal is
+  // the only thing that hides it, and picking a first day counts as one (see
+  // setControlValue), so it cannot key off the value and blink as that changes.
+  $: showWeekStartBanner = !settings.weekStartNoticeSeen;
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
@@ -349,6 +355,8 @@
     </div>
   </div>
 
+  <!-- One banner at a time: these are full-width and push the task list down, and
+       all three are once-ever events, so they queue instead of stacking. -->
   {#if showLanguageBanner}
     <div class="gtd-language-banner">
       <span class="gtd-language-banner-message">{t("panel.languageBanner.message")}</span>
@@ -359,9 +367,7 @@
         <span class="gtd-language-banner-btn" on:click={onDismissLanguageBanner}>{t("panel.languageBanner.dismiss")}</span>
       </div>
     </div>
-  {/if}
-
-  {#if showCatchAllBanner}
+  {:else if showCatchAllBanner}
     <div class="gtd-language-banner">
       <span class="gtd-language-banner-message">{t("panel.catchAllBanner.message")}</span>
       <div class="gtd-language-banner-actions">
@@ -369,6 +375,16 @@
         <span class="gtd-language-banner-btn" on:click={onOpenSettings}>{t("panel.catchAllBanner.openSettings")}</span>
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
         <span class="gtd-language-banner-btn" on:click={onDismissCatchAllNotice}>{t("panel.catchAllBanner.dismiss")}</span>
+      </div>
+    </div>
+  {:else if showWeekStartBanner}
+    <div class="gtd-language-banner">
+      <span class="gtd-language-banner-message">{t("panel.weekStartBanner.message")}</span>
+      <div class="gtd-language-banner-actions">
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={onOpenSettings}>{t("panel.weekStartBanner.openSettings")}</span>
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={onDismissWeekStartNotice}>{t("panel.weekStartBanner.dismiss")}</span>
       </div>
     </div>
   {/if}
