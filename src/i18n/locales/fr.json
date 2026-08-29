@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks : Migration terminée. {{migrated}} tâches mises à jour, {{failed}} ignorées."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "Général",
     "banner": {
       "message": "Les catégories acceptent désormais la plage de dates « Tout (règle fourre-tout) », qui récupère toute date que les autres laissent passer. Appliquez-la à la dernière catégorie si vous le souhaitez.",
       "buttonText": "Partager vos retours et idées",

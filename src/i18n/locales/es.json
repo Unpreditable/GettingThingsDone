@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks: Migración completada. {{migrated}} tareas actualizadas, {{failed}} omitidas."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "General",
     "banner": {
       "message": "Las categorías ahora admiten el rango de fechas «Todo (comodín)», que recoge cualquier fecha que las demás no cubran. Aplícalo a la última categoría si lo deseas.",
       "buttonText": "Compartir comentarios e ideas",

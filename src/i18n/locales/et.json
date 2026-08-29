@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks: Migratsioon lõpetatud. {{migrated}} ülesannet uuendatud, {{failed}} vahele jäetud."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "Üldine",
     "banner": {
       "message": "Kategooriad toetavad nüüd kuupäevavahemikku „Kõik (püüab ülejäänu)“, mis püüab kinni kuupäevad, mille teised vahele jätavad. Soovi korral määra see viimasele kategooriale.",
       "buttonText": "Jaga tagasisidet ja ideid",

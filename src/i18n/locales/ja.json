@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks: 移行完了。{{migrated}}件更新、{{failed}}件スキップ。"
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "一般",
     "banner": {
       "message": "カテゴリで日付範囲「すべて（残り全部）」が使えるようになりました。他のカテゴリが拾わない日付を受け止めるので、必要に応じて最後のカテゴリに設定してください。",
       "buttonText": "フィードバック・要望を送る",

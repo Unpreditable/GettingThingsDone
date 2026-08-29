@@ -424,13 +424,38 @@
    matches elements that received the class from getSettingDefinitions()'s
    render callbacks, which core only calls on Obsidian 1.13+; older versions
    use the untouched imperative display()/refresh() path and never add the
-   class, so this rule has no effect there. */
-.setting-item.gtd-settings-escape-hatch {
+   class, so this rule has no effect there. The selector mirrors core's own
+   `.setting-group .setting-item:not(.setting-item-heading)` and adds our class
+   on top, so it outranks the row padding that rule applies; at lower
+   specificity the padding below loses and every row the section renders is
+   indented by a second helping of it. */
+.setting-group .setting-item.gtd-settings-escape-hatch:not(.setting-item-heading) {
   display: block;
   background: none;
   border: none;
   padding: 0;
   margin-bottom: 0;
+}
+
+/* Free-form DOM inside an escape hatch (the banner card, the scope path list,
+   the bucket cards and their action row) sits flush against the container edge
+   now that the wrapper adds no padding. Inset it by the same amount core uses
+   for a real setting row so it lines up with the rows above it. Margin rather
+   than padding, since several of these children draw their own border. */
+.gtd-settings-escape-hatch > *:not(.setting-item) {
+  margin-inline: var(--setting-items-padding-x);
+}
+
+/* Core hairlines every row in a group against the one above it, suppressing it
+   only on the group's first row. An escape hatch is one such row, and the rows
+   it renders inside itself match that descendant selector a second time, so the
+   General section picks up a rule above its heading (it follows the banner row)
+   and another below it (its first row is the heading's sibling, never the
+   group's :first-child). Core's own headings sit outside .setting-items and get
+   neither, so suppress both to match. */
+.setting-group .setting-item.gtd-settings-escape-hatch:not(.setting-item-heading)::before,
+.setting-group .gtd-settings-escape-hatch .setting-item-heading + .setting-item::before {
+  content: none;
 }
 
 .gtd-settings-banner {

@@ -123,7 +123,7 @@
   },
   "settings": {
     "heading_comment": "Top-level section heading shown in the Obsidian settings panel above all plugin settings.",
-    "heading": "Getting Things Done",
+    "heading": "General",
     "banner": {
       "message_comment": "Personal thank-you note from the author, shown at the top of the settings tab. Stands alone as a complete sentence — no link is embedded in it.",
       "message": "Thanks for using GTD Tasks! I built it to manage my own work every day, and I hope it makes yours a little easier too. I'd genuinely appreciate hearing what's working, what's not, or what you wish it did.",

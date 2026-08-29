@@ -92,7 +92,7 @@
     "migrationComplete": "GTD Tasks: Migracija baigta. Atnaujinta {{migrated}} užduočių, praleista {{failed}}."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "Bendra",
     "banner": {
       "message": "Kategorijos dabar palaiko datų intervalą „Viskas (visa kita)“, kuris pagauna bet kurią kitų praleistą datą. Jei norite, nustatykite jį paskutinei kategorijai.",
       "buttonText": "Dalintis atsiliepimais ir idėjomis",

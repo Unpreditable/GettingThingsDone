@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks: Migração concluída. {{migrated}} tarefas atualizadas, {{failed}} ignoradas."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "Geral",
     "banner": {
       "message": "As categorias já suportam o intervalo de datas «Tudo (apanha o resto)», que apanha qualquer data que as outras deixem passar. Defina-o na última categoria, se assim o desejar.",
       "buttonText": "Compartilhar feedback e ideias",

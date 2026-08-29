@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks: Migration abgeschlossen. {{migrated}} Aufgaben aktualisiert, {{failed}} übersprungen."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "Allgemein",
     "banner": {
       "message": "Kategorien unterstützen jetzt den Datumsbereich „Alles (Auffangregel)“, der jedes Datum abfängt, das die anderen auslassen. Setze ihn bei Bedarf auf deine letzte Kategorie.",
       "buttonText": "Feedback & Ideen teilen",

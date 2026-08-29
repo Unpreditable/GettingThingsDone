@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks：迁移完成。已更新 {{migrated}} 个任务，跳过 {{failed}} 个。"
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "常规",
     "banner": {
       "message": "分类现在支持“全部（兜底）”日期范围，可接住其他分类漏掉的日期。如有需要，可将它设置到最后一个分类。",
       "buttonText": "分享反馈与想法",

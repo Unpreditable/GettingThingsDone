@@ -86,7 +86,7 @@
     "migrationComplete": "GTD Tasks: 마이그레이션 완료. {{migrated}}개 업데이트, {{failed}}개 건너뜀."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "일반",
     "banner": {
       "message": "카테고리에서 다른 카테고리가 놓치는 모든 날짜를 담는 '전체 (나머지 모두)' 날짜 범위를 사용할 수 있습니다. 원하면 마지막 카테고리에 적용하세요.",
       "buttonText": "피드백 및 아이디어 공유",

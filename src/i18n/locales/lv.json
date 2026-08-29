@@ -89,7 +89,7 @@
     "migrationComplete": "GTD Tasks: Migrācija pabeigta. Atjaunināti {{migrated}} uzdevumi, izlaisti {{failed}}."
   },
   "settings": {
-    "heading": "Getting Things Done",
+    "heading": "Vispārīgi",
     "banner": {
       "message": "Kategorijas tagad atbalsta datumu diapazonu “Viss (viss pārējais)”, kas notver jebkuru datumu, ko pārējās izlaiž. Ja vēlaties, iestatiet to pēdējai kategorijai.",
       "buttonText": "Dalīties atsauksmēs un idejās",
