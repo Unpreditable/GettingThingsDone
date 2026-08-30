@@ -131,11 +131,12 @@ The prefix used in both storage modes. Default: `gtd`. Changing this also change
 
 ### Files to scan
 
-Limit which files are indexed:
+Choose which files the plugin indexes.
 
-- **Entire vault** — all `*.md` files
-- **Specific folders** — enter one or more folder paths
-- **Specific files** — enter one or more file paths
+- **Entire vault, except…** scans every `*.md` file except the ones you list.
+- **Selected paths only** scans only the folders and files you list.
+
+Add an entry with **+ Add folder**/**+ Exclude folder** or **+ Add file**/**+ Exclude file**.
 
 ### Show completed tasks until midnight
 

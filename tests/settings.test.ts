@@ -1,6 +1,7 @@
 import {
   getActiveScope,
   isPathInScope,
+  matchesEntry,
   migrateSettingsData,
   normalizeSettingsShapes,
   shouldAdoptCatchAll,
@@ -8,22 +9,28 @@ import {
   DEFAULT_BUCKETS,
   DEFAULT_SETTINGS,
 } from "../src/settings";
-import type { BucketConfig, PluginSettings } from "../src/settings";
+import type { BucketConfig, PathEntry, PluginSettings } from "../src/settings";
 
 describe("getActiveScope", () => {
-  it("returns a vault scope when scopeType is vault", () => {
-    const scope = getActiveScope({ scopeType: "vault", folderPaths: ["ignored"], filePaths: ["ignored"] });
-    expect(scope).toEqual({ type: "vault" });
+  const folder = (path: string): PathEntry => ({ type: "folder", path });
+  const file = (path: string): PathEntry => ({ type: "file", path });
+
+  it("returns a vault scope carrying the exclusion list", () => {
+    const scope = getActiveScope({
+      scopeType: "vault",
+      scopePaths: [folder("parked")],
+      ignoredPaths: [folder("Templates")],
+    });
+    expect(scope).toEqual({ type: "vault", ignored: [folder("Templates")] });
   });
 
-  it("returns a folders scope using folderPaths when scopeType is folders", () => {
-    const scope = getActiveScope({ scopeType: "folders", folderPaths: ["Tasks", "Work"], filePaths: [] });
-    expect(scope).toEqual({ type: "folders", paths: ["Tasks", "Work"] });
-  });
-
-  it("returns a files scope using filePaths when scopeType is files", () => {
-    const scope = getActiveScope({ scopeType: "files", folderPaths: [], filePaths: ["Tasks/inbox.md"] });
-    expect(scope).toEqual({ type: "files", paths: ["Tasks/inbox.md"] });
+  it("returns a paths scope using scopePaths", () => {
+    const scope = getActiveScope({
+      scopeType: "paths",
+      scopePaths: [folder("Tasks"), file("Work/inbox.md")],
+      ignoredPaths: [folder("parked")],
+    });
+    expect(scope).toEqual({ type: "paths", included: [folder("Tasks"), file("Work/inbox.md")] });
   });
 });
 
@@ -43,26 +50,77 @@ describe("migrateSettingsData", () => {
     expect(migrateSettingsData(data)).toEqual({ tagPrefix: "gtd", scopeType: "vault", planBy: "due-only" });
   });
 
-  it("migrates a legacy folders taskScope into folderPaths", () => {
+  // Two generations of scope shape in one call: the taskScope object becomes
+  // folderPaths, which then becomes a typed scopePaths entry.
+  it("migrates a legacy folders taskScope all the way to scopePaths", () => {
     const data = { taskScope: { type: "folders", paths: ["Tasks", "Work"] } };
     expect(migrateSettingsData(data)).toEqual({
-      scopeType: "folders",
-      folderPaths: ["Tasks", "Work"],
+      scopeType: "paths",
+      scopePaths: [
+        { type: "folder", path: "Tasks" },
+        { type: "folder", path: "Work" },
+      ],
       planBy: "due-only",
     });
   });
 
-  it("migrates a legacy files taskScope into filePaths", () => {
+  it("migrates a legacy files taskScope all the way to scopePaths", () => {
     const data = { taskScope: { type: "files", paths: ["Tasks/inbox.md"] } };
     expect(migrateSettingsData(data)).toEqual({
-      scopeType: "files",
-      filePaths: ["Tasks/inbox.md"],
+      scopeType: "paths",
+      scopePaths: [{ type: "file", path: "Tasks/inbox.md" }],
       planBy: "due-only",
     });
   });
 
-  it("does not re-migrate data that already has scopeType", () => {
-    const data = { scopeType: "folders", folderPaths: ["Tasks"] };
+  it("merges the folders scope into scopePaths, discarding the parked file list", () => {
+    const data = { scopeType: "folders", folderPaths: ["Tasks"], filePaths: ["parked.md"] };
+    expect(migrateSettingsData(data)).toEqual({
+      scopeType: "paths",
+      scopePaths: [{ type: "folder", path: "Tasks" }],
+      planBy: "due-only",
+    });
+  });
+
+  it("merges the files scope into scopePaths, discarding the parked folder list", () => {
+    const data = { scopeType: "files", folderPaths: ["parked"], filePaths: ["a.md"] };
+    expect(migrateSettingsData(data)).toEqual({
+      scopeType: "paths",
+      scopePaths: [{ type: "file", path: "a.md" }],
+      planBy: "due-only",
+    });
+  });
+
+  it("drops both path lists from a vault install without inventing entries", () => {
+    const data = { scopeType: "vault", folderPaths: ["parked"], filePaths: ["parked.md"] };
+    expect(migrateSettingsData(data)).toEqual({ scopeType: "vault", planBy: "due-only" });
+  });
+
+  // A newer build can write scopePaths before the legacy fields are gone, so
+  // the migration keys off the legacy scopeType instead of that field's absence.
+  it("still migrates when a stale empty scopePaths sits alongside the legacy fields", () => {
+    const data = {
+      scopeType: "folders",
+      scopePaths: [],
+      folderPaths: ["Tasks", "Templates"],
+      filePaths: ["parked.md"],
+    };
+    expect(migrateSettingsData(data)).toEqual({
+      scopeType: "paths",
+      scopePaths: [
+        { type: "folder", path: "Tasks" },
+        { type: "folder", path: "Templates" },
+      ],
+      planBy: "due-only",
+    });
+  });
+
+  it("leaves already-migrated data alone", () => {
+    const data = {
+      scopeType: "paths",
+      scopePaths: [{ type: "folder", path: "Tasks" }],
+      ignoredPaths: [{ type: "folder", path: "Templates" }],
+    };
     expect(migrateSettingsData(data)).toEqual({ ...data, planBy: "due-only" });
   });
 
@@ -182,8 +240,8 @@ describe("normalizeSettingsShapes", () => {
       ...DEFAULT_SETTINGS,
       taskOrder: { today: [{ file: "a.md", key: "k1" }] },
       completionSeen: { "a.md::k1": 123 },
-      folderPaths: ["Tasks"],
-      filePaths: ["a.md"],
+      scopePaths: [{ type: "folder", path: "Tasks" }],
+      ignoredPaths: [{ type: "file", path: "a.md" }],
     };
     expect(normalizeSettingsShapes(settings)).toEqual(settings);
   });
@@ -235,32 +293,90 @@ describe("normalizeSettingsShapes", () => {
     expect(normalizeSettingsShapes(settings).orderKeyScheme).toBe("due-only");
   });
 
-  it("forces folderPaths/filePaths to an array if they are not one", () => {
+  it("forces the path lists to an array if they are not one", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
-      folderPaths: "Tasks",
-      filePaths: null,
+      scopePaths: "Tasks",
+      ignoredPaths: null,
     } as unknown as PluginSettings;
     const result = normalizeSettingsShapes(settings);
-    expect(result.folderPaths).toEqual([]);
-    expect(result.filePaths).toEqual([]);
+    expect(result.scopePaths).toEqual([]);
+    expect(result.ignoredPaths).toEqual([]);
+  });
+
+  it("drops path entries that are not well-formed, keeping the rest", () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      scopePaths: [
+        { type: "folder", path: "Tasks" },
+        "Tasks",
+        null,
+        { type: "symlink", path: "Tasks" },
+        { type: "file" },
+        { type: "file", path: 5 },
+        { type: "file", path: "a.md" },
+      ],
+    } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(settings).scopePaths).toEqual([
+      { type: "folder", path: "Tasks" },
+      { type: "file", path: "a.md" },
+    ]);
+  });
+});
+
+describe("matchesEntry", () => {
+  it("matches a folder entry against everything beneath it", () => {
+    expect(matchesEntry("Tasks/a.md", { type: "folder", path: "Tasks" })).toBe(true);
+    expect(matchesEntry("Tasks/deep/a.md", { type: "folder", path: "Tasks" })).toBe(true);
+  });
+
+  it("tolerates a trailing slash on a folder entry", () => {
+    expect(matchesEntry("Tasks/a.md", { type: "folder", path: "Tasks/" })).toBe(true);
+  });
+
+  it("does not let a folder entry swallow a sibling sharing its prefix", () => {
+    expect(matchesEntry("TasksArchive/a.md", { type: "folder", path: "Tasks" })).toBe(false);
+  });
+
+  it("matches a file entry only against itself", () => {
+    expect(matchesEntry("Tasks/a.md", { type: "file", path: "Tasks/a.md" })).toBe(true);
+    expect(matchesEntry("Tasks/b.md", { type: "file", path: "Tasks/a.md" })).toBe(false);
   });
 });
 
 describe("isPathInScope", () => {
-  it("accepts every path under a vault scope", () => {
-    expect(isPathInScope("anything/at/all.md", { type: "vault" })).toBe(true);
+  it("accepts every path when nothing is excluded", () => {
+    expect(isPathInScope("anything/at/all.md", { type: "vault", ignored: [] })).toBe(true);
   });
 
-  it("matches folder scopes by prefix, with or without a trailing slash", () => {
-    expect(isPathInScope("Tasks/a.md", { type: "folders", paths: ["Tasks"] })).toBe(true);
-    expect(isPathInScope("Tasks/a.md", { type: "folders", paths: ["Tasks/"] })).toBe(true);
-    expect(isPathInScope("TasksArchive/a.md", { type: "folders", paths: ["Tasks"] })).toBe(false);
+  it("rejects a path covered by an exclusion entry and admits the rest", () => {
+    const scope = {
+      type: "vault" as const,
+      ignored: [
+        { type: "folder" as const, path: "Templates" },
+        { type: "file" as const, path: "Notes/scratch.md" },
+      ],
+    };
+    expect(isPathInScope("Templates/daily.md", scope)).toBe(false);
+    expect(isPathInScope("Notes/scratch.md", scope)).toBe(false);
+    expect(isPathInScope("Notes/real.md", scope)).toBe(true);
   });
 
-  it("matches file scopes by exact path", () => {
-    expect(isPathInScope("Tasks/a.md", { type: "files", paths: ["Tasks/a.md"] })).toBe(true);
-    expect(isPathInScope("Tasks/b.md", { type: "files", paths: ["Tasks/a.md"] })).toBe(false);
+  it("admits only what a paths scope lists, mixing folders and files", () => {
+    const scope = {
+      type: "paths" as const,
+      included: [
+        { type: "folder" as const, path: "Projects" },
+        { type: "file" as const, path: "Inbox.md" },
+      ],
+    };
+    expect(isPathInScope("Projects/a.md", scope)).toBe(true);
+    expect(isPathInScope("Inbox.md", scope)).toBe(true);
+    expect(isPathInScope("Archive/a.md", scope)).toBe(false);
+  });
+
+  it("admits nothing when a paths scope is empty", () => {
+    expect(isPathInScope("a.md", { type: "paths", included: [] })).toBe(false);
   });
 });
 

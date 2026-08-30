@@ -125,16 +125,19 @@
     },
     "filesToScan": {
       "name": "Файли для сканування",
-      "description": "Файли, в яких плагін шукає завдання.",
-      "entireVault": "Усе сховище",
-      "specificFolders": "Певні папки",
-      "specificFiles": "Певні файли",
+      "entireVault": "Усе сховище, крім…",
+      "selectedPaths": "Лише вибрані шляхи",
+      "descriptionVault": "Сканує всі markdown-файли сховища, крім папок і файлів, указаних нижче.",
+      "descriptionPaths": "Сканує лише папки та файли, указані нижче.",
       "addFolder": "+ Додати папку",
       "addFile": "+ Додати файл",
+      "excludeFolder": "+ Виключити папку",
+      "excludeFile": "+ Виключити файл",
       "folderPlaceholder": "напр. Завдання",
       "filePlaceholder": "напр. Завдання/inbox.md",
-      "noFoldersSelected": "Папки не вибрано. Плагін не шукатиме завдання.",
-      "noFilesSelected": "Файли не вибрано. Плагін не шукатиме завдання."
+      "noPathsSelected": "Шляхи не вибрано. Плагін не шукатиме завдання.",
+      "folderNotFound": "Папку не знайдено",
+      "fileNotFound": "Файл не знайдено"
     },
     "behaviour": {
       "heading": "Поведінка",

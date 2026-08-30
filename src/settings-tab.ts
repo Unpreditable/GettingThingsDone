@@ -1,6 +1,6 @@
-import { App, PluginSettingTab, Setting, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
+import { App, PluginSettingTab, Setting, TFile, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, ScopeType, DEFAULT_BUCKETS, WEEK_STARTS } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { renderIcon } from "./views/icon";
@@ -301,6 +301,22 @@ function generateBucketId(): string {
 }
 
 
+/**
+ * Settles a path list for storage: blank rows an add button created but the
+ * user never filled in are dropped, and what remains is ordered for reading —
+ * folders above files, alphabetical within each, the way the file explorer
+ * reads. Order carries no meaning to matching, which is set-based. Applied on
+ * close rather than on edit so a row never leaps away mid-keystroke.
+ */
+function tidyPathList(entries: PathEntry[]): PathEntry[] {
+  return entries
+    .filter((entry) => entry.path !== "")
+    .sort((a, b) => {
+      if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
+      return a.path.localeCompare(b.path);
+    });
+}
+
 export class GtdSettingsTab extends PluginSettingTab {
   constructor(app: App, private plugin: GtdTasksPlugin) {
     super(app, plugin);
@@ -308,6 +324,21 @@ export class GtdSettingsTab extends PluginSettingTab {
 
   display(): void {
     this.refresh();
+  }
+
+  /**
+   * Settling the path lists happens here rather than on open because 1.13+
+   * never calls display() for a tab that returns setting definitions — it
+   * renders those instead — while hide() runs on every path away from the tab.
+   */
+  hide(): void {
+    const settings = this.plugin.settings;
+    const before = JSON.stringify([settings.scopePaths, settings.ignoredPaths]);
+    settings.scopePaths = tidyPathList(settings.scopePaths);
+    settings.ignoredPaths = tidyPathList(settings.ignoredPaths);
+    if (JSON.stringify([settings.scopePaths, settings.ignoredPaths]) !== before) {
+      void this.plugin.saveSettings();
+    }
   }
 
   private refresh(): void {
@@ -568,15 +599,20 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
 
-    // Scope type selector
+    // Scope type selector. The description carries the polarity of the list
+    // below it, so it swaps with the mode rather than describing both at once.
+    const scopeType = this.plugin.settings.scopeType;
     new Setting(containerEl)
       .setName(t("settings.filesToScan.name"))
-      .setDesc(t("settings.filesToScan.description"))
+      .setDesc(
+        scopeType === "vault"
+          ? t("settings.filesToScan.descriptionVault")
+          : t("settings.filesToScan.descriptionPaths")
+      )
       .addDropdown((dd) => {
         dd.addOption("vault", t("settings.filesToScan.entireVault"));
-        dd.addOption("folders", t("settings.filesToScan.specificFolders"));
-        dd.addOption("files", t("settings.filesToScan.specificFiles"));
-        dd.setValue(this.plugin.settings.scopeType);
+        dd.addOption("paths", t("settings.filesToScan.selectedPaths"));
+        dd.setValue(scopeType);
         dd.onChange(async (val) => {
           this.plugin.settings.scopeType = val as ScopeType;
           await this.plugin.saveSettings();
@@ -585,64 +621,88 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
 
-    const scopeType = this.plugin.settings.scopeType;
-    if (scopeType === "folders" || scopeType === "files") {
-      this.renderScopePathList(containerEl, scopeType);
-    }
+    this.renderScopePathList(containerEl, scopeType);
   }
 
-  private renderScopePathList(
-    container: HTMLElement,
-    scopeType: "folders" | "files"
-  ) {
-    const paths = scopeType === "folders" ? this.plugin.settings.folderPaths : this.plugin.settings.filePaths;
+  /**
+   * Renders one path list: the scanned paths under "paths" scope, or the
+   * skipped ones under vault scope. Both modes share the widget — the mode
+   * only decides which list is written, how the add buttons read, and whether
+   * an empty list deserves a warning.
+   */
+  private renderScopePathList(container: HTMLElement, scopeType: ScopeType) {
+    const isExclusion = scopeType === "vault";
+    const entries = isExclusion
+      ? this.plugin.settings.ignoredPaths
+      : this.plugin.settings.scopePaths;
 
     const listEl = container.createDiv({ cls: "gtd-scope-list" });
 
+    // One datalist per entry type, so a folder row autocompletes folders and a
+    // file row files. Rebuilt on every render: the vault moves under us.
+    const buildDatalist = (type: PathEntry["type"]): string => {
+      const id = `gtd-scope-datalist-${type}`;
+      let datalist = container.querySelector<HTMLDataListElement>(`#${id}`);
+      if (!datalist) datalist = container.createEl("datalist", { attr: { id } });
+      datalist.empty();
+      const options = type === "folder" ? this.getFolderPaths() : this.getFilePaths();
+      for (const opt of options) datalist.createEl("option", { attr: { value: opt } });
+      return id;
+    };
+
     const renderEntries = () => {
       listEl.empty();
+      const datalistIds = { folder: buildDatalist("folder"), file: buildDatalist("file") };
 
-      // Autocomplete options
-      const datalistId = "gtd-scope-datalist";
-      let datalist = container.querySelector<HTMLDataListElement>(`#${datalistId}`);
-      if (!datalist) {
-        datalist = container.createEl("datalist", {
-          attr: { id: datalistId },
-        });
-      }
-      datalist.empty();
-      const options =
-        scopeType === "folders" ? this.getFolderPaths() : this.getFilePaths();
-      for (const opt of options) {
-        datalist.createEl("option", { attr: { value: opt } });
-      }
-
-      if (paths.length === 0) {
+      // An empty exclusion list is the ordinary state and needs no comment. An
+      // empty scan list means nothing is indexed at all, which does.
+      if (entries.length === 0 && !isExclusion) {
         listEl.createDiv({
           cls: "gtd-scope-empty",
-          text:
-            scopeType === "folders"
-              ? t("settings.filesToScan.noFoldersSelected")
-              : t("settings.filesToScan.noFilesSelected"),
+          text: t("settings.filesToScan.noPathsSelected"),
         });
       }
 
-      paths.forEach((path, idx) => {
+      entries.forEach((entry, idx) => {
         const row = listEl.createDiv({ cls: "gtd-scope-entry" });
+
+        // A blank row is one the user has only just added, not a broken path.
+        const missing = entry.path !== "" && !this.entryExists(entry);
+        const iconEl = row.createSpan({ cls: "gtd-scope-icon" });
+        if (missing) {
+          iconEl.addClass("gtd-scope-icon-missing");
+          renderIcon(iconEl, "alert-triangle");
+          iconEl.setAttribute(
+            "aria-label",
+            entry.type === "folder"
+              ? t("settings.filesToScan.folderNotFound")
+              : t("settings.filesToScan.fileNotFound")
+          );
+        } else if (entry.type === "folder") {
+          renderIcon(iconEl, "folder");
+        } else {
+          renderIcon(iconEl, "file");
+        }
 
         const input = row.createEl("input", {
           type: "text",
           cls: "gtd-scope-input",
-          value: path,
-          attr: { list: datalistId },
+          value: entry.path,
+          attr: { list: datalistIds[entry.type] },
         });
         input.placeholder =
-          scopeType === "folders" ? t("settings.filesToScan.folderPlaceholder") : t("settings.filesToScan.filePlaceholder");
+          entry.type === "folder"
+            ? t("settings.filesToScan.folderPlaceholder")
+            : t("settings.filesToScan.filePlaceholder");
 
         input.onblur = async () => {
-          paths[idx] = input.value.trim();
+          if (input.value.trim() === entry.path) return;
+          entry.path = input.value.trim();
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
+          // Re-rendered so the icon catches up with what the new path resolves
+          // to. Safe on blur specifically: focus is leaving the input anyway.
+          renderEntries();
         };
 
         const removeBtn = row.createEl("button", {
@@ -650,25 +710,38 @@ export class GtdSettingsTab extends PluginSettingTab {
           cls: "gtd-scope-remove-btn",
         });
         removeBtn.onclick = async () => {
-          paths.splice(idx, 1);
+          entries.splice(idx, 1);
           await this.plugin.saveSettings();
           await this.plugin.refreshIndex();
           renderEntries();
         };
       });
 
-      // Add entry button
-      const addBtn = listEl.createEl("button", {
-        text: scopeType === "folders" ? t("settings.filesToScan.addFolder") : t("settings.filesToScan.addFile"),
-        cls: "gtd-scope-add-btn",
-      });
-      addBtn.onclick = () => {
-        paths.push("");
-        renderEntries();
+      const addRow = listEl.createDiv({ cls: "gtd-scope-add-row" });
+      const addButton = (type: PathEntry["type"], label: string) => {
+        const btn = addRow.createEl("button", { text: label, cls: "gtd-scope-add-btn" });
+        btn.onclick = () => {
+          entries.push({ type, path: "" });
+          renderEntries();
+        };
       };
+      addButton(
+        "folder",
+        isExclusion ? t("settings.filesToScan.excludeFolder") : t("settings.filesToScan.addFolder")
+      );
+      addButton(
+        "file",
+        isExclusion ? t("settings.filesToScan.excludeFile") : t("settings.filesToScan.addFile")
+      );
     };
 
     renderEntries();
+  }
+
+  /** Whether an entry's path resolves to something of the type it claims. */
+  private entryExists(entry: PathEntry): boolean {
+    const target = this.app.vault.getAbstractFileByPath(entry.path);
+    return entry.type === "folder" ? target instanceof TFolder : target instanceof TFile;
   }
 
   private getFolderPaths(): string[] {

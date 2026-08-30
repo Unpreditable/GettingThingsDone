@@ -531,6 +531,21 @@
   gap: 6px;
 }
 
+/* Fixed width so the inputs line up whichever icon a row carries. */
+.gtd-scope-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  flex: 0 0 20px;
+  color: var(--text-muted);
+  --icon-size: var(--icon-s);
+}
+
+.gtd-scope-icon-missing {
+  color: var(--text-error);
+}
+
 .gtd-scope-input {
   flex: 1;
   padding: 4px 8px;
@@ -563,8 +578,13 @@
   padding: 2px 0;
 }
 
+.gtd-scope-add-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
 .gtd-scope-add-btn {
-  align-self: flex-start;
   padding: 3px 10px;
   border-radius: 4px;
   border: 1px dashed var(--background-modifier-border);
@@ -572,7 +592,6 @@
   color: var(--text-muted);
   cursor: pointer;
   font-size: var(--font-ui-small);
-  margin-top: 2px;
 }
 
 .gtd-scope-add-btn:hover {

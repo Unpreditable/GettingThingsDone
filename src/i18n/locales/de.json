@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "Zu durchsuchende Dateien",
-      "description": "Welche Dateien das Plugin nach Aufgaben durchsucht.",
-      "entireVault": "Gesamter Tresor",
-      "specificFolders": "Bestimmte Ordner",
-      "specificFiles": "Bestimmte Dateien",
+      "entireVault": "Gesamter Tresor, außer…",
+      "selectedPaths": "Nur ausgewählte Pfade",
+      "descriptionVault": "Durchsucht jede Markdown-Datei im Tresor, außer den unten aufgeführten Ordnern und Dateien.",
+      "descriptionPaths": "Durchsucht nur die unten aufgeführten Ordner und Dateien.",
       "addFolder": "+ Ordner hinzufügen",
       "addFile": "+ Datei hinzufügen",
+      "excludeFolder": "+ Ordner ausschließen",
+      "excludeFile": "+ Datei ausschließen",
       "folderPlaceholder": "z.B. Aufgaben",
       "filePlaceholder": "z.B. Aufgaben/inbox.md",
-      "noFoldersSelected": "Keine Ordner ausgewählt. Das Plugin durchsucht nichts nach Aufgaben.",
-      "noFilesSelected": "Keine Dateien ausgewählt. Das Plugin durchsucht nichts nach Aufgaben."
+      "noPathsSelected": "Keine Pfade ausgewählt. Das Plugin durchsucht nichts nach Aufgaben.",
+      "folderNotFound": "Ordner nicht gefunden",
+      "fileNotFound": "Datei nicht gefunden"
     },
     "behaviour": {
       "heading": "Verhalten",

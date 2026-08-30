@@ -87,8 +87,9 @@ function* sourceFiles(dir) {
   }
 }
 
-// use:icon={"pin"} · setIcon("pin") · icon: "pin" · marker: "zap"
-const usage = /(?:use:icon=\{|setIcon\(|(?:icon|marker):\s*)"([a-z][a-z0-9-]*)"/g;
+// use:icon={"pin"} · setIcon("pin") · renderIcon(el, "pin") · icon: "pin" · marker: "zap"
+const usage =
+  /(?:use:icon=\{|setIcon\(|renderIcon\([\w.[\]]+,\s*|(?:icon|marker):\s*)"([a-z][a-z0-9-]*)"/g;
 const used = new Map();
 for (const file of sourceFiles("src")) {
   const text = readFileSync(file, "utf8");

@@ -121,16 +121,19 @@
     },
     "filesToScan": {
       "name": "Skenējamie faili",
-      "description": "Kuri faili tiek meklēti uzdevumu atrašanai.",
-      "entireVault": "Viss glabātuve",
-      "specificFolders": "Konkrētas mapes",
-      "specificFiles": "Konkrēti faili",
+      "entireVault": "Visa glabātuve, izņemot…",
+      "selectedPaths": "Tikai izvēlētie ceļi",
+      "descriptionVault": "Skenē visus glabātuves markdown failus, izņemot zemāk norādītās mapes un failus.",
+      "descriptionPaths": "Skenē tikai zemāk norādītās mapes un failus.",
       "addFolder": "+ Pievienot mapi",
       "addFile": "+ Pievienot failu",
+      "excludeFolder": "+ Izslēgt mapi",
+      "excludeFile": "+ Izslēgt failu",
       "folderPlaceholder": "piem. Uzdevumi",
       "filePlaceholder": "piem. Uzdevumi/inbox.md",
-      "noFoldersSelected": "Nav izvēlēta neviena mape. Spraudnis nemeklēs nevienu uzdevumu.",
-      "noFilesSelected": "Nav izvēlēts neviens fails. Spraudnis nemeklēs nevienu uzdevumu."
+      "noPathsSelected": "Nav izvēlēts neviens ceļš. Spraudnis nemeklēs uzdevumus.",
+      "folderNotFound": "Mape nav atrasta",
+      "fileNotFound": "Fails nav atrasts"
     },
     "behaviour": {
       "heading": "Uzvedība",

@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "スキャン対象ファイル",
-      "description": "プラグインがタスクを検索するファイル。",
-      "entireVault": "保管庫全体",
-      "specificFolders": "特定のフォルダ",
-      "specificFiles": "特定のファイル",
+      "entireVault": "保管庫全体（下記を除く）",
+      "selectedPaths": "選択したパスのみ",
+      "descriptionVault": "下記のフォルダとファイルを除き、保管庫内のすべてのMarkdownファイルをスキャンします。",
+      "descriptionPaths": "下記のフォルダとファイルのみをスキャンします。",
       "addFolder": "+ フォルダを追加",
       "addFile": "+ ファイルを追加",
+      "excludeFolder": "+ フォルダを除外",
+      "excludeFile": "+ ファイルを除外",
       "folderPlaceholder": "例: Tasks",
       "filePlaceholder": "例: Tasks/inbox.md",
-      "noFoldersSelected": "フォルダが選択されていません。プラグインはタスクを検索しません。",
-      "noFilesSelected": "ファイルが選択されていません。プラグインはタスクを検索しません。"
+      "noPathsSelected": "パスが選択されていません。プラグインはタスクを検索しません。",
+      "folderNotFound": "フォルダが見つかりません",
+      "fileNotFound": "ファイルが見つかりません"
     },
     "behaviour": {
       "heading": "動作",

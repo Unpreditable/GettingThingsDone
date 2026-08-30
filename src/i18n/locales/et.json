@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "Skaneeritavad failid",
-      "description": "Millistes failides plugin ülesandeid otsib.",
-      "entireVault": "Kogu hoidla",
-      "specificFolders": "Konkreetsed kaustad",
-      "specificFiles": "Konkreetsed failid",
+      "entireVault": "Kogu hoidla, välja arvatud…",
+      "selectedPaths": "Ainult valitud asukohad",
+      "descriptionVault": "Skaneerib kõiki hoidla markdown-faile peale allpool loetletud kaustade ja failide.",
+      "descriptionPaths": "Skaneerib ainult allpool loetletud kaustu ja faile.",
       "addFolder": "+ Lisa kaust",
       "addFile": "+ Lisa fail",
+      "excludeFolder": "+ Välista kaust",
+      "excludeFile": "+ Välista fail",
       "folderPlaceholder": "nt Ülesanded",
       "filePlaceholder": "nt Ülesanded/inbox.md",
-      "noFoldersSelected": "Kaustu pole valitud. Plugin ei otsi ühestki kaustast ülesandeid.",
-      "noFilesSelected": "Faile pole valitud. Plugin ei otsi ühestki failist ülesandeid."
+      "noPathsSelected": "Asukohti pole valitud. Plugin ei otsi ülesandeid.",
+      "folderNotFound": "Kausta ei leitud",
+      "fileNotFound": "Faili ei leitud"
     },
     "behaviour": {
       "heading": "Käitumine",

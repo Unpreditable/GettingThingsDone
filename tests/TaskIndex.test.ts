@@ -1,6 +1,6 @@
 import { TaskIndex } from "../src/core/TaskIndex";
 import { TFile } from "obsidian";
-import type { TaskScope } from "../src/settings";
+import type { PathEntry, TaskScope } from "../src/settings";
 
 function makeTFile(path: string) {
   return new (TFile as any)(path, "md", path.replace(".md", ""));
@@ -72,7 +72,7 @@ function makeMockEnv(initialFiles: Record<string, string>) {
   };
 }
 
-const vaultScope: TaskScope = { type: "vault" };
+const vaultScope: TaskScope = { type: "vault", ignored: [] };
 
 describe("TaskIndex", () => {
   it("initialScan indexes all in-scope files and notifies listeners once", async () => {
@@ -124,7 +124,7 @@ describe("TaskIndex", () => {
   });
 
   it("ignores a created file that is out of scope", async () => {
-    const scope: TaskScope = { type: "files", paths: ["a.md"] };
+    const scope: TaskScope = { type: "paths", included: [{ type: "file", path: "a.md" }] };
     const { app, plugin, fireCreated } = makeMockEnv({ "a.md": "- [ ] Task A" });
     const index = new TaskIndex(app, plugin, () => scope);
     index.registerVaultEvents();
@@ -242,14 +242,14 @@ describe("TaskIndex", () => {
   });
 
   it("notifies rename listeners before applying the scope check", async () => {
-    let scopePaths = ["old.md"];
+    let scopePaths: PathEntry[] = [{ type: "file", path: "old.md" }];
     const { app, plugin, fireRename } = makeMockEnv({ "old.md": "- [ ] Task A" });
-    const index = new TaskIndex(app, plugin, () => ({ type: "files", paths: scopePaths }));
+    const index = new TaskIndex(app, plugin, () => ({ type: "paths", included: scopePaths }));
     index.registerVaultEvents();
     await index.initialScan();
 
     index.onRename((oldPath, newPath) => {
-      scopePaths = scopePaths.map((p) => (p === oldPath ? newPath : p));
+      scopePaths = scopePaths.map((e) => (e.path === oldPath ? { ...e, path: newPath } : e));
     });
 
     await fireRename("old.md", "new.md");

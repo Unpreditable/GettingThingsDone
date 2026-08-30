@@ -125,16 +125,19 @@
     },
     "filesToScan": {
       "name": "Nuskaityti failai",
-      "description": "Failai, kuriuose įskiepis ieško užduočių.",
-      "entireVault": "Visas saugykla",
-      "specificFolders": "Konkretūs aplankai",
-      "specificFiles": "Konkretūs failai",
+      "entireVault": "Visa saugykla, išskyrus…",
+      "selectedPaths": "Tik pasirinkti keliai",
+      "descriptionVault": "Nuskaito visus saugyklos markdown failus, išskyrus žemiau nurodytus aplankus ir failus.",
+      "descriptionPaths": "Nuskaito tik žemiau nurodytus aplankus ir failus.",
       "addFolder": "+ Pridėti aplanką",
       "addFile": "+ Pridėti failą",
+      "excludeFolder": "+ Neįtraukti aplanko",
+      "excludeFile": "+ Neįtraukti failo",
       "folderPlaceholder": "pvz. Užduotys",
       "filePlaceholder": "pvz. Užduotys/inbox.md",
-      "noFoldersSelected": "Nepasirinktas nė vienas aplankas. Įskiepis neieškos jokių užduočių.",
-      "noFilesSelected": "Nepasirinktas nė vienas failas. Įskiepis neieškos jokių užduočių."
+      "noPathsSelected": "Nepasirinktas nė vienas kelias. Įskiepis neieškos užduočių.",
+      "folderNotFound": "Aplankas nerastas",
+      "fileNotFound": "Failas nerastas"
     },
     "behaviour": {
       "heading": "Elgsena",

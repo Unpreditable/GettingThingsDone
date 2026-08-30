@@ -73,22 +73,29 @@ export function weekStartIndex(weekStart: WeekStart): number {
   return WEEK_STARTS.indexOf(weekStart);
 }
 
-export type TaskScope =
-  | { type: "vault" }
-  | { type: "folders"; paths: string[] }
-  | { type: "files"; paths: string[] };
+/**
+ * One entry in a scope or exclusion list. The type is stored rather than
+ * inferred from what the path currently resolves to, so an entry whose target
+ * has been renamed away can still be reported as a missing folder or a missing
+ * file rather than an untyped dead path.
+ */
+export type PathEntry = { type: "folder" | "file"; path: string };
 
-export type ScopeType = "vault" | "folders" | "files";
+export type TaskScope =
+  | { type: "vault"; ignored: PathEntry[] }
+  | { type: "paths"; included: PathEntry[] };
+
+export type ScopeType = "vault" | "paths";
 
 export interface PluginSettings {
   storageMode: StorageMode;
   planBy: PlanBy;
-  /** Which scope mode is active. Path lists below persist independently of this. */
+  /** Which scope mode is active. Both lists below persist independently of this. */
   scopeType: ScopeType;
-  /** Folder paths for "folders" scope. Preserved even while a different scope mode is active. */
-  folderPaths: string[];
-  /** File paths for "files" scope. Preserved even while a different scope mode is active. */
-  filePaths: string[];
+  /** Paths scanned in "paths" scope. Preserved even while vault scope is active. */
+  scopePaths: PathEntry[];
+  /** Paths skipped in "vault" scope. Preserved even while paths scope is active. */
+  ignoredPaths: PathEntry[];
   buckets: BucketConfig[];
   /** Last Obsidian language seen on load — used to detect language changes. */
   lastSeenLanguage: string;
@@ -209,8 +216,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   storageMode: "inline-tag",
   planBy: "scheduled-first",
   scopeType: "vault",
-  folderPaths: [],
-  filePaths: [],
+  scopePaths: [],
+  ignoredPaths: [],
   buckets: DEFAULT_BUCKETS,
   lastSeenLanguage: "",
   panelOpenedOnce: false,
@@ -248,48 +255,76 @@ export function activeOrderKeyScheme(
 
 /** Builds the scope TaskIndex scans with, from the active scopeType and its matching persistent path list. */
 export function getActiveScope(
-  settings: Pick<PluginSettings, "scopeType" | "folderPaths" | "filePaths">
+  settings: Pick<PluginSettings, "scopeType" | "scopePaths" | "ignoredPaths">
 ): TaskScope {
   switch (settings.scopeType) {
     case "vault":
-      return { type: "vault" };
-    case "folders":
-      return { type: "folders", paths: settings.folderPaths };
-    case "files":
-      return { type: "files", paths: settings.filePaths };
+      return { type: "vault", ignored: settings.ignoredPaths };
+    case "paths":
+      return { type: "paths", included: settings.scopePaths };
   }
 }
 
-interface LegacyTaskScope {
-  type: ScopeType;
-  paths?: string[];
+type LegacyScopeType = "vault" | "folders" | "files";
+
+/** Scope fields as they sit in a data.json written before the lists merged. */
+interface LegacyScopeFields {
+  taskScope?: { type: LegacyScopeType; paths?: string[] };
+  scopeType?: LegacyScopeType | ScopeType;
+  folderPaths?: string[];
+  filePaths?: string[];
 }
 
 /**
- * Normalizes raw loaded plugin data. Three migrations live here:
- * the pre-persistence `taskScope: {type, paths}` object is split into
- * scopeType/folderPaths/filePaths (seeded once, without losing the user's
- * existing selections), the removed `readTasksPlugin` field is dropped —
- * 📅/✅ parsing and due-date auto-assign are unconditional now — and an install
- * that predates `planBy` is pinned to "due-only" — DEFAULT_SETTINGS ships
- * "scheduled-first", which would rearrange the board of every existing user
- * with a ⏳ anywhere. Reaching this function at all means a data.json existed,
- * which is exactly the "existing install" test.
+ * Normalizes raw loaded plugin data. Four migrations live here, and the two
+ * scope ones run in sequence so a data.json old enough to need both is carried
+ * all the way forward in a single load:
+ *
+ * 1. The pre-persistence `taskScope: {type, paths}` object splits into
+ *    scopeType plus the two typed path lists.
+ * 2. Those two lists merge into one `scopePaths` list of typed entries, and
+ *    the "folders"/"files" scope types collapse into "paths".
+ * 3. The removed `readTasksPlugin` field is dropped — 📅/✅ parsing and
+ *    due-date auto-assign are unconditional now.
+ * 4. An install that predates `planBy` is pinned to "due-only" —
+ *    DEFAULT_SETTINGS ships "scheduled-first", which would rearrange the board
+ *    of every existing user with a ⏳ anywhere. Reaching this function at all
+ *    means a data.json existed, which is exactly the "existing install" test.
  */
 export function migrateSettingsData(raw: unknown): Partial<PluginSettings> {
   if (!raw || typeof raw !== "object") return {};
-  const data = { ...(raw as Record<string, unknown> & { taskScope?: LegacyTaskScope }) };
+  const data = { ...(raw as Record<string, unknown> & LegacyScopeFields) };
   delete data.readTasksPlugin;
 
   if (data.planBy === undefined) data.planBy = "due-only";
 
-  if (!data.taskScope || "scopeType" in data) return data as Partial<PluginSettings>;
+  if (data.taskScope && !("scopeType" in data)) {
+    const { taskScope } = data;
+    delete data.taskScope;
+    data.scopeType = taskScope.type;
+    if (taskScope.type === "folders") data.folderPaths = taskScope.paths ?? [];
+    if (taskScope.type === "files") data.filePaths = taskScope.paths ?? [];
+  }
 
-  const { taskScope, ...rest } = data;
-  const migrated: Partial<PluginSettings> = { ...rest, scopeType: taskScope.type };
-  if (taskScope.type === "folders") migrated.folderPaths = taskScope.paths ?? [];
-  if (taskScope.type === "files") migrated.filePaths = taskScope.paths ?? [];
-  return migrated;
+  // Keyed on the legacy scopeType rather than on scopePaths being absent: only
+  // a pre-merge data.json can say "folders" or "files", so the branch cannot
+  // fire twice, and a stale scopePaths left behind by a newer build cannot
+  // suppress a migration that still needs to happen.
+  //
+  // Only the list belonging to the mode that was actually active carries over.
+  // Merging both would hand a "specific files" user the folders they had parked
+  // in the other list, widening what gets scanned without them asking.
+  const active = data.scopeType;
+  if (active === "folders" || active === "files") {
+    const type = active === "folders" ? "folder" : "file";
+    const paths = (active === "folders" ? data.folderPaths : data.filePaths) ?? [];
+    data.scopeType = "paths";
+    data.scopePaths = paths.map((path) => ({ type, path }));
+  }
+  delete data.folderPaths;
+  delete data.filePaths;
+
+  return data as Partial<PluginSettings>;
 }
 
 function sameRule(a: DateRangeRule | null, b: DateRangeRule | null): boolean {
@@ -332,9 +367,19 @@ export function shouldRecommendCatchAll(buckets: BucketConfig[]): boolean {
   return last !== undefined && last.dateRangeRule === null && !shouldAdoptCatchAll(buckets);
 }
 
+/** Drops anything in a stored path list that is not a well-formed PathEntry. */
+function normalizePathEntries(raw: unknown): PathEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((entry): entry is PathEntry => {
+    if (!entry || typeof entry !== "object") return false;
+    const { type, path } = entry as Partial<PathEntry>;
+    return (type === "folder" || type === "file") && typeof path === "string";
+  });
+}
+
 /**
  * Guards the shapes the rest of the code assumes taskOrder/completionSeen/
- * folderPaths/filePaths hold, once loadSettings() has merged raw data.json
+ * scopePaths/ignoredPaths hold, once loadSettings() has merged raw data.json
  * onto DEFAULT_SETTINGS. A hand-edited or corrupted data.json can put any
  * JSON value under these keys (e.g. a bucket's taskOrder value being a
  * number instead of an array), which would otherwise throw deep inside
@@ -382,19 +427,29 @@ export function normalizeSettingsShapes(settings: PluginSettings): PluginSetting
     orderKeyScheme:
       scheme !== null && knownSchemes.includes(scheme) ? scheme : null,
     weekStartsOn: WEEK_STARTS.includes(weekStart) ? weekStart : "monday",
-    folderPaths: Array.isArray(settings.folderPaths) ? settings.folderPaths : [],
-    filePaths: Array.isArray(settings.filePaths) ? settings.filePaths : [],
+    scopePaths: normalizePathEntries(settings.scopePaths),
+    ignoredPaths: normalizePathEntries(settings.ignoredPaths),
   };
+}
+
+/**
+ * Whether `path` matches one scope or exclusion entry. A folder entry covers
+ * everything beneath it but not a sibling that merely shares its prefix
+ * ("Tasks" must not swallow "TasksArchive/a.md"); a file entry covers only
+ * itself.
+ */
+export function matchesEntry(path: string, entry: PathEntry): boolean {
+  if (entry.type === "file") return path === entry.path;
+  const prefix = entry.path.endsWith("/") ? entry.path : entry.path + "/";
+  return path.startsWith(prefix);
 }
 
 /** Whether `path` falls inside `scope`. Extension filtering is the caller's job. */
 export function isPathInScope(path: string, scope: TaskScope): boolean {
   switch (scope.type) {
     case "vault":
-      return true;
-    case "folders":
-      return scope.paths.some((p) => path.startsWith(p.endsWith("/") ? p : p + "/"));
-    case "files":
-      return scope.paths.includes(path);
+      return !scope.ignored.some((entry) => matchesEntry(path, entry));
+    case "paths":
+      return scope.included.some((entry) => matchesEntry(path, entry));
   }
 }

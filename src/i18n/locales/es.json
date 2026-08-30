@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "Archivos a escanear",
-      "description": "Qué archivos busca el plugin para encontrar tareas.",
-      "entireVault": "Bóveda completa",
-      "specificFolders": "Carpetas específicas",
-      "specificFiles": "Archivos específicos",
+      "entireVault": "Bóveda completa, excepto…",
+      "selectedPaths": "Solo rutas seleccionadas",
+      "descriptionVault": "Escanea todos los archivos markdown de la bóveda, excepto las carpetas y archivos que indiques abajo.",
+      "descriptionPaths": "Escanea solo las carpetas y archivos que indiques abajo.",
       "addFolder": "+ Añadir carpeta",
       "addFile": "+ Añadir archivo",
+      "excludeFolder": "+ Excluir carpeta",
+      "excludeFile": "+ Excluir archivo",
       "folderPlaceholder": "ej. Tareas",
       "filePlaceholder": "ej. Tareas/inbox.md",
-      "noFoldersSelected": "No hay carpetas seleccionadas. El plugin no buscará tareas.",
-      "noFilesSelected": "No hay archivos seleccionados. El plugin no buscará tareas."
+      "noPathsSelected": "No hay rutas seleccionadas. El plugin no buscará tareas.",
+      "folderNotFound": "Carpeta no encontrada",
+      "fileNotFound": "Archivo no encontrado"
     },
     "behaviour": {
       "heading": "Comportamiento",

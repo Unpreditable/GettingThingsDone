@@ -88,16 +88,19 @@
     },
     "filesToScan": {
       "name": "",
-      "description": "",
       "entireVault": "",
-      "specificFolders": "",
-      "specificFiles": "",
+      "selectedPaths": "",
+      "descriptionVault": "",
+      "descriptionPaths": "",
       "addFolder": "",
       "addFile": "",
+      "excludeFolder": "",
+      "excludeFile": "",
       "folderPlaceholder": "",
       "filePlaceholder": "",
-      "noFoldersSelected": "",
-      "noFilesSelected": ""
+      "noPathsSelected": "",
+      "folderNotFound": "",
+      "fileNotFound": ""
     },
     "behaviour": {
       "heading": "",

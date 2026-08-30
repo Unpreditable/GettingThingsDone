@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "Fichiers à analyser",
-      "description": "Quels fichiers le plugin recherche pour les tâches.",
-      "entireVault": "Coffre entier",
-      "specificFolders": "Dossiers spécifiques",
-      "specificFiles": "Fichiers spécifiques",
+      "entireVault": "Coffre entier, sauf…",
+      "selectedPaths": "Chemins sélectionnés uniquement",
+      "descriptionVault": "Analyse tous les fichiers markdown du coffre, sauf les dossiers et fichiers listés ci-dessous.",
+      "descriptionPaths": "Analyse uniquement les dossiers et fichiers listés ci-dessous.",
       "addFolder": "+ Ajouter un dossier",
       "addFile": "+ Ajouter un fichier",
+      "excludeFolder": "+ Exclure un dossier",
+      "excludeFile": "+ Exclure un fichier",
       "folderPlaceholder": "ex. Tâches",
       "filePlaceholder": "ex. Tâches/inbox.md",
-      "noFoldersSelected": "Aucun dossier sélectionné. Le plugin ne recherchera aucune tâche.",
-      "noFilesSelected": "Aucun fichier sélectionné. Le plugin ne recherchera aucune tâche."
+      "noPathsSelected": "Aucun chemin sélectionné. Le plugin ne recherchera aucune tâche.",
+      "folderNotFound": "Dossier introuvable",
+      "fileNotFound": "Fichier introuvable"
     },
     "behaviour": {
       "heading": "Comportement",

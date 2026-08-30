@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "Ficheiros a analisar",
-      "description": "Quais os ficheiros que o plugin pesquisa para encontrar tarefas.",
-      "entireVault": "Cofre completo",
-      "specificFolders": "Pastas específicas",
-      "specificFiles": "Ficheiros específicos",
+      "entireVault": "Cofre completo, exceto…",
+      "selectedPaths": "Apenas caminhos selecionados",
+      "descriptionVault": "Analisa todos os ficheiros markdown do cofre, exceto as pastas e ficheiros indicados abaixo.",
+      "descriptionPaths": "Analisa apenas as pastas e ficheiros indicados abaixo.",
       "addFolder": "+ Adicionar pasta",
       "addFile": "+ Adicionar ficheiro",
+      "excludeFolder": "+ Excluir pasta",
+      "excludeFile": "+ Excluir ficheiro",
       "folderPlaceholder": "ex. Tarefas",
       "filePlaceholder": "ex. Tarefas/inbox.md",
-      "noFoldersSelected": "Nenhuma pasta selecionada. O plugin não irá procurar tarefas.",
-      "noFilesSelected": "Nenhum ficheiro selecionado. O plugin não irá procurar tarefas."
+      "noPathsSelected": "Nenhum caminho selecionado. O plugin não irá procurar tarefas.",
+      "folderNotFound": "Pasta não encontrada",
+      "fileNotFound": "Ficheiro não encontrado"
     },
     "behaviour": {
       "heading": "Comportamento",

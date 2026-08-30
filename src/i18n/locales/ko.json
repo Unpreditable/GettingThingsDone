@@ -117,16 +117,19 @@
     },
     "filesToScan": {
       "name": "검색할 파일",
-      "description": "플러그인이 작업을 검색하는 파일.",
-      "entireVault": "전체 볼트",
-      "specificFolders": "특정 폴더",
-      "specificFiles": "특정 파일",
+      "entireVault": "전체 볼트(아래 제외)",
+      "selectedPaths": "선택한 경로만",
+      "descriptionVault": "아래 나열된 폴더와 파일을 제외한 볼트의 모든 마크다운 파일을 검색합니다.",
+      "descriptionPaths": "아래 나열된 폴더와 파일만 검색합니다.",
       "addFolder": "+ 폴더 추가",
       "addFile": "+ 파일 추가",
+      "excludeFolder": "+ 폴더 제외",
+      "excludeFile": "+ 파일 제외",
       "folderPlaceholder": "예: Tasks",
       "filePlaceholder": "예: Tasks/inbox.md",
-      "noFoldersSelected": "선택된 폴더가 없습니다. 플러그인이 작업을 검색하지 않습니다.",
-      "noFilesSelected": "선택된 파일이 없습니다. 플러그인이 작업을 검색하지 않습니다."
+      "noPathsSelected": "선택된 경로가 없습니다. 플러그인이 작업을 검색하지 않습니다.",
+      "folderNotFound": "폴더를 찾을 수 없음",
+      "fileNotFound": "파일을 찾을 수 없음"
     },
     "behaviour": {
       "heading": "동작",

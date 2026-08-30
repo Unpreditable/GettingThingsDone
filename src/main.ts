@@ -103,10 +103,16 @@ export default class GtdTasksPlugin extends Plugin {
         this.applyOrderState(renamed.state);
         this.orderStateDirty = true;
       }
-      const idx = this.settings.filePaths.indexOf(oldPath);
-      if (idx !== -1) {
-        this.settings.filePaths[idx] = newPath;
-        this.orderStateDirty = true;
+      // Obsidian fires this once per markdown file, so only file entries can be
+      // repaired here: renaming a folder arrives as one event per child and
+      // never carries the folder's own old path.
+      for (const list of [this.settings.scopePaths, this.settings.ignoredPaths]) {
+        for (const entry of list) {
+          if (entry.type === "file" && entry.path === oldPath) {
+            entry.path = newPath;
+            this.orderStateDirty = true;
+          }
+        }
       }
     });
 
@@ -166,7 +172,7 @@ export default class GtdTasksPlugin extends Plugin {
       this.settings.buckets = DEFAULT_BUCKETS.map((b) => ({ ...b }));
     }
     // Trust boundary for raw data.json: guarantees taskOrder/completionSeen/
-    // folderPaths/filePaths hold the shapes every downstream consumer
+    // scopePaths/ignoredPaths hold the shapes every downstream consumer
     // assumes, even if the file was hand-edited or corrupted.
     this.settings = normalizeSettingsShapes(this.settings);
     // Always start a session with no witnessed completions, discarding any

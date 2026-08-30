@@ -125,16 +125,19 @@
     },
     "filesToScan": {
       "name": "Файлы для сканирования",
-      "description": "Файлы, в которых плагин ищет задачи.",
-      "entireVault": "Всё хранилище",
-      "specificFolders": "Определённые папки",
-      "specificFiles": "Определённые файлы",
+      "entireVault": "Всё хранилище, кроме…",
+      "selectedPaths": "Только выбранные пути",
+      "descriptionVault": "Сканирует все markdown-файлы хранилища, кроме папок и файлов, указанных ниже.",
+      "descriptionPaths": "Сканирует только папки и файлы, указанные ниже.",
       "addFolder": "+ Добавить папку",
       "addFile": "+ Добавить файл",
+      "excludeFolder": "+ Исключить папку",
+      "excludeFile": "+ Исключить файл",
       "folderPlaceholder": "напр. Задачи",
       "filePlaceholder": "напр. Задачи/inbox.md",
-      "noFoldersSelected": "Папки не выбраны. Плагин не будет искать задачи.",
-      "noFilesSelected": "Файлы не выбраны. Плагин не будет искать задачи."
+      "noPathsSelected": "Пути не выбраны. Плагин не будет искать задачи.",
+      "folderNotFound": "Папка не найдена",
+      "fileNotFound": "Файл не найден"
     },
     "behaviour": {
       "heading": "Поведение",
