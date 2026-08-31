@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Esta data determina a categoria",
     "subtaskTooltip": "Subtarefa",
+    "subtaskOf": "Subtarefa de: {{text}}",
+    "subtaskOfInBucket": "Subtarefa de: {{text}} (em {{bucket}})",
+    "subtaskOfCompleted": "Subtarefa de: {{text}} (concluída)",
     "activeSubtasks_one": "{{count}} subtarefa ativa",
     "activeSubtasks_other": "{{count}} subtarefas ativas",
     "dismiss": "Dispensar",

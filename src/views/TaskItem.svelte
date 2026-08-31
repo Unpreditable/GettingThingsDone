@@ -9,6 +9,7 @@
   import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
   import { formatTasksFields } from "../core/TasksFieldText";
+  import { placeRow } from "../core/RowPlacement";
   import { icon } from "./icon";
 
   export let task: TaskRecord;
@@ -54,6 +55,8 @@
   export let showCompleted: boolean = false;
   export let allTasksMap: Map<string, TaskRecord> = new Map();
   export let taskBucketMap: Map<string, string> = new Map();
+  /** Ids of the rows this bucket is rendering, which is not every task it holds. */
+  export let visibleIds: ReadonlySet<string> = new Set();
   export let bucketGroups: BucketGroupData[] = [];
   export let currentBucketId: string = "";
 
@@ -64,29 +67,32 @@
     dismiss: { task: TaskRecord };
   }>();
 
+  $: placement = placeRow(task, {
+    allTasks: allTasksMap,
+    taskBucket: taskBucketMap,
+    bucketId: currentBucketId,
+    visibleIds,
+  });
+  $: visualIndentLevel = placement.indentLevel;
+  $: showParentArrow = placement.detachedParent;
+
   $: parentTask = task.parentId ? allTasksMap.get(task.parentId) ?? null : null;
   $: parentBucketId = task.parentId ? (taskBucketMap.get(task.parentId) ?? null) : null;
-  $: showParentArrow = task.parentId !== null && parentBucketId !== currentBucketId;
   $: parentBucketName = (() => {
     if (!parentBucketId) return null;
     const group = bucketGroups.find((g) => g.bucketId === parentBucketId);
     return group ? `${group.emoji} ${group.name}` : null;
   })();
-  $: parentTooltip = parentTask
-    ? `Subtask of: ${parentTask.text}${parentBucketName ? ` (in ${parentBucketName})` : ""}`
-    : null;
-
-  $: visualIndentLevel = (() => {
-    if (!task.parentId) return 0;
-    let level = 0;
-    let cur: TaskRecord | undefined = task;
-    while (cur?.parentId) {
-      const parent = allTasksMap.get(cur.parentId);
-      if (!parent) break;
-      if (taskBucketMap.get(parent.id) === currentBucketId) level++;
-      cur = parent;
+  // Each case is a whole sentence of its own rather than a stem plus a clause:
+  // the parenthetical cannot be translated apart from what it qualifies.
+  $: parentTooltip = (() => {
+    if (!parentTask) return null;
+    const text = parentTask.text;
+    if (parentBucketId !== currentBucketId && parentBucketName) {
+      return t("task.subtaskOfInBucket", { text, bucket: parentBucketName });
     }
-    return level;
+    if (parentTask.isCompleted) return t("task.subtaskOfCompleted", { text });
+    return t("task.subtaskOf", { text });
   })();
 
   $: activeDescendantCount = (() => {

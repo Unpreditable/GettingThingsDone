@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "See kuupäev määrab kategooria",
     "subtaskTooltip": "Alamülesanne",
+    "subtaskOf": "Ülemülesanne: {{text}}",
+    "subtaskOfInBucket": "Ülemülesanne: {{text}} ({{bucket}})",
+    "subtaskOfCompleted": "Ülemülesanne: {{text}} (tehtud)",
     "activeSubtasks_one": "{{count}} aktiivne alamülesanne",
     "activeSubtasks_other": "{{count}} aktiivset alamülesannet",
     "dismiss": "Peida",

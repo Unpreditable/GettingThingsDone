@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "此日期决定分类",
     "subtaskTooltip": "子任务",
+    "subtaskOf": "父任务：{{text}}",
+    "subtaskOfInBucket": "父任务：{{text}}（在 {{bucket}}）",
+    "subtaskOfCompleted": "父任务：{{text}}（已完成）",
     "activeSubtasks_one": "{{count}} 个活跃子任务",
     "activeSubtasks_other": "{{count}} 个活跃子任务",
     "dismiss": "隐藏",

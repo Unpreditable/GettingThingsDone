@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Šis datums nosaka kategoriju",
     "subtaskTooltip": "Apakšuzdevums",
+    "subtaskOf": "Virsuzdevums: {{text}}",
+    "subtaskOfInBucket": "Virsuzdevums: {{text}} ({{bucket}})",
+    "subtaskOfCompleted": "Virsuzdevums: {{text}} (pabeigts)",
     "activeSubtasks_zero": "{{count}} aktīvu apakšuzdevumu",
     "activeSubtasks_one": "{{count}} aktīvs apakšuzdevums",
     "activeSubtasks_other": "{{count}} aktīvi apakšuzdevumi",

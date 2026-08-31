@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Cette date détermine la catégorie",
     "subtaskTooltip": "Sous-tâche",
+    "subtaskOf": "Sous-tâche de : {{text}}",
+    "subtaskOfInBucket": "Sous-tâche de : {{text}} (dans {{bucket}})",
+    "subtaskOfCompleted": "Sous-tâche de : {{text}} (terminée)",
     "activeSubtasks_one": "{{count}} sous-tâche active",
     "activeSubtasks_other": "{{count}} sous-tâches actives",
     "dismiss": "Ignorer",

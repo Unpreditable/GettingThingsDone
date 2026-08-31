@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "이 날짜가 카테고리를 결정합니다",
     "subtaskTooltip": "하위 작업",
+    "subtaskOf": "상위 작업: {{text}}",
+    "subtaskOfInBucket": "상위 작업: {{text}} ({{bucket}}에 있음)",
+    "subtaskOfCompleted": "상위 작업: {{text}} (완료됨)",
     "activeSubtasks_one": "활성 하위 작업 {{count}}개",
     "activeSubtasks_other": "활성 하위 작업 {{count}}개",
     "dismiss": "숨기기",

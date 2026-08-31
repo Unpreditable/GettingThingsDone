@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Эта дата определяет категорию",
     "subtaskTooltip": "Подзадача",
+    "subtaskOf": "Родительская задача: {{text}}",
+    "subtaskOfInBucket": "Родительская задача: {{text}} (в {{bucket}})",
+    "subtaskOfCompleted": "Родительская задача: {{text}} (выполнена)",
     "activeSubtasks_one": "{{count}} активная подзадача",
     "activeSubtasks_few": "{{count}} активные подзадачи",
     "activeSubtasks_many": "{{count}} активных подзадач",

@@ -33,6 +33,9 @@
   },
   "task": {
     "subtaskTooltip": "",
+    "subtaskOf": "",
+    "subtaskOfInBucket": "",
+    "subtaskOfCompleted": "",
     "activeSubtasks_one": "",
     "activeSubtasks_other": "",
     "dismiss": "",

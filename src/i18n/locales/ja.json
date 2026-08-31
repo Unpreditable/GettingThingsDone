@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "この日付がカテゴリを決めます",
     "subtaskTooltip": "サブタスク",
+    "subtaskOf": "親タスク: {{text}}",
+    "subtaskOfInBucket": "親タスク: {{text}}（{{bucket}} 内）",
+    "subtaskOfCompleted": "親タスク: {{text}}（完了済み）",
     "activeSubtasks_one": "アクティブなサブタスク {{count}} 件",
     "activeSubtasks_other": "アクティブなサブタスク {{count}} 件",
     "dismiss": "非表示",

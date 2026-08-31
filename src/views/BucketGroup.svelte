@@ -71,6 +71,7 @@
     if (!showCompletedUntilMidnight) return false;
     return !agedSet.has(t.id);
   });
+  $: visibleIds = new Set(visibleTasks.map((t) => t.id));
   $: activeCount = tasks.filter((t) => !t.isCompleted).length;
   $: totalCount = visibleTasks.length;
 
@@ -359,6 +360,7 @@
           showCompleted={task.isCompleted}
           {allTasksMap}
           {taskBucketMap}
+          {visibleIds}
           {bucketGroups}
           currentBucketId={bucketId}
           on:move={(e) => dispatch("move", e.detail)}

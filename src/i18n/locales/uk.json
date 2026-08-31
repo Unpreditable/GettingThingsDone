@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Ця дата визначає категорію",
     "subtaskTooltip": "Підзавдання",
+    "subtaskOf": "Батьківське завдання: {{text}}",
+    "subtaskOfInBucket": "Батьківське завдання: {{text}} (у {{bucket}})",
+    "subtaskOfCompleted": "Батьківське завдання: {{text}} (виконано)",
     "activeSubtasks_one": "{{count}} активне підзавдання",
     "activeSubtasks_few": "{{count}} активні підзавдання",
     "activeSubtasks_many": "{{count}} активних підзавдань",

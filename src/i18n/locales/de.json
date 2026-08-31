@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Dieses Datum bestimmt die Kategorie",
     "subtaskTooltip": "Unteraufgabe",
+    "subtaskOf": "Unteraufgabe von: {{text}}",
+    "subtaskOfInBucket": "Unteraufgabe von: {{text}} (in {{bucket}})",
+    "subtaskOfCompleted": "Unteraufgabe von: {{text}} (erledigt)",
     "activeSubtasks_one": "{{count}} aktive Unteraufgabe",
     "activeSubtasks_other": "{{count}} aktive Unteraufgaben",
     "dismiss": "Ausblenden",

@@ -42,6 +42,9 @@
   "task": {
     "autoPlacedMarker": "Ši data nustato kategoriją",
     "subtaskTooltip": "Použduotis",
+    "subtaskOf": "Pagrindinė užduotis: {{text}}",
+    "subtaskOfInBucket": "Pagrindinė užduotis: {{text}} ({{bucket}})",
+    "subtaskOfCompleted": "Pagrindinė užduotis: {{text}} (atlikta)",
     "activeSubtasks_one": "{{count}} aktyvi použduotis",
     "activeSubtasks_few": "{{count}} aktyvios použduotys",
     "activeSubtasks_many": "{{count}} aktyvių použduočių",
