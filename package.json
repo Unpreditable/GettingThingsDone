@@ -1,6 +1,6 @@
 {
   "name": "obsidian-gtd-tasks",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "GTD task organizer for Obsidian",
   "main": "main.js",
   "scripts": {
