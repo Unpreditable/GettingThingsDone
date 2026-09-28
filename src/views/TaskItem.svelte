@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { TaskRecord, TaskPriority } from "../core/TaskParser";
-  import { stripWikilinks, parseWikilinks } from "../core/TaskParser";
+  import { stripWikilinks, parseWikilinks, statusSymbol } from "../core/TaskParser";
   import type { BucketConfig, PriorityDisplay } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { DueStatus } from "../core/DueStatus";
@@ -147,16 +147,22 @@
     showTooltip = false;
   }
 
+  // Mirrors how Obsidian renders a task in a note, so theme rules keyed on
+  // `data-task` and `is-checked` style this row too: any symbol but a space
+  // is checked, whether or not it closes the task.
+  $: symbol = statusSymbol(task.rawLine);
+  $: checkboxChecked = symbol !== " ";
+
   /**
    * The file is the source of truth, so undo the browser's own optimistic
    * flip and let the re-render after the write set the real state. Without
    * this the DOM can keep a tick Svelte never clears: `checked` is one-way,
-   * so if this row is reused for a task whose isCompleted is unchanged
+   * so if this row is reused for a task whose checkbox state is unchanged
    * (a 🔁 recurrence puts a NEW open occurrence on the completed task's
    * line), Svelte sees no value change and leaves the user's tick in place.
    */
   function onCheckboxChange(e: Event) {
-    (e.currentTarget as HTMLInputElement).checked = task.isCompleted;
+    (e.currentTarget as HTMLInputElement).checked = checkboxChecked;
     dispatch("toggle", { task });
   }
 
@@ -183,8 +189,10 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="gtd-task"
+  class="gtd-task task-list-item"
+  class:is-checked={checkboxChecked}
   class:is-completed={task.isCompleted && showCompleted}
+  data-task={symbol}
   style="padding-left: {12 + visualIndentLevel * 16}px"
   on:mouseenter={onMouseEnter}
   on:mouseleave={onMouseLeave}
@@ -196,8 +204,9 @@
 >
   <input
     type="checkbox"
-    class="gtd-task-checkbox"
-    checked={task.isCompleted}
+    class="gtd-task-checkbox task-list-item-checkbox"
+    data-task={symbol}
+    checked={checkboxChecked}
     on:change={onCheckboxChange}
   />
 

@@ -41,7 +41,21 @@ export interface TaskRecord {
   childIds: string[];
 }
 
-const TASK_REGEX = /^(\s*[-*+]|\s*\d+[.)]) \[([ xX])\] (.*)$/;
+/**
+ * Checkbox symbols read as tasks: open are space, Tasks' default in-progress
+ * (/), and the forwarded (>) and scheduled (<) that themes draw icons for;
+ * closed are done (x, X) and cancelled (-). Any other symbol is not a task.
+ */
+const TASK_REGEX = /^(\s*[-*+]|\s*\d+[.)]) \[([ xX/><-])\] (.*)$/;
+const CLOSED_SYMBOLS = "xX-";
+/** The checkbox of a task line, with the list marker before it. */
+export const CHECKBOX_REGEX = /^(\s*(?:[-*+]|\d+[.)]) )\[(.)\]/;
+
+/** The character inside a task line's checkbox, e.g. "/" for `- [/] …`. */
+export function statusSymbol(rawLine: string): string {
+  return rawLine.match(CHECKBOX_REGEX)?.[2] ?? " ";
+}
+
 const LIST_ITEM_REGEX = /^(\s*)(?:[-*+]|\d+[.)]) /;
 
 function escapeRegExp(s: string): string {
@@ -74,7 +88,7 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
     const checkMark = match[2];
     const rawRest = match[3];
 
-    const isCompleted = checkMark === "x" || checkMark === "X";
+    const isCompleted = CLOSED_SYMBOLS.includes(checkMark);
     // One scan per line: parseDueDate/parseCompletionDate each used to run
     // their own regex over the same string, and stripMetadata a third set.
     // Scanned first, and handed to the Tasks scanner as holes: a free-text

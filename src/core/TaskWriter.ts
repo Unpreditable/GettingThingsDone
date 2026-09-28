@@ -1,7 +1,7 @@
 import { App, TFile, Notice } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
-import { setTagValue, setInlineFieldValue } from "./TaskParser";
+import { setTagValue, setInlineFieldValue, CHECKBOX_REGEX } from "./TaskParser";
 
 export interface MoveResult {
   success: boolean;
@@ -49,12 +49,13 @@ export function toggleTaskLine(
   if (isCompleted) {
     return [
       rawLine
-        .replace(/\[[ xX]\]/, "[ ]")
+        .replace(CHECKBOX_REGEX, "$1[ ]")
         .replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "")
+        .replace(/\s*❌\s*\d{4}-\d{2}-\d{2}/, "")
         .trimEnd(),
     ];
   }
-  return [rawLine.replace(/\[ \]/, "[x]")];
+  return [rawLine.replace(CHECKBOX_REGEX, "$1[x]")];
 }
 
 /**

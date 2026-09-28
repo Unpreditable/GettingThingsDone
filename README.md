@@ -44,6 +44,8 @@ Pin a task (via the right-click menu, a quick-move button, or dragging it to ano
 
 Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin's recurrence and completion-date setting.
 
+The panel also recognises the checkbox statuses that Tasks and many themes use. `[/]` (in progress), `[>]` (forwarded) and `[<]` (scheduled) are open tasks. `[-]` (cancelled) counts as done. If your theme draws its own icons for these, the panel shows them too. Other symbols, such as `[?]` or `[l]`, aren't treated as tasks.
+
 > **As of v0.2.0,** panel completions don't write a `✅` date. Install [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) if you want one.
 
 ---

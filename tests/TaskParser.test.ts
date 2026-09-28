@@ -18,6 +18,23 @@ describe("parseFile", () => {
     expect(tasks[1].isCompleted).toBe(true);
   });
 
+  it("parses in-progress, forwarded and scheduled tasks as open", () => {
+    const content = "- [/] Started\n- [>] Forwarded\n- [<] Scheduled";
+    const tasks = parseFile("test.md", content);
+    expect(tasks).toHaveLength(3);
+    expect(tasks.every((t) => !t.isCompleted)).toBe(true);
+  });
+
+  it("parses cancelled tasks as completed", () => {
+    const tasks = parseFile("test.md", "- [-] Dropped");
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].isCompleted).toBe(true);
+  });
+
+  it("ignores checkbox symbols it doesn't know", () => {
+    expect(parseFile("test.md", "- [l] Location\n- [?] Question")).toHaveLength(0);
+  });
+
   it("ignores non-task lines", () => {
     const content = "# Header\nSome paragraph\n- [ ] Real task\n- Not a task";
     const tasks = parseFile("test.md", content);

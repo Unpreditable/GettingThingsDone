@@ -208,6 +208,26 @@ describe("toggleTaskLine", () => {
     expect(toggleTaskLine("- [ ] Test task", "test.md", false, null)).toEqual(["- [x] Test task"]);
   });
 
+  it("completes an in-progress task when Tasks is absent", () => {
+    expect(toggleTaskLine("- [/] Test task", "test.md", false, null)).toEqual(["- [x] Test task"]);
+  });
+
+  it("reopens a cancelled task when Tasks is absent", () => {
+    expect(toggleTaskLine("- [-] Test task", "test.md", true, null)).toEqual(["- [ ] Test task"]);
+  });
+
+  it("strips an existing ❌ date on reopen when Tasks is absent", () => {
+    expect(toggleTaskLine("- [-] Test task ❌ 2026-09-27 #gtd/today", "test.md", true, null)).toEqual([
+      "- [ ] Test task #gtd/today",
+    ]);
+  });
+
+  it("only rewrites the checkbox, not a later bracket that looks like one", () => {
+    expect(toggleTaskLine("- [/] Compare [ ] and [x]", "test.md", false, null)).toEqual([
+      "- [x] Compare [ ] and [x]",
+    ]);
+  });
+
   it("clears the checkbox and strips an existing ✅ date on reopen when Tasks is absent", () => {
     expect(toggleTaskLine("- [x] Test task ✅ 2026-08-02", "test.md", true, null)).toEqual([
       "- [ ] Test task",
