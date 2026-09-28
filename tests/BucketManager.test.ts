@@ -3,7 +3,6 @@ import { DEFAULT_SETTINGS, DEFAULT_BUCKETS } from "../src/settings";
 import type { PlanBy } from "../src/settings";
 import type { TaskRecord } from "../src/core/TaskParser";
 import { computeOrderKeys, entryId } from "../src/core/TaskOrder";
-import type { OrderEntry } from "../src/core/TaskOrder";
 
 // Use a fixed Monday so calendar-aware week boundaries are predictable
 const FIXED_MONDAY = new Date("2026-02-23T00:00:00"); // Monday Feb 23, 2026
@@ -656,54 +655,6 @@ describe("regroupByHierarchy", () => {
     const result = regroupByHierarchy([parentA, parentB, childA, childB]);
 
     expect(result.map((t) => t.id)).toEqual(["pa", "ca", "pb", "cb"]);
-  });
-});
-
-describe("groupTasksIntoBuckets performance", () => {
-  it("stays fast with thousands of tasks in one large, long-lived file", () => {
-    // Models a single daily-note-style file accumulating tasks over months —
-    // the scenario where a per-refresh cost that scales with total task
-    // count (not file count) would actually be felt.
-    const taskCount = 5000;
-    const tasks: TaskRecord[] = [];
-
-    for (let i = 0; i < taskCount; i++) {
-      const isParent = i % 20 === 0;
-      const isChild = i % 20 === 1;
-      tasks.push(
-        makeTask({
-          id: `t${i}`,
-          filePath: "big-daily-note.md",
-          lineNumber: i,
-          text: `Task ${i}`,
-          isCompleted: i % 3 === 0,
-          parentId: isChild ? `t${i - 1}` : null,
-          childIds: isParent ? [`t${i + 1}`] : [],
-        })
-      );
-    }
-
-    const bigSettings = {
-      ...DEFAULT_SETTINGS,
-      buckets: DEFAULT_BUCKETS,
-      taskOrder: {} as Record<string, OrderEntry[]>,
-    };
-    const orderKeys = computeOrderKeys(tasks, "due-only");
-    // A long-lived file accumulates a large manual order over months of use.
-    bigSettings.taskOrder[TO_REVIEW_ID] = tasks
-      .slice(0, 1000)
-      .map((t) => orderKeys.get(t.id)!)
-      .reverse();
-
-    const start = performance.now();
-    const result = groupTasksIntoBuckets(tasks, bigSettings);
-    const elapsed = performance.now() - start;
-
-    expect(result.find((g) => g.bucketId === TO_REVIEW_ID)?.tasks.length).toBe(taskCount);
-    // Generous threshold — this guards against an accidental quadratic-time
-    // regression (e.g. an O(n^2) lookup creeping into regroupByHierarchy or
-    // applyManualOrder), not a tight budget tuned to one specific machine.
-    expect(elapsed).toBeLessThan(500);
   });
 });
 

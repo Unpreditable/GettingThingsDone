@@ -8,9 +8,10 @@
     "validate-translations": "node scripts/validate-translations.mjs",
     "check-icons": "node scripts/check-icons.mjs",
     "build": "tsc -noEmit -skipLibCheck && npm run lint && node esbuild.config.mjs production",
-    "release-check": "npm run validate-translations && npm run build && npm test",
+    "release-check": "npm run validate-translations && npm run build && npm test && npm run test:perf",
     "lint": "eslint src/",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "test:perf": "jest --config jest.perf.config.js --runInBand"
   },
   "keywords": [],
   "author": "Vitaly Ditman",

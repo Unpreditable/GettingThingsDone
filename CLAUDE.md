@@ -27,6 +27,8 @@ npm run dev       # esbuild watch mode (rebuilds on save — use with Hot Reload
 npm run build     # TypeScript check + production bundle → main.js
 npm test          # Jest unit tests (pure logic only, no Obsidian API)
 npm test -- --testPathPattern=BucketManager  # run a single test file
+npm run test:perf # wall-clock tests in tests/perf, run serially on their own
+npm run release-check  # translations + build + npm test + test:perf
 ```
 
 **During development**: symlink this folder into `<vault>/.obsidian/plugins/gtd-tasks/` and install the [Hot Reload](https://github.com/pjeby/hot-reload) community plugin. With `npm run dev` running, any source change auto-reloads the plugin without restarting Obsidian.
@@ -90,6 +92,12 @@ Migration between modes via the settings tab.
 ### Tests
 
 Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, `BucketManager`, `TaskWriter`, and `StorageMigrator` — pure logic with no Obsidian API dependency. The mock at `tests/__mocks__/obsidian.ts` stubs the `obsidian` module for Jest.
+
+Timing tests live in `tests/perf/` and are excluded from `npm test`: run in parallel with the
+other suites they fail on CPU load, not on real regressions. `npm run test:perf` runs them alone
+via `jest.perf.config.js`. Prefer a growth-ratio assertion (time at N vs. time at k·N) over an
+absolute budget, and calibrate it by temporarily injecting an O(n²) loop and confirming the test
+fails — a 2× step was too small to catch one in `BucketManager.perf.test.ts`.
 
 ## CSS rules
 
