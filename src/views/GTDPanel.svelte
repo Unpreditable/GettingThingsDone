@@ -29,6 +29,9 @@
   ) => Promise<void>;
   export let onToggle: (task: TaskRecord) => Promise<void>;
   export let onNavigate: (task: TaskRecord) => void;
+  /** Asked each time the menu opens, since Tasks can be enabled or disabled while the panel is up. */
+  export let canEditTask: () => boolean;
+  export let onEdit: (task: TaskRecord) => void;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onOpenSettings: () => void;
   export let onDismissLanguageBanner: () => void;
@@ -190,6 +193,13 @@
     const currentBucketId = taskBucketMap.get(task.id) ?? TO_REVIEW_ID;
     const autoTarget = autoBucketFor(task, settings);
 
+    let topSection = false;
+
+    if (canEditTask()) {
+      menu.addItem((item) => item.setTitle(t("panel.contextMenu.editTask")).onClick(() => onEdit(task)));
+      topSection = true;
+    }
+
     if (hasExplicitAssignment(task)) {
       if (autoTarget) {
         // The arrow promises the task will land elsewhere, so it is dropped when
@@ -199,7 +209,7 @@
             ? t("panel.contextMenu.unpinHere")
             : t("panel.contextMenu.unpin", { name: autoTarget.name });
         menu.addItem((item) => item.setTitle(title).setIcon("pin-off").onClick(() => onMove(task, null)));
-        menu.addSeparator();
+        topSection = true;
       }
     } else {
       const here = bucketConfigMap.get(currentBucketId);
@@ -210,9 +220,11 @@
             .setIcon("pin")
             .onClick(() => onMove(task, here.id))
         );
-        menu.addSeparator();
+        topSection = true;
       }
     }
+
+    if (topSection) menu.addSeparator();
 
     for (const bucket of settings.buckets) {
       const b = bucket;

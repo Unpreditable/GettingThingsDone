@@ -64,6 +64,39 @@ export function diffFileTasks(
   return diff;
 }
 
+/**
+ * The diff for a known edit: the line at `lineIdx` in `before` was replaced
+ * by `lineCount` lines starting at the same index in `after`. No pairing
+ * heuristic is needed, because the caller knows which line became which.
+ * When a recurring task is completed the edit returns several lines, and the
+ * open occurrence inherits the position, which matches what a checkbox
+ * toggle does with Tasks' default "new occurrence above".
+ */
+export function diffForEdit(
+  before: TaskRecord[],
+  after: TaskRecord[],
+  lineIdx: number,
+  lineCount: number,
+  scheme: OrderKeyScheme
+): TaskDiff {
+  const diff: TaskDiff = { rekeys: [], completed: [], reopened: [] };
+
+  const oldTask = before.find((t) => t.lineNumber === lineIdx);
+  const replacements = after.filter(
+    (t) => t.lineNumber >= lineIdx && t.lineNumber < lineIdx + lineCount
+  );
+  const heir = replacements.find((t) => !t.isCompleted) ?? replacements[0];
+  if (!oldTask || !heir) return diff;
+
+  const oldKey = computeOrderKeys(before, scheme).get(oldTask.id)?.key;
+  const newKey = computeOrderKeys(after, scheme).get(heir.id)?.key;
+  if (oldKey === undefined || newKey === undefined) return diff;
+
+  if (oldKey !== newKey) diff.rekeys.push({ from: oldKey, to: newKey });
+  recordCompletion(diff, oldTask, heir, newKey);
+  return diff;
+}
+
 function keyTasks(tasks: TaskRecord[], scheme: OrderKeyScheme): Map<string, TaskRecord> {
   const entries = computeOrderKeys(tasks, scheme);
   const result = new Map<string, TaskRecord>();

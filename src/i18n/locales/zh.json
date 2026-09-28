@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "移动到：{{name}}",
+      "editTask": "编辑任务",
       "openFile": "打开文件",
       "pinTo": "固定到 {{name}}",
       "unpin": "取消固定（→ {{name}}）",
@@ -85,6 +86,7 @@
   "notices": {
     "moveFailed": "GTD Tasks：移动失败——{{error}}",
     "toggleFailed": "GTD Tasks：切换失败——{{error}}",
+    "editFailed": "GTD Tasks：编辑失败——{{error}}",
     "confirmFailed": "GTD Tasks：确认失败——{{error}}",
     "migrationComplete": "GTD Tasks：迁移完成。已更新 {{migrated}} 个任务，跳过 {{failed}} 个。"
   },

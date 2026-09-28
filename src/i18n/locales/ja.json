@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "移動先: {{name}}",
+      "editTask": "タスクを編集",
       "openFile": "ファイルを開く",
       "pinTo": "{{name}} に固定",
       "unpin": "固定を解除（→ {{name}}）",
@@ -85,6 +86,7 @@
   "notices": {
     "moveFailed": "GTD Tasks: 移動に失敗しました — {{error}}",
     "toggleFailed": "GTD Tasks: 切り替えに失敗しました — {{error}}",
+    "editFailed": "GTD Tasks: 編集に失敗しました — {{error}}",
     "confirmFailed": "GTD Tasks: 確認に失敗しました — {{error}}",
     "migrationComplete": "GTD Tasks: 移行完了。{{migrated}}件更新、{{failed}}件スキップ。"
   },

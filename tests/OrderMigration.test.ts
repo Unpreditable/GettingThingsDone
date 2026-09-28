@@ -1,6 +1,7 @@
-import { diffFileTasks, applyTaskDiff, renameFileInState, migrateOrderFormat } from "../src/core/OrderMigration";
+import { diffFileTasks, diffForEdit, applyTaskDiff, renameFileInState, migrateOrderFormat } from "../src/core/OrderMigration";
 import type { OrderState } from "../src/core/OrderMigration";
 import { computeOrderKeys, computeLegacyOrderKeys } from "../src/core/TaskOrder";
+import { parseFile } from "../src/core/TaskParser";
 import type { TaskRecord } from "../src/core/TaskParser";
 
 function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
@@ -427,5 +428,84 @@ describe("migrateOrderFormat", () => {
   it("preserves empty buckets", () => {
     const { taskOrder } = migrateOrderFormat({ today: [], someday: [] }, tasks, "due-only");
     expect(taskOrder).toEqual({ today: [], someday: [] });
+  });
+});
+
+describe("diffForEdit", () => {
+  const keyAt = (tasks: TaskRecord[], line: number) =>
+    computeOrderKeys(tasks, "due-only").get(tasks.find((t) => t.lineNumber === line)!.id)!.key;
+
+  it("rekeys an edited line from its old key to its new one", () => {
+    const before = parseFile("a.md", "- [ ] First\n- [ ] Buy milk\n- [ ] Last");
+    const after = parseFile("a.md", "- [ ] First\n- [ ] Buy oat milk 📅 2026-10-01\n- [ ] Last");
+
+    expect(diffForEdit(before, after, 1, 1, "due-only")).toEqual({
+      rekeys: [{ from: keyAt(before, 1), to: keyAt(after, 1) }],
+      completed: [],
+      reopened: [],
+    });
+  });
+
+  it("records a completion made in the modal", () => {
+    const before = parseFile("a.md", "- [ ] Buy milk");
+    const after = parseFile("a.md", "- [x] Buy milk ✅ 2026-09-27");
+
+    const diff = diffForEdit(before, after, 0, 1, "due-only");
+
+    expect(diff.completed).toEqual([keyAt(after, 0)]);
+    expect(diff.reopened).toEqual([]);
+  });
+
+  it("records a reopen made in the modal", () => {
+    const before = parseFile("a.md", "- [x] Buy milk ✅ 2026-09-27");
+    const after = parseFile("a.md", "- [ ] Buy milk");
+
+    expect(diffForEdit(before, after, 0, 1, "due-only").reopened).toEqual([keyAt(after, 0)]);
+  });
+
+  it("hands the position to the open occurrence when it comes back above the completed one", () => {
+    const before = parseFile("a.md", "- [ ] Water plants 🔁 every week 📅 2026-09-24");
+    const after = parseFile(
+      "a.md",
+      "- [ ] Water plants 🔁 every week 📅 2026-10-01\n- [x] Water plants 🔁 every week 📅 2026-09-24 ✅ 2026-09-27"
+    );
+
+    expect(diffForEdit(before, after, 0, 2, "due-only")).toEqual({
+      rekeys: [{ from: keyAt(before, 0), to: keyAt(after, 0) }],
+      completed: [],
+      reopened: [],
+    });
+  });
+
+  it("hands the position to the open occurrence when it comes back below the completed one", () => {
+    const before = parseFile("a.md", "- [ ] Water plants 🔁 every week 📅 2026-09-24");
+    const after = parseFile(
+      "a.md",
+      "- [x] Water plants 🔁 every week 📅 2026-09-24 ✅ 2026-09-27\n- [ ] Water plants 🔁 every week 📅 2026-10-01"
+    );
+
+    expect(diffForEdit(before, after, 0, 2, "due-only").rekeys).toEqual([
+      { from: keyAt(before, 0), to: keyAt(after, 1) },
+    ]);
+  });
+
+  it("leaves the other tasks in the file out of the diff", () => {
+    const before = parseFile("a.md", "- [ ] Buy milk\n- [ ] Call Bob");
+    const after = parseFile("a.md", "- [ ] Buy oat milk\n- [ ] Call Bob");
+
+    const diff = diffForEdit(before, after, 0, 1, "due-only");
+
+    expect(diff.rekeys.map((r) => r.from)).toEqual([keyAt(before, 0)]);
+  });
+
+  it("reports nothing when the edit leaves the key unchanged", () => {
+    const before = parseFile("a.md", "- [ ] Buy milk");
+    const after = parseFile("a.md", "- [ ] Buy milk #gtd/today");
+
+    expect(diffForEdit(before, after, 0, 1, "due-only")).toEqual({
+      rekeys: [],
+      completed: [],
+      reopened: [],
+    });
   });
 });

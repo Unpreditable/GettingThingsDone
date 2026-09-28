@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "Perkelti į: {{name}}",
+      "editTask": "Redaguoti užduotį",
       "openFile": "Atidaryti failą",
       "pinTo": "Prisegti prie {{name}}",
       "unpin": "Atsegti (→ {{name}})",
@@ -91,6 +92,7 @@
   "notices": {
     "moveFailed": "GTD Tasks: Perkėlimas nepavyko — {{error}}",
     "toggleFailed": "GTD Tasks: Perjungimas nepavyko — {{error}}",
+    "editFailed": "GTD Tasks: Redagavimas nepavyko — {{error}}",
     "confirmFailed": "GTD Tasks: Patvirtinimas nepavyko — {{error}}",
     "migrationComplete": "GTD Tasks: Migracija baigta. Atnaujinta {{migrated}} užduočių, praleista {{failed}}."
   },

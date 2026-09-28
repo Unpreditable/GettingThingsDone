@@ -17,6 +17,11 @@ apply it, however clear the resulting change seems.
 doing it. Surface the rest as a list and let the user pick. Finding a real problem is a reason to
 mention it, never a licence to fix it uninvited.
 
+**No translations until asked.** A new or changed UI string goes into `en.json` only. Do not add
+or update it in the other locale files until the user explicitly asks for translations, even
+though `validate-translations` (and so `release-check`) fails meanwhile. English strings get
+tweaked several times before a commit, and translating text that will be replaced is wasted work.
+
 **Ask when uncertain, before acting.** If a request could mean two things, say so and wait. Do not
 pick the likelier reading and proceed. Guessing wrong wastes more of the user's time than asking.
 

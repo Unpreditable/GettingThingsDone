@@ -11,6 +11,14 @@ export interface MoveResult {
 /** The subset of the Tasks plugin's documented apiV1 that this plugin uses. */
 export interface TasksPluginApiV1 {
   executeToggleTaskDoneCommand: (line: string, path: string) => string;
+  /** Opens Tasks' edit modal. Resolves with the edited line(s) on Apply; never settles on Cancel. */
+  editTaskLineModal?: (line: string) => Promise<string>;
+}
+
+/** Tasks' edit modal, if the installed Tasks version has one. */
+export function getTaskEditor(app: App): ((line: string) => Promise<string>) | null {
+  const api = getTasksApi(app);
+  return typeof api?.editTaskLineModal === "function" ? api.editTaskLineModal.bind(api) : null;
 }
 
 /** The Tasks community plugin's apiV1, if it is installed and enabled. */
@@ -105,17 +113,40 @@ export async function moveTaskToBucket(
   }
 }
 
-export async function toggleTaskCompletion(
+export function toggleTaskCompletion(
   app: App,
   task: TaskRecord
 ): Promise<MoveResult> {
+  const api = getTasksApi(app);
+  return replaceTaskLine(app, task, (line) =>
+    toggleTaskLine(line, task.filePath, task.isCompleted, api)
+  );
+}
+
+export interface ReplaceResult extends MoveResult {
+  /** Where the task's line was actually found; differs from task.lineNumber if the file shifted. */
+  lineIdx?: number;
+  /** File content before and after the write, for callers that diff the edit themselves. */
+  before?: string;
+  after?: string;
+}
+
+/**
+ * Replaces the task's line with whatever `replace` returns: none, one or
+ * several lines. Locates the line the same way as every other write, and
+ * leaves the file untouched if it can't.
+ */
+export async function replaceTaskLine(
+  app: App,
+  task: TaskRecord,
+  replace: (line: string) => string[]
+): Promise<ReplaceResult> {
   const file = app.vault.getAbstractFileByPath(task.filePath);
   if (!(file instanceof TFile)) {
     return { success: false, error: `File not found: ${task.filePath}` };
   }
 
-  const api = getTasksApi(app);
-  let result: MoveResult = { success: false, error: "Task line not found in file (stale index)" };
+  let result: ReplaceResult = { success: false, error: "Task line not found in file (stale index)" };
 
   try {
     await app.vault.process(file, (content) => {
@@ -127,9 +158,10 @@ export async function toggleTaskCompletion(
         return content;
       }
 
-      lines.splice(lineIdx, 1, ...toggleTaskLine(lines[lineIdx], task.filePath, task.isCompleted, api));
-      result = { success: true };
-      return lines.join("\n");
+      lines.splice(lineIdx, 1, ...replace(lines[lineIdx]));
+      const after = lines.join("\n");
+      result = { success: true, lineIdx, before: content, after };
+      return after;
     });
     return result;
   } catch (e) {

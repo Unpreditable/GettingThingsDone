@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "Mover para: {{name}}",
+      "editTask": "Editar tarefa",
       "openFile": "Abrir ficheiro",
       "pinTo": "Fixar em {{name}}",
       "unpin": "Desafixar (→ {{name}})",
@@ -85,6 +86,7 @@
   "notices": {
     "moveFailed": "GTD Tasks: Falha ao mover — {{error}}",
     "toggleFailed": "GTD Tasks: Falha ao alternar — {{error}}",
+    "editFailed": "GTD Tasks: Falha ao editar — {{error}}",
     "confirmFailed": "GTD Tasks: Falha ao confirmar — {{error}}",
     "migrationComplete": "GTD Tasks: Migração concluída. {{migrated}} tarefas atualizadas, {{failed}} ignoradas."
   },

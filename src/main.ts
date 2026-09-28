@@ -16,17 +16,19 @@ import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
-import { moveTaskToBucket, toggleTaskCompletion } from "./core/TaskWriter";
+import { getTaskEditor, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion } from "./core/TaskWriter";
+import { parseFile } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
 import {
   diffFileTasks,
+  diffForEdit,
   applyTaskDiff,
   renameFileInState,
   migrateOrderFormat,
   migrateOrderKeys,
 } from "./core/OrderMigration";
-import type { OrderState } from "./core/OrderMigration";
+import type { OrderState, TaskDiff } from "./core/OrderMigration";
 import { purgeAgedEntries, reconcileDanglingEntries } from "./core/OrderPurge";
 import { dayKey, msUntilNextMidnight } from "./core/DueStatus";
 import GTDPanel from "./views/GTDPanel.svelte";
@@ -322,6 +324,15 @@ export default class GtdTasksPlugin extends Plugin {
     this.settings.orderKeyScheme = this.settings.planBy;
   }
 
+  /** Folds in a diff the caller built itself; saved by the next index change. */
+  recordTaskDiff(filePath: string, diff: TaskDiff): void {
+    const applied = applyTaskDiff(this.orderState(), filePath, diff, Date.now());
+    if (applied.changed) {
+      this.applyOrderState(applied.state);
+      this.orderStateDirty = true;
+    }
+  }
+
   private applyOrderState(state: OrderState): void {
     this.settings.taskOrder = state.taskOrder;
     this.settings.completionSeen = state.completionSeen;
@@ -491,6 +502,8 @@ class GtdPanelView extends ItemView {
         onMove: this.handleMove.bind(this),
         onToggle: this.handleToggle.bind(this),
         onNavigate: this.handleNavigate.bind(this),
+        canEditTask: () => getTaskEditor(this.app) !== null,
+        onEdit: this.handleEdit.bind(this),
         onReorder: this.handleReorder.bind(this),
         onOpenSettings: openSettings,
         // Only an explicit dismiss sets this. Opening settings settles nothing;
@@ -589,6 +602,44 @@ class GtdPanelView extends ItemView {
     // fails to locate its line. Reindexing here also re-runs the diff, so a
     // dateless completion still gets its completionSeen record.
     await this.plugin.taskIndex.reindexFile(task.filePath);
+  }
+
+  /**
+   * Tasks' modal never settles its promise on Cancel, so nothing may wait on
+   * it: the write-back lives in .then() and Cancel is simply a no-op.
+   *
+   * The order-key diff is built here, where it's known which line became
+   * which, and applied before the reindex runs its own heuristic diff. That
+   * one then finds the old key already gone and changes nothing.
+   */
+  private handleEdit(task: TaskRecord) {
+    const edit = getTaskEditor(this.app);
+    if (!edit) return;
+
+    edit(task.rawLine).then(
+      async (edited) => {
+        if (edited === task.rawLine) return;
+        const lines = edited.split("\n");
+        const result = await replaceTaskLine(this.app, task, () => lines);
+
+        if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
+          new Notice(t("notices.editFailed", { error: result.error }));
+          await this.plugin.taskIndex.reindexFile(task.filePath);
+          return;
+        }
+
+        const diff = diffForEdit(
+          parseFile(task.filePath, result.before),
+          parseFile(task.filePath, result.after),
+          result.lineIdx,
+          lines.length,
+          activeOrderKeyScheme(this.plugin.settings)
+        );
+        this.plugin.recordTaskDiff(task.filePath, diff);
+        await this.plugin.taskIndex.reindexFile(task.filePath);
+      },
+      (e: unknown) => new Notice(t("notices.editFailed", { error: String(e) }))
+    );
   }
 
   scrollToBucket(bucketId: string) {

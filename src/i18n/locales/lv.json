@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "Pārvietot uz: {{name}}",
+      "editTask": "Rediģēt uzdevumu",
       "openFile": "Atvērt failu",
       "pinTo": "Piespraust {{name}}",
       "unpin": "Atspraust (→ {{name}})",
@@ -88,6 +89,7 @@
   "notices": {
     "moveFailed": "GTD Tasks: Pārvietošana neizdevās — {{error}}",
     "toggleFailed": "GTD Tasks: Pārslēgšana neizdevās — {{error}}",
+    "editFailed": "GTD Tasks: Rediģēšana neizdevās — {{error}}",
     "confirmFailed": "GTD Tasks: Apstiprināšana neizdevās — {{error}}",
     "migrationComplete": "GTD Tasks: Migrācija pabeigta. Atjaunināti {{migrated}} uzdevumi, izlaisti {{failed}}."
   },

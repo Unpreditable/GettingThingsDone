@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "Переместить в: {{name}}",
+      "editTask": "Редактировать задачу",
       "openFile": "Открыть файл",
       "pinTo": "Закрепить в {{name}}",
       "unpin": "Открепить (→ {{name}})",
@@ -91,6 +92,7 @@
   "notices": {
     "moveFailed": "GTD Tasks: Ошибка перемещения — {{error}}",
     "toggleFailed": "GTD Tasks: Ошибка переключения — {{error}}",
+    "editFailed": "GTD Tasks: Ошибка редактирования — {{error}}",
     "confirmFailed": "GTD Tasks: Ошибка подтверждения — {{error}}",
     "migrationComplete": "GTD Tasks: Миграция завершена. Обновлено {{migrated}} задач, пропущено {{failed}}."
   },

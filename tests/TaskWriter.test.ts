@@ -1,4 +1,4 @@
-import { findTaskLine, moveTaskToBucket, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
+import { findTaskLine, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
 import { DEFAULT_SETTINGS } from "../src/settings";
 import { TFile } from "obsidian";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -277,6 +277,43 @@ describe("toggleTaskCompletion", () => {
     const task = makeTask({ rawLine: "- [ ] Test task", lineNumber: 5 });
 
     expect((await toggleTaskCompletion(app, task)).success).toBe(false);
+  });
+});
+
+describe("replaceTaskLine", () => {
+  it("replaces the task's line with every line it is given", async () => {
+    const { app, getContent } = makeMockApp("- [ ] Before\n- [ ] Test task\n- [ ] After");
+    const task = makeTask({ lineNumber: 1 });
+
+    const result = await replaceTaskLine(app, task, () => ["- [ ] New one", "- [x] Test task"]);
+
+    expect(result.success).toBe(true);
+    expect(getContent()).toBe("- [ ] Before\n- [ ] New one\n- [x] Test task\n- [ ] After");
+  });
+
+  it("reports where the line was found and the file content on both sides of the write", async () => {
+    const original = "- [ ] Inserted\n- [ ] Test task";
+    const { app } = makeMockApp(original);
+    const task = makeTask({ lineNumber: 0 });
+
+    const result = await replaceTaskLine(app, task, () => ["- [ ] Edited"]);
+
+    expect(result).toEqual({
+      success: true,
+      lineIdx: 1,
+      before: original,
+      after: "- [ ] Inserted\n- [ ] Edited",
+    });
+  });
+
+  it("leaves the file alone when the task line can't be located", async () => {
+    const { app, getContent } = makeMockApp("- [ ] Something else");
+    const task = makeTask({ lineNumber: 5 });
+
+    const result = await replaceTaskLine(app, task, () => ["- [ ] Edited"]);
+
+    expect(result.success).toBe(false);
+    expect(getContent()).toBe("- [ ] Something else");
   });
 });
 

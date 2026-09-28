@@ -31,6 +31,8 @@
     "contextMenu": {
       "moveTo_comment": "Right-click context menu item on a task. {{name}} = the destination bucket's display name.",
       "moveTo": "Move to: {{name}}",
+      "editTask_comment": "Right-click context menu item on a task. Opens the Tasks plugin's own edit dialog for that task; shown only when Tasks is installed.",
+      "editTask": "Edit task",
       "openFile_comment": "Right-click context menu item on a task. Opens the markdown file at that task's line. Phrased like Obsidian's own 'Show in system explorer'.",
       "openFile": "Show in file",
       "pinTo_comment": "Context menu item shown on a task that is currently placed automatically by its date. Choosing it pins the task to the bucket it is already in, so it stops following the date. {{name}} = that bucket's display name.",
@@ -123,6 +125,8 @@
     "_comment": "Toast notifications shown in Obsidian's notification area. All prefixed with 'GTD Tasks:' so users can identify their source. {{error}} is the raw error message from the failed operation.",
     "moveFailed": "GTD Tasks: Move failed — {{error}}",
     "toggleFailed": "GTD Tasks: Toggle failed — {{error}}",
+    "editFailed_comment": "Notice shown when a task edited in the Tasks dialog could not be written back. {{error}} = the technical reason.",
+    "editFailed": "GTD Tasks: Edit failed — {{error}}",
     "confirmFailed": "GTD Tasks: Confirm failed — {{error}}",
     "migrationComplete_comment": "Shown after the user migrates tasks between storage modes (inline tag ↔ inline field). {{migrated}} = tasks successfully rewritten, {{failed}} = tasks skipped due to errors.",
     "migrationComplete": "GTD Tasks: Migration complete. {{migrated}} tasks updated, {{failed}} skipped."

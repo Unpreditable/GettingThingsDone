@@ -18,6 +18,7 @@
     },
     "contextMenu": {
       "moveTo": "이동: {{name}}",
+      "editTask": "작업 편집",
       "openFile": "파일 열기",
       "pinTo": "{{name}}에 고정",
       "unpin": "고정 해제 (→ {{name}})",
@@ -85,6 +86,7 @@
   "notices": {
     "moveFailed": "GTD Tasks: 이동 실패 — {{error}}",
     "toggleFailed": "GTD Tasks: 전환 실패 — {{error}}",
+    "editFailed": "GTD Tasks: 편집 실패 — {{error}}",
     "confirmFailed": "GTD Tasks: 확인 실패 — {{error}}",
     "migrationComplete": "GTD Tasks: 마이그레이션 완료. {{migrated}}개 업데이트, {{failed}}개 건너뜀."
   },
