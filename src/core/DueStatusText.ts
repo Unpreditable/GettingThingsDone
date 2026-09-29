@@ -3,7 +3,7 @@ import type { DueStatus } from "./DueStatus";
 import type { BucketConfig } from "../settings";
 
 /** Locale-aware short date, e.g. "Fri, Aug 7". */
-function formatDate(date: Date): string {
+export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat(i18next.language, {
     weekday: "short",
     month: "short",

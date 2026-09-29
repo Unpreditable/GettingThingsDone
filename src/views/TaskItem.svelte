@@ -8,7 +8,7 @@
   import { t } from "../i18n/i18n";
   import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
-  import { formatTasksFields } from "../core/TasksFieldText";
+  import { formatTasksFields, PRIORITY_EMOJI } from "../core/TasksFieldText";
   import { placeRow } from "../core/RowPlacement";
   import { icon } from "./icon";
 
@@ -37,9 +37,6 @@
     : [];
   $: isRecurringTask = isRecurring(task);
 
-  const PRIORITY_EMOJI: Record<TaskPriority, string> = {
-    highest: "🔺", high: "⏫", medium: "🔼", low: "🔽", lowest: "⏬",
-  };
   /** Levels each dropdown entry admits, highest first. */
   const PRIORITY_VISIBLE: Record<PriorityDisplay, TaskPriority[]> = {
     all: ["highest", "high", "medium", "low", "lowest"],

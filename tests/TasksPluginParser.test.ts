@@ -1,13 +1,13 @@
-import { parseDueDate, parseCompletionDate, scanTasksMetadata, foldTasksFields } from "../src/integrations/TasksPluginParser";
+import { scanTasksMetadata, foldTasksFields } from "../src/integrations/TasksPluginParser";
 
 /** Convenience: scan + fold in one call, as parseFile will do. */
 function fields(text: string) {
   return foldTasksFields(scanTasksMetadata(text));
 }
 
-describe("parseDueDate", () => {
+describe("due and done dates", () => {
   it("parses a valid due date", () => {
-    const d = parseDueDate("- [ ] Task 📅 2026-02-18");
+    const d = fields("- [ ] Task 📅 2026-02-18").dueDate;
     expect(d).not.toBeNull();
     expect(d!.getFullYear()).toBe(2026);
     expect(d!.getMonth()).toBe(1);
@@ -15,17 +15,15 @@ describe("parseDueDate", () => {
   });
 
   it("returns null for lines without a date", () => {
-    expect(parseDueDate("- [ ] Task without date")).toBeNull();
+    expect(fields("- [ ] Task without date").dueDate).toBeNull();
   });
 
   it("returns null for invalid dates", () => {
-    expect(parseDueDate("- [ ] Task 📅 not-a-date")).toBeNull();
+    expect(fields("- [ ] Task 📅 not-a-date").dueDate).toBeNull();
   });
-});
 
-describe("parseCompletionDate", () => {
   it("parses a completion date", () => {
-    const d = parseCompletionDate("- [x] Done ✅ 2026-02-17");
+    const d = fields("- [x] Done ✅ 2026-02-17").completedAt;
     expect(d).not.toBeNull();
     expect(d!.getDate()).toBe(17);
   });

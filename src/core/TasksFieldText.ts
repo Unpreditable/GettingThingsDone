@@ -1,8 +1,8 @@
-import { t, i18next } from "../i18n/i18n";
+import { t } from "../i18n/i18n";
 import type { TaskRecord, TaskPriority } from "./TaskParser";
 import type { DueStatus } from "./DueStatus";
 import type { BucketConfig } from "../settings";
-import { formatDueLine, formatMisfiledLine } from "./DueStatusText";
+import { formatDate, formatDueLine, formatMisfiledLine } from "./DueStatusText";
 
 /**
  * One line of the hover popover's metadata block.
@@ -31,22 +31,13 @@ export interface PlacementInfo {
   misfiledIn: BucketConfig | null;
 }
 
-const PRIORITY_EMOJI: Record<TaskPriority, string> = {
+export const PRIORITY_EMOJI: Record<TaskPriority, string> = {
   highest: "🔺",
   high: "⏫",
   medium: "🔼",
   low: "🔽",
   lowest: "⏬",
 };
-
-/** Locale-aware short date, e.g. "Wed, Aug 5". Matches DueStatusText's format. */
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat(i18next.language, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
 
 /**
  * The metadata rows for a task's hover popover, already in display order and

@@ -227,14 +227,6 @@ export function foldTasksFields(spans: TokenSpan[]): TasksFields {
   };
 }
 
-export function parseDueDate(rawLine: string): Date | null {
-  return foldTasksFields(scanTasksMetadata(rawLine)).dueDate;
-}
-
-export function parseCompletionDate(rawLine: string): Date | null {
-  return foldTasksFields(scanTasksMetadata(rawLine)).completedAt;
-}
-
 export function today(): Date {
   const d = new Date();
   d.setHours(0, 0, 0, 0);

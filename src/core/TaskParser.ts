@@ -89,7 +89,7 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
     const rawRest = match[3];
 
     const isCompleted = CLOSED_SYMBOLS.includes(checkMark);
-    // One scan per line: parseDueDate/parseCompletionDate each used to run
+    // One scan per line: the due and completion dates each used to run
     // their own regex over the same string, and stripMetadata a third set.
     // Scanned first, and handed to the Tasks scanner as holes: a free-text
     // Tasks value (🔁, 🏁) that is the last marker on the line would otherwise

@@ -9,12 +9,6 @@ const FIXED_MONDAY = new Date("2026-02-23T00:00:00"); // Monday Feb 23, 2026
 
 jest.mock("../src/integrations/TasksPluginParser", () => ({
   today: () => new Date("2026-02-23T00:00:00"),
-  parseDueDate: jest.fn((line: string) => {
-    const match = line.match(/\u{1F4C5} (\d{4}-\d{2}-\d{2})/u);
-    if (!match) return null;
-    const [y, m, d] = match[1].split("-").map(Number);
-    return new Date(y, m - 1, d);
-  }),
 }));
 
 function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
