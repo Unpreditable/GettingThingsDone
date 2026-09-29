@@ -1,4 +1,4 @@
-import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks } from "../src/core/TaskParser";
+import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn } from "../src/core/TaskParser";
 
 describe("parseFile", () => {
   it("parses simple unchecked tasks", () => {
@@ -527,5 +527,21 @@ describe("TaskRecord Tasks-plugin fields", () => {
     const task = parseFile("test.md", "- [x] Done thing 📅 2026-02-18 ✅ 2026-02-19")[0];
     expect(task.dueDate!.getDate()).toBe(18);
     expect(task.completedAt!.getDate()).toBe(19);
+  });
+});
+
+describe("taskTextColumn", () => {
+  it("points just past the checkbox and its space", () => {
+    expect(taskTextColumn("- [ ] Buy milk")).toBe(6);
+    expect(taskTextColumn("    - [x] Done")).toBe(10);
+    expect(taskTextColumn("1. [/] Numbered")).toBe(7);
+  });
+
+  it("stops at the checkbox when nothing follows it", () => {
+    expect(taskTextColumn("- [ ]")).toBe(5);
+  });
+
+  it("is 0 for a line that isn't a task", () => {
+    expect(taskTextColumn("Just a paragraph")).toBe(0);
   });
 });

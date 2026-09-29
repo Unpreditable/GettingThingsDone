@@ -17,6 +17,8 @@
   "author": "Vitaly Ditman",
   "license": "GPL-3.0-only",
   "devDependencies": {
+    "@codemirror/state": "6.5.0",
+    "@codemirror/view": "6.38.6",
     "@eslint/js": "^9.39.3",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",

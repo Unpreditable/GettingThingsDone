@@ -8,6 +8,7 @@ import {
   App,
   getLanguage,
 } from "obsidian";
+import type { EditorView } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
@@ -17,7 +18,7 @@ import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { getTaskEditor, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion } from "./core/TaskWriter";
-import { parseFile } from "./core/TaskParser";
+import { parseFile, taskTextColumn } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
 import {
@@ -35,6 +36,7 @@ import GTDPanel from "./views/GTDPanel.svelte";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
 import { celebrationImages } from "./assets/celebrationImages";
+import { flashLine, lineFlashField } from "./views/lineFlash";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
@@ -61,6 +63,7 @@ export default class GtdTasksPlugin extends Plugin {
     this.addSettingTab(new GtdSettingsTab(this.app, this));
 
     this.registerView(VIEW_TYPE_GTD, (leaf) => new GtdPanelView(leaf, this));
+    this.registerEditorExtension(lineFlashField);
 
     this.addCommand({
       id: "open-gtd-panel",
@@ -648,18 +651,31 @@ class GtdPanelView extends ItemView {
   }
 
   private handleNavigate(task: TaskRecord) {
+    void this.revealTaskLine(task);
+  }
+
+  private async revealTaskLine(task: TaskRecord) {
     const file = this.app.vault.getAbstractFileByPath(task.filePath);
     if (!(file instanceof TFile)) return;
 
     const { workspace } = this.app;
+    const line = task.lineNumber;
     const existingLeaf = workspace.getLeavesOfType("markdown")
       .find((leaf) => (leaf.view as MarkdownView).file?.path === task.filePath);
+    const leaf = existingLeaf ?? workspace.getLeaf(false);
+    if (existingLeaf) await workspace.revealLeaf(leaf);
+    else await leaf.openFile(file, { eState: { line } });
+    if (!(leaf.view instanceof MarkdownView)) return;
 
-    if (existingLeaf) {
-      void workspace.revealLeaf(existingLeaf);
-      (existingLeaf.view as MarkdownView).editor?.setCursor({ line: task.lineNumber, ch: 0 });
-    } else {
-      void workspace.getLeaf(false).openFile(file, { eState: { line: task.lineNumber } });
-    }
+    // setCursor alone scrolls the least it can, which leaves an off-screen line
+    // pinned to the viewport's bottom edge.
+    const { editor } = leaf.view;
+    const pos = { line, ch: taskTextColumn(editor.getLine(line)) };
+    editor.setCursor(pos);
+    editor.scrollIntoView({ from: pos, to: pos }, true);
+    // Clicking the panel leaves focus there, which hides the caret.
+    editor.focus();
+    const cm = (editor as unknown as { cm?: EditorView }).cm;
+    if (cm) flashLine(cm, line);
   }
 }

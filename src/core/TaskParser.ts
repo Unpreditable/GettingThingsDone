@@ -56,6 +56,14 @@ export function statusSymbol(rawLine: string): string {
   return rawLine.match(CHECKBOX_REGEX)?.[2] ?? " ";
 }
 
+/** The column where a task line's text begins, just past `- [ ] `; 0 if it isn't a task. */
+export function taskTextColumn(line: string): number {
+  const match = line.match(CHECKBOX_REGEX);
+  if (!match) return 0;
+  const end = match[0].length;
+  return line[end] === " " ? end + 1 : end;
+}
+
 const LIST_ITEM_REGEX = /^(\s*)(?:[-*+]|\d+[.)]) /;
 
 function escapeRegExp(s: string): string {

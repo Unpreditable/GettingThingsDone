@@ -973,3 +973,17 @@ div.gtd-hidden {
   object-fit: contain;
   animation: gtd-creature-fly 2.32s ease-in-out forwards;
 }
+
+/* ── Editor line flash ──────────────────────────────────────────────────── */
+
+/* Marks the task line after a jump from the panel. Painted as an inset shadow,
+   not a background: the flashed line is also the cursor line, and themes such
+   as Nord set its background-color with !important. */
+@keyframes gtd-line-flash {
+  from { box-shadow: inset 0 0 0 100vmax var(--text-highlight-bg); }
+  to   { box-shadow: inset 0 0 0 100vmax transparent; }
+}
+
+.cm-line.gtd-line-flash {
+  animation: gtd-line-flash 2s ease-out forwards;
+}
