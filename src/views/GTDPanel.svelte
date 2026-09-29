@@ -196,7 +196,7 @@
     let topSection = false;
 
     if (canEditTask()) {
-      menu.addItem((item) => item.setTitle(t("panel.contextMenu.editTask")).onClick(() => onEdit(task)));
+      menu.addItem((item) => item.setTitle(t("panel.contextMenu.editTask")).setIcon("pencil").onClick(() => onEdit(task)));
       topSection = true;
     }
 
@@ -226,15 +226,18 @@
 
     if (topSection) menu.addSeparator();
 
-    for (const bucket of settings.buckets) {
-      const b = bucket;
-      if (b.id === currentBucketId) continue;
+    // The panel shows To Review first, then the buckets in settings order, so
+    // To Review's -1 puts every bucket below it.
+    const currentIndex = settings.buckets.findIndex((b) => b.id === currentBucketId);
+    settings.buckets.forEach((b, index) => {
+      if (b.id === currentBucketId) return;
       menu.addItem((item) =>
         item
           .setTitle(t("panel.contextMenu.moveTo", { name: `${b.emoji} ${b.name}` }))
+          .setIcon(index < currentIndex ? "arrow-up-from-line" : "arrow-down-from-line")
           .onClick(() => onMove(task, b.id))
       );
-    }
+    });
 
     menu.addSeparator();
     menu.addItem((item) =>
