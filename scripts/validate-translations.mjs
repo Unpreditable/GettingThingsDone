@@ -37,9 +37,10 @@ function basePluralKey(path) {
 const en = JSON.parse(readFileSync(join(localesDir, 'en.json'), 'utf8'));
 const requiredPaths = new Set(extractPaths(en));
 
-const SKIP = new Set(['en.json', 'sample_lang.json']);
+// The translator template: every key, values left for the translator.
+const BLANK_ALLOWED = new Set(['sample_lang.json']);
 const files = readdirSync(localesDir)
-  .filter(f => f.endsWith('.json') && !SKIP.has(f))
+  .filter(f => f.endsWith('.json') && f !== 'en.json')
   .sort();
 
 let allPassed = true;
@@ -64,7 +65,7 @@ for (const file of files) {
     }
     return true;
   });
-  const blank   = [...requiredPaths].filter(p => localePaths.has(p) && getValueAtPath(locale, p).trim() === '');
+  const blank   = BLANK_ALLOWED.has(file) ? [] : [...requiredPaths].filter(p => localePaths.has(p) && getValueAtPath(locale, p).trim() === '');
 
   if (missing.length || extra.length || blank.length) {
     allPassed = false;

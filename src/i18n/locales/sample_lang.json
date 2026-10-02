@@ -16,23 +16,36 @@
       "parentOnly": "",
       "cancel": ""
     },
+    "createNote": {
+      "message": "",
+      "confirmButton": ""
+    },
     "contextMenu": {
       "moveTo": "",
       "editTask": "",
-      "openFile": ""
+      "openFile": "",
+      "pinTo": "",
+      "unpin": "",
+      "unpinHere": ""
+    },
+    "languageBanner": {
+      "message": "",
+      "openSettings": "",
+      "dismiss": ""
     },
     "weekStartBanner": {
       "message": "",
       "openSettings": "",
       "dismiss": ""
     },
-    "languageBanner": {
+    "catchAllBanner": {
       "message": "",
       "openSettings": "",
       "dismiss": ""
     }
   },
   "task": {
+    "autoPlacedMarker": "",
     "subtaskTooltip": "",
     "subtaskOf": "",
     "subtaskOfInBucket": "",
@@ -51,6 +64,24 @@
       "overdue_one": "",
       "overdue_other": "",
       "withDetail": ""
+    },
+    "priority": {
+      "highest": "",
+      "high": "",
+      "medium": "",
+      "low": "",
+      "lowest": ""
+    },
+    "fields": {
+      "recurrence": "",
+      "scheduled": "",
+      "start": "",
+      "created": "",
+      "cancelled": "",
+      "done": "",
+      "onCompletion": "",
+      "pinnedTo": "",
+      "belongsIn": ""
     }
   },
   "commands": {
@@ -68,6 +99,8 @@
     "banner": {
       "message": "",
       "buttonText": "",
+      "confirmMessage": "",
+      "confirmButton": "",
       "signature": ""
     },
     "emoji": "",
@@ -122,6 +155,10 @@
         "descriptionOverdue": "",
         "descriptionMisfiled": ""
       },
+      "openLinks": {
+        "name": "",
+        "description": ""
+      },
       "compactView": {
         "name": "",
         "description": ""
@@ -173,6 +210,7 @@
         "withinDays": "",
         "withinRange": "",
         "beyondDays": "",
+        "everything": "",
         "days": {
           "name": "",
           "description": ""
@@ -197,15 +235,56 @@
         "button2Description": "",
         "none": ""
       }
+    },
+    "tasksIntegration": {
+      "heading": "",
+      "blurb": "",
+      "planBy": {
+        "name": "",
+        "description": "",
+        "descriptionPinned": "",
+        "manual": "",
+        "dueOnly": "",
+        "dueFirst": "",
+        "scheduledFirst": "",
+        "scheduledOnly": "",
+        "earliest": ""
+      },
+      "priority": {
+        "name": "",
+        "description": "",
+        "all": "",
+        "mediumUp": "",
+        "highUp": "",
+        "hidden": ""
+      },
+      "recurrence": {
+        "name": "",
+        "description": ""
+      },
+      "popoverFields": {
+        "name": "",
+        "description": ""
+      }
     }
   },
   "buckets": {
     "defaults": {
-      "today":      { "name": "" },
-      "this-week":  { "name": "" },
-      "next-week":  { "name": "" },
-      "this-month": { "name": "" },
-      "someday":    { "name": "" }
+      "today": {
+        "name": ""
+      },
+      "this-week": {
+        "name": ""
+      },
+      "next-week": {
+        "name": ""
+      },
+      "this-month": {
+        "name": ""
+      },
+      "someday": {
+        "name": ""
+      }
     },
     "toReview": ""
   },
