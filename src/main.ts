@@ -7,6 +7,7 @@ import {
   TFile,
   App,
   getLanguage,
+  getLinkpath,
 } from "obsidian";
 import type { EditorView } from "@codemirror/view";
 import { mount, unmount } from "svelte";
@@ -33,6 +34,7 @@ import type { OrderState, TaskDiff } from "./core/OrderMigration";
 import { purgeAgedEntries, reconcileDanglingEntries } from "./core/OrderPurge";
 import { dayKey, msUntilNextMidnight } from "./core/DueStatus";
 import GTDPanel from "./views/GTDPanel.svelte";
+import { ConfirmModal } from "./views/ConfirmModal";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
 import { celebrationImages } from "./assets/celebrationImages";
@@ -505,6 +507,7 @@ class GtdPanelView extends ItemView {
         onMove: this.handleMove.bind(this),
         onToggle: this.handleToggle.bind(this),
         onNavigate: this.handleNavigate.bind(this),
+        onOpenLink: this.handleOpenLink.bind(this),
         canEditTask: () => getTaskEditor(this.app) !== null,
         onEdit: this.handleEdit.bind(this),
         onReorder: this.handleReorder.bind(this),
@@ -652,6 +655,29 @@ class GtdPanelView extends ItemView {
 
   private handleNavigate(task: TaskRecord) {
     void this.revealTaskLine(task);
+  }
+
+  private handleOpenLink(task: TaskRecord, target: string, external: boolean, newTab: boolean) {
+    if (external) {
+      window.open(target);
+      return;
+    }
+
+    const open = () => void this.app.workspace.openLinkText(target, task.filePath, newTab);
+    // Empty for a `#Heading` link into the task's own note, which always exists.
+    const notePath = getLinkpath(target);
+    if (notePath === "" || this.app.metadataCache.getFirstLinkpathDest(notePath, task.filePath)) {
+      open();
+      return;
+    }
+
+    // openLinkText creates a missing note without asking.
+    new ConfirmModal(
+      this.app,
+      t("panel.createNote.message", { name: notePath }),
+      t("panel.createNote.confirmButton"),
+      open
+    ).open();
   }
 
   private async revealTaskLine(task: TaskRecord) {

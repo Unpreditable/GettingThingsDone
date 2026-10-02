@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { TaskRecord, TaskPriority } from "../core/TaskParser";
+  import type { TaskRecord, TaskPriority, TextSegment } from "../core/TaskParser";
   import { stripWikilinks, parseWikilinks, statusSymbol } from "../core/TaskParser";
   import type { BucketConfig, PriorityDisplay } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
@@ -18,6 +18,7 @@
   export let showDueFlags: boolean = true;
   export let priorityDisplay: PriorityDisplay = "all";
   export let showRecurrenceBadge: boolean = true;
+  export let openLinksOnClick: boolean = true;
   export let showTasksFieldsInPopover: boolean = true;
   /** Which date field placed this task, or null when it is pinned or dateless. */
   export let autoPlacedFrom: "due" | "scheduled" | null = null;
@@ -61,6 +62,7 @@
     move: { task: TaskRecord; targetBucketId: string | null };
     toggle: { task: TaskRecord };
     navigate: { task: TaskRecord };
+    openLink: { task: TaskRecord; target: string; external: boolean; newTab: boolean };
     dismiss: { task: TaskRecord };
   }>();
 
@@ -168,6 +170,17 @@
     dispatch("navigate", { task });
   }
 
+  function onLinkClick(e: MouseEvent, seg: TextSegment) {
+    if (seg.target === undefined) return;
+    e.stopPropagation();
+    dispatch("openLink", {
+      task,
+      target: seg.target,
+      external: seg.external ?? false,
+      newTab: e.ctrlKey || e.metaKey,
+    });
+  }
+
   function onMoveClick(e: MouseEvent, bucketId: string | null) {
     e.stopPropagation();
     dispatch("move", { task, targetBucketId: bucketId });
@@ -236,8 +249,11 @@
   >
     {#if task.text}
       {#each parseWikilinks(task.text) as seg}
-        {#if seg.type === "wikilink" || seg.type === "bold"}<strong>{seg.content}</strong
+        {#if openLinksOnClick && seg.target !== undefined}<!-- svelte-ignore a11y-no-static-element-interactions --><span
+            class="gtd-md-link is-clickable"
+            on:click={(e) => onLinkClick(e, seg)}>{seg.content}</span
         >{:else if seg.type === "mdlink"}<span class="gtd-md-link">{seg.content}</span
+        >{:else if seg.type === "wikilink" || seg.type === "bold"}<strong>{seg.content}</strong
         >{:else if seg.type === "italic"}<em>{seg.content}</em
         >{:else if seg.type === "strike"}<s>{seg.content}</s
         >{:else if seg.type === "code"}<code class="gtd-inline-code">{seg.content}</code

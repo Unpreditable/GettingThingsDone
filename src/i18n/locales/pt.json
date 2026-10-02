@@ -16,6 +16,10 @@
       "parentOnly": "Apenas tarefa principal",
       "cancel": "Cancelar"
     },
+    "createNote": {
+      "message": "«{{name}}» ainda não existe. Criar?",
+      "confirmButton": "Criar"
+    },
     "contextMenu": {
       "moveTo": "Mover para: {{name}}",
       "editTask": "Editar tarefa",
@@ -150,6 +154,10 @@
         "name": "Sinalizar tarefas atrasadas e mal classificadas",
         "descriptionOverdue": "marca tarefas cuja data de vencimento já passou.",
         "descriptionMisfiled": "sugere uma categoria melhor para não perder a data: uma tarefa que vence hoje em {{later}} pertence a {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Abrir ligações a partir do painel",
+        "description": "Clicar numa ligação de uma tarefa abre-a em vez de mostrar a tarefa na respetiva nota."
       },
       "compactView": {
         "name": "Vista compacta",

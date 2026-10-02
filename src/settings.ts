@@ -133,6 +133,8 @@ export interface PluginSettings {
    *  been settled for this install. Seeded once on load, like catchAllNoticeSeen:
    *  fresh installs never see the notice, since the setting is right there. */
   weekStartNoticeSeen: boolean;
+  /** A click on a link in a task row opens the link; off, it reveals the task like any other click. */
+  openLinksOnClick: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
   compactView: boolean;
   /** Which priority levels show a badge on the row. The popover is unaffected. */
@@ -230,6 +232,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   catchAllNoticeSeen: false,
   weekStartsOn: "monday",
   weekStartNoticeSeen: false,
+  openLinksOnClick: true,
   compactView: false,
   priorityDisplay: "all",
   showRecurrenceBadge: true,

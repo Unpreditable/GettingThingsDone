@@ -16,6 +16,10 @@
       "parentOnly": "Nur übergeordnete Aufgabe",
       "cancel": "Abbrechen"
     },
+    "createNote": {
+      "message": "„{{name}}“ existiert noch nicht. Erstellen?",
+      "confirmButton": "Erstellen"
+    },
     "contextMenu": {
       "moveTo": "Verschieben nach: {{name}}",
       "editTask": "Aufgabe bearbeiten",
@@ -150,6 +154,10 @@
         "name": "Überfällige und falsch einsortierte Aufgaben markieren",
         "descriptionOverdue": "markiert Aufgaben, deren Fälligkeitsdatum verstrichen ist.",
         "descriptionMisfiled": "schlägt einen besseren Bereich vor, damit keine Fälligkeit verpasst wird: eine heute fällige Aufgabe in {{later}} gehört in {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Links aus dem Panel öffnen",
+        "description": "Ein Klick auf einen Link in einer Aufgabe öffnet ihn, statt die Aufgabe in ihrer Notiz anzuzeigen."
       },
       "compactView": {
         "name": "Kompakte Ansicht",

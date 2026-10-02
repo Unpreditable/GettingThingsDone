@@ -16,6 +16,10 @@
       "parentOnly": "Solo tarea principal",
       "cancel": "Cancelar"
     },
+    "createNote": {
+      "message": "«{{name}}» aún no existe. ¿Crearla?",
+      "confirmButton": "Crear"
+    },
     "contextMenu": {
       "moveTo": "Mover a: {{name}}",
       "editTask": "Editar tarea",
@@ -150,6 +154,10 @@
         "name": "Marcar tareas vencidas y mal clasificadas",
         "descriptionOverdue": "marca las tareas cuya fecha de vencimiento ya pasó.",
         "descriptionMisfiled": "sugiere una categoría mejor para no perder la fecha: una tarea que vence hoy en {{later}} pertenece a {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Abrir enlaces desde el panel",
+        "description": "Al hacer clic en un enlace de una tarea, se abre el enlace en lugar de mostrar la tarea en su nota."
       },
       "compactView": {
         "name": "Vista compacta",

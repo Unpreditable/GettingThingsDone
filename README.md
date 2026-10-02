@@ -18,6 +18,7 @@ Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) pl
 - **Time-horizon buckets** — Today ⚡, This Week 📌, Next Week 🔭, This Month 📅, Someday / Maybe 💭. Rename them, swap the emoji, reorder them, or write your own date rules.
 - **To Review inbox** 📥 — every task without a bucket lands here, so nothing slips through.
 - **Three ways to move a task** — quick-move buttons on the row, drag-and-drop between buckets, or right-click.
+- **Clickable links** — open a web link or a linked note straight from a task, without visiting its note first.
 - **Subtask-aware** — indented tasks track with their parent, with a count badge and a prompt to move them along.
 - **Overdue and misfiled flags** — <img src="assets/icons/overdue.svg" width="16" height="16" alt="overdue"> once a due date has passed, <img src="assets/icons/misfiled.svg" width="16" height="16" alt="misfiled"> when a task sits in a bucket that will make you miss it.
 - **Reads Tasks plugin fields** — due dates, priority, recurrence and the rest show up as badges and on hover.
@@ -157,6 +158,10 @@ When enabled, two badges call out tasks that need attention:
 
 Neither badge appears on a completed task. Only a `📅` due date makes a task overdue. A `⏳` scheduled date that has passed doesn't. Both can apply at once. The row shows the overdue badge, the more urgent of the two, and hovering the task spells out both reasons along with the bucket the misfiled badge points at.
 
+### Open links from the panel
+
+On by default. Allows clicking links as if from your note.
+
 ### Compact view
 
 Reduces padding on bucket headers and task rows for a denser layout.
@@ -246,7 +251,7 @@ The panel and settings UI are available in German, Spanish, Estonian, French, Ja
 
 ## Network Use
 
-This plugin opens github.com in your default browser when you click **Share feedback & ideas** in settings, after you confirm a dialog. No background connections, and your data never leaves your machine.
+This plugin opens github.com in your default browser when you click **Share feedback & ideas** in settings, after you confirm a dialog. Clicking a web link in one of your tasks opens that link in your browser. No background connections, and your data never leaves your machine.
 
 ---
 

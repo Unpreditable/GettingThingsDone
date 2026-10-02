@@ -16,6 +16,10 @@
       "parentOnly": "상위 작업만",
       "cancel": "취소"
     },
+    "createNote": {
+      "message": "“{{name}}” 노트가 아직 없습니다. 만드시겠습니까?",
+      "confirmButton": "만들기"
+    },
     "contextMenu": {
       "moveTo": "이동: {{name}}",
       "editTask": "작업 편집",
@@ -150,6 +154,10 @@
         "name": "기한 초과 및 잘못 분류된 작업 표시",
         "descriptionOverdue": "는 마감일이 지난 작업을 표시합니다.",
         "descriptionMisfiled": "는 마감일을 놓치지 않도록 더 적합한 버킷을 제안합니다. 오늘 마감인데 '{{later}}'에 있는 작업은 '{{sooner}}'에 있어야 합니다."
+      },
+      "openLinks": {
+        "name": "패널에서 링크 열기",
+        "description": "작업의 링크를 클릭하면 노트에서 작업을 표시하는 대신 링크를 엽니다."
       },
       "compactView": {
         "name": "컴팩트 보기",

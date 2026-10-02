@@ -177,8 +177,7 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
 }
 
 function extractTags(text: string): string[] {
-  const matches = text.match(/#[\w/-]+/g) ?? [];
-  return matches.map((t) => t.slice(1));
+  return scanTags(text).map((span) => text.slice(span.start + 1, span.end));
 }
 
 /** Returns the value of the first [key:: value] field found, regardless of key name. */
@@ -196,6 +195,18 @@ interface Span {
 const TAG_REGEX = /#[\w/-]+/g;
 const INLINE_FIELD_REGEX = /\[[\w-]+::\s*[^\]]*\]/g;
 const BLOCK_REF_REGEX = /\s+\^([\w-]+)\s*$/;
+const LINK_REGEX = /\[\[[^\]]*\]\]|\[[^\]]*\]\([^)]*\)|https?:\/\/[^\s<>]+/g;
+
+/** Inside a link a `#` starts a heading or a URL fragment, never a tag. */
+function scanTags(text: string): Span[] {
+  const links = [...text.matchAll(LINK_REGEX)].map((m) => ({ start: m.index, end: m.index + m[0].length }));
+  const spans: Span[] = [];
+  for (const m of text.matchAll(TAG_REGEX)) {
+    if (links.some((link) => m.index >= link.start && m.index < link.end)) continue;
+    spans.push({ start: m.index, end: m.index + m[0].length });
+  }
+  return spans;
+}
 
 /**
  * Spans for the syntax this parser owns — Obsidian tags, Dataview inline
@@ -205,10 +216,7 @@ const BLOCK_REF_REGEX = /\s+\^([\w-]+)\s*$/;
  * stop-list describing the other.
  */
 function scanObsidianMetadata(text: string): Span[] {
-  const spans: Span[] = [];
-  for (const m of text.matchAll(TAG_REGEX)) {
-    spans.push({ start: m.index, end: m.index + m[0].length });
-  }
+  const spans: Span[] = scanTags(text);
   for (const m of text.matchAll(INLINE_FIELD_REGEX)) {
     spans.push({ start: m.index, end: m.index + m[0].length });
   }
@@ -266,13 +274,50 @@ export function stripWikilinks(text: string): string {
 }
 
 export interface TextSegment {
-  type: "text" | "wikilink" | "mdlink" | "bold" | "italic" | "strike" | "code" | "highlight";
+  type: "text" | "wikilink" | "mdlink" | "url" | "bold" | "italic" | "strike" | "code" | "highlight";
   content: string;
+  /** Where a link segment points: a URL when `external`, otherwise link text
+   *  for Obsidian to resolve (`Note`, `Note#Heading`, `Folder/Note.md`). */
+  target?: string;
+  external?: boolean;
+}
+
+const URL_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+
+/** `[text](dest)` reaches a note as readily as a web page; only a scheme tells them apart. */
+function mdLinkSegment(label: string, destination: string): TextSegment {
+  const dest = destination.trim().replace(/^<(.*)>$/, "$1");
+  if (dest === "") return { type: "mdlink", content: label };
+  if (URL_SCHEME.test(dest)) return { type: "mdlink", content: label, target: dest, external: true };
+  let path = dest;
+  try {
+    path = decodeURIComponent(dest);
+  } catch {
+    // A stray % is not an escape; the raw text is the best link text there is.
+  }
+  return { type: "mdlink", content: label, target: path, external: false };
+}
+
+/** Cuts what a sentence wraps around a bare URL: closing punctuation, and a
+ *  `)` the URL never opened. */
+function trimBareUrl(url: string): string {
+  let end = url.length;
+  for (;;) {
+    const last = url[end - 1];
+    if (".,;:!?'\"".includes(last)) end--;
+    else if (last === ")" && unbalancedClose(url.slice(0, end))) end--;
+    else break;
+  }
+  return url.slice(0, end);
+}
+
+function unbalancedClose(url: string): boolean {
+  return url.split(")").length > url.split("(").length;
 }
 
 /** Splits text into typed segments for safe DOM rendering without {@html}.
- *  Handles: [[wikilinks]], [md](links), **bold**, __bold__, *italic*, _italic_,
- *  ~~strike~~, ==highlight==, `code`, and strips %%comments%%. */
+ *  Handles: [[wikilinks]], [md](links), bare URLs, **bold**, __bold__, *italic*,
+ *  _italic_, ~~strike~~, ==highlight==, `code`, and strips %%comments%%. */
 export function parseWikilinks(text: string): TextSegment[] {
   const segments: TextSegment[] = [];
   const cleaned = text.replace(/%%.*?%%/g, "");
@@ -280,8 +325,9 @@ export function parseWikilinks(text: string): TextSegment[] {
   // Order matters: longer/more specific patterns before shorter ones.
   // Group 1: `code`   2: **bold**   3: __bold__   4: ~~strike~~   5: ==highlight==
   // Group 6: *italic*   7: _italic_ (word-boundary)
-  // Group 8: [[wikilink]]   Group 9: [md](link)
-  const regex = /`([^`]+)`|\*\*(.+?)\*\*|__(.+?)__|~~(.+?)~~|==(.+?)==|\*(.+?)\*|(?<!\w)_(.+?)_(?!\w)|\[\[(?:[^\]|]+\|)?([^\]]+)\]\]|(?<!\[)\[([^\]]+)\]\([^)]*\)/g;
+  // Group 8, 9: [[target|alias]]   Group 10, 11: [label](destination)
+  // Group 12: bare URL
+  const regex = /`([^`]+)`|\*\*(.+?)\*\*|__(.+?)__|~~(.+?)~~|==(.+?)==|\*(.+?)\*|(?<!\w)_(.+?)_(?!\w)|\[\[([^\]|]+)(?:\|([^\]]+))?\]\]|(?<!\[)\[([^\]]+)\]\(([^)]*)\)|(https?:\/\/[^\s<>]+)/g;
 
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -296,8 +342,13 @@ export function parseWikilinks(text: string): TextSegment[] {
     else if (match[5] !== undefined) segments.push({ type: "highlight", content: match[5] });
     else if (match[6] !== undefined) segments.push({ type: "italic",    content: match[6] });
     else if (match[7] !== undefined) segments.push({ type: "italic",    content: match[7] });
-    else if (match[8] !== undefined) segments.push({ type: "wikilink",  content: match[8] });
-    else if (match[9] !== undefined) segments.push({ type: "mdlink",    content: match[9] });
+    else if (match[8] !== undefined) segments.push({ type: "wikilink",  content: match[9] ?? match[8], target: match[8], external: false });
+    else if (match[10] !== undefined) segments.push(mdLinkSegment(match[10], match[11]));
+    else if (match[12] !== undefined) {
+      const url = trimBareUrl(match[12]);
+      segments.push({ type: "url", content: url, target: url, external: true });
+      regex.lastIndex = match.index + url.length;
+    }
     lastIndex = regex.lastIndex;
   }
   if (lastIndex < cleaned.length) {

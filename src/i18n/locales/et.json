@@ -16,6 +16,10 @@
       "parentOnly": "Ainult peaülesanne",
       "cancel": "Tühista"
     },
+    "createNote": {
+      "message": "„{{name}}“ pole veel olemas. Kas luua see?",
+      "confirmButton": "Loo"
+    },
     "contextMenu": {
       "moveTo": "Teisalda: {{name}}",
       "editTask": "Muuda ülesannet",
@@ -150,6 +154,10 @@
         "name": "Märgi tähtaja ületanud ja valesti paigutatud ülesanded",
         "descriptionOverdue": "märgib ülesanded, mille tähtaeg on möödas.",
         "descriptionMisfiled": "soovitab paremat kategooriat, et tähtaeg ei jääks märkamata: täna tähtaja saabuv ülesanne kategoorias {{later}} kuulub kategooriasse {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Ava lingid paneelilt",
+        "description": "Ülesandes olevale lingile klõpsamine avab lingi, selle asemel et näidata ülesannet selle märkmes."
       },
       "compactView": {
         "name": "Kompaktne vaade",

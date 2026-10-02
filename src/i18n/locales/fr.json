@@ -16,6 +16,10 @@
       "parentOnly": "Tâche parente uniquement",
       "cancel": "Annuler"
     },
+    "createNote": {
+      "message": "« {{name}} » n'existe pas encore. La créer ?",
+      "confirmButton": "Créer"
+    },
     "contextMenu": {
       "moveTo": "Déplacer vers : {{name}}",
       "editTask": "Modifier la tâche",
@@ -150,6 +154,10 @@
         "name": "Signaler les tâches en retard et mal classées",
         "descriptionOverdue": "signale les tâches dont l'échéance est passée.",
         "descriptionMisfiled": "suggère une meilleure catégorie pour ne pas manquer l'échéance : une tâche due aujourd'hui dans {{later}} a sa place dans {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Ouvrir les liens depuis le panneau",
+        "description": "Cliquer sur un lien dans une tâche l'ouvre au lieu d'afficher la tâche dans sa note."
       },
       "compactView": {
         "name": "Vue compacte",

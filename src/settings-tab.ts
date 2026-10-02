@@ -1,9 +1,10 @@
-import { App, PluginSettingTab, Setting, TFile, TFolder, Modal, SettingDefinitionItem, requireApiVersion } from "obsidian";
+import { App, PluginSettingTab, Setting, TFile, TFolder, SettingDefinitionItem, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
 import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { renderIcon } from "./views/icon";
+import { ConfirmModal } from "./views/ConfirmModal";
 import { t, i18next } from "./i18n/i18n";
 
 /**
@@ -255,43 +256,6 @@ function renderEmojiSetting(
 }
 
 
-class ConfirmModal extends Modal {
-  constructor(
-    app: App,
-    private message: string,
-    private confirmLabel: string,
-    private onConfirm: () => void | Promise<void>
-  ) {
-    super(app);
-  }
-
-  onOpen() {
-    this.titleEl.setText(t("panel.title"));
-    this.contentEl.createEl("p", { text: this.message });
-
-    const footer = this.contentEl.createDiv({
-      cls: "modal-button-container",
-    });
-
-    const confirmBtn = footer.createEl("button", {
-      text: this.confirmLabel,
-      cls: "mod-warning",
-    });
-    confirmBtn.onclick = () => {
-      void this.onConfirm();
-      this.close();
-    };
-
-    const cancelBtn = footer.createEl("button", { text: t("common.cancel") });
-    cancelBtn.onclick = () => this.close();
-  }
-
-  onClose() {
-    this.contentEl.empty();
-  }
-}
-
-
 function generateBucketId(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from(
@@ -421,6 +385,11 @@ export class GtdSettingsTab extends PluginSettingTab {
             name: t("settings.behaviour.markDueFlags.name"),
             desc: markDueFlagsDesc(),
             control: { type: "toggle", key: "staleIndicatorEnabled" },
+          },
+          {
+            name: t("settings.behaviour.openLinks.name"),
+            desc: t("settings.behaviour.openLinks.description"),
+            control: { type: "toggle", key: "openLinksOnClick" },
           },
           {
             name: t("settings.behaviour.compactView.name"),
@@ -802,6 +771,16 @@ export class GtdSettingsTab extends PluginSettingTab {
         tog.setValue(this.plugin.settings.staleIndicatorEnabled);
         tog.onChange(async (val) => {
           await this.setControlValue("staleIndicatorEnabled", val);
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(t("settings.behaviour.openLinks.name"))
+      .setDesc(t("settings.behaviour.openLinks.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.openLinksOnClick);
+        tog.onChange(async (val) => {
+          await this.setControlValue("openLinksOnClick", val);
         });
       });
 

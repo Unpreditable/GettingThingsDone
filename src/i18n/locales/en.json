@@ -28,6 +28,13 @@
       "parentOnly": "Parent only",
       "cancel": "Cancel"
     },
+    "createNote": {
+      "_comment": "Confirmation dialog shown when the user clicks a link, in a task's text in the panel, to a note that does not exist. Confirming creates the note and opens it. The Cancel button reuses common.cancel.",
+      "message_comment": "{{name}} = the name of the missing note, as written in the link.",
+      "message": "\"{{name}}\" doesn't exist yet. Create it?",
+      "confirmButton_comment": "Button: create the missing note and open it.",
+      "confirmButton": "Create"
+    },
     "contextMenu": {
       "moveTo_comment": "Right-click context menu item on a task. {{name}} = the destination bucket's display name.",
       "moveTo": "Move to: {{name}}",
@@ -231,6 +238,11 @@
         "descriptionOverdue": "marks tasks whose due date has passed.",
         "descriptionMisfiled_comment": "Follows the amber misfiled icon on its own line. {{later}} and {{sooner}} are bucket display names injected by the plugin.",
         "descriptionMisfiled": "suggests a better bucket so you don't miss the due date: a task due today in {{later}} belongs in {{sooner}}."
+      },
+      "openLinks": {
+        "_comment": "Toggle for links inside a task's text in the sidebar panel (web links, and links to other notes). On: clicking such a link opens it. Off: the click does what a click anywhere else on the task does, which is open the task's note at that task. 'The panel' is the plugin's sidebar, named so the setting is not read as being about links in the user's notes.",
+        "name": "Open links from the panel",
+        "description": "Clicking a link in a task opens it instead of showing the task in its note."
       },
       "compactView": {
         "name": "Compact view",

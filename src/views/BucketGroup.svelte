@@ -19,6 +19,7 @@
   export let showDueFlags: boolean = true;
   export let priorityDisplay: PriorityDisplay = "all";
   export let showRecurrenceBadge: boolean = true;
+  export let openLinksOnClick: boolean = true;
   export let showTasksFieldsInPopover: boolean = true;
   /** Which date field auto-placed each task here, keyed by task id. */
   export let autoPlacedFrom: Record<string, "due" | "scheduled"> = {};
@@ -37,6 +38,7 @@
     move: { task: TaskRecord; targetBucketId: string | null };
     toggle: { task: TaskRecord };
     navigate: { task: TaskRecord };
+    openLink: { task: TaskRecord; target: string; external: boolean; newTab: boolean };
     drop: {
       taskId: string;
       sourceBucketId: string;
@@ -353,6 +355,7 @@
           {showDueFlags}
           {priorityDisplay}
           {showRecurrenceBadge}
+          {openLinksOnClick}
           {showTasksFieldsInPopover}
           autoPlacedFrom={task.isCompleted ? null : autoPlacedFrom[task.id] ?? null}
           misfiledIn={misfiledIn[task.id] ?? null}
@@ -366,6 +369,7 @@
           on:move={(e) => dispatch("move", e.detail)}
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}
+          on:openLink={(e) => dispatch("openLink", e.detail)}
           on:dismiss={(e) => { dismissedIds.add(e.detail.task.id); dismissedIds = dismissedIds; }}
         />
       {/each}

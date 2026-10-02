@@ -16,6 +16,10 @@
       "parentOnly": "Tikai vecākuzdevumu",
       "cancel": "Atcelt"
     },
+    "createNote": {
+      "message": "„{{name}}” vēl nepastāv. Izveidot?",
+      "confirmButton": "Izveidot"
+    },
     "contextMenu": {
       "moveTo": "Pārvietot uz: {{name}}",
       "editTask": "Rediģēt uzdevumu",
@@ -154,6 +158,10 @@
         "name": "Atzīmēt nokavētos un nepareizi sakārtotos uzdevumus",
         "descriptionOverdue": "atzīmē uzdevumus, kuriem termiņš ir pagājis.",
         "descriptionMisfiled": "iesaka piemērotāku grupu, lai nepalaistu garām termiņu: uzdevums ar šodienas termiņu grupā {{later}} pieder grupai {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Atvērt saites no paneļa",
+        "description": "Noklikšķinot uz saites uzdevumā, tā tiek atvērta, nevis parādīts uzdevums tā piezīmē."
       },
       "compactView": {
         "name": "Kompakts skats",

@@ -16,6 +16,10 @@
       "parentOnly": "親タスクのみ",
       "cancel": "キャンセル"
     },
+    "createNote": {
+      "message": "「{{name}}」はまだ存在しません。作成しますか？",
+      "confirmButton": "作成"
+    },
     "contextMenu": {
       "moveTo": "移動先: {{name}}",
       "editTask": "タスクを編集",
@@ -150,6 +154,10 @@
         "name": "期限切れ・分類ミスのタスクに印を付ける",
         "descriptionOverdue": "は期限を過ぎたタスクに付きます。",
         "descriptionMisfiled": "は期限を見逃さないよう、より適したバケットを提案します。今日が期限で「{{later}}」にあるタスクは「{{sooner}}」に入れるべきです。"
+      },
+      "openLinks": {
+        "name": "パネルからリンクを開く",
+        "description": "タスク内のリンクをクリックすると、ノート内のタスクを表示する代わりにリンクを開きます。"
       },
       "compactView": {
         "name": "コンパクト表示",

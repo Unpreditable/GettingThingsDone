@@ -29,6 +29,7 @@
   ) => Promise<void>;
   export let onToggle: (task: TaskRecord) => Promise<void>;
   export let onNavigate: (task: TaskRecord) => void;
+  export let onOpenLink: (task: TaskRecord, target: string, external: boolean, newTab: boolean) => void;
   /** Asked each time the menu opens, since Tasks can be enabled or disabled while the panel is up. */
   export let canEditTask: () => boolean;
   export let onEdit: (task: TaskRecord) => void;
@@ -424,6 +425,7 @@
         showDueFlags={settings.staleIndicatorEnabled}
         priorityDisplay={settings.priorityDisplay}
         showRecurrenceBadge={settings.showRecurrenceBadge}
+        openLinksOnClick={settings.openLinksOnClick}
         showTasksFieldsInPopover={settings.showTasksFieldsInPopover}
         autoPlacedFrom={group.autoPlacedFrom}
         misfiledIn={group.misfiledIn}
@@ -437,6 +439,7 @@
         on:move={(e) => handleMove(e.detail.task, e.detail.targetBucketId)}
         on:toggle={(e) => handleToggle(e.detail.task)}
         on:navigate={(e) => onNavigate(e.detail.task)}
+        on:openLink={(e) => onOpenLink(e.detail.task, e.detail.target, e.detail.external, e.detail.newTab)}
         on:drop={handleDrop}
         on:reorder={handleReorderEvent}
       />

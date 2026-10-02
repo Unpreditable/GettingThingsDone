@@ -390,3 +390,9 @@ describe("Tasks integration defaults", () => {
     expect(DEFAULT_SETTINGS.showTasksFieldsInPopover).toBe(true);
   });
 });
+
+describe("panel link defaults", () => {
+  it("opens links from the panel unless turned off", () => {
+    expect(DEFAULT_SETTINGS.openLinksOnClick).toBe(true);
+  });
+});

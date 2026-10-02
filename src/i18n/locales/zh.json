@@ -16,6 +16,10 @@
       "parentOnly": "仅父任务",
       "cancel": "取消"
     },
+    "createNote": {
+      "message": "“{{name}}”尚不存在。要创建吗？",
+      "confirmButton": "创建"
+    },
     "contextMenu": {
       "moveTo": "移动到：{{name}}",
       "editTask": "编辑任务",
@@ -150,6 +154,10 @@
         "name": "标记逾期和归类错误的任务",
         "descriptionOverdue": "标记已过期的任务。",
         "descriptionMisfiled": "建议更合适的分组，避免错过到期日：今天到期却放在「{{later}}」的任务应放入「{{sooner}}」。"
+      },
+      "openLinks": {
+        "name": "从面板打开链接",
+        "description": "点击任务中的链接会打开该链接，而不是在笔记中显示该任务。"
       },
       "compactView": {
         "name": "紧凑视图",

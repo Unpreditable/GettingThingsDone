@@ -16,6 +16,10 @@
       "parentOnly": "Tik pagrindinę užduotį",
       "cancel": "Atšaukti"
     },
+    "createNote": {
+      "message": "„{{name}}“ dar neegzistuoja. Sukurti?",
+      "confirmButton": "Sukurti"
+    },
     "contextMenu": {
       "moveTo": "Perkelti į: {{name}}",
       "editTask": "Redaguoti užduotį",
@@ -158,6 +162,10 @@
         "name": "Žymėti vėluojančias ir netinkamai priskirtas užduotis",
         "descriptionOverdue": "žymi užduotis, kurių terminas praėjo.",
         "descriptionMisfiled": "siūlo tinkamesnę grupę, kad nepraleistumėte termino: šiandien pasibaigiančio termino užduotis grupėje {{later}} turi būti grupėje {{sooner}}."
+      },
+      "openLinks": {
+        "name": "Atidaryti nuorodas iš skydelio",
+        "description": "Spustelėjus nuorodą užduotyje, ji atidaroma, užuot rodžius užduotį jos užraše."
       },
       "compactView": {
         "name": "Kompaktiškas rodinys",

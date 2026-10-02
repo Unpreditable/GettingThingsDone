@@ -330,19 +330,125 @@ describe("parseWikilinks", () => {
   it("parses plain wikilink into wikilink segment", () => {
     expect(parseWikilinks("Buy [[hardware-store]] supplies")).toEqual([
       { type: "text", content: "Buy " },
-      { type: "wikilink", content: "hardware-store" },
+      { type: "wikilink", content: "hardware-store", target: "hardware-store", external: false },
       { type: "text", content: " supplies" },
     ]);
   });
   it("uses alias for aliased wikilinks", () => {
     expect(parseWikilinks("See [[long page|short]] here")).toEqual([
       { type: "text", content: "See " },
-      { type: "wikilink", content: "short" },
+      { type: "wikilink", content: "short", target: "long page", external: false },
       { type: "text", content: " here" },
     ]);
   });
   it("returns empty array for empty string", () => {
     expect(parseWikilinks("")).toEqual([]);
+  });
+});
+
+describe("parseWikilinks link targets", () => {
+  it("keeps the heading in a wikilink's target", () => {
+    expect(parseWikilinks("[[Plan#Risks]]")).toEqual([
+      { type: "wikilink", content: "Plan#Risks", target: "Plan#Risks", external: false },
+    ]);
+  });
+  it("keeps the URL of a markdown link", () => {
+    expect(parseWikilinks("Read [the docs](https://example.com/guide)")).toEqual([
+      { type: "text", content: "Read " },
+      { type: "mdlink", content: "the docs", target: "https://example.com/guide", external: true },
+    ]);
+  });
+  it("gives each of several links its own target", () => {
+    expect(parseWikilinks("[one](https://a.example) then [two](https://b.example) and [[Three]]")).toEqual([
+      { type: "mdlink", content: "one", target: "https://a.example", external: true },
+      { type: "text", content: " then " },
+      { type: "mdlink", content: "two", target: "https://b.example", external: true },
+      { type: "text", content: " and " },
+      { type: "wikilink", content: "Three", target: "Three", external: false },
+    ]);
+  });
+  it("treats a markdown link without a scheme as a note path", () => {
+    expect(parseWikilinks("[plan](Projects/Some%20Note.md)")).toEqual([
+      { type: "mdlink", content: "plan", target: "Projects/Some Note.md", external: false },
+    ]);
+  });
+  it("unwraps an angle-bracketed markdown link destination", () => {
+    expect(parseWikilinks("[plan](<Some Note.md>)")).toEqual([
+      { type: "mdlink", content: "plan", target: "Some Note.md", external: false },
+    ]);
+  });
+  it("treats non-http schemes as external", () => {
+    expect(parseWikilinks("[mail](mailto:a@example.com)")).toEqual([
+      { type: "mdlink", content: "mail", target: "mailto:a@example.com", external: true },
+    ]);
+  });
+  it("leaves a markdown link with an empty destination unlinked", () => {
+    expect(parseWikilinks("[later]()")).toEqual([{ type: "mdlink", content: "later" }]);
+  });
+  it("links a bare URL", () => {
+    expect(parseWikilinks("Watch https://example.com/video today")).toEqual([
+      { type: "text", content: "Watch " },
+      { type: "url", content: "https://example.com/video", target: "https://example.com/video", external: true },
+      { type: "text", content: " today" },
+    ]);
+  });
+  it("leaves sentence punctuation out of a bare URL", () => {
+    expect(parseWikilinks("See https://example.com/a, then https://example.com/b.")).toEqual([
+      { type: "text", content: "See " },
+      { type: "url", content: "https://example.com/a", target: "https://example.com/a", external: true },
+      { type: "text", content: ", then " },
+      { type: "url", content: "https://example.com/b", target: "https://example.com/b", external: true },
+      { type: "text", content: "." },
+    ]);
+  });
+  it("leaves an enclosing parenthesis out of a bare URL", () => {
+    expect(parseWikilinks("(see https://example.com/a)")).toEqual([
+      { type: "text", content: "(see " },
+      { type: "url", content: "https://example.com/a", target: "https://example.com/a", external: true },
+      { type: "text", content: ")" },
+    ]);
+  });
+  it("keeps a bare URL's own balanced parentheses", () => {
+    const url = "https://en.wikipedia.org/wiki/Mercury_(planet)";
+    expect(parseWikilinks(url)).toEqual([{ type: "url", content: url, target: url, external: true }]);
+  });
+  it("does not read underscores inside a bare URL as italics", () => {
+    const url = "https://example.com/_drafts_/a_b";
+    expect(parseWikilinks(`Open ${url}`)).toEqual([
+      { type: "text", content: "Open " },
+      { type: "url", content: url, target: url, external: true },
+    ]);
+  });
+  it("leaves a URL inside backticks as code", () => {
+    expect(parseWikilinks("Run `curl https://example.com`")).toEqual([
+      { type: "text", content: "Run " },
+      { type: "code", content: "curl https://example.com" },
+    ]);
+  });
+});
+
+describe("a # inside a link", () => {
+  const only = (line: string) => parseFile("test.md", line)[0];
+
+  it("stays in a wikilink as its heading", () => {
+    const task = only("- [ ] Review [[Plan#3. Risks]]");
+    expect(task.text).toBe("Review [[Plan#3. Risks]]");
+    expect(task.tags).toEqual([]);
+  });
+  it("stays in a bare URL as its fragment", () => {
+    const task = only("- [ ] Read https://example.com/page#section today");
+    expect(task.text).toBe("Read https://example.com/page#section today");
+    expect(task.tags).toEqual([]);
+  });
+  it("stays in a markdown link's destination", () => {
+    const task = only("- [ ] Read [docs](https://example.com/a#b)");
+    expect(task.text).toBe("Read [docs](https://example.com/a#b)");
+    expect(task.tags).toEqual([]);
+  });
+  it("does not shield a real tag elsewhere on the line", () => {
+    const task = only("- [ ] #work See [[Note#Heading]] and https://example.com/a#b #gtd/today");
+    expect(task.text).toBe("See [[Note#Heading]] and https://example.com/a#b");
+    expect(task.tags).toEqual(["work", "gtd/today"]);
   });
 });
 

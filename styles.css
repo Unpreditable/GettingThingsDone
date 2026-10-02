@@ -819,6 +819,10 @@
   text-decoration: underline;
 }
 
+.gtd-md-link.is-clickable {
+  cursor: pointer;
+}
+
 .gtd-inline-code {
   font-family: var(--font-monospace);
   font-size: 0.9em;
