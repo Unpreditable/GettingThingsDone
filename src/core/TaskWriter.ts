@@ -11,7 +11,11 @@ export interface MoveResult {
 /** The subset of the Tasks plugin's documented apiV1 that this plugin uses. */
 export interface TasksPluginApiV1 {
   executeToggleTaskDoneCommand: (line: string, path: string) => string;
-  /** Opens Tasks' edit modal. Resolves with the edited line(s) on Apply; never settles on Cancel. */
+  /**
+   * Opens Tasks' edit modal. Resolves with the edited line(s) on Apply. On
+   * Cancel, newer versions resolve with an empty string and older ones never
+   * settle; closing the modal any other way never settles.
+   */
   editTaskLineModal?: (line: string) => Promise<string>;
 }
 
@@ -19,6 +23,16 @@ export interface TasksPluginApiV1 {
 export function getTaskEditor(app: App): ((line: string) => Promise<string>) | null {
   const api = getTasksApi(app);
   return typeof api?.editTaskLineModal === "function" ? api.editTaskLineModal.bind(api) : null;
+}
+
+/**
+ * The lines to write back for what Tasks' edit modal resolved with, or null
+ * when nothing should be written. An empty string is Cancel: writing it would
+ * blank the task's line in the note.
+ */
+export function editedLines(edited: string, originalLine: string): string[] | null {
+  if (edited === "" || edited === originalLine) return null;
+  return edited.split("\n");
 }
 
 /** The Tasks community plugin's apiV1, if it is installed and enabled. */

@@ -18,7 +18,7 @@ import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
-import { getTaskEditor, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion } from "./core/TaskWriter";
+import { editedLines, getTaskEditor, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion } from "./core/TaskWriter";
 import { parseFile, taskTextColumn } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
@@ -611,8 +611,9 @@ class GtdPanelView extends ItemView {
   }
 
   /**
-   * Tasks' modal never settles its promise on Cancel, so nothing may wait on
-   * it: the write-back lives in .then() and Cancel is simply a no-op.
+   * Tasks' modal may never settle its promise (see editTaskLineModal), so
+   * nothing may wait on it: the write-back lives in .then(), and Cancel is a
+   * no-op whether it settles with an empty string or not at all.
    *
    * The order-key diff is built here, where it's known which line became
    * which, and applied before the reindex runs its own heuristic diff. That
@@ -624,8 +625,8 @@ class GtdPanelView extends ItemView {
 
     edit(task.rawLine).then(
       async (edited) => {
-        if (edited === task.rawLine) return;
-        const lines = edited.split("\n");
+        const lines = editedLines(edited, task.rawLine);
+        if (!lines) return;
         const result = await replaceTaskLine(this.app, task, () => lines);
 
         if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {

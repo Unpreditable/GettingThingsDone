@@ -1,4 +1,4 @@
-import { findTaskLine, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
+import { editedLines, findTaskLine, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
 import { DEFAULT_SETTINGS } from "../src/settings";
 import { TFile } from "obsidian";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -314,6 +314,30 @@ describe("replaceTaskLine", () => {
 
     expect(result.success).toBe(false);
     expect(getContent()).toBe("- [ ] Something else");
+  });
+});
+
+describe("editedLines", () => {
+  const original = "- [ ] Buy milk #gtd/today";
+
+  it("is null for Cancel, which newer Tasks versions report as an empty string", () => {
+    expect(editedLines("", original)).toBeNull();
+  });
+
+  it("is null when the line comes back unchanged", () => {
+    expect(editedLines(original, original)).toBeNull();
+  });
+
+  it("is the edited line", () => {
+    expect(editedLines("- [ ] Buy oat milk #gtd/today", original)).toEqual(["- [ ] Buy oat milk #gtd/today"]);
+  });
+
+  it("splits a recurring task's two lines", () => {
+    const edited = "- [ ] Water plants 🔁 every week 📅 2026-10-20\n- [x] Water plants 🔁 every week ✅ 2026-10-13";
+    expect(editedLines(edited, original)).toEqual([
+      "- [ ] Water plants 🔁 every week 📅 2026-10-20",
+      "- [x] Water plants 🔁 every week ✅ 2026-10-13",
+    ]);
   });
 });
 
