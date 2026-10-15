@@ -140,6 +140,19 @@
       "folderNotFound": "Ordner nicht gefunden",
       "fileNotFound": "Datei nicht gefunden"
     },
+    "taskFilter": {
+      "name": "Globaler Aufgabenfilter",
+      "description": "Nur Checkboxen, die einen dieser Einträge enthalten, werden zu Aufgaben. Einer pro Zeile, Groß-/Kleinschreibung wird beachtet. Leer lassen, um alle Checkboxen einzubeziehen.",
+      "placeholder": "z. B. #task oder TODO",
+      "includeSubtasks": {
+        "name": "Unteraufgaben einer passenden Aufgabe als Aufgaben zählen",
+        "description": "Eine Unteraufgabe unter einer Aufgabe, die zum Filter passt, ist ebenfalls eine Aufgabe, auch wenn sie den Filtertext selbst nicht enthält."
+      },
+      "hideText": {
+        "name": "Globalen Filter aus dem Aufgabentext entfernen",
+        "description": "Blendet den Filtertext im Panel aus, wo er als eigenes Wort steht. Tags werden immer ausgeblendet. Notizen werden nicht verändert."
+      }
+    },
     "behaviour": {
       "heading": "Verhalten",
       "weekStart": {

@@ -20,6 +20,7 @@
   export let priorityDisplay: PriorityDisplay = "all";
   export let showRecurrenceBadge: boolean = true;
   export let openLinksOnClick: boolean = true;
+  export let hiddenFilterStrings: string[] = [];
   export let showTasksFieldsInPopover: boolean = true;
   /** Which date field auto-placed each task here, keyed by task id. */
   export let autoPlacedFrom: Record<string, "due" | "scheduled"> = {};
@@ -356,6 +357,7 @@
           {priorityDisplay}
           {showRecurrenceBadge}
           {openLinksOnClick}
+          {hiddenFilterStrings}
           {showTasksFieldsInPopover}
           autoPlacedFrom={task.isCompleted ? null : autoPlacedFrom[task.id] ?? null}
           misfiledIn={misfiledIn[task.id] ?? null}

@@ -1,5 +1,7 @@
 import {
   getActiveScope,
+  getTaskFilter,
+  hiddenFilterStrings,
   isPathInScope,
   matchesEntry,
   migrateSettingsData,
@@ -394,5 +396,37 @@ describe("Tasks integration defaults", () => {
 describe("panel link defaults", () => {
   it("opens links from the panel unless turned off", () => {
     expect(DEFAULT_SETTINGS.openLinksOnClick).toBe(true);
+  });
+});
+
+describe("global task filter settings", () => {
+  it("is off by default", () => {
+    expect(DEFAULT_SETTINGS.taskFilters).toEqual([]);
+    expect(DEFAULT_SETTINGS.taskFilterIncludeSubtasks).toBe(false);
+    expect(DEFAULT_SETTINGS.taskFilterHideText).toBe(false);
+  });
+
+  it("trims entries and drops blanks and duplicates", () => {
+    const settings = { ...DEFAULT_SETTINGS, taskFilters: ["  #task ", "", "   ", "TODO", "#task"] };
+    expect(normalizeSettingsShapes(settings).taskFilters).toEqual(["#task", "TODO"]);
+  });
+
+  it("drops entries that are not strings, and a list that is not a list", () => {
+    const mixed = { ...DEFAULT_SETTINGS, taskFilters: ["#task", 7, null] } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(mixed).taskFilters).toEqual(["#task"]);
+
+    const notAList = { ...DEFAULT_SETTINGS, taskFilters: "#task" } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(notAList).taskFilters).toEqual([]);
+  });
+
+  it("hands the parser the strings and the subtask choice as one filter", () => {
+    const settings = { ...DEFAULT_SETTINGS, taskFilters: ["#task"], taskFilterIncludeSubtasks: true };
+    expect(getTaskFilter(settings)).toEqual({ strings: ["#task"], includeSubtasks: true });
+  });
+
+  it("gives the panel strings to hide only while hiding is on", () => {
+    const off = { ...DEFAULT_SETTINGS, taskFilters: ["TODO"] };
+    expect(hiddenFilterStrings(off)).toEqual([]);
+    expect(hiddenFilterStrings({ ...off, taskFilterHideText: true })).toEqual(["TODO"]);
   });
 });

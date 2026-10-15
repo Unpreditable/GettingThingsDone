@@ -13,7 +13,7 @@ import type { EditorView } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
-import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, activeOrderKeyScheme, getActiveScope, isPathInScope, migrateSettingsData, normalizeSettingsShapes, shouldAdoptCatchAll, shouldRecommendCatchAll } from "./settings";
+import { PluginSettings, DEFAULT_SETTINGS, DEFAULT_BUCKETS, activeOrderKeyScheme, getActiveScope, getTaskFilter, isPathInScope, migrateSettingsData, normalizeSettingsShapes, shouldAdoptCatchAll, shouldRecommendCatchAll } from "./settings";
 import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
@@ -58,7 +58,12 @@ export default class GtdTasksPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
 
-    this.taskIndex = new TaskIndex(this.app, this, () => getActiveScope(this.settings));
+    this.taskIndex = new TaskIndex(
+      this.app,
+      this,
+      () => getActiveScope(this.settings),
+      () => getTaskFilter(this.settings)
+    );
 
     this.statusBarItem = this.addStatusBarItem();
     this.statusBarItem.addClass("gtd-status-bar-item");
@@ -636,8 +641,8 @@ class GtdPanelView extends ItemView {
         }
 
         const diff = diffForEdit(
-          parseFile(task.filePath, result.before),
-          parseFile(task.filePath, result.after),
+          parseFile(task.filePath, result.before, getTaskFilter(this.plugin.settings)),
+          parseFile(task.filePath, result.after, getTaskFilter(this.plugin.settings)),
           result.lineIdx,
           lines.length,
           activeOrderKeyScheme(this.plugin.settings)

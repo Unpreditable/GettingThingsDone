@@ -347,3 +347,27 @@ describe("TaskIndex", () => {
     expect(calls).toBe(0);
   });
 });
+
+describe("TaskIndex with a task filter", () => {
+  const vault: TaskScope = { type: "vault", ignored: [] };
+  const filter = { strings: ["#task"], includeSubtasks: false };
+
+  it("indexes only the checkboxes that pass the filter", async () => {
+    const { app, plugin } = makeMockEnv({ "a.md": "- [ ] Keep #task\n- [ ] Drop" });
+    const index = new TaskIndex(app, plugin, () => vault, () => filter);
+    await index.initialScan();
+
+    expect(index.getAllTasks().map((t) => t.text)).toEqual(["Keep"]);
+  });
+
+  it("applies the filter to a file that changes afterwards", async () => {
+    const { app, plugin, fireChanged } = makeMockEnv({ "a.md": "- [ ] Keep #task" });
+    const index = new TaskIndex(app, plugin, () => vault, () => filter);
+    index.registerVaultEvents();
+    await index.initialScan();
+
+    fireChanged("a.md", "- [ ] Keep #task\n- [ ] Added without the tag\n- [ ] Added #task");
+
+    expect(index.getAllTasks().map((t) => t.text)).toEqual(["Keep", "Added"]);
+  });
+});

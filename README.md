@@ -25,7 +25,7 @@ Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) pl
 - **Celebration animations** — confetti, a pixel creature, both, or nothing.
 - **13 languages**, matching your Obsidian UI language.
 
-Also: search, scoping to folders or files, Dataview-friendly inline fields, per-bucket status bar counts, and a compact view. See [Configuration](#configuration).
+Also: search, scoping to folders or files, a global task filter, Dataview-friendly inline fields, per-bucket status bar counts, and a compact view. See [Configuration](#configuration).
 
 ---
 
@@ -46,6 +46,8 @@ Pin a task (via the right-click menu, a quick-move button, or dragging it to ano
 Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin's recurrence and completion-date setting.
 
 With Tasks installed, right-click a task → **Edit task** to change it in Tasks' own edit dialog; saving writes it back to its note.
+
+If you use Tasks' global filter, enter the same text under **Global task filter** so both plugins agree on what a task is.
 
 The panel also recognises the checkbox statuses that Tasks and many themes use. `[/]` (in progress), `[>]` (forwarded) and `[<]` (scheduled) are open tasks. `[-]` (cancelled) counts as done. If your theme draws its own icons for these, the panel shows them too. Other symbols, such as `[?]` or `[l]`, aren't treated as tasks.
 
@@ -142,6 +144,10 @@ Choose which files the plugin indexes.
 - **Selected paths only** scans only the folders and files you list.
 
 Add an entry with **+ Add folder**/**+ Exclude folder** or **+ Add file**/**+ Exclude file**.
+
+### Global task filter
+
+Similar to the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin's global filter, count a checkbox as a task only if it contains one of the texts you list, e.g. a tag or a keyword.
 
 ### Show completed tasks until midnight
 

@@ -140,6 +140,19 @@
       "folderNotFound": "Carpeta no encontrada",
       "fileNotFound": "Archivo no encontrado"
     },
+    "taskFilter": {
+      "name": "Filtro global de tareas",
+      "description": "Solo las casillas que contienen alguno de estos textos se convierten en tareas. Uno por línea; distingue mayúsculas y minúsculas. Si se deja vacío, se incluyen todas las casillas.",
+      "placeholder": "p. ej. #task o TODO",
+      "includeSubtasks": {
+        "name": "Contar las subtareas de una tarea coincidente como tareas",
+        "description": "Una subtarea de una tarea que coincide con el filtro también es una tarea, aunque no contenga el texto del filtro."
+      },
+      "hideText": {
+        "name": "Eliminar el filtro global del texto de la tarea",
+        "description": "Oculta el texto del filtro en el panel cuando aparece como palabra independiente. Las etiquetas siempre se ocultan. Las notas no se modifican."
+      }
+    },
     "behaviour": {
       "heading": "Comportamiento",
       "weekStart": {

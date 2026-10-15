@@ -1,4 +1,5 @@
 import type { OrderEntry, OrderKeyScheme } from "./core/TaskOrder";
+import type { TaskFilter } from "./core/TaskParser";
 
 export type DateRangeRule =
   | { type: "today" }
@@ -96,6 +97,12 @@ export interface PluginSettings {
   scopePaths: PathEntry[];
   /** Paths skipped in "vault" scope. Preserved even while paths scope is active. */
   ignoredPaths: PathEntry[];
+  /** Global task filter: a checkbox is a task only if it contains one of these. Empty = every checkbox. */
+  taskFilters: string[];
+  /** Keep the subtasks of a task that passes the filter, whatever they contain. */
+  taskFilterIncludeSubtasks: boolean;
+  /** Hide the filter strings in the panel where they stand as whole words. */
+  taskFilterHideText: boolean;
   buckets: BucketConfig[];
   /** Last Obsidian language seen on load — used to detect language changes. */
   lastSeenLanguage: string;
@@ -220,6 +227,9 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   scopeType: "vault",
   scopePaths: [],
   ignoredPaths: [],
+  taskFilters: [],
+  taskFilterIncludeSubtasks: false,
+  taskFilterHideText: false,
   buckets: DEFAULT_BUCKETS,
   lastSeenLanguage: "",
   panelOpenedOnce: false,
@@ -266,6 +276,35 @@ export function getActiveScope(
     case "paths":
       return { type: "paths", included: settings.scopePaths };
   }
+}
+
+/** Builds the filter TaskIndex parses with, from the global-filter settings that decide what is a task. */
+export function getTaskFilter(
+  settings: Pick<PluginSettings, "taskFilters" | "taskFilterIncludeSubtasks">
+): TaskFilter {
+  return {
+    strings: settings.taskFilters,
+    includeSubtasks: settings.taskFilterIncludeSubtasks,
+  };
+}
+
+/** The filter strings the panel cuts from task text: all of them, or none while hiding is off. */
+export function hiddenFilterStrings(
+  settings: Pick<PluginSettings, "taskFilters" | "taskFilterHideText">
+): string[] {
+  return settings.taskFilterHideText ? settings.taskFilters : [];
+}
+
+/** Trims each filter string and drops blanks, duplicates and non-strings. */
+export function normalizeTaskFilters(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const result: string[] = [];
+  for (const entry of raw) {
+    if (typeof entry !== "string") continue;
+    const trimmed = entry.trim();
+    if (trimmed !== "" && !result.includes(trimmed)) result.push(trimmed);
+  }
+  return result;
 }
 
 type LegacyScopeType = "vault" | "folders" | "files";
@@ -432,6 +471,7 @@ export function normalizeSettingsShapes(settings: PluginSettings): PluginSetting
     weekStartsOn: WEEK_STARTS.includes(weekStart) ? weekStart : "monday",
     scopePaths: normalizePathEntries(settings.scopePaths),
     ignoredPaths: normalizePathEntries(settings.ignoredPaths),
+    taskFilters: normalizeTaskFilters(settings.taskFilters),
   };
 }
 

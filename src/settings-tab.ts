@@ -1,6 +1,6 @@
-import { App, PluginSettingTab, Setting, TFile, TFolder, SettingDefinitionItem, requireApiVersion } from "obsidian";
+import { App, PluginSettingTab, Setting, TFile, TFolder, SettingDefinitionItem, debounce, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, normalizeTaskFilters } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { renderIcon } from "./views/icon";
@@ -290,12 +290,26 @@ export class GtdSettingsTab extends PluginSettingTab {
     this.refresh();
   }
 
+  private async applyTaskFilter() {
+    this.applyTaskFilterWhenTypingStops.cancel();
+    await this.plugin.saveSettings();
+    await this.plugin.refreshIndex();
+  }
+
+  /**
+   * Each change to the global filter rescans the vault, so typing waits for
+   * a pause. hide() runs a pending one at once: otherwise an edit made just
+   * before the plugin is disabled, or Obsidian quit, would never be saved.
+   */
+  private applyTaskFilterWhenTypingStops = debounce(() => void this.applyTaskFilter(), 2000, true);
+
   /**
    * Settling the path lists happens here rather than on open because 1.13+
    * never calls display() for a tab that returns setting definitions — it
    * renders those instead — while hide() runs on every path away from the tab.
    */
   hide(): void {
+    this.applyTaskFilterWhenTypingStops.run();
     const settings = this.plugin.settings;
     const before = JSON.stringify([settings.scopePaths, settings.ignoredPaths]);
     settings.scopePaths = tidyPathList(settings.scopePaths);
@@ -591,6 +605,45 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
 
     this.renderScopePathList(containerEl, scopeType);
+    this.renderTaskFilter(containerEl);
+  }
+
+  /** The global task filter — one string per line — and its two toggles. */
+  private renderTaskFilter(containerEl: HTMLElement) {
+    new Setting(containerEl)
+      .setName(t("settings.taskFilter.name"))
+      .setDesc(t("settings.taskFilter.description"))
+      .addTextArea((area) => {
+        area.setValue(this.plugin.settings.taskFilters.join("\n"));
+        area.setPlaceholder(t("settings.taskFilter.placeholder"));
+        area.inputEl.rows = 3;
+        area.onChange((val) => {
+          this.plugin.settings.taskFilters = normalizeTaskFilters(val.split("\n"));
+          this.applyTaskFilterWhenTypingStops();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(t("settings.taskFilter.includeSubtasks.name"))
+      .setDesc(t("settings.taskFilter.includeSubtasks.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.taskFilterIncludeSubtasks);
+        tog.onChange(async (val) => {
+          this.plugin.settings.taskFilterIncludeSubtasks = val;
+          await this.applyTaskFilter();
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(t("settings.taskFilter.hideText.name"))
+      .setDesc(t("settings.taskFilter.hideText.description"))
+      .addToggle((tog) => {
+        tog.setValue(this.plugin.settings.taskFilterHideText);
+        tog.onChange(async (val) => {
+          this.plugin.settings.taskFilterHideText = val;
+          await this.plugin.saveSettings();
+        });
+      });
   }
 
   /**

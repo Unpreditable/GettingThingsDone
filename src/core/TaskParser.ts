@@ -84,9 +84,42 @@ function insertBeforeBlockRef(line: string, token: string): string {
   return `${line.trimEnd()} ${token}`;
 }
 
-export function parseFile(filePath: string, content: string): TaskRecord[] {
+/**
+ * The global task filter: a checkbox is a task only if the text after it
+ * contains one of `strings`, as a case-sensitive substring. An empty list
+ * lets every checkbox through. Modelled on the Tasks plugin's global filter.
+ */
+export interface TaskFilter {
+  strings: string[];
+  /** A checkbox under a kept task is kept too, at any depth. */
+  includeSubtasks: boolean;
+}
+
+const WHOLE_TAG_REGEX = /^#[\w/-]+$/;
+
+/**
+ * A task's text as the panel shows it while the global filter is hidden:
+ * each string is cut where it stands as a whole word, so one inside a longer
+ * word stays. For display only — `text` itself feeds the task id and the
+ * saved-order key. Tag-shaped strings are skipped: stripMetadata has already
+ * removed every tag from `text`.
+ */
+export function hideFilterText(text: string, strings: string[]): string {
+  let result = text;
+  for (const s of strings) {
+    if (WHOLE_TAG_REGEX.test(s)) continue;
+    result = result.replace(new RegExp(`(?<=^|\\s)${escapeRegExp(s)}(?=$|\\s)`, "g"), "");
+  }
+  return result === text ? text : result.replace(/\s{2,}/g, " ").trim();
+}
+
+export function parseFile(filePath: string, content: string, filter?: TaskFilter): TaskRecord[] {
   const lines = content.split("\n");
   const records: TaskRecord[] = [];
+  const strings = filter?.strings ?? [];
+  // Checkboxes that miss the filter but may still be kept as the subtask of
+  // a kept task, which only the hierarchy pass below can tell.
+  const unmatched = new Set<TaskRecord>();
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -95,6 +128,9 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
 
     const checkMark = match[2];
     const rawRest = match[3];
+
+    const matchesFilter = strings.length === 0 || strings.some((s) => rawRest.includes(s));
+    if (!matchesFilter && !filter?.includeSubtasks) continue;
 
     const isCompleted = CLOSED_SYMBOLS.includes(checkMark);
     // One scan per line: the due and completion dates each used to run
@@ -111,7 +147,7 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
     const text = stripMetadata(rawRest, tasksSpans, obsidianSpans);
     const blockRef = rawRest.match(BLOCK_REF_REGEX);
 
-    records.push({
+    const record: TaskRecord = {
       id: makeId(filePath, i, text),
       filePath,
       lineNumber: i,
@@ -133,7 +169,9 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
       indentLevel: extractIndentLevel(line),
       parentId: null,
       childIds: [],
-    });
+    };
+    if (!matchesFilter) unmatched.add(record);
+    records.push(record);
   }
 
   // Build parent/child hierarchy using all list items (tasks + bullets) as context.
@@ -141,6 +179,7 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
   // walks up the stack to find the nearest task ancestor. A bullet only severs the
   // relationship when it causes a task to be popped (sibling case); bullets nested
   // under a task leave that task reachable on the stack.
+  // A checkbox the filter dropped is a plain bullet here, as it is in the note.
   const taskByLine = new Map<number, TaskRecord>(records.map((r) => [r.lineNumber, r]));
   const taskLookup = new Map<string, TaskRecord>(records.map((t) => [t.id, t]));
   const stack: Array<{ indentLevel: number; taskId: string | null }> = [];
@@ -162,6 +201,13 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
       for (let j = stack.length - 1; j >= 0; j--) {
         if (stack[j].taskId != null) { parentTaskId = stack[j].taskId; break; }
       }
+      if (unmatched.has(task)) {
+        if (parentTaskId == null) {
+          stack.push({ indentLevel, taskId: null });
+          continue;
+        }
+        unmatched.delete(task);
+      }
       if (parentTaskId != null) {
         task.parentId = parentTaskId;
         const parentTask = taskLookup.get(parentTaskId);
@@ -173,7 +219,7 @@ export function parseFile(filePath: string, content: string): TaskRecord[] {
     }
   }
 
-  return records;
+  return unmatched.size === 0 ? records : records.filter((r) => !unmatched.has(r));
 }
 
 function extractTags(text: string): string[] {

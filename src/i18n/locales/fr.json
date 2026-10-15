@@ -140,6 +140,19 @@
       "folderNotFound": "Dossier introuvable",
       "fileNotFound": "Fichier introuvable"
     },
+    "taskFilter": {
+      "name": "Filtre global des tâches",
+      "description": "Seules les cases à cocher contenant l'un de ces textes deviennent des tâches. Un par ligne, sensible à la casse. Laissez vide pour inclure toutes les cases à cocher.",
+      "placeholder": "ex. #task ou TODO",
+      "includeSubtasks": {
+        "name": "Compter les sous-tâches d'une tâche correspondante comme des tâches",
+        "description": "Une sous-tâche d'une tâche qui correspond au filtre est aussi une tâche, même si elle ne contient pas elle-même le texte du filtre."
+      },
+      "hideText": {
+        "name": "Masquer le filtre global dans le texte des tâches",
+        "description": "Masque le texte du filtre dans le panneau lorsqu'il forme un mot à part. Les étiquettes sont toujours masquées. Les notes ne sont pas modifiées."
+      }
+    },
     "behaviour": {
       "heading": "Comportement",
       "weekStart": {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import type { TaskRecord, TaskPriority, TextSegment } from "../core/TaskParser";
-  import { stripWikilinks, parseWikilinks, statusSymbol } from "../core/TaskParser";
+  import { stripWikilinks, parseWikilinks, statusSymbol, hideFilterText } from "../core/TaskParser";
   import type { BucketConfig, PriorityDisplay } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { DueStatus } from "../core/DueStatus";
@@ -26,6 +26,10 @@
   export let misfiledIn: BucketConfig | null = null;
   /** The bucket this task is pinned to, or null when it follows its dates. */
   export let pinnedIn: BucketConfig | null = null;
+  /** Global-filter strings to cut from the text shown; empty while hiding is off. */
+  export let hiddenFilterStrings: string[] = [];
+
+  $: shownText = hideFilterText(task.text, hiddenFilterStrings);
 
   // Both can be true at once. The row has space for one signal, so the more
   // serious wins; the popover below carries both.
@@ -86,7 +90,7 @@
   // the parenthetical cannot be translated apart from what it qualifies.
   $: parentTooltip = (() => {
     if (!parentTask) return null;
-    const text = parentTask.text;
+    const text = hideFilterText(parentTask.text, hiddenFilterStrings);
     if (parentBucketId !== currentBucketId && parentBucketName) {
       return t("task.subtaskOfInBucket", { text, bucket: parentBucketName });
     }
@@ -247,8 +251,8 @@
     class="gtd-task-text"
     on:click={onTextClick}
   >
-    {#if task.text}
-      {#each parseWikilinks(task.text) as seg}
+    {#if shownText}
+      {#each parseWikilinks(shownText) as seg}
         {#if openLinksOnClick && seg.target !== undefined}<!-- svelte-ignore a11y-no-static-element-interactions --><span
             class="gtd-md-link is-clickable"
             on:click={(e) => onLinkClick(e, seg)}>{seg.content}</span
@@ -296,16 +300,16 @@
         </div>
         <hr class="gtd-tooltip-divider" />
       {/if}
-      {#if task.text.length > 40}
-        <div class="gtd-tooltip-text">{stripWikilinks(task.text)}</div>
+      {#if shownText.length > 40}
+        <div class="gtd-tooltip-text">{stripWikilinks(shownText)}</div>
       {/if}
       {#if activeDescendantCount > 0}
-        {#if task.text.length > 40}
+        {#if shownText.length > 40}
           <hr class="gtd-tooltip-divider" />
         {/if}
         <div class="gtd-tooltip-subtask-header">{t("task.activeSubtasks", { count: activeDescendantCount })}</div>
       {/if}
-      {#if task.text.length > 40 || activeDescendantCount > 0}
+      {#if shownText.length > 40 || activeDescendantCount > 0}
         <hr class="gtd-tooltip-divider" />
       {/if}
       <div class="gtd-tooltip-source">@ {sourceFile} (L{displayLineNumber})</div>

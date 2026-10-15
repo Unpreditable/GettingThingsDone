@@ -140,6 +140,19 @@
       "folderNotFound": "폴더를 찾을 수 없음",
       "fileNotFound": "파일을 찾을 수 없음"
     },
+    "taskFilter": {
+      "name": "전역 작업 필터",
+      "description": "이 중 하나를 포함하는 체크박스만 작업이 됩니다. 한 줄에 하나씩, 대소문자를 구분합니다. 비워 두면 모든 체크박스가 포함됩니다.",
+      "placeholder": "예: #task 또는 TODO",
+      "includeSubtasks": {
+        "name": "일치하는 작업의 하위 작업도 작업으로 간주",
+        "description": "필터와 일치하는 작업 아래의 하위 작업은 필터 텍스트를 직접 포함하지 않아도 작업이 됩니다."
+      },
+      "hideText": {
+        "name": "작업 텍스트에서 전역 필터 제거",
+        "description": "필터 텍스트가 별도의 단어로 있을 때 패널에서 숨깁니다. 태그는 항상 숨겨집니다. 노트는 변경되지 않습니다."
+      }
+    },
     "behaviour": {
       "heading": "동작",
       "weekStart": {

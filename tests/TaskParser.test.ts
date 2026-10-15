@@ -1,4 +1,4 @@
-import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn } from "../src/core/TaskParser";
+import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn, hideFilterText } from "../src/core/TaskParser";
 
 describe("parseFile", () => {
   it("parses simple unchecked tasks", () => {
@@ -649,5 +649,111 @@ describe("taskTextColumn", () => {
 
   it("is 0 for a line that isn't a task", () => {
     expect(taskTextColumn("Just a paragraph")).toBe(0);
+  });
+});
+
+describe("parseFile with a task filter", () => {
+  const filter = (strings: string[], extra: { includeSubtasks?: boolean } = {}) => ({
+    strings,
+    includeSubtasks: false,
+    ...extra,
+  });
+  const texts = (content: string, f: ReturnType<typeof filter>) =>
+    parseFile("test.md", content, f).map((t) => t.text);
+
+  it("keeps only the checkboxes that contain the filter string", () => {
+    expect(texts("- [ ] Buy milk #task\n- [ ] Pack socks", filter(["#task"]))).toEqual(["Buy milk"]);
+  });
+
+  it("matches as a plain substring, inside longer tags and words too", () => {
+    const content = "- [ ] One #tasks\n- [ ] Two #task/work\n- [ ] Three #other";
+    expect(texts(content, filter(["#task"]))).toEqual(["One", "Two"]);
+    expect(texts("- [ ] Learn to multitask", filter(["task"]))).toEqual(["Learn to multitask"]);
+  });
+
+  it("is case-sensitive", () => {
+    expect(texts("- [ ] Buy milk #Task", filter(["#task"]))).toEqual([]);
+  });
+
+  it("keeps a checkbox that contains any one of several strings", () => {
+    const content = "- [ ] One #task\n- [ ] Two TODO\n- [ ] Three";
+    expect(texts(content, filter(["#task", "TODO"]))).toEqual(["One", "Two TODO"]);
+  });
+
+  it("keeps every checkbox when the list is empty", () => {
+    expect(texts("- [ ] One\n- [ ] Two", filter([]))).toEqual(["One", "Two"]);
+  });
+
+  it("looks only at the text after the checkbox", () => {
+    expect(texts("- [ ] Plain", filter(["[ ]"]))).toEqual([]);
+    expect(texts("  - [ ] Indented", filter(["  -"]))).toEqual([]);
+  });
+
+  it("treats a filtered-out checkbox as a plain bullet for parenthood", () => {
+    const tasks = parseFile("test.md", "- [ ] Packing list\n  - [ ] Passport #task", filter(["#task"]));
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].parentId).toBeNull();
+  });
+
+  it("attaches a matching task to its nearest kept ancestor", () => {
+    const content = "- [ ] Trip #task\n  - [ ] Packing list\n    - [ ] Passport #task";
+    const tasks = parseFile("test.md", content, filter(["#task"]));
+    expect(tasks.map((t) => t.text)).toEqual(["Trip", "Passport"]);
+    expect(tasks[1].parentId).toBe(tasks[0].id);
+    expect(tasks[0].childIds).toEqual([tasks[1].id]);
+  });
+
+  describe("with subtasks included", () => {
+    const withSubtasks = (strings: string[]) => filter(strings, { includeSubtasks: true });
+
+    it("keeps the subtasks of a matching task at any depth", () => {
+      const content = "- [ ] Trip #task\n  - [ ] Book flights\n    - [ ] Compare prices\n- [ ] Pack socks";
+      const tasks = parseFile("test.md", content, withSubtasks(["#task"]));
+      expect(tasks.map((t) => t.text)).toEqual(["Trip", "Book flights", "Compare prices"]);
+      expect(tasks[1].parentId).toBe(tasks[0].id);
+      expect(tasks[2].parentId).toBe(tasks[1].id);
+      expect(tasks[0].childIds).toEqual([tasks[1].id]);
+    });
+
+    it("keeps a subtask that sits under a plain bullet of a matching task", () => {
+      const content = "- [ ] Trip #task\n  - notes\n    - [ ] Book flights";
+      expect(texts(content, withSubtasks(["#task"]))).toEqual(["Trip", "Book flights"]);
+    });
+
+    it("drops the subtasks of a checkbox that was itself filtered out", () => {
+      const content = "- [ ] Packing list\n  - [ ] Passport\n- [ ] Trip #task";
+      expect(texts(content, withSubtasks(["#task"]))).toEqual(["Trip"]);
+    });
+  });
+});
+
+describe("hideFilterText", () => {
+  it("cuts the filter string where it stands as a separate word", () => {
+    expect(hideFilterText("TODO Buy milk", ["TODO"])).toBe("Buy milk");
+  });
+
+  it("cuts every standalone occurrence", () => {
+    expect(hideFilterText("TODO call TODO TODO Bob", ["TODO"])).toBe("call Bob");
+  });
+
+  it("leaves the string alone inside a longer word", () => {
+    expect(hideFilterText("Finish multitask task", ["task"])).toBe("Finish multitask");
+  });
+
+  it("cuts each of several filter strings", () => {
+    expect(hideFilterText("TODO Call Bob @work", ["TODO", "@work"])).toBe("Call Bob");
+  });
+
+  it("treats the string literally, not as a pattern", () => {
+    expect(hideFilterText("a.c abc", ["a.c"])).toBe("abc");
+  });
+
+  it("skips a tag-shaped string, since tags never reach the text", () => {
+    expect(hideFilterText("Reply about #task", ["#task"])).toBe("Reply about #task");
+  });
+
+  it("returns the text as it is when there is nothing to hide", () => {
+    expect(hideFilterText("Buy  milk", [])).toBe("Buy  milk");
+    expect(hideFilterText("Buy  milk", ["TODO"])).toBe("Buy  milk");
   });
 });

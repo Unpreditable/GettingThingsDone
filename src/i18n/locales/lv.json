@@ -144,6 +144,19 @@
       "folderNotFound": "Mape nav atrasta",
       "fileNotFound": "Fails nav atrasts"
     },
+    "taskFilter": {
+      "name": "Globālais uzdevumu filtrs",
+      "description": "Par uzdevumiem kļūst tikai izvēles rūtiņas, kas satur kādu no šiem tekstiem. Pa vienam rindā, reģistrjutīgi. Atstājiet tukšu, lai iekļautu visas izvēles rūtiņas.",
+      "placeholder": "piem. #task vai TODO",
+      "includeSubtasks": {
+        "name": "Uzskatīt atbilstoša uzdevuma apakšuzdevumus par uzdevumiem",
+        "description": "Apakšuzdevums zem uzdevuma, kas atbilst filtram, arī ir uzdevums, pat ja tas pats nesatur filtra tekstu."
+      },
+      "hideText": {
+        "name": "Noņemt globālo filtru no uzdevuma teksta",
+        "description": "Paslēpj filtra tekstu panelī, ja tas ir atsevišķs vārds. Birkas vienmēr ir paslēptas. Piezīmes netiek mainītas."
+      }
+    },
     "behaviour": {
       "heading": "Uzvedība",
       "weekStart": {

@@ -1,5 +1,5 @@
 import { App, TFile, Plugin } from "obsidian";
-import { parseFile, TaskRecord } from "./TaskParser";
+import { parseFile, TaskFilter, TaskRecord } from "./TaskParser";
 import { TaskScope, isPathInScope } from "../settings";
 import { hashString } from "./TaskOrder";
 
@@ -28,7 +28,8 @@ export class TaskIndex {
   constructor(
     private app: App,
     private plugin: Plugin,
-    private getScope: () => TaskScope
+    private getScope: () => TaskScope,
+    private getFilter: () => TaskFilter | undefined = () => undefined
   ) {}
 
   async initialScan(): Promise<void> {
@@ -91,7 +92,7 @@ export class TaskIndex {
           if (this.contentHashes.get(file.path) === hash) return;
           this.contentHashes.set(file.path, hash);
           const oldTasks = this.index.get(file.path) ?? [];
-          const tasks = parseFile(file.path, data);
+          const tasks = parseFile(file.path, data, this.getFilter());
           this.index.set(file.path, tasks);
           this.notifyFileReplaced(file.path, oldTasks, tasks);
           this.emit();
@@ -178,7 +179,7 @@ export class TaskIndex {
       const content = await this.app.vault.cachedRead(file);
       this.contentHashes.set(file.path, hashString(content));
       const oldTasks = this.index.get(file.path) ?? [];
-      const tasks = parseFile(file.path, content);
+      const tasks = parseFile(file.path, content, this.getFilter());
       this.index.set(file.path, tasks);
       // Priming contentHashes above makes Obsidian's own later "changed"
       // event a no-op for this content, so this is the only chance to

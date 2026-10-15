@@ -217,6 +217,25 @@
       "fileNotFound_comment": "Tooltip on the warning icon shown when a file entry's path no longer exists in the vault — renamed, moved, or deleted. The path itself is visible in the input beside it, so it is not repeated here.",
       "fileNotFound": "File not found"
     },
+    "taskFilter": {
+      "_comment": "Three settings that narrow which checkbox lines count as tasks, shown directly under 'Files to scan'. Named after the 'Global task filter' of the community Tasks plugin so its users recognise it, but independent of that plugin. 'The panel' is the plugin's sidebar.",
+      "name_comment": "Setting name for a multi-line text box. Same name as the equivalent setting in the Tasks plugin; if Tasks is translated into your language, use its wording.",
+      "name": "Global task filter",
+      "description_comment": "The filter is any text, most often a tag such as #task. 'One per line' refers to the text box.",
+      "description": "Only checkboxes that contain one of these become tasks. One per line, case-sensitive. Leave empty to include every checkbox.",
+      "placeholder_comment": "Placeholder inside the empty text box showing example values. #task is a tag; TODO is plain text.",
+      "placeholder": "e.g. #task or TODO",
+      "includeSubtasks": {
+        "_comment": "Toggle. A subtask is a checkbox indented under another checkbox, at any depth. On: such a checkbox is treated exactly like one that contains the filter text — it appears in the panel and can be moved between buckets. Off: each checkbox needs the text itself.",
+        "name": "Count subtasks of a matching task as tasks",
+        "description": "A subtask under a task that matches the filter is a task too, even if it doesn't contain the filter text itself."
+      },
+      "hideText": {
+        "_comment": "Toggle. Display only: the note file is never edited. 'Separate word' means surrounded by spaces or the ends of the line, so the text inside a longer word or a nested tag stays. Tags never show in the panel regardless of this toggle, which is what the second sentence says.",
+        "name": "Remove global filter from task text",
+        "description": "Hides the filter text in the panel where it stands as a separate word. Tags are always hidden. Your notes are not changed."
+      }
+    },
     "behaviour": {
       "heading_comment": "Section heading for the Behaviour group of settings (completed-task visibility, due flags, compact view, celebration animations). Shown above the group and used as its search label in Obsidian 1.13.0+.",
       "heading": "Behaviour",

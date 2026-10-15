@@ -140,6 +140,19 @@
       "folderNotFound": "",
       "fileNotFound": ""
     },
+    "taskFilter": {
+      "name": "",
+      "description": "",
+      "placeholder": "",
+      "includeSubtasks": {
+        "name": "",
+        "description": ""
+      },
+      "hideText": {
+        "name": "",
+        "description": ""
+      }
+    },
     "behaviour": {
       "heading": "",
       "weekStart": {

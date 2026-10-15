@@ -140,6 +140,19 @@
       "folderNotFound": "Pasta não encontrada",
       "fileNotFound": "Ficheiro não encontrado"
     },
+    "taskFilter": {
+      "name": "Filtro global de tarefas",
+      "description": "Só as caixas de verificação que contêm um destes textos se tornam tarefas. Um por linha, distingue maiúsculas de minúsculas. Deixe vazio para incluir todas as caixas de verificação.",
+      "placeholder": "ex. #task ou TODO",
+      "includeSubtasks": {
+        "name": "Contar as subtarefas de uma tarefa correspondente como tarefas",
+        "description": "Uma subtarefa sob uma tarefa que corresponde ao filtro também é uma tarefa, mesmo que não contenha o texto do filtro."
+      },
+      "hideText": {
+        "name": "Remover o filtro global do texto da tarefa",
+        "description": "Oculta o texto do filtro no painel quando aparece como palavra isolada. As etiquetas ficam sempre ocultas. As notas não são alteradas."
+      }
+    },
     "behaviour": {
       "heading": "Comportamento",
       "weekStart": {

@@ -140,6 +140,19 @@
       "folderNotFound": "未找到文件夹",
       "fileNotFound": "未找到文件"
     },
+    "taskFilter": {
+      "name": "全局任务筛选器",
+      "description": "只有包含其中任一文本的复选框才会成为任务。每行一个，区分大小写。留空则包含所有复选框。",
+      "placeholder": "例如：#task 或 TODO",
+      "includeSubtasks": {
+        "name": "将匹配任务的子任务视为任务",
+        "description": "位于匹配筛选器的任务下的子任务也是任务，即使它本身不包含筛选文本。"
+      },
+      "hideText": {
+        "name": "从任务文本中移除全局筛选器",
+        "description": "当筛选文本作为独立的词出现时，在面板中将其隐藏。标签始终隐藏。笔记不会被修改。"
+      }
+    },
     "behaviour": {
       "heading": "行为",
       "weekStart": {

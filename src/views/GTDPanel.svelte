@@ -6,9 +6,9 @@
   import Celebration from "./Celebration.svelte";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
-  import { getTagValue, getInlineFieldValue } from "../core/TaskParser";
+  import { getTagValue, getInlineFieldValue, hideFilterText } from "../core/TaskParser";
   import type { BucketConfig, PluginSettings } from "../settings";
-  import { shouldRecommendCatchAll } from "../settings";
+  import { shouldRecommendCatchAll, hiddenFilterStrings } from "../settings";
   import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
   import { icon } from "./icon";
   import { t } from "../i18n/i18n";
@@ -19,6 +19,7 @@
   export let languageChangeNotice$: Readable<boolean>;
   $: bucketGroups = $bucketGroups$;
   $: settings = $settings$;
+  $: hiddenStrings = hiddenFilterStrings(settings);
   $: celebrationImageUrls = $celebrationImageUrls$;
   $: showLanguageBanner = $languageChangeNotice$;
 
@@ -80,7 +81,7 @@
         .map((g) => ({
           ...g,
           tasks: g.tasks.filter((t) =>
-            t.text.toLowerCase().includes(searchQuery.toLowerCase())
+            hideFilterText(t.text, hiddenStrings).toLowerCase().includes(searchQuery.toLowerCase())
           ),
         }))
         .filter((g) => g.tasks.length > 0);
@@ -426,6 +427,7 @@
         priorityDisplay={settings.priorityDisplay}
         showRecurrenceBadge={settings.showRecurrenceBadge}
         openLinksOnClick={settings.openLinksOnClick}
+        hiddenFilterStrings={hiddenStrings}
         showTasksFieldsInPopover={settings.showTasksFieldsInPopover}
         autoPlacedFrom={group.autoPlacedFrom}
         misfiledIn={group.misfiledIn}

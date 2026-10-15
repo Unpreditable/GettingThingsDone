@@ -140,6 +140,19 @@
       "folderNotFound": "Kausta ei leitud",
       "fileNotFound": "Faili ei leitud"
     },
+    "taskFilter": {
+      "name": "Globaalne ülesannete filter",
+      "description": "Ülesanneteks saavad ainult märkeruudud, mis sisaldavad mõnda neist tekstidest. Üks rea kohta, tõstutundlik. Tühjaks jätmisel kaasatakse kõik märkeruudud.",
+      "placeholder": "nt #task või TODO",
+      "includeSubtasks": {
+        "name": "Arvesta sobiva ülesande alamülesandeid ülesanneteks",
+        "description": "Filtrile vastava ülesande all olev alamülesanne on samuti ülesanne, isegi kui see ise filtriteksti ei sisalda."
+      },
+      "hideText": {
+        "name": "Eemalda globaalne filter ülesande tekstist",
+        "description": "Peidab filtriteksti paneelil, kui see on eraldi sõna. Sildid on alati peidetud. Märkmeid ei muudeta."
+      }
+    },
     "behaviour": {
       "heading": "Käitumine",
       "weekStart": {

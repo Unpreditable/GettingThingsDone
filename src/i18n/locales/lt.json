@@ -148,6 +148,19 @@
       "folderNotFound": "Aplankas nerastas",
       "fileNotFound": "Failas nerastas"
     },
+    "taskFilter": {
+      "name": "Visuotinis užduočių filtras",
+      "description": "Užduotimis tampa tik žymimieji langeliai, kuriuose yra bent vienas iš šių tekstų. Po vieną eilutėje, skiriamos didžiosios ir mažosios raidės. Palikite tuščią, kad būtų įtraukti visi žymimieji langeliai.",
+      "placeholder": "pvz. #task arba TODO",
+      "includeSubtasks": {
+        "name": "Laikyti atitinkančios užduoties použduotis užduotimis",
+        "description": "Použduotis, esanti po filtrą atitinkančia užduotimi, taip pat yra užduotis, net jei pati neturi filtro teksto."
+      },
+      "hideText": {
+        "name": "Pašalinti visuotinį filtrą iš užduoties teksto",
+        "description": "Paslepia filtro tekstą skydelyje, kai jis yra atskiras žodis. Žymos visada paslėptos. Užrašai nekeičiami."
+      }
+    },
     "behaviour": {
       "heading": "Elgsena",
       "weekStart": {
