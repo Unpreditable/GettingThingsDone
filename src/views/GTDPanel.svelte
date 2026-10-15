@@ -6,7 +6,8 @@
   import Celebration from "./Celebration.svelte";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
-  import { getTagValue, getInlineFieldValue, hideFilterText } from "../core/TaskParser";
+  import { getTagValue, getInlineFieldValue } from "../core/TaskParser";
+  import { countShown, searchBuckets, shownTasks, visibleCompleted } from "../core/PanelVisibility";
   import type { BucketConfig, PluginSettings } from "../settings";
   import { shouldRecommendCatchAll, hiddenFilterStrings } from "../settings";
   import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
@@ -74,22 +75,14 @@
 
   let searchQuery = '';
 
-  $: totalTaskCount = bucketGroups.flatMap((g) => g.tasks).length;
+  $: untilMidnight = settings.completedVisibilityUntilMidnight;
+  $: totalTaskCount = countShown(bucketGroups, untilMidnight);
 
-  $: filteredBucketGroups = searchQuery === ''
-    ? bucketGroups
-    : bucketGroups
-        .map((g) => ({
-          ...g,
-          tasks: g.tasks.filter((t) =>
-            hideFilterText(t.text, hiddenStrings).toLowerCase().includes(searchQuery.toLowerCase())
-          ),
-        }))
-        .filter((g) => g.tasks.length > 0);
+  $: filteredBucketGroups = searchBuckets(bucketGroups, searchQuery, hiddenStrings, untilMidnight);
 
   $: matchedTaskCount = searchQuery === ''
     ? totalTaskCount
-    : filteredBucketGroups.flatMap((g) => g.tasks).length;
+    : countShown(filteredBucketGroups, untilMidnight);
 
   function getQuickMoveTargets(bucketId: string): BucketConfig[] {
     const targetIds =
@@ -306,15 +299,8 @@
     await onToggle(task);
   }
 
-  /** The completed tasks a bucket shows: ticked this session, and not dismissed or aged out. */
-  function visibleCompleted(group: BucketGroupData, untilMidnight: boolean): TaskRecord[] {
-    if (!untilMidnight) return [];
-    const aged = new Set(group.agedCompletedTaskIds);
-    return group.tasks.filter((t) => t.isCompleted && !aged.has(t.id));
-  }
-
   function dismissAllCompleted() {
-    onDismiss(filteredBucketGroups.flatMap((g) => visibleCompleted(g, settings.completedVisibilityUntilMidnight)));
+    onDismiss(filteredBucketGroups.flatMap((g) => visibleCompleted(g, untilMidnight)));
   }
 
   async function handleDrop(event: CustomEvent<{
@@ -419,7 +405,7 @@
 
   <div class="gtd-panel-body">
     {#each filteredBucketGroups as group (group.bucketId)}
-      {#if !group.isSystem || group.tasks.some((t) => !t.isCompleted) || visibleCompleted(group, settings.completedVisibilityUntilMidnight).length > 0}
+      {#if !group.isSystem || shownTasks(group, untilMidnight).length > 0}
       <BucketGroup
         bucketId={group.bucketId}
         name={group.name}
