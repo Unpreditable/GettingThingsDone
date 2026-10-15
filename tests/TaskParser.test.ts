@@ -10,6 +10,13 @@ describe("parseFile", () => {
     expect(tasks[0].lineNumber).toBe(0);
   });
 
+  it("parses a note with Windows line endings, leaving no \r on a line", () => {
+    const tasks = parseFile("test.md", "- [ ] Buy milk #gtd/today\r\n- [x] Write report\r\n");
+    expect(tasks.map((t) => t.text)).toEqual(["Buy milk", "Write report"]);
+    expect(tasks.map((t) => t.rawLine)).toEqual(["- [ ] Buy milk #gtd/today", "- [x] Write report"]);
+    expect(tasks[1].lineNumber).toBe(1);
+  });
+
   it("parses completed tasks", () => {
     const content = "- [x] Done task\n- [X] Also done";
     const tasks = parseFile("test.md", content);

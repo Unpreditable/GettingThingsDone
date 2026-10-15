@@ -75,6 +75,22 @@ describe("migrateStorageMode", () => {
     expect(getContent("test.md")).not.toContain("#gtd/today");
   });
 
+  it("keeps a note's Windows line endings", async () => {
+    const content = "- [ ] Task #gtd/today\r\n- [ ] Other\r\n";
+    const { app, getContent } = makeMockApp({ "test.md": content });
+    const task = makeTask({ rawLine: "- [ ] Task #gtd/today" });
+    const toSettings = {
+      ...DEFAULT_SETTINGS,
+      storageMode: "inline-field" as const,
+      tagPrefix: "gtd",
+      buckets: baseBuckets,
+    };
+
+    await migrateStorageMode(app, [task], "inline-tag", toSettings);
+
+    expect(getContent("test.md")).toBe("- [ ] Task [gtd:: today]\r\n- [ ] Other\r\n");
+  });
+
   it("migrates inline-field to inline-tag", async () => {
     const content = "- [ ] Task [gtd:: this-week]";
     const { app, getContent } = makeMockApp({ "test.md": content });

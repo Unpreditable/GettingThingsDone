@@ -1,7 +1,7 @@
 import { App, TFile, Notice } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
-import { setTagValue, setInlineFieldValue, CHECKBOX_REGEX } from "./TaskParser";
+import { setTagValue, setInlineFieldValue, splitLines, lineEnding, CHECKBOX_REGEX } from "./TaskParser";
 
 export interface MoveResult {
   success: boolean;
@@ -107,7 +107,7 @@ export async function moveTaskToBucket(
 
   try {
     await app.vault.process(file, (content) => {
-      const lines = content.split("\n");
+      const lines = splitLines(content);
       const lineIdx = findTaskLine(lines, task);
 
       if (lineIdx === -1) {
@@ -119,7 +119,7 @@ export async function moveTaskToBucket(
 
       lines[lineIdx] = applyBucketChange(lines[lineIdx], targetBucket, settings);
       result = { success: true };
-      return lines.join("\n");
+      return lines.join(lineEnding(content));
     });
     return result;
   } catch (e) {
@@ -164,7 +164,7 @@ export async function replaceTaskLine(
 
   try {
     await app.vault.process(file, (content) => {
-      const lines = content.split("\n");
+      const lines = splitLines(content);
       const lineIdx = findTaskLine(lines, task);
 
       if (lineIdx === -1) {
@@ -173,7 +173,7 @@ export async function replaceTaskLine(
       }
 
       lines.splice(lineIdx, 1, ...replace(lines[lineIdx]));
-      const after = lines.join("\n");
+      const after = lines.join(lineEnding(content));
       result = { success: true, lineIdx, before: content, after };
       return after;
     });

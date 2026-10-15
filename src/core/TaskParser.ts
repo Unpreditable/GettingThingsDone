@@ -113,8 +113,21 @@ export function hideFilterText(text: string, strings: string[]): string {
   return result === text ? text : result.replace(/\s{2,}/g, " ").trim();
 }
 
+/**
+ * A note's lines, without their line endings. A note written on Windows ends
+ * each line in \r\n, and a \r left on the line stops TASK_REGEX matching it.
+ */
+export function splitLines(content: string): string[] {
+  return content.split(/\r?\n/);
+}
+
+/** The line ending to write a note back with: the one it already uses. */
+export function lineEnding(content: string): string {
+  return content.includes("\r\n") ? "\r\n" : "\n";
+}
+
 export function parseFile(filePath: string, content: string, filter?: TaskFilter): TaskRecord[] {
-  const lines = content.split("\n");
+  const lines = splitLines(content);
   const records: TaskRecord[] = [];
   const strings = filter?.strings ?? [];
   // Checkboxes that miss the filter but may still be kept as the subtask of

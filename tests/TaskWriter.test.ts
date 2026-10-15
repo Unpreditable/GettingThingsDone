@@ -120,6 +120,13 @@ describe("moveTaskToBucket", () => {
     expect(getContent()).not.toContain("#gtd");
   });
 
+  it("keeps a note's Windows line endings", async () => {
+    const { app, getContent } = makeMockApp("- [ ] Test task\r\n- [ ] Other\r\n");
+    const result = await moveTaskToBucket(app, makeTask(), todayBucket, settings);
+    expect(result.success).toBe(true);
+    expect(getContent()).toBe("- [ ] Test task #gtd/today\r\n- [ ] Other\r\n");
+  });
+
   it("fails when file not found", async () => {
     const { app } = makeMockApp("- [ ] Test task");
     const task = makeTask({ filePath: "nonexistent.md" });
@@ -304,6 +311,15 @@ describe("replaceTaskLine", () => {
       before: original,
       after: "- [ ] Inserted\n- [ ] Edited",
     });
+  });
+
+  it("keeps a note's Windows line endings, on the new lines too", async () => {
+    const { app, getContent } = makeMockApp("- [ ] Before\r\n- [ ] Test task\r\n");
+    const task = makeTask({ lineNumber: 1 });
+
+    await replaceTaskLine(app, task, () => ["- [ ] New one", "- [x] Test task"]);
+
+    expect(getContent()).toBe("- [ ] Before\r\n- [ ] New one\r\n- [x] Test task\r\n");
   });
 
   it("leaves the file alone when the task line can't be located", async () => {

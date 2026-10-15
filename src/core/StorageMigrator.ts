@@ -1,7 +1,7 @@
 import { App, TFile, Notice } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { PluginSettings, StorageMode } from "../settings";
-import { getTagValue, getInlineFieldValue, setTagValue, setInlineFieldValue } from "./TaskParser";
+import { getTagValue, getInlineFieldValue, setTagValue, setInlineFieldValue, splitLines, lineEnding } from "./TaskParser";
 import { findTaskLine } from "./TaskWriter";
 import { t } from "../i18n/i18n";
 
@@ -32,7 +32,7 @@ export async function migrateStorageMode(
     let fileFailed = 0;
 
     await app.vault.process(file, (content) => {
-      const lines = content.split("\n");
+      const lines = splitLines(content);
       let changed = false;
 
       for (const task of tasks) {
@@ -48,7 +48,7 @@ export async function migrateStorageMode(
         fileMigrated++;
       }
 
-      return changed ? lines.join("\n") : content;
+      return changed ? lines.join(lineEnding(content)) : content;
     });
 
     migrated += fileMigrated;
