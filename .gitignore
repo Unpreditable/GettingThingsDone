@@ -7,3 +7,4 @@ data.json
 docs/plans/
 .planning/*
 TODO.md
+e2e/.output/

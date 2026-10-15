@@ -1,0 +1,5 @@
+- [ ] Buy milk
+- [ ] Call the plumber #gtd/today
+- [ ] Renew passport #gtd/this-week
+- [ ] Learn the cello #gtd/someday
+- [x] Already done #gtd/today
