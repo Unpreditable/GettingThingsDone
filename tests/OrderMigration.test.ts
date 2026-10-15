@@ -1,4 +1,4 @@
-import { diffFileTasks, diffForEdit, applyTaskDiff, renameFileInState, migrateOrderFormat } from "../src/core/OrderMigration";
+import { diffFileTasks, diffForEdit, applyTaskDiff, dismissCompletions, renameFileInState, migrateOrderFormat } from "../src/core/OrderMigration";
 import type { OrderState } from "../src/core/OrderMigration";
 import { computeOrderKeys, computeLegacyOrderKeys } from "../src/core/TaskOrder";
 import { parseFile } from "../src/core/TaskParser";
@@ -269,6 +269,41 @@ describe("applyTaskDiff", () => {
     );
 
     expect(after.taskOrder.today).toEqual(["legacy:0"]);
+  });
+});
+
+describe("dismissCompletions", () => {
+  it("drops the records of the dismissed tasks and keeps the rest", () => {
+    const before = state({ completionSeen: { "a.md::k1:0": 1, "a.md::k2:0": 2, "b.md::k1:0": 3 } });
+
+    const { state: after, changed } = dismissCompletions(before, [
+      { file: "a.md", key: "k1:0" },
+      { file: "b.md", key: "k1:0" },
+    ]);
+
+    expect(changed).toBe(true);
+    expect(after.completionSeen).toEqual({ "a.md::k2:0": 2 });
+  });
+
+  it("leaves saved order for the aged-out purge to release", () => {
+    const before = state({
+      taskOrder: { today: [{ file: "a.md", key: "k:0" }] },
+      completionSeen: { "a.md::k:0": 1 },
+    });
+
+    const { state: after } = dismissCompletions(before, [{ file: "a.md", key: "k:0" }]);
+
+    expect(after.taskOrder).toEqual({ today: [{ file: "a.md", key: "k:0" }] });
+  });
+
+  it("reports changed: false when no dismissed task has a record, and does not mutate the input", () => {
+    const before = state({ completionSeen: { "a.md::k:0": 1 } });
+
+    const { state: after, changed } = dismissCompletions(before, [{ file: "a.md", key: "other:0" }]);
+
+    expect(changed).toBe(false);
+    expect(after.completionSeen).toEqual({ "a.md::k:0": 1 });
+    expect(before.completionSeen).toEqual({ "a.md::k:0": 1 });
   });
 });
 

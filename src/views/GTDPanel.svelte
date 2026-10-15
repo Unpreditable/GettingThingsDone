@@ -35,6 +35,7 @@
   export let canEditTask: () => boolean;
   export let onEdit: (task: TaskRecord) => void;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
+  export let onDismiss: (tasks: TaskRecord[]) => void;
   export let onOpenSettings: () => void;
   export let onDismissLanguageBanner: () => void;
   export let onDismissCatchAllNotice: () => void;
@@ -305,12 +306,15 @@
     await onToggle(task);
   }
 
-  let bucketGroupRefs: BucketGroup[] = [];
+  /** The completed tasks a bucket shows: ticked this session, and not dismissed or aged out. */
+  function visibleCompleted(group: BucketGroupData, untilMidnight: boolean): TaskRecord[] {
+    if (!untilMidnight) return [];
+    const aged = new Set(group.agedCompletedTaskIds);
+    return group.tasks.filter((t) => t.isCompleted && !aged.has(t.id));
+  }
 
   function dismissAllCompleted() {
-    for (const ref of bucketGroupRefs) {
-      ref?.dismissAllVisible();
-    }
+    onDismiss(filteredBucketGroups.flatMap((g) => visibleCompleted(g, settings.completedVisibilityUntilMidnight)));
   }
 
   async function handleDrop(event: CustomEvent<{
@@ -414,10 +418,9 @@
   {/if}
 
   <div class="gtd-panel-body">
-    {#each filteredBucketGroups as group, i (group.bucketId)}
-      {#if !group.isSystem || group.tasks.some((t) => !t.isCompleted)}
+    {#each filteredBucketGroups as group (group.bucketId)}
+      {#if !group.isSystem || group.tasks.some((t) => !t.isCompleted) || visibleCompleted(group, settings.completedVisibilityUntilMidnight).length > 0}
       <BucketGroup
-        bind:this={bucketGroupRefs[i]}
         bucketId={group.bucketId}
         name={group.name}
         emoji={group.emoji}
@@ -444,6 +447,7 @@
         on:openLink={(e) => onOpenLink(e.detail.task, e.detail.target, e.detail.external, e.detail.newTab)}
         on:drop={handleDrop}
         on:reorder={handleReorderEvent}
+        on:dismiss={(e) => onDismiss([e.detail.task])}
       />
       {/if}
     {/each}

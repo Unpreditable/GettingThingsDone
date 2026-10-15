@@ -188,6 +188,28 @@ export function applyTaskDiff(
 }
 
 /**
+ * Forgets that this session saw these tasks completed, which hides them like
+ * any completion from before the session. Nothing re-creates a record but a
+ * fresh open → completed flip, so a dismissed task stays gone. Their saved
+ * order slots are left to purgeAgedEntries, which now counts them as aged.
+ */
+export function dismissCompletions(
+  state: OrderState,
+  entries: OrderEntry[]
+): { state: OrderState; changed: boolean } {
+  let changed = false;
+  const completionSeen = { ...state.completionSeen };
+  for (const entry of entries) {
+    const id = entryId(entry);
+    if (id in completionSeen) {
+      delete completionSeen[id];
+      changed = true;
+    }
+  }
+  return { state: { taskOrder: state.taskOrder, completionSeen }, changed };
+}
+
+/**
  * Rewrites the `file` half of every entry belonging to a renamed file, and
  * the matching completionSeen keys. Structurally lossless — nothing is
  * rehashed and no array position moves.

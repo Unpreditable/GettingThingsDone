@@ -26,6 +26,7 @@ import {
   diffFileTasks,
   diffForEdit,
   applyTaskDiff,
+  dismissCompletions,
   renameFileInState,
   migrateOrderFormat,
   migrateOrderKeys,
@@ -343,6 +344,16 @@ export default class GtdTasksPlugin extends Plugin {
     }
   }
 
+  /** Hides these completed tasks for the rest of the session. */
+  dismissCompleted(tasks: TaskRecord[]): void {
+    const orderKeys = computeOrderKeys(this.taskIndex.getAllTasks(), activeOrderKeyScheme(this.settings));
+    const entries = tasks.flatMap((task) => orderKeys.get(task.id) ?? []);
+    const dismissed = dismissCompletions(this.orderState(), entries);
+    if (!dismissed.changed) return;
+    this.applyOrderState(dismissed.state);
+    this.renderAll();
+  }
+
   private applyOrderState(state: OrderState): void {
     this.settings.taskOrder = state.taskOrder;
     this.settings.completionSeen = state.completionSeen;
@@ -516,6 +527,7 @@ class GtdPanelView extends ItemView {
         canEditTask: () => getTaskEditor(this.app) !== null,
         onEdit: this.handleEdit.bind(this),
         onReorder: this.handleReorder.bind(this),
+        onDismiss: (tasks: TaskRecord[]) => this.plugin.dismissCompleted(tasks),
         onOpenSettings: openSettings,
         // Only an explicit dismiss sets this. Opening settings settles nothing;
         // actually fixing the rule hides the banner on its own.

@@ -47,9 +47,8 @@
       orderedTaskIds: string[] | null;
     };
     reorder: { bucketId: string; orderedTaskIds: string[] };
+    dismiss: { task: TaskRecord };
   }>();
-
-  let dismissedIds = new Set<string>();
 
   let collapsed = false;
   let headerDragOver = false;
@@ -57,19 +56,7 @@
   let sortable: Sortable;
 
   $: agedSet = new Set(agedCompletedTaskIds);
-  $: {
-    // When a task is unchecked, remove it from dismissedIds so it reappears
-    let changed = false;
-    for (const t of tasks) {
-      if (!t.isCompleted && dismissedIds.has(t.id)) {
-        dismissedIds.delete(t.id);
-        changed = true;
-      }
-    }
-    if (changed) dismissedIds = dismissedIds;
-  }
   $: visibleTasks = tasks.filter((t) => {
-    if (dismissedIds.has(t.id)) return false;
     if (!t.isCompleted) return true;
     if (!showCompletedUntilMidnight) return false;
     return !agedSet.has(t.id);
@@ -307,12 +294,6 @@
   onDestroy(() => {
     sortable?.destroy();
   });
-
-  export function dismissAllVisible() {
-    const completed = visibleTasks.filter((t) => t.isCompleted);
-    for (const t of completed) dismissedIds.add(t.id);
-    if (completed.length > 0) dismissedIds = dismissedIds;
-  }
 </script>
 
 <div class="gtd-bucket" data-bucket-id={bucketId}>
@@ -372,7 +353,7 @@
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}
           on:openLink={(e) => dispatch("openLink", e.detail)}
-          on:dismiss={(e) => { dismissedIds.add(e.detail.task.id); dismissedIds = dismissedIds; }}
+          on:dismiss={(e) => dispatch("dismiss", e.detail)}
         />
       {/each}
     {/if}
