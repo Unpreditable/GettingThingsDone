@@ -1,4 +1,4 @@
-// The panel by itself, with no other plugin installed: what it lists from the fixture's Inbox.md, and
+// The panel by itself, with Tasks switched off: what it lists from the fixture's Inbox.md, and
 // what ticking a task or moving it writes back to the note.
 
 // Written without imports: describe, it, expect, browser, $ and the helpers are globals the harness
@@ -19,6 +19,36 @@ const SEARCH_PILL = ".gtd-search-pill";
 /** What Obsidian keeps of its commands that the specs reach for. */
 interface Commands {
   executeCommandById(id: string): boolean;
+}
+
+/** The panel's view, for the one call a spec makes on it: what a drag ends in. */
+interface PanelView {
+  handleReorder(bucketId: string, orderedTaskIds: string[]): Promise<void>;
+}
+
+/** Today plus `days`, as a Tasks date (YYYY-MM-DD) in local time. */
+function dayFromToday(days: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/** Clicks from inside the page: the row's buttons show only while it is hovered, and the harness has no hover yet. */
+async function clickHidden(selector: string): Promise<void> {
+  await browser.execute((selector) => {
+    const button = document.querySelector<HTMLElement>(selector);
+    if (!button) throw new Error(`nothing to click at ${selector}`);
+    button.click();
+  }, selector);
+}
+
+/** The note open in the editor, and the line the cursor is on. */
+function activeEditor(): Promise<{ file: string | null; line: number | null }> {
+  return browser.executeObsidian(({ app }) => ({
+    file: app.workspace.activeEditor?.file?.path ?? null,
+    line: app.workspace.activeEditor?.editor?.getCursor().line ?? null,
+  }));
 }
 
 /**
@@ -68,6 +98,8 @@ async function waitForNoteLine(expected: string): Promise<void> {
 describe("The panel", () => {
   beforeEach(async () => {
     await resetState();
+    // Installed for tasks.e2e.ts; here the panel ticks without it, as it does for a user without Tasks.
+    await obsidianPage.disablePlugin("obsidian-tasks-plugin");
     await openPanel();
   });
 
@@ -134,15 +166,92 @@ describe("The panel", () => {
     expect(await obsidianPage.read("Windows.md")).toBe("- [x] Pay rent #gtd/today\r\n- [ ] Book flights\r\n");
   });
 
+  it("opens the note at the task's line when a row is clicked", async () => {
+    expect((await activeEditor()).file).not.toBe(NOTE);
+    const row = await rowOf("Renew passport");
+    await $(`${row} .gtd-task-text`).click();
+    await browser.waitUntil(async () => (await activeEditor()).file === NOTE, {
+      timeoutMsg: `${NOTE} never opened`,
+    });
+    expect((await activeEditor()).line).toBe(2);
+  });
+
+  it("opens the note a wikilink in a task points to", async () => {
+    await obsidianPage.write("Reference.md", "# Reference\n");
+    await obsidianPage.write("Plans.md", "- [ ] Read [[Reference]] #gtd/today\n");
+    await browser.waitUntil(async () => (await tasksIn("today")).includes("Read Reference"), {
+      timeoutMsg: "the task with the link never showed",
+    });
+    const row = await rowOf("Read Reference");
+    await $(`${row} .gtd-md-link.is-clickable`).click();
+    await browser.waitUntil(async () => (await activeEditor()).file === "Reference.md", {
+      timeoutMsg: "the linked note never opened",
+    });
+  });
+
+  it("dismisses only the completed task whose own button is used", async () => {
+    const plumber = await rowOf("Call the plumber");
+    const passport = await rowOf("Renew passport");
+    await $(`${plumber} ${CHECKBOX}`).click();
+    await $(`${plumber}.is-checked`).waitForDisplayed();
+    await $(`${passport} ${CHECKBOX}`).click();
+    await $(`${passport}.is-checked`).waitForDisplayed();
+
+    await clickHidden(`${plumber} button[title="Dismiss"]`);
+    await $(plumber).waitForExist({ reverse: true, timeoutMsg: "the dismissed task stayed in the panel" });
+    expect(await $(`${passport}.is-checked`).isDisplayed()).toBe(true);
+  });
+
+  it("places dated tasks by their date", async () => {
+    // Dates worked out from today, so the buckets are the same whatever day the suite runs.
+    await obsidianPage.write(
+      "Dated.md",
+      `- [ ] Due today 📅 ${dayFromToday(0)}\n` +
+        `- [ ] Due in a week 📅 ${dayFromToday(7)}\n` +
+        `- [ ] Due next year 📅 ${dayFromToday(400)}\n`,
+    );
+    await browser.waitUntil(async () => (await tasksIn("someday")).includes("Due next year"), {
+      timeoutMsg: "the dated tasks never showed",
+    });
+    expect(await tasksIn("today")).toContain("Due today");
+    expect(await tasksIn("next-week")).toEqual(["Due in a week"]);
+    expect(await tasksIn("to-review")).toEqual(["Buy milk"]);
+  });
+
+  it("keeps a note's manual order when the note is renamed", async () => {
+    await obsidianPage.write("Order.md", "- [ ] Alpha #gtd/someday\n- [ ] Beta #gtd/someday\n");
+    await browser.waitUntil(async () => (await tasksIn("someday")).includes("Beta"), {
+      timeoutMsg: "the new note's tasks never showed",
+    });
+    expect(await tasksIn("someday")).toEqual(["Learn the cello", "Alpha", "Beta"]);
+
+    // What a drag ends in, called directly: the harness has no drag yet.
+    const reversed = await browser.execute(
+      (selector) => Array.from(document.querySelectorAll<HTMLElement>(selector), (row) => row.dataset.taskId ?? "").reverse(),
+      `.gtd-bucket[data-bucket-id="someday"] ${ROW}`,
+    );
+    await browser.executeObsidian(async ({ app }, type, ids) => {
+      const view = app.workspace.getLeavesOfType(type)[0].view as unknown as PanelView;
+      await view.handleReorder("someday", ids);
+    }, PANEL_VIEW, reversed);
+    await browser.waitUntil(async () => (await tasksIn("someday"))[0] === "Beta", {
+      timeoutMsg: "the new order never showed",
+    });
+    expect(await tasksIn("someday")).toEqual(["Beta", "Alpha", "Learn the cello"]);
+
+    await browser.executeObsidian(async ({ app }) => {
+      const file = app.vault.getFileByPath("Order.md");
+      if (!file) throw new Error("Order.md is not in the vault");
+      await app.fileManager.renameFile(file, "Renamed.md");
+    });
+    await $(`${ROW}[data-file-path="Renamed.md"]`).waitForExist({ timeoutMsg: "the renamed note's tasks never showed" });
+    expect(await tasksIn("someday")).toEqual(["Beta", "Alpha", "Learn the cello"]);
+  });
+
   it("writes the bucket tag when a quick-move button is used", async () => {
     const row = await rowOf("Buy milk");
-    // Clicked from inside the page, not with the pointer: the buttons show only while the row is
-    // hovered, and the harness has no hover yet. To Review's first button moves to Today.
-    await browser.execute((selector) => {
-      const button = document.querySelector<HTMLElement>(selector);
-      if (!button) throw new Error(`no quick-move button at ${selector}`);
-      button.click();
-    }, `${row} ${MOVE_BUTTON}`);
+    // To Review's first button moves to Today.
+    await clickHidden(`${row} ${MOVE_BUTTON}`);
     await waitForNoteLine("- [ ] Buy milk #gtd/today");
     await browser.waitUntil(async () => (await tasksIn("today")).includes("Buy milk"), {
       timeoutMsg: "the moved task never showed under Today",

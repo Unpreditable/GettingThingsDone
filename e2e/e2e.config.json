@@ -1,5 +1,5 @@
 {
   "appVersion": "1.14.4",
   "installerVersion": "1.14.4",
-  "plugins": []
+  "plugins": [{ "id": "obsidian-tasks-plugin", "version": "8.5.0" }]
 }
