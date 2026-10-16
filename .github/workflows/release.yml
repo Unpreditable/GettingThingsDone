@@ -106,5 +106,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ steps.version.outputs.new }}"
-          gh release create "$TAG" main.js styles.css manifest.json \
-            --title "$TAG" --draft
+          URL=$(gh release create "$TAG" main.js styles.css manifest.json \
+            --title "$TAG" --draft)
+
+          # A draft has no address under its tag until it is published:
+          # /releases/edit/<tag> opens a blank new release instead. The address
+          # gh prints is the draft's own (…/releases/tag/untagged-…), and its
+          # edit page is the same address with "edit" in place of "tag".
+          EDIT="${URL/\/releases\/tag\//\/releases\/edit\/}"
+          echo "Edit the draft release: $EDIT"
+          echo "### [Edit the $TAG draft release]($EDIT)" >> "$GITHUB_STEP_SUMMARY"
