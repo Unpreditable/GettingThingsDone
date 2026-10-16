@@ -26,7 +26,9 @@
       "openFile": "ファイルを開く",
       "pinTo": "{{name}} に固定",
       "unpin": "固定を解除（→ {{name}}）",
-      "unpinHere": "固定を解除"
+      "unpinHere": "固定を解除",
+      "setInProgress": "進行中にする",
+      "cancelTask": "タスクをキャンセル"
     },
     "languageBanner": {
       "message": "Obsidianの言語が変更されました。可能な場合はカテゴリ名を更新しました — 必要に応じて設定を確認してください。",
@@ -85,11 +87,14 @@
     }
   },
   "commands": {
-    "openPanel": "パネルを開く"
+    "openPanel": "パネルを開く",
+    "toggleInProgress": "タスクの進行中を切り替え",
+    "toggleCancelled": "タスクのキャンセルを切り替え"
   },
   "notices": {
     "moveFailed": "GTD Tasks: 移動に失敗しました — {{error}}",
     "toggleFailed": "GTD Tasks: 切り替えに失敗しました — {{error}}",
+    "statusFailed": "GTD Tasks: ステータスの変更に失敗しました — {{error}}",
     "editFailed": "GTD Tasks: 編集に失敗しました — {{error}}",
     "confirmFailed": "GTD Tasks: 確認に失敗しました — {{error}}",
     "migrationComplete": "GTD Tasks: 移行完了。{{migrated}}件更新、{{failed}}件スキップ。"

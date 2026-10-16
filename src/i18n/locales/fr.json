@@ -26,7 +26,9 @@
       "openFile": "Ouvrir le fichier",
       "pinTo": "Épingler à {{name}}",
       "unpin": "Détacher (→ {{name}})",
-      "unpinHere": "Détacher"
+      "unpinHere": "Détacher",
+      "setInProgress": "Marquer en cours",
+      "cancelTask": "Annuler la tâche"
     },
     "languageBanner": {
       "message": "Votre langue Obsidian a changé. Les noms des catégories ont été mis à jour si possible — vérifiez les paramètres si nécessaire.",
@@ -85,11 +87,14 @@
     }
   },
   "commands": {
-    "openPanel": "Ouvrir le panneau"
+    "openPanel": "Ouvrir le panneau",
+    "toggleInProgress": "Basculer la tâche en cours",
+    "toggleCancelled": "Basculer la tâche annulée"
   },
   "notices": {
     "moveFailed": "GTD Tasks : Déplacement échoué — {{error}}",
     "toggleFailed": "GTD Tasks : Basculement échoué — {{error}}",
+    "statusFailed": "GTD Tasks : Changement de statut échoué — {{error}}",
     "editFailed": "GTD Tasks : Modification échouée — {{error}}",
     "confirmFailed": "GTD Tasks : Confirmation échouée — {{error}}",
     "migrationComplete": "GTD Tasks : Migration terminée. {{migrated}} tâches mises à jour, {{failed}} ignorées."

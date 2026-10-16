@@ -26,7 +26,9 @@
       "openFile": "Ava fail",
       "pinTo": "Kinnita kategooriasse {{name}}",
       "unpin": "Vabasta (→ {{name}})",
-      "unpinHere": "Vabasta"
+      "unpinHere": "Vabasta",
+      "setInProgress": "Märgi pooleliolevaks",
+      "cancelTask": "Tühista ülesanne"
     },
     "languageBanner": {
       "message": "Obsidiani keel on muutunud. Kategooriate nimed uuendati võimalusel — vaata vajadusel seadetest üle.",
@@ -85,11 +87,14 @@
     }
   },
   "commands": {
-    "openPanel": "Ava paneel"
+    "openPanel": "Ava paneel",
+    "toggleInProgress": "Lülita ülesanne pooleliolevaks",
+    "toggleCancelled": "Lülita ülesanne tühistatuks"
   },
   "notices": {
     "moveFailed": "GTD Tasks: Teisaldamine ebaõnnestus — {{error}}",
     "toggleFailed": "GTD Tasks: Lülitamine ebaõnnestus — {{error}}",
+    "statusFailed": "GTD Tasks: Oleku muutmine ebaõnnestus — {{error}}",
     "editFailed": "GTD Tasks: Muutmine ebaõnnestus — {{error}}",
     "confirmFailed": "GTD Tasks: Kinnitamine ebaõnnestus — {{error}}",
     "migrationComplete": "GTD Tasks: Migratsioon lõpetatud. {{migrated}} ülesannet uuendatud, {{failed}} vahele jäetud."

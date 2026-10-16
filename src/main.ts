@@ -1,5 +1,7 @@
 import {
   Plugin,
+  Editor,
+  EditorPosition,
   WorkspaceLeaf,
   ItemView,
   MarkdownView,
@@ -18,7 +20,8 @@ import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
-import { editedLines, getTaskEditor, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion } from "./core/TaskWriter";
+import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setStatusLine, setTaskStatus, toggleTaskCompletion } from "./core/TaskWriter";
+import type { SettableStatus } from "./core/TaskWriter";
 import { parseFile, taskTextColumn } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
@@ -42,6 +45,17 @@ import { celebrationImages } from "./assets/celebrationImages";
 import { flashLine, lineFlashField } from "./views/lineFlash";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
+
+/** The line numbers under every cursor and selection, each once. */
+function selectedLines(editor: Editor): number[] {
+  const lines = new Set<number>();
+  for (const { anchor, head } of editor.listSelections()) {
+    for (let line = Math.min(anchor.line, head.line); line <= Math.max(anchor.line, head.line); line++) {
+      lines.add(line);
+    }
+  }
+  return [...lines];
+}
 
 export default class GtdTasksPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
@@ -78,6 +92,42 @@ export default class GtdTasksPlugin extends Plugin {
       name: t("commands.openPanel"),
       callback: () => this.activateView(),
     });
+
+    // Fill the gap Obsidian's own "Toggle checkbox status" leaves: it only
+    // knows [ ] and [x]. Each one sets its status, or clears it on a repeat.
+    const statusCommands: [string, string, SettableStatus][] = [
+      ["toggle-in-progress", t("commands.toggleInProgress"), "/"],
+      ["toggle-cancelled", t("commands.toggleCancelled"), "-"],
+    ];
+    for (const [id, name, symbol] of statusCommands) {
+      this.addCommand({
+        id,
+        name,
+        editorCheckCallback: (checking, editor, ctx) => {
+          const lines = selectedLines(editor).filter((line) => hasSettableStatus(editor.getLine(line)));
+          if (checking) return lines.length > 0;
+          const api = getTasksApi(this.app);
+          const path = ctx.file?.path ?? "";
+          const after = new Map(
+            lines.map((line) => [line, setStatusLine(editor.getLine(line), path, symbol, api).join("\n")])
+          );
+          // Tasks may also drop a date from the end of the line, so the caret
+          // is put back where it was rather than left to the replaced text.
+          const clamp = ({ line, ch }: EditorPosition) => ({
+            line,
+            ch: Math.min(ch, (after.get(line) ?? editor.getLine(line)).length),
+          });
+          editor.transaction({
+            changes: lines.map((line) => ({
+              from: { line, ch: 0 },
+              to: { line, ch: editor.getLine(line).length },
+              text: after.get(line) ?? "",
+            })),
+            selections: editor.listSelections().map(({ anchor, head }) => ({ from: clamp(anchor), to: clamp(head) })),
+          });
+        },
+      });
+    }
 
     // The panel is this plugin's whole UI, and nothing else reopens it: the
     // one-time auto-open never fires again after the first install, and the
@@ -526,6 +576,7 @@ class GtdPanelView extends ItemView {
         onOpenLink: this.handleOpenLink.bind(this),
         canEditTask: () => getTaskEditor(this.app) !== null,
         onEdit: this.handleEdit.bind(this),
+        onSetStatus: this.handleSetStatus.bind(this),
         onReorder: this.handleReorder.bind(this),
         onDismiss: (tasks: TaskRecord[]) => this.plugin.dismissCompleted(tasks),
         onOpenSettings: openSettings,
@@ -624,6 +675,17 @@ class GtdPanelView extends ItemView {
     // whose rawLine no longer exists in the file — every later toggle on it
     // fails to locate its line. Reindexing here also re-runs the diff, so a
     // dateless completion still gets its completionSeen record.
+    await this.plugin.taskIndex.reindexFile(task.filePath);
+  }
+
+  private async handleSetStatus(task: TaskRecord, symbol: SettableStatus) {
+    const result = await setTaskStatus(this.app, task, symbol);
+
+    if (!result.success) {
+      new Notice(t("notices.statusFailed", { error: result.error }));
+    }
+
+    // Same as handleToggle: catch the index up on our own write.
     await this.plugin.taskIndex.reindexFile(task.filePath);
   }
 

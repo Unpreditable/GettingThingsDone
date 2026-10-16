@@ -26,7 +26,9 @@
       "openFile": "파일 열기",
       "pinTo": "{{name}}에 고정",
       "unpin": "고정 해제 (→ {{name}})",
-      "unpinHere": "고정 해제"
+      "unpinHere": "고정 해제",
+      "setInProgress": "진행 중으로 표시",
+      "cancelTask": "작업 취소"
     },
     "languageBanner": {
       "message": "Obsidian 언어가 변경되었습니다. 가능한 경우 카테고리 이름이 업데이트되었습니다 — 필요하면 설정을 확인하세요.",
@@ -85,11 +87,14 @@
     }
   },
   "commands": {
-    "openPanel": "패널 열기"
+    "openPanel": "패널 열기",
+    "toggleInProgress": "작업 진행 중 전환",
+    "toggleCancelled": "작업 취소 전환"
   },
   "notices": {
     "moveFailed": "GTD Tasks: 이동 실패 — {{error}}",
     "toggleFailed": "GTD Tasks: 전환 실패 — {{error}}",
+    "statusFailed": "GTD Tasks: 상태 변경 실패 — {{error}}",
     "editFailed": "GTD Tasks: 편집 실패 — {{error}}",
     "confirmFailed": "GTD Tasks: 확인 실패 — {{error}}",
     "migrationComplete": "GTD Tasks: 마이그레이션 완료. {{migrated}}개 업데이트, {{failed}}개 건너뜀."

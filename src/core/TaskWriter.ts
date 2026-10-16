@@ -80,6 +80,61 @@ export function toggleTaskLine(
   return [rawLine.replace(CHECKBOX_REGEX, "$1[x]")];
 }
 
+/** The statuses the status commands and menu items set. */
+export type SettableStatus = "/" | "-";
+
+/** Whether `line` is a task whose status `setStatusLine` changes: open, in progress, done or cancelled. */
+export function hasSettableStatus(line: string): boolean {
+  const current = line.match(CHECKBOX_REGEX)?.[2];
+  return current !== undefined && " /xX-".includes(current);
+}
+
+/**
+ * The line(s) that replace `rawLine` when it is set to `symbol`, or set back
+ * to `[ ]` if it already has it. The ✅ and ❌ dates are Tasks' to write and
+ * clear, so a task leaving `[x]` or `[-]` is first reopened through Tasks'
+ * toggle; only a plain `[ ]` result is then changed to `symbol`. Without Tasks
+ * only the symbol changes, and any dates stay on the line.
+ */
+export function setStatusLine(
+  rawLine: string,
+  filePath: string,
+  symbol: SettableStatus,
+  api: TasksPluginApiV1 | null
+): string[] {
+  if (!hasSettableStatus(rawLine)) return [rawLine];
+  const current = rawLine.match(CHECKBOX_REGEX)?.[2];
+  const withSymbol = (line: string, s: string) => line.replace(CHECKBOX_REGEX, `$1[${s}]`);
+
+  if (current === " " || current === "/") {
+    return [withSymbol(rawLine, current === symbol ? " " : symbol)];
+  }
+
+  const target = current === symbol ? " " : symbol;
+  if (api) {
+    try {
+      const result = api.executeToggleTaskDoneCommand(rawLine, filePath);
+      if (typeof result === "string") {
+        const lines = result === "" ? [] : result.split("\n");
+        if (lines.length !== 1 || lines[0].match(CHECKBOX_REGEX)?.[2] !== " ") return lines;
+        return [withSymbol(lines[0], target)];
+      }
+    } catch {
+      // Fall through to changing the symbol alone.
+    }
+  }
+  return [withSymbol(rawLine, target)];
+}
+
+export function setTaskStatus(
+  app: App,
+  task: TaskRecord,
+  symbol: SettableStatus
+): Promise<MoveResult> {
+  const api = getTasksApi(app);
+  return replaceTaskLine(app, task, (line) => setStatusLine(line, task.filePath, symbol, api));
+}
+
 /**
  * Locate a task's line index in the file. Tries lineNumber first for O(1) lookup;
  * falls back to scanning for rawLine if the file has shifted since last index.

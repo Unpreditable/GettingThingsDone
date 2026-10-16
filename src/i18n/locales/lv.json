@@ -26,7 +26,9 @@
       "openFile": "Atvērt failu",
       "pinTo": "Piespraust {{name}}",
       "unpin": "Atspraust (→ {{name}})",
-      "unpinHere": "Atspraust"
+      "unpinHere": "Atspraust",
+      "setInProgress": "Atzīmēt kā procesā",
+      "cancelTask": "Atcelt uzdevumu"
     },
     "languageBanner": {
       "message": "Obsidian valoda ir mainīta. Kategoriju nosaukumi atjaunināti, kur iespējams — pārbaudiet iestatījumus, ja nepieciešams.",
@@ -88,11 +90,14 @@
     }
   },
   "commands": {
-    "openPanel": "Atvērt paneli"
+    "openPanel": "Atvērt paneli",
+    "toggleInProgress": "Pārslēgt uzdevumu procesā",
+    "toggleCancelled": "Pārslēgt uzdevumu atcelts"
   },
   "notices": {
     "moveFailed": "GTD Tasks: Pārvietošana neizdevās — {{error}}",
     "toggleFailed": "GTD Tasks: Pārslēgšana neizdevās — {{error}}",
+    "statusFailed": "GTD Tasks: Statusa maiņa neizdevās — {{error}}",
     "editFailed": "GTD Tasks: Rediģēšana neizdevās — {{error}}",
     "confirmFailed": "GTD Tasks: Apstiprināšana neizdevās — {{error}}",
     "migrationComplete": "GTD Tasks: Migrācija pabeigta. Atjaunināti {{migrated}} uzdevumi, izlaisti {{failed}}."

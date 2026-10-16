@@ -1,4 +1,4 @@
-import { editedLines, findTaskLine, moveTaskToBucket, replaceTaskLine, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
+import { editedLines, findTaskLine, moveTaskToBucket, replaceTaskLine, setStatusLine, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
 import { DEFAULT_SETTINGS } from "../src/settings";
 import { TFile } from "obsidian";
 import type { TaskRecord } from "../src/core/TaskParser";
@@ -245,6 +245,91 @@ describe("toggleTaskLine", () => {
     expect(toggleTaskLine("- [ ] Test task 📅 2026-08-09 #gtd/today", "test.md", false, null)).toEqual([
       "- [x] Test task 📅 2026-08-09 #gtd/today",
     ]);
+  });
+});
+
+describe("setStatusLine", () => {
+  const tasksApi = (result: string) => ({ executeToggleTaskDoneCommand: jest.fn(() => result) });
+
+  it("sets an open task in progress without asking Tasks", () => {
+    const api = tasksApi("unused");
+
+    expect(setStatusLine("- [ ] Test task", "test.md", "/", api)).toEqual(["- [/] Test task"]);
+    expect(api.executeToggleTaskDoneCommand).not.toHaveBeenCalled();
+  });
+
+  it("cancels an open task without writing a ❌ date", () => {
+    expect(setStatusLine("- [ ] Test task 📅 2026-10-20", "test.md", "-", tasksApi("unused"))).toEqual([
+      "- [-] Test task 📅 2026-10-20",
+    ]);
+  });
+
+  it("sets an in-progress task back to open on a second press", () => {
+    expect(setStatusLine("- [/] Test task", "test.md", "/", null)).toEqual(["- [ ] Test task"]);
+  });
+
+  it("cancels an in-progress task", () => {
+    expect(setStatusLine("- [/] Test task", "test.md", "-", null)).toEqual(["- [-] Test task"]);
+  });
+
+  it("hands a second cancel press to Tasks, which reopens the task and owns the ❌ date", () => {
+    const api = tasksApi("- [ ] Test task");
+
+    expect(setStatusLine("- [-] Test task ❌ 2026-10-14", "test.md", "-", api)).toEqual(["- [ ] Test task"]);
+    expect(api.executeToggleTaskDoneCommand).toHaveBeenCalledWith("- [-] Test task ❌ 2026-10-14", "test.md");
+  });
+
+  it("reopens a cancelled task through Tasks, then sets it in progress", () => {
+    const api = tasksApi("- [ ] Test task");
+
+    expect(setStatusLine("- [-] Test task ❌ 2026-10-14", "test.md", "/", api)).toEqual(["- [/] Test task"]);
+  });
+
+  it("reopens a done task through Tasks, then cancels it", () => {
+    const api = tasksApi("- [ ] Test task");
+
+    expect(setStatusLine("- [x] Test task ✅ 2026-10-14", "test.md", "-", api)).toEqual(["- [-] Test task"]);
+  });
+
+  it("keeps Tasks' result when it does not reopen the task to [ ]", () => {
+    const api = tasksApi("- [>] Test task");
+
+    expect(setStatusLine("- [-] Test task", "test.md", "/", api)).toEqual(["- [>] Test task"]);
+  });
+
+  it("keeps Tasks' result when it returns more than one line", () => {
+    const api = tasksApi("- [ ] Next\n- [ ] Other");
+
+    expect(setStatusLine("- [x] Test task", "test.md", "/", api)).toEqual(["- [ ] Next", "- [ ] Other"]);
+  });
+
+  it("changes only the symbol and keeps dates when Tasks is absent", () => {
+    expect(setStatusLine("- [-] Test task ❌ 2026-10-14", "test.md", "/", null)).toEqual([
+      "- [/] Test task ❌ 2026-10-14",
+    ]);
+    expect(setStatusLine("- [x] Test task ✅ 2026-10-14", "test.md", "-", null)).toEqual([
+      "- [-] Test task ✅ 2026-10-14",
+    ]);
+    expect(setStatusLine("- [-] Test task ❌ 2026-10-14", "test.md", "-", null)).toEqual([
+      "- [ ] Test task ❌ 2026-10-14",
+    ]);
+  });
+
+  it("changes only the symbol when the Tasks API throws", () => {
+    const api = {
+      executeToggleTaskDoneCommand: () => {
+        throw new Error("boom");
+      },
+    };
+
+    expect(setStatusLine("- [x] Test task ✅ 2026-10-14", "test.md", "/", api)).toEqual([
+      "- [/] Test task ✅ 2026-10-14",
+    ]);
+  });
+
+  it("leaves other statuses and non-task lines alone", () => {
+    expect(setStatusLine("- [>] Test task", "test.md", "/", null)).toEqual(["- [>] Test task"]);
+    expect(setStatusLine("- Just a bullet", "test.md", "-", null)).toEqual(["- Just a bullet"]);
   });
 });
 

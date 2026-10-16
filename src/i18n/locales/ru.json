@@ -26,7 +26,9 @@
       "openFile": "Открыть файл",
       "pinTo": "Закрепить в {{name}}",
       "unpin": "Открепить (→ {{name}})",
-      "unpinHere": "Открепить"
+      "unpinHere": "Открепить",
+      "setInProgress": "Отметить «в работе»",
+      "cancelTask": "Отменить задачу"
     },
     "languageBanner": {
       "message": "Язык Obsidian изменён. Названия категорий обновлены там, где это возможно — проверьте настройки при необходимости.",
@@ -91,11 +93,14 @@
     }
   },
   "commands": {
-    "openPanel": "Открыть панель"
+    "openPanel": "Открыть панель",
+    "toggleInProgress": "Переключить: задача в работе",
+    "toggleCancelled": "Переключить: задача отменена"
   },
   "notices": {
     "moveFailed": "GTD Tasks: Ошибка перемещения — {{error}}",
     "toggleFailed": "GTD Tasks: Ошибка переключения — {{error}}",
+    "statusFailed": "GTD Tasks: Ошибка смены статуса — {{error}}",
     "editFailed": "GTD Tasks: Ошибка редактирования — {{error}}",
     "confirmFailed": "GTD Tasks: Ошибка подтверждения — {{error}}",
     "migrationComplete": "GTD Tasks: Миграция завершена. Обновлено {{migrated}} задач, пропущено {{failed}}."

@@ -6,7 +6,8 @@
   import Celebration from "./Celebration.svelte";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
-  import { getTagValue, getInlineFieldValue } from "../core/TaskParser";
+  import { getTagValue, getInlineFieldValue, statusSymbol } from "../core/TaskParser";
+  import type { SettableStatus } from "../core/TaskWriter";
   import { countShown, searchBuckets, shownTasks, visibleCompleted } from "../core/PanelVisibility";
   import type { BucketConfig, PluginSettings } from "../settings";
   import { shouldRecommendCatchAll, hiddenFilterStrings } from "../settings";
@@ -35,6 +36,7 @@
   /** Asked each time the menu opens, since Tasks can be enabled or disabled while the panel is up. */
   export let canEditTask: () => boolean;
   export let onEdit: (task: TaskRecord) => void;
+  export let onSetStatus: (task: TaskRecord, symbol: SettableStatus) => Promise<void>;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onDismiss: (tasks: TaskRecord[]) => void;
   export let onOpenSettings: () => void;
@@ -193,6 +195,21 @@
 
     if (canEditTask()) {
       menu.addItem((item) => item.setTitle(t("panel.contextMenu.editTask")).setIcon("pencil").onClick(() => onEdit(task)));
+      topSection = true;
+    }
+
+    // Done stays with the row's checkbox, so a done task gets neither item.
+    const status = statusSymbol(task.rawLine);
+    if (status === " " || status === "-") {
+      menu.addItem((item) =>
+        item.setTitle(t("panel.contextMenu.setInProgress")).setIcon("loader").onClick(() => onSetStatus(task, "/"))
+      );
+      topSection = true;
+    }
+    if (status === " " || status === "/") {
+      menu.addItem((item) =>
+        item.setTitle(t("panel.contextMenu.cancelTask")).setIcon("x-octagon").onClick(() => onSetStatus(task, "-"))
+      );
       topSection = true;
     }
 

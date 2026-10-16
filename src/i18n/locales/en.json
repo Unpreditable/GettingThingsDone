@@ -47,7 +47,11 @@
       "unpin_comment": "Context menu item shown on a pinned task. Choosing it removes the pin so the task follows its dates again. {{name}} = the bucket its dates will send it to. The arrow means 'goes to'.",
       "unpin": "Unpin (→ {{name}})",
       "unpinHere_comment": "Same action as 'unpin', shown when the task's dates point at the bucket it is already in — nothing moves, only the pin is removed. Keep it identical to 'unpin' minus the destination.",
-      "unpinHere": "Unpin"
+      "unpinHere": "Unpin",
+      "setInProgress_comment": "Right-click context menu item on a task. Marks the task as in progress (checkbox [/]). Shown on open and cancelled tasks.",
+      "setInProgress": "Mark in progress",
+      "cancelTask_comment": "Right-click context menu item on a task. Marks the task as cancelled (checkbox [-]). Shown on open and in-progress tasks.",
+      "cancelTask": "Cancel task"
     },
     "languageBanner": {
       "message_comment": "Dismissable info banner shown once after the user changes their Obsidian interface language and restarts. 'Bucket names' are the GTD time-horizon categories (Today, This Week, etc.) — their display names may have been auto-renamed to match the new language.",
@@ -126,12 +130,18 @@
   },
   "commands": {
     "openPanel_comment": "Label shown in Obsidian's command palette for the command that opens the GTD sidebar panel.",
-    "openPanel": "Open panel"
+    "openPanel": "Open panel",
+    "toggleInProgress_comment": "Command palette label. Marks the task on the cursor's line as in progress (checkbox [/]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",
+    "toggleInProgress": "Toggle task in progress",
+    "toggleCancelled_comment": "Command palette label. Marks the task on the cursor's line as cancelled (checkbox [-]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",
+    "toggleCancelled": "Toggle task cancelled"
   },
   "notices": {
     "_comment": "Toast notifications shown in Obsidian's notification area. All prefixed with 'GTD Tasks:' so users can identify their source. {{error}} is the raw error message from the failed operation.",
     "moveFailed": "GTD Tasks: Move failed — {{error}}",
     "toggleFailed": "GTD Tasks: Toggle failed — {{error}}",
+    "statusFailed_comment": "Notice shown when a status change chosen from a task's right-click menu could not be written back. {{error}} = the technical reason.",
+    "statusFailed": "GTD Tasks: Status change failed — {{error}}",
     "editFailed_comment": "Notice shown when a task edited in the Tasks dialog could not be written back. {{error}} = the technical reason.",
     "editFailed": "GTD Tasks: Edit failed — {{error}}",
     "confirmFailed": "GTD Tasks: Confirm failed — {{error}}",

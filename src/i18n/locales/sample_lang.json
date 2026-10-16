@@ -26,7 +26,9 @@
       "openFile": "",
       "pinTo": "",
       "unpin": "",
-      "unpinHere": ""
+      "unpinHere": "",
+      "setInProgress": "",
+      "cancelTask": ""
     },
     "languageBanner": {
       "message": "",
@@ -85,11 +87,14 @@
     }
   },
   "commands": {
-    "openPanel": ""
+    "openPanel": "",
+    "toggleInProgress": "",
+    "toggleCancelled": ""
   },
   "notices": {
     "moveFailed": "",
     "toggleFailed": "",
+    "statusFailed": "",
     "editFailed": "",
     "confirmFailed": "",
     "migrationComplete": ""
