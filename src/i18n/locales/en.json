@@ -134,7 +134,66 @@
     "toggleInProgress_comment": "Command palette label. Marks the task on the cursor's line as in progress (checkbox [/]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",
     "toggleInProgress": "Toggle task in progress",
     "toggleCancelled_comment": "Command palette label. Marks the task on the cursor's line as cancelled (checkbox [-]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",
-    "toggleCancelled": "Toggle task cancelled"
+    "toggleCancelled": "Toggle task cancelled",
+    "reviewCompleted_comment": "Command palette label. Opens a dialog listing the tasks completed today, yesterday, this week or last week, with a graph of completions per week.",
+    "reviewCompleted": "See what you got done"
+  },
+  "report": {
+    "_comment": "The completed-tasks dialog opened by the 'See what you got done' command. It reads only the done (✅) and cancelled (❌) dates written on task lines; the plugin stores no history.",
+    "title_comment": "Heading of the dialog.",
+    "title": "What you got done!",
+    "tabs": {
+      "_comment": "Tabs choosing which days the list shows. 'thisWeek' is also the label under the graph's last point. Weeks begin on the first day of the week set in the plugin settings.",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week",
+      "lastWeek": "Last week"
+    },
+    "empty": {
+      "_comment": "Shown in place of the list when the selected tab has no completed tasks.",
+      "today": "Nothing completed today.",
+      "yesterday": "Nothing completed yesterday.",
+      "thisWeek": "Nothing completed this week.",
+      "lastWeek": "Nothing completed last week."
+    },
+    "dayCount_comment": "Tooltip on the number next to a day's heading. {{n}} = tasks completed that day; cancelled tasks are not counted.",
+    "dayCount": "{{n}} completed",
+    "openTask_comment": "Tooltip on a task row. Clicking the row closes the dialog and opens the file at the task's line. {{file}} = the file's path in the vault.",
+    "openTask": "Open in {{file}}",
+    "graph": {
+      "title_comment": "Caption above the line graph of completed tasks per week.",
+      "title": "Completed per week",
+      "span_comment": "Right-hand caption above the graph while nothing is hovered. {{n}} = the number of weeks shown.",
+      "span": "Last {{n}} weeks",
+      "soFar_comment": "Right-hand caption while hovering the point for the current, unfinished week. {{range}} = that week's dates, e.g. '12–18 Oct'.",
+      "soFar": "{{range}} (so far)",
+      "point_comment": "Tooltip on a graph point. {{range}} = the week's dates, e.g. '28 Sep – 4 Oct'. {{n}} = tasks completed that week.",
+      "point": "{{range}}: {{n}} completed",
+      "pointSoFar_comment": "Tooltip on the graph point for the current, unfinished week. {{range}} = the week's dates. {{n}} = tasks completed so far.",
+      "pointSoFar": "{{range}}: {{n}} completed so far"
+    },
+    "options": {
+      "button_comment": "Tooltip on the sliders icon in the dialog's header. Opens a small menu of display switches, remembered between openings.",
+      "button": "Display options",
+      "showGraph": "Show graph",
+      "showCancelled": "Show cancelled tasks",
+      "showFileNames": "Show file names"
+    },
+    "info": {
+      "_comment": "Panel opened by the ⓘ icon in the dialog's header, explaining where the dialog's data comes from and what it can't show.",
+      "button": "How this works",
+      "title": "How this works",
+      "source": "Everything here is read from the ✅ done dates on task lines in your vault. The plugin keeps no history of its own.",
+      "undated_comment": "'Set done date on every completed task' is the name of a setting in the Tasks community plugin; keep it as Tasks shows it in this language.",
+      "undated": "A task completed without a ✅ date can't be placed on a day, so it isn't listed. The Tasks plugin adds the date when \"Set done date on every completed task\" is on.",
+      "undatedCount_comment": "Appended to 'undated' only when such tasks exist. {{n}} = how many completed tasks in scope have no done date.",
+      "undatedCount": "Right now {{n}} completed tasks have no date.",
+      "removed": "Deleting a completed task, or moving it out of the folders this plugin scans, also removes it from past weeks.",
+      "recurring": "Each completed instance of a recurring task counts, by its own ✅ date.",
+      "cancelled": "Cancelled tasks are listed by their ❌ date when shown, and never count toward totals or the graph.",
+      "weekStart_comment": "{{day}} = the weekday name weeks start on, e.g. 'Monday'.",
+      "weekStart": "Weeks start on {{day}}, as set in the plugin settings."
+    }
   },
   "notices": {
     "_comment": "Toast notifications shown in Obsidian's notification area. All prefixed with 'GTD Tasks:' so users can identify their source. {{error}} is the raw error message from the failed operation.",

@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "",
     "toggleInProgress": "",
-    "toggleCancelled": ""
+    "toggleCancelled": "",
+    "reviewCompleted": ""
+  },
+  "report": {
+    "title": "",
+    "tabs": {
+      "today": "",
+      "yesterday": "",
+      "thisWeek": "",
+      "lastWeek": ""
+    },
+    "empty": {
+      "today": "",
+      "yesterday": "",
+      "thisWeek": "",
+      "lastWeek": ""
+    },
+    "dayCount": "",
+    "openTask": "",
+    "graph": {
+      "title": "",
+      "span": "",
+      "soFar": "",
+      "point": "",
+      "pointSoFar": ""
+    },
+    "options": {
+      "button": "",
+      "showGraph": "",
+      "showCancelled": "",
+      "showFileNames": ""
+    },
+    "info": {
+      "button": "",
+      "title": "",
+      "source": "",
+      "undated": "",
+      "undatedCount": "",
+      "removed": "",
+      "recurring": "",
+      "cancelled": "",
+      "weekStart": ""
+    }
   },
   "notices": {
     "moveFailed": "",

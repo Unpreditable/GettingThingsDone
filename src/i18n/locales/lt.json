@@ -95,7 +95,49 @@
   "commands": {
     "openPanel": "Atidaryti skydelį",
     "toggleInProgress": "Perjungti užduotį vykdoma",
-    "toggleCancelled": "Perjungti užduotį atšaukta"
+    "toggleCancelled": "Perjungti užduotį atšaukta",
+    "reviewCompleted": "Peržiūrėti, kas atlikta"
+  },
+  "report": {
+    "title": "Kas atlikta!",
+    "tabs": {
+      "today": "Šiandien",
+      "yesterday": "Vakar",
+      "thisWeek": "Ši savaitė",
+      "lastWeek": "Praėjusi savaitė"
+    },
+    "empty": {
+      "today": "Šiandien nieko neatlikta.",
+      "yesterday": "Vakar nieko neatlikta.",
+      "thisWeek": "Šią savaitę nieko neatlikta.",
+      "lastWeek": "Praėjusią savaitę nieko neatlikta."
+    },
+    "dayCount": "Atlikta: {{n}}",
+    "openTask": "Atidaryti faile {{file}}",
+    "graph": {
+      "title": "Atlikta per savaitę",
+      "span": "Paskutinės {{n}} savaičių",
+      "soFar": "{{range}} (kol kas)",
+      "point": "{{range}}: atlikta {{n}}",
+      "pointSoFar": "{{range}}: kol kas atlikta {{n}}"
+    },
+    "options": {
+      "button": "Rodymo parinktys",
+      "showGraph": "Rodyti grafiką",
+      "showCancelled": "Rodyti atšauktas užduotis",
+      "showFileNames": "Rodyti failų pavadinimus"
+    },
+    "info": {
+      "button": "Kaip tai veikia",
+      "title": "Kaip tai veikia",
+      "source": "Viskas čia nuskaitoma iš ✅ atlikimo datų jūsų saugyklos užduočių eilutėse. Įskiepis pats jokios istorijos nesaugo.",
+      "undated": "Užduoties, atliktos be ✅ datos, negalima priskirti jokiai dienai, todėl jos sąraše nėra. Įskiepis Tasks prideda datą, kai įjungtas nustatymas „Set done date on every completed task“.",
+      "undatedCount": "Atliktų užduočių be datos: {{n}}.",
+      "removed": "Ištrynus atliktą užduotį arba perkėlus ją už aplankų, kuriuos nuskaito šis įskiepis, ji dingsta ir iš praėjusių savaičių.",
+      "recurring": "Kiekvienas atliktas pasikartojančios užduoties kartas skaičiuojamas pagal savo ✅ datą.",
+      "cancelled": "Atšauktos užduotys, kai rodomos, išvardijamos pagal ❌ datą ir niekada neįskaičiuojamos į sumas ar grafiką.",
+      "weekStart": "Pirmoji savaitės diena: {{day}} (nustatoma įskiepio nustatymuose)."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: Perkėlimas nepavyko — {{error}}",

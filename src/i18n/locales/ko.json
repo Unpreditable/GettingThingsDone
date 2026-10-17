@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "패널 열기",
     "toggleInProgress": "작업 진행 중 전환",
-    "toggleCancelled": "작업 취소 전환"
+    "toggleCancelled": "작업 취소 전환",
+    "reviewCompleted": "해낸 일 보기"
+  },
+  "report": {
+    "title": "해낸 일!",
+    "tabs": {
+      "today": "오늘",
+      "yesterday": "어제",
+      "thisWeek": "이번 주",
+      "lastWeek": "지난주"
+    },
+    "empty": {
+      "today": "오늘 완료한 작업이 없습니다.",
+      "yesterday": "어제 완료한 작업이 없습니다.",
+      "thisWeek": "이번 주에 완료한 작업이 없습니다.",
+      "lastWeek": "지난주에 완료한 작업이 없습니다."
+    },
+    "dayCount": "{{n}}개 완료",
+    "openTask": "{{file}}에서 열기",
+    "graph": {
+      "title": "주별 완료 수",
+      "span": "최근 {{n}}주",
+      "soFar": "{{range}} (진행 중)",
+      "point": "{{range}}: {{n}}개 완료",
+      "pointSoFar": "{{range}}: 지금까지 {{n}}개 완료"
+    },
+    "options": {
+      "button": "표시 옵션",
+      "showGraph": "그래프 표시",
+      "showCancelled": "취소된 작업 표시",
+      "showFileNames": "파일 이름 표시"
+    },
+    "info": {
+      "button": "작동 방식",
+      "title": "작동 방식",
+      "source": "여기의 모든 내용은 볼트의 작업 줄에 있는 ✅ 완료 날짜에서 읽어 옵니다. 플러그인은 자체 기록을 저장하지 않습니다.",
+      "undated": "✅ 날짜 없이 완료된 작업은 날짜에 배정할 수 없어 목록에 나오지 않습니다. Tasks 플러그인은 \"Set done date on every completed task\"이 켜져 있을 때 날짜를 추가합니다.",
+      "undatedCount": "날짜가 없는 완료된 작업: {{n}}개.",
+      "removed": "완료된 작업을 삭제하거나 이 플러그인이 검색하는 폴더 밖으로 옮기면 지난 주에서도 사라집니다.",
+      "recurring": "반복 작업은 완료된 회차마다 각자의 ✅ 날짜로 집계됩니다.",
+      "cancelled": "취소된 작업은 표시할 때 ❌ 날짜 기준으로 나열되며, 합계나 그래프에는 포함되지 않습니다.",
+      "weekStart": "한 주의 시작: {{day}} (플러그인 설정에서 지정)."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: 이동 실패 — {{error}}",

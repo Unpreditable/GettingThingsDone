@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "Ouvrir le panneau",
     "toggleInProgress": "Basculer la tâche en cours",
-    "toggleCancelled": "Basculer la tâche annulée"
+    "toggleCancelled": "Basculer la tâche annulée",
+    "reviewCompleted": "Voir ce que vous avez accompli"
+  },
+  "report": {
+    "title": "Ce que vous avez accompli !",
+    "tabs": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "thisWeek": "Cette semaine",
+      "lastWeek": "La semaine dernière"
+    },
+    "empty": {
+      "today": "Rien de terminé aujourd'hui.",
+      "yesterday": "Rien de terminé hier.",
+      "thisWeek": "Rien de terminé cette semaine.",
+      "lastWeek": "Rien de terminé la semaine dernière."
+    },
+    "dayCount": "Terminées : {{n}}",
+    "openTask": "Ouvrir dans {{file}}",
+    "graph": {
+      "title": "Terminées par semaine",
+      "span": "{{n}} dernières semaines",
+      "soFar": "{{range}} (en cours)",
+      "point": "{{range}} : {{n}} terminées",
+      "pointSoFar": "{{range}} : {{n}} terminées pour l'instant"
+    },
+    "options": {
+      "button": "Options d'affichage",
+      "showGraph": "Afficher le graphique",
+      "showCancelled": "Afficher les tâches annulées",
+      "showFileNames": "Afficher les noms de fichiers"
+    },
+    "info": {
+      "button": "Fonctionnement",
+      "title": "Fonctionnement",
+      "source": "Tout ici est lu à partir des dates d'achèvement ✅ des lignes de tâches de votre coffre. Le plugin ne conserve aucun historique.",
+      "undated": "Une tâche terminée sans date ✅ ne peut être rattachée à aucun jour, elle n'est donc pas listée. Le plugin Tasks ajoute la date quand « Set done date on every completed task » est activé.",
+      "undatedCount": "Tâches terminées sans date : {{n}}.",
+      "removed": "Supprimer une tâche terminée, ou la déplacer hors des dossiers analysés par ce plugin, la retire aussi des semaines passées.",
+      "recurring": "Chaque occurrence terminée d'une tâche récurrente compte, à sa propre date ✅.",
+      "cancelled": "Les tâches annulées, quand elles sont affichées, sont listées à leur date ❌ et ne comptent jamais dans les totaux ni dans le graphique.",
+      "weekStart": "Les semaines commencent le {{day}}, comme défini dans les paramètres du plugin."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks : Déplacement échoué — {{error}}",

@@ -4,14 +4,12 @@ import {
   EditorPosition,
   WorkspaceLeaf,
   ItemView,
-  MarkdownView,
   Notice,
   TFile,
   App,
   getLanguage,
   getLinkpath,
 } from "obsidian";
-import type { EditorView } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import { writable, type Writable } from "svelte/store";
 
@@ -22,7 +20,7 @@ import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setStatusLine, setTaskStatus, toggleTaskCompletion } from "./core/TaskWriter";
 import type { SettableStatus } from "./core/TaskWriter";
-import { parseFile, taskTextColumn } from "./core/TaskParser";
+import { parseFile } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
 import {
@@ -42,7 +40,9 @@ import { ConfirmModal } from "./views/ConfirmModal";
 import { t } from "./i18n/i18n";
 import { BucketLocalizer } from "./core/BucketLocalizer";
 import { celebrationImages } from "./assets/celebrationImages";
-import { flashLine, lineFlashField } from "./views/lineFlash";
+import { lineFlashField } from "./views/lineFlash";
+import { revealTaskLine } from "./views/revealTaskLine";
+import { CompletionReportModal } from "./views/CompletionReportModal";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
@@ -93,6 +93,12 @@ export default class GtdTasksPlugin extends Plugin {
       callback: () => this.activateView(),
     });
 
+    this.addCommand({
+      id: "review-completed-tasks",
+      name: t("commands.reviewCompleted"),
+      callback: () => new CompletionReportModal(this).open(),
+    });
+
     // Fill the gap Obsidian's own "Toggle checkbox status" leaves: it only
     // knows [ ] and [x]. Each one sets its status, or clears it on a repeat.
     const statusCommands: [string, string, SettableStatus][] = [
@@ -136,6 +142,10 @@ export default class GtdTasksPlugin extends Plugin {
     this.addRibbonIcon("check-square", t("ribbon.openPanel"), () => {
       void this.activateView();
     });
+    // Named like the command palette names it, so the trophy says whose it is.
+    this.addRibbonIcon("trophy", `${t("panel.title")}: ${t("commands.reviewCompleted")}`, () =>
+      new CompletionReportModal(this).open()
+    );
 
     const currentLang = getLanguage() ?? "en";
     if (this.settings.lastSeenLanguage !== currentLang) {
@@ -734,7 +744,7 @@ class GtdPanelView extends ItemView {
   }
 
   private handleNavigate(task: TaskRecord) {
-    void this.revealTaskLine(task);
+    void revealTaskLine(this.app, task);
   }
 
   private handleOpenLink(task: TaskRecord, target: string, external: boolean, newTab: boolean) {
@@ -760,28 +770,4 @@ class GtdPanelView extends ItemView {
     ).open();
   }
 
-  private async revealTaskLine(task: TaskRecord) {
-    const file = this.app.vault.getAbstractFileByPath(task.filePath);
-    if (!(file instanceof TFile)) return;
-
-    const { workspace } = this.app;
-    const line = task.lineNumber;
-    const existingLeaf = workspace.getLeavesOfType("markdown")
-      .find((leaf) => (leaf.view as MarkdownView).file?.path === task.filePath);
-    const leaf = existingLeaf ?? workspace.getLeaf(false);
-    if (existingLeaf) await workspace.revealLeaf(leaf);
-    else await leaf.openFile(file, { eState: { line } });
-    if (!(leaf.view instanceof MarkdownView)) return;
-
-    // setCursor alone scrolls the least it can, which leaves an off-screen line
-    // pinned to the viewport's bottom edge.
-    const { editor } = leaf.view;
-    const pos = { line, ch: taskTextColumn(editor.getLine(line)) };
-    editor.setCursor(pos);
-    editor.scrollIntoView({ from: pos, to: pos }, true);
-    // Clicking the panel leaves focus there, which hides the caret.
-    editor.focus();
-    const cm = (editor as unknown as { cm?: EditorView }).cm;
-    if (cm) flashLine(cm, line);
-  }
 }

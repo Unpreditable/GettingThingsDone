@@ -92,7 +92,49 @@
   "commands": {
     "openPanel": "Atvērt paneli",
     "toggleInProgress": "Pārslēgt uzdevumu procesā",
-    "toggleCancelled": "Pārslēgt uzdevumu atcelts"
+    "toggleCancelled": "Pārslēgt uzdevumu atcelts",
+    "reviewCompleted": "Skatīt, kas paveikts"
+  },
+  "report": {
+    "title": "Kas paveikts!",
+    "tabs": {
+      "today": "Šodien",
+      "yesterday": "Vakar",
+      "thisWeek": "Šī nedēļa",
+      "lastWeek": "Pagājusī nedēļa"
+    },
+    "empty": {
+      "today": "Šodien nekas nav paveikts.",
+      "yesterday": "Vakar nekas nav paveikts.",
+      "thisWeek": "Šonedēļ nekas nav paveikts.",
+      "lastWeek": "Pagājušajā nedēļā nekas nav paveikts."
+    },
+    "dayCount": "Paveikti: {{n}}",
+    "openTask": "Atvērt failā {{file}}",
+    "graph": {
+      "title": "Paveiktie nedēļā",
+      "span": "Pēdējās {{n}} nedēļas",
+      "soFar": "{{range}} (līdz šim)",
+      "point": "{{range}}: paveikti {{n}}",
+      "pointSoFar": "{{range}}: līdz šim paveikti {{n}}"
+    },
+    "options": {
+      "button": "Attēlošanas iespējas",
+      "showGraph": "Rādīt grafiku",
+      "showCancelled": "Rādīt atceltos uzdevumus",
+      "showFileNames": "Rādīt failu nosaukumus"
+    },
+    "info": {
+      "button": "Kā tas darbojas",
+      "title": "Kā tas darbojas",
+      "source": "Viss šeit tiek nolasīts no ✅ izpildes datumiem uzdevumu rindās jūsu glabātuvē. Spraudnis pats nekādu vēsturi neglabā.",
+      "undated": "Uzdevumu, kas paveikts bez ✅ datuma, nevar piesaistīt nevienai dienai, tāpēc tas nav sarakstā. Spraudnis Tasks pievieno datumu, ja ir ieslēgts iestatījums “Set done date on every completed task”.",
+      "undatedCount": "Paveiktie uzdevumi bez datuma: {{n}}.",
+      "removed": "Ja paveiktu uzdevumu izdzēš vai pārvieto ārpus mapēm, ko šis spraudnis skenē, tas pazūd arī no pagājušajām nedēļām.",
+      "recurring": "Katra atkārtota uzdevuma paveiktā reize tiek skaitīta pēc sava ✅ datuma.",
+      "cancelled": "Atceltie uzdevumi, ja tie ir redzami, tiek rādīti pēc ❌ datuma un nekad netiek ieskaitīti kopsummās vai grafikā.",
+      "weekStart": "Nedēļas pirmā diena: {{day}} (iestatīta spraudņa iestatījumos)."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: Pārvietošana neizdevās — {{error}}",

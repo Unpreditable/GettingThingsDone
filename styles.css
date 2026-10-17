@@ -86,6 +86,20 @@
   color: var(--color-purple);
 }
 
+/* The completion report draws its own close button in its header row. Obsidian
+   pins its own to the modal's corner, which sits higher than any header row. */
+.gtd-report-modal .modal-header-button {
+  display: none;
+}
+
+/* The trophy before the report's title: the ribbon button's icon, as a badge. */
+.gtd-report-title-icon .svg-icon {
+  --icon-size: 1.1em;
+  opacity: 1;
+  margin-right: 0;
+  color: var(--interactive-accent);
+}
+
 .gtd-panel-header h3 {
   margin: 0;
   font-size: var(--font-ui-medium);

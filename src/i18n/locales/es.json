@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "Abrir panel",
     "toggleInProgress": "Alternar tarea en curso",
-    "toggleCancelled": "Alternar tarea cancelada"
+    "toggleCancelled": "Alternar tarea cancelada",
+    "reviewCompleted": "Ver lo que has logrado"
+  },
+  "report": {
+    "title": "¡Lo que has logrado!",
+    "tabs": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "thisWeek": "Esta semana",
+      "lastWeek": "La semana pasada"
+    },
+    "empty": {
+      "today": "Nada completado hoy.",
+      "yesterday": "Nada completado ayer.",
+      "thisWeek": "Nada completado esta semana.",
+      "lastWeek": "Nada completado la semana pasada."
+    },
+    "dayCount": "Completadas: {{n}}",
+    "openTask": "Abrir en {{file}}",
+    "graph": {
+      "title": "Completadas por semana",
+      "span": "Últimas {{n}} semanas",
+      "soFar": "{{range}} (en curso)",
+      "point": "{{range}}: {{n}} completadas",
+      "pointSoFar": "{{range}}: {{n}} completadas hasta ahora"
+    },
+    "options": {
+      "button": "Opciones de visualización",
+      "showGraph": "Mostrar gráfico",
+      "showCancelled": "Mostrar tareas canceladas",
+      "showFileNames": "Mostrar nombres de archivo"
+    },
+    "info": {
+      "button": "Cómo funciona",
+      "title": "Cómo funciona",
+      "source": "Todo lo que ves aquí se lee de las fechas de finalización ✅ de las líneas de tareas de tu bóveda. El plugin no guarda ningún historial propio.",
+      "undated": "Una tarea completada sin fecha ✅ no se puede asignar a ningún día, así que no aparece. El plugin Tasks añade la fecha cuando «Set done date on every completed task» está activado.",
+      "undatedCount": "Tareas completadas sin fecha: {{n}}.",
+      "removed": "Si eliminas una tarea completada, o la mueves fuera de las carpetas que analiza este plugin, también desaparece de las semanas pasadas.",
+      "recurring": "Cada instancia completada de una tarea recurrente cuenta, con su propia fecha ✅.",
+      "cancelled": "Las tareas canceladas, cuando se muestran, aparecen según su fecha ❌ y nunca cuentan en los totales ni en el gráfico.",
+      "weekStart": "Las semanas empiezan el {{day}}, según la configuración del plugin."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: Error al mover — {{error}}",

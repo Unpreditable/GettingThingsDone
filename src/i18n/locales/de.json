@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "Panel öffnen",
     "toggleInProgress": "Aufgabe in Bearbeitung umschalten",
-    "toggleCancelled": "Aufgabe abgebrochen umschalten"
+    "toggleCancelled": "Aufgabe abgebrochen umschalten",
+    "reviewCompleted": "Sehen, was du geschafft hast"
+  },
+  "report": {
+    "title": "Was du geschafft hast!",
+    "tabs": {
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "thisWeek": "Diese Woche",
+      "lastWeek": "Letzte Woche"
+    },
+    "empty": {
+      "today": "Heute nichts erledigt.",
+      "yesterday": "Gestern nichts erledigt.",
+      "thisWeek": "Diese Woche nichts erledigt.",
+      "lastWeek": "Letzte Woche nichts erledigt."
+    },
+    "dayCount": "{{n}} erledigt",
+    "openTask": "In {{file}} öffnen",
+    "graph": {
+      "title": "Erledigt pro Woche",
+      "span": "Letzte {{n}} Wochen",
+      "soFar": "{{range}} (bisher)",
+      "point": "{{range}}: {{n}} erledigt",
+      "pointSoFar": "{{range}}: bisher {{n}} erledigt"
+    },
+    "options": {
+      "button": "Anzeigeoptionen",
+      "showGraph": "Diagramm anzeigen",
+      "showCancelled": "Abgebrochene Aufgaben anzeigen",
+      "showFileNames": "Dateinamen anzeigen"
+    },
+    "info": {
+      "button": "So funktioniert es",
+      "title": "So funktioniert es",
+      "source": "Alles hier wird aus den ✅-Erledigt-Daten der Aufgabenzeilen in deinem Tresor gelesen. Das Plugin speichert keinen eigenen Verlauf.",
+      "undated": "Eine ohne ✅-Datum erledigte Aufgabe lässt sich keinem Tag zuordnen und wird daher nicht aufgeführt. Das Tasks-Plugin setzt das Datum, wenn „Set done date on every completed task“ aktiviert ist.",
+      "undatedCount": "Erledigte Aufgaben ohne Datum: {{n}}.",
+      "removed": "Wird eine erledigte Aufgabe gelöscht oder aus den Ordnern verschoben, die dieses Plugin durchsucht, verschwindet sie auch aus vergangenen Wochen.",
+      "recurring": "Jede erledigte Instanz einer wiederkehrenden Aufgabe zählt, jeweils mit ihrem eigenen ✅-Datum.",
+      "cancelled": "Abgebrochene Aufgaben werden, wenn eingeblendet, nach ihrem ❌-Datum aufgeführt und zählen nie zu den Summen oder zum Diagramm.",
+      "weekStart": "Wochen beginnen am {{day}}, wie in den Plugin-Einstellungen festgelegt."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: Verschieben fehlgeschlagen — {{error}}",

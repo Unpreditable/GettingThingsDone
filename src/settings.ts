@@ -88,6 +88,9 @@ export type TaskScope =
 
 export type ScopeType = "vault" | "paths";
 
+/** The completion report's display switches. */
+export type ReportOption = "reportShowGraph" | "reportShowCancelled" | "reportShowFileNames";
+
 export interface PluginSettings {
   storageMode: StorageMode;
   planBy: PlanBy;
@@ -134,7 +137,7 @@ export interface PluginSettings {
    *  rule months later cannot resurrect a banner about a migration that never
    *  applied here. */
   catchAllNoticeSeen: boolean;
-  /** First day of the week, for the this-week and next-week date rules only. */
+  /** First day of the week, for the this-week and next-week date rules and the completion report. */
   weekStartsOn: WeekStart;
   /** Whether the one-off "the week start is configurable now" panel notice has
    *  been settled for this install. Seeded once on load, like catchAllNoticeSeen:
@@ -152,6 +155,10 @@ export interface PluginSettings {
   showTasksFieldsInPopover: boolean;
   /** Controls which celebration animations play on task completion. */
   celebrationMode: CelebrationMode;
+  /** Completion report display options, switched from the report itself. */
+  reportShowGraph: boolean;
+  reportShowCancelled: boolean;
+  reportShowFileNames: boolean;
   /**
    * Manual per-bucket task order from drag-and-drop, keyed by bucket ID.
    * Each value is an array of order entries (see core/TaskOrder.ts) in
@@ -248,6 +255,9 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   showRecurrenceBadge: true,
   showTasksFieldsInPopover: true,
   celebrationMode: "confetti",
+  reportShowGraph: true,
+  reportShowCancelled: true,
+  reportShowFileNames: true,
   taskOrder: {},
   completionSeen: {},
   orderKeyScheme: null,

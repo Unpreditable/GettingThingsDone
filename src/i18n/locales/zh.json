@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "打开面板",
     "toggleInProgress": "切换任务进行中状态",
-    "toggleCancelled": "切换任务已取消状态"
+    "toggleCancelled": "切换任务已取消状态",
+    "reviewCompleted": "看看完成了什么"
+  },
+  "report": {
+    "title": "你完成的事！",
+    "tabs": {
+      "today": "今天",
+      "yesterday": "昨天",
+      "thisWeek": "本周",
+      "lastWeek": "上周"
+    },
+    "empty": {
+      "today": "今天没有完成的任务。",
+      "yesterday": "昨天没有完成的任务。",
+      "thisWeek": "本周没有完成的任务。",
+      "lastWeek": "上周没有完成的任务。"
+    },
+    "dayCount": "已完成 {{n}} 项",
+    "openTask": "在 {{file}} 中打开",
+    "graph": {
+      "title": "每周完成数",
+      "span": "最近 {{n}} 周",
+      "soFar": "{{range}}（进行中）",
+      "point": "{{range}}：完成 {{n}} 项",
+      "pointSoFar": "{{range}}：目前完成 {{n}} 项"
+    },
+    "options": {
+      "button": "显示选项",
+      "showGraph": "显示图表",
+      "showCancelled": "显示已取消的任务",
+      "showFileNames": "显示文件名"
+    },
+    "info": {
+      "button": "工作原理",
+      "title": "工作原理",
+      "source": "这里的所有内容都读取自库中任务行上的 ✅ 完成日期。插件本身不保存任何历史记录。",
+      "undated": "没有 ✅ 日期的已完成任务无法归到某一天，因此不会列出。启用“Set done date on every completed task”后，Tasks 插件会添加日期。",
+      "undatedCount": "没有日期的已完成任务：{{n}} 项。",
+      "removed": "删除已完成的任务，或将其移出本插件扫描的文件夹，也会让它从过去的周中消失。",
+      "recurring": "重复任务的每次完成都会计入，按各自的 ✅ 日期统计。",
+      "cancelled": "已取消的任务在显示时按 ❌ 日期列出，从不计入总数或图表。",
+      "weekStart": "每周从{{day}}开始（在插件设置中设定）。"
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks：移动失败——{{error}}",

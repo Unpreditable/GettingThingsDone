@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "パネルを開く",
     "toggleInProgress": "タスクの進行中を切り替え",
-    "toggleCancelled": "タスクのキャンセルを切り替え"
+    "toggleCancelled": "タスクのキャンセルを切り替え",
+    "reviewCompleted": "やり遂げたことを見る"
+  },
+  "report": {
+    "title": "やり遂げたこと！",
+    "tabs": {
+      "today": "今日",
+      "yesterday": "昨日",
+      "thisWeek": "今週",
+      "lastWeek": "先週"
+    },
+    "empty": {
+      "today": "今日完了したタスクはありません。",
+      "yesterday": "昨日完了したタスクはありません。",
+      "thisWeek": "今週完了したタスクはありません。",
+      "lastWeek": "先週完了したタスクはありません。"
+    },
+    "dayCount": "{{n}}件完了",
+    "openTask": "{{file}} で開く",
+    "graph": {
+      "title": "週ごとの完了数",
+      "span": "過去{{n}}週間",
+      "soFar": "{{range}}（途中経過）",
+      "point": "{{range}}：{{n}}件完了",
+      "pointSoFar": "{{range}}：これまでに{{n}}件完了"
+    },
+    "options": {
+      "button": "表示オプション",
+      "showGraph": "グラフを表示",
+      "showCancelled": "キャンセルしたタスクを表示",
+      "showFileNames": "ファイル名を表示"
+    },
+    "info": {
+      "button": "仕組み",
+      "title": "仕組み",
+      "source": "ここに表示される内容は、保管庫内のタスク行にある ✅ 完了日だけから読み取られます。プラグイン自体は履歴を保存しません。",
+      "undated": "✅ の日付がないまま完了したタスクは日付に割り当てられないため、一覧に表示されません。Tasks プラグインは「Set done date on every completed task」がオンのときに日付を追加します。",
+      "undatedCount": "日付のない完了タスク：{{n}}件。",
+      "removed": "完了したタスクを削除したり、このプラグインがスキャンするフォルダの外へ移動したりすると、過去の週からも消えます。",
+      "recurring": "繰り返しタスクは、完了した回ごとにそれぞれの ✅ 日付で数えられます。",
+      "cancelled": "キャンセルしたタスクは、表示する場合 ❌ の日付で一覧に並びますが、合計やグラフには含まれません。",
+      "weekStart": "週の始まりは{{day}}です（プラグインの設定で指定）。"
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: 移動に失敗しました — {{error}}",

@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "Ava paneel",
     "toggleInProgress": "Lülita ülesanne pooleliolevaks",
-    "toggleCancelled": "Lülita ülesanne tühistatuks"
+    "toggleCancelled": "Lülita ülesanne tühistatuks",
+    "reviewCompleted": "Vaata, mis sai tehtud"
+  },
+  "report": {
+    "title": "Mis sai tehtud!",
+    "tabs": {
+      "today": "Täna",
+      "yesterday": "Eile",
+      "thisWeek": "See nädal",
+      "lastWeek": "Eelmine nädal"
+    },
+    "empty": {
+      "today": "Täna pole midagi lõpetatud.",
+      "yesterday": "Eile ei lõpetatud midagi.",
+      "thisWeek": "Sel nädalal pole midagi lõpetatud.",
+      "lastWeek": "Eelmisel nädalal ei lõpetatud midagi."
+    },
+    "dayCount": "Lõpetatud: {{n}}",
+    "openTask": "Ava failis {{file}}",
+    "graph": {
+      "title": "Lõpetatud nädalas",
+      "span": "Viimased {{n}} nädalat",
+      "soFar": "{{range}} (seni)",
+      "point": "{{range}}: lõpetatud {{n}}",
+      "pointSoFar": "{{range}}: seni lõpetatud {{n}}"
+    },
+    "options": {
+      "button": "Kuvamisvalikud",
+      "showGraph": "Näita graafikut",
+      "showCancelled": "Näita tühistatud ülesandeid",
+      "showFileNames": "Näita failinimesid"
+    },
+    "info": {
+      "button": "Kuidas see töötab",
+      "title": "Kuidas see töötab",
+      "source": "Kõik siin loetakse sinu hoidla ülesanderidadel olevatest ✅ lõpetamiskuupäevadest. Plugin ise ajalugu ei salvesta.",
+      "undated": "Ilma ✅ kuupäevata lõpetatud ülesannet ei saa ühegi päevaga siduda, seega seda loendis pole. Tasks-plugin lisab kuupäeva, kui säte „Set done date on every completed task“ on sees.",
+      "undatedCount": "Lõpetatud ülesandeid ilma kuupäevata: {{n}}.",
+      "removed": "Lõpetatud ülesande kustutamine või teisaldamine väljapoole selle plugina skannitavaid kaustu eemaldab selle ka möödunud nädalatest.",
+      "recurring": "Korduva ülesande iga lõpetatud kord läheb arvesse oma ✅ kuupäeva järgi.",
+      "cancelled": "Tühistatud ülesanded kuvatakse nähtavuse korral nende ❌ kuupäeva järgi ega lähe kunagi kokkuvõtetesse ega graafikusse.",
+      "weekStart": "Nädala esimene päev: {{day}} (määratud plugina seadetes)."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: Teisaldamine ebaõnnestus — {{error}}",

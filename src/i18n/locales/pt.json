@@ -89,7 +89,49 @@
   "commands": {
     "openPanel": "Abrir painel",
     "toggleInProgress": "Alternar tarefa em andamento",
-    "toggleCancelled": "Alternar tarefa cancelada"
+    "toggleCancelled": "Alternar tarefa cancelada",
+    "reviewCompleted": "Ver o que conseguiu fazer"
+  },
+  "report": {
+    "title": "O que conseguiu fazer!",
+    "tabs": {
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "thisWeek": "Esta semana",
+      "lastWeek": "Semana passada"
+    },
+    "empty": {
+      "today": "Nada concluído hoje.",
+      "yesterday": "Nada concluído ontem.",
+      "thisWeek": "Nada concluído esta semana.",
+      "lastWeek": "Nada concluído na semana passada."
+    },
+    "dayCount": "Concluídas: {{n}}",
+    "openTask": "Abrir em {{file}}",
+    "graph": {
+      "title": "Concluídas por semana",
+      "span": "Últimas {{n}} semanas",
+      "soFar": "{{range}} (em curso)",
+      "point": "{{range}}: {{n}} concluídas",
+      "pointSoFar": "{{range}}: {{n}} concluídas até agora"
+    },
+    "options": {
+      "button": "Opções de apresentação",
+      "showGraph": "Mostrar gráfico",
+      "showCancelled": "Mostrar tarefas canceladas",
+      "showFileNames": "Mostrar nomes de ficheiros"
+    },
+    "info": {
+      "button": "Como funciona",
+      "title": "Como funciona",
+      "source": "Tudo aqui é lido a partir das datas de conclusão ✅ nas linhas de tarefas do seu cofre. O plugin não guarda nenhum histórico próprio.",
+      "undated": "Uma tarefa concluída sem data ✅ não pode ser atribuída a nenhum dia, por isso não aparece. O plugin Tasks acrescenta a data quando «Set done date on every completed task» está ativado.",
+      "undatedCount": "Tarefas concluídas sem data: {{n}}.",
+      "removed": "Eliminar uma tarefa concluída, ou movê-la para fora das pastas que este plugin analisa, também a retira das semanas anteriores.",
+      "recurring": "Cada instância concluída de uma tarefa recorrente conta, pela sua própria data ✅.",
+      "cancelled": "As tarefas canceladas, quando visíveis, aparecem pela sua data ❌ e nunca contam para os totais nem para o gráfico.",
+      "weekStart": "Primeiro dia da semana: {{day}}, conforme as definições do plugin."
+    }
   },
   "notices": {
     "moveFailed": "GTD Tasks: Falha ao mover — {{error}}",
