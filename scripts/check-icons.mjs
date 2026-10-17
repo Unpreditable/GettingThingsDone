@@ -66,10 +66,12 @@ function readFromAsar(archive, name) {
 
 const appJs = readFromAsar(asar, "app.js");
 
-// Registry entries are `name:[[n,"M…"]]` — a bare identifier when the name is a
-// valid JS identifier, quoted when it is kebab-case.
+// Registry entries are `name:[[type, …], …]`, one array per shape — a bare identifier
+// when the name is a valid JS identifier, quoted when it is kebab-case. The type is
+// 0–6 (line, circle, polyline, polygon, ellipse, rect, path); a path or polyline
+// carries a string, the others numbers, so `info:[[1,12,12,10],…]` opens with a circle.
 const available = new Set();
-const entry = /(?:"([a-z][a-z0-9-]{1,40})"|\b([a-z][a-zA-Z0-9]{1,40}))\s*:\s*\[\[\s*\d+\s*,\s*"[Mm]/g;
+const entry = /(?:"([a-z][a-z0-9-]{1,40})"|\b([a-z][a-zA-Z0-9]{1,40}))\s*:\s*\[\[\s*[0-6]\s*,\s*(?:"|-?[\d.])/g;
 for (let m; (m = entry.exec(appJs)); ) available.add(m[1] || m[2]);
 
 console.log(`${asar.split(/[\\/]/).pop()} — ${available.size} icons`);
