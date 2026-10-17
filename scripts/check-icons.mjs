@@ -70,9 +70,12 @@ const appJs = readFromAsar(asar, "app.js");
 // when the name is a valid JS identifier, quoted when it is kebab-case. The type is
 // 0–6 (line, circle, polyline, polygon, ellipse, rect, path); a path or polyline
 // carries a string, the others numbers, so `info:[[1,12,12,10],…]` opens with a circle.
+// A one-letter name (`x`) is only taken straight after the previous icon's closing `]],`:
+// minified code is full of one-letter keys, and that is where the registry's own sit.
 const available = new Set();
-const entry = /(?:"([a-z][a-z0-9-]{1,40})"|\b([a-z][a-zA-Z0-9]{1,40}))\s*:\s*\[\[\s*[0-6]\s*,\s*(?:"|-?[\d.])/g;
-for (let m; (m = entry.exec(appJs)); ) available.add(m[1] || m[2]);
+const entry =
+  /(?:"([a-z][a-z0-9-]{1,40})"|\b([a-z][a-zA-Z0-9]{1,40})|(?<=\]\],)([a-z]))\s*:\s*\[\[\s*[0-6]\s*,\s*(?:"|-?[\d.])/g;
+for (let m; (m = entry.exec(appJs)); ) available.add(m[1] || m[2] || m[3]);
 
 console.log(`${asar.split(/[\\/]/).pop()} — ${available.size} icons`);
 
