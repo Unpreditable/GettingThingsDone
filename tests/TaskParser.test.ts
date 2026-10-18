@@ -162,6 +162,32 @@ describe("getInlineFieldValue / setInlineFieldValue", () => {
     const result = setInlineFieldValue("- [ ] Task ^abc123", "horizon", "today");
     expect(result).toBe("- [ ] Task [horizon:: today] ^abc123");
   });
+
+  // Tasks reads its fields from the end of the line, and stops at a field of ours.
+  it("writes the field before Tasks' emoji fields", () => {
+    expect(setInlineFieldValue("- [ ] Pay rent 📅 2027-06-01 ⏫", "gtd", "today"))
+      .toBe("- [ ] Pay rent [gtd:: today] 📅 2027-06-01 ⏫");
+  });
+
+  it("writes the field before Tasks' Dataview fields", () => {
+    expect(setInlineFieldValue("- [ ] Pay rent  [due:: 2027-06-01]  [priority:: high]", "gtd", "today"))
+      .toBe("- [ ] Pay rent [gtd:: today] [due:: 2027-06-01]  [priority:: high]");
+  });
+
+  it("moves a field that stands after Tasks' fields to before them", () => {
+    expect(setInlineFieldValue("- [ ] Pay rent 📅 2027-06-01 [gtd:: today]", "gtd", "someday"))
+      .toBe("- [ ] Pay rent [gtd:: someday] 📅 2027-06-01");
+  });
+
+  it("leaves tags and a block reference after Tasks' fields where they are", () => {
+    expect(setInlineFieldValue("- [ ] Pay rent #home 📅 2027-06-01 #bills ^abc123", "gtd", "today"))
+      .toBe("- [ ] Pay rent #home [gtd:: today] 📅 2027-06-01 #bills ^abc123");
+  });
+
+  it("removes a field that stands before Tasks' fields", () => {
+    expect(setInlineFieldValue("- [ ] Pay rent [gtd:: today] 📅 2027-06-01", "gtd", null))
+      .toBe("- [ ] Pay rent 📅 2027-06-01");
+  });
 });
 
 describe("indentLevel and buildTaskHierarchy", () => {

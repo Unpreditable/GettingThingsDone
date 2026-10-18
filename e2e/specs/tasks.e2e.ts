@@ -135,6 +135,31 @@ describe("With Tasks", () => {
     expect(await tasksIn("someday")).toEqual(["Water the plants", "Learn the cello"]);
   });
 
+  it("writes the inline field where Tasks still reads the line's dates", async () => {
+    await setPluginSettings(GTD, { storageMode: "inline-field" });
+    const due = dayFromToday(400);
+    await obsidianPage.write("Rent.md", `- [ ] Pay rent 📅 ${due} ⏫\n`);
+    await browser.waitUntil(async () => (await tasksIn("someday")).includes("Pay rent"), {
+      timeoutMsg: "the dated task never showed under Someday",
+    });
+
+    // Someday's first quick-move button moves to Today. Clicked from inside the page: the buttons
+    // show only while the row is hovered, and the harness has no hover yet.
+    await browser.execute((selector) => document.querySelector<HTMLElement>(selector)?.click(), `${await rowOf("Pay rent")} .gtd-task-move-btn`);
+    await waitForNote("Rent.md", `- [ ] Pay rent [gtd:: today] 📅 ${due} ⏫\n`);
+
+    // Tasks' edit modal shows what Tasks reads from the line: the date, not a description holding it.
+    await browser.execute((selector) => {
+      document.querySelector(selector)?.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 200, clientY: 200 }));
+    }, await rowOf("Pay rent"));
+    await browser.execute(() => Array.from(document.querySelectorAll<HTMLElement>(".menu-item"))
+      .find((el) => el.querySelector(".menu-item-title")?.textContent === "Edit task")?.click());
+    await $(".modal .tasks-modal-description").waitForDisplayed({ timeoutMsg: "Tasks' edit modal never opened" });
+    expect(await browser.execute(() => document.querySelector<HTMLInputElement>(".modal #due")?.value)).toBe(due);
+    await browser.execute(() => Array.from(document.querySelectorAll<HTMLButtonElement>(".modal button"))
+      .find((el) => el.textContent?.trim() === "Cancel")?.click());
+  });
+
   it("ticks a line outside Tasks' global filter the way Tasks does in the editor", async () => {
     await setTasksSettings({ globalFilter: "#task" });
     await obsidianPage.write("Mixed.md", "- [ ] Pay rent #task #gtd/today\n- [ ] Pack the bag #gtd/today\n");

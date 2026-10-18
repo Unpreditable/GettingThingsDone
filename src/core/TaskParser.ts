@@ -491,19 +491,23 @@ export function setInlineFieldValue(
   key: string,
   value: string | null
 ): string {
-  const escaped = escapeRegExp(key);
-  const re = new RegExp(`\\s*\\[${escaped}::\\s*[^\\]]*\\]`, "gi");
-  const hasField = re.test(rawLine);
+  const re = new RegExp(`\\s*\\[${escapeRegExp(key)}::\\s*[^\\]]*\\]`, "gi");
+  const cleaned = rawLine.replace(re, "").trimEnd();
+  if (value === null) return cleaned;
+  return insertBeforeTasksFields(cleaned, `[${key}:: ${value}]`, key);
+}
 
-  if (value === null) {
-    return rawLine.replace(re, "").trimEnd();
-  }
-
-  const token = `[${key}:: ${value}]`;
-  if (hasField) {
-    return rawLine.replace(new RegExp(`\\[${escaped}::\\s*[^\\]]*\\]`, "i"), token);
-  }
-  return insertBeforeBlockRef(rawLine, token);
+/**
+ * Inserts `token` before the line's first Tasks field, or as insertBeforeBlockRef
+ * does when it has none. Tasks reads its fields from the end of the line and
+ * stops at anything but a field or a tag, so a token after them would hide
+ * every one of them from Tasks.
+ */
+function insertBeforeTasksFields(line: string, token: string, bucketKey: string): string {
+  const spans = scanTasksMetadata(line, [], bucketKey);
+  if (spans.length === 0) return insertBeforeBlockRef(line, token);
+  const at = Math.min(...spans.map((span) => span.start));
+  return `${line.slice(0, at).trimEnd()} ${token} ${line.slice(at)}`;
 }
 
 export function getTagValue(rawLine: string, prefix: string): string | null {
