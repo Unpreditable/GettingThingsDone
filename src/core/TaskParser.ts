@@ -93,6 +93,11 @@ export interface TaskFilter {
   strings: string[];
   /** A checkbox under a kept task is kept too, at any depth. */
   includeSubtasks: boolean;
+  /**
+   * The bucket field's key in inline-field mode, never read as a Tasks
+   * Dataview field. Not a filter, but parsed with the same settings.
+   */
+  bucketField?: string;
 }
 
 const WHOLE_TAG_REGEX = /^#[\w/-]+$/;
@@ -153,7 +158,7 @@ export function parseFile(filePath: string, content: string, filter?: TaskFilter
     // run to end of line and absorb this plugin's own bucket tag, making a
     // read-only field transitively writable. See scanTasksMetadata's comment.
     const obsidianSpans = scanObsidianMetadata(rawRest);
-    const tasksSpans = scanTasksMetadata(rawRest, obsidianSpans);
+    const tasksSpans = scanTasksMetadata(rawRest, obsidianSpans, filter?.bucketField);
     const fields = foldTasksFields(tasksSpans);
     const tags = extractTags(rawRest);
     const inlineField = extractInlineField(rawRest);

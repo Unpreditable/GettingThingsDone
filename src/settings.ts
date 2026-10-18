@@ -1,5 +1,6 @@
 import type { OrderEntry, OrderKeyScheme } from "./core/TaskOrder";
 import type { TaskFilter } from "./core/TaskParser";
+import { DATAVIEW_KEYS } from "./integrations/TasksPluginParser";
 
 export type DateRangeRule =
   | { type: "today" }
@@ -288,13 +289,24 @@ export function getActiveScope(
   }
 }
 
+/**
+ * True for a tag / field name that is one of Tasks' Dataview keys. As the
+ * field key, `[due:: today]` would be both a bucket and a due date. The match
+ * ignores case because the bucket reader does.
+ */
+export function isReservedFieldName(name: string): boolean {
+  const lower = name.toLowerCase();
+  return DATAVIEW_KEYS.some((key) => key.toLowerCase() === lower);
+}
+
 /** Builds the filter TaskIndex parses with, from the global-filter settings that decide what is a task. */
 export function getTaskFilter(
-  settings: Pick<PluginSettings, "taskFilters" | "taskFilterIncludeSubtasks">
+  settings: Pick<PluginSettings, "taskFilters" | "taskFilterIncludeSubtasks" | "storageMode" | "tagPrefix">
 ): TaskFilter {
   return {
     strings: settings.taskFilters,
     includeSubtasks: settings.taskFilterIncludeSubtasks,
+    ...(settings.storageMode === "inline-field" ? { bucketField: settings.tagPrefix } : {}),
   };
 }
 

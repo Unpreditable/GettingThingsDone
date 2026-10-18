@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "标签 / 字段名称",
       "description": "在内联标签模式下用作标签前缀（#<名称>/分类ID），在内联字段模式下用作字段键（[<名称>:: 分类ID]）。",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "「{{name}}」是 Tasks 的字段名称。请选择其他标签 / 字段名称。"
     },
     "filesToScan": {
       "name": "扫描文件",

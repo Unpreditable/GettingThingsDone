@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "Nome da etiqueta / campo",
       "description": "Usado como prefixo de etiqueta no modo Etiqueta inline (#<nome>/id-categoria) e como chave de campo no modo Campo inline ([<nome>:: id-categoria]).",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "\"{{name}}\" é um nome de campo do Tasks. Escolha outro nome de etiqueta / campo."
     },
     "filesToScan": {
       "name": "Ficheiros a analisar",

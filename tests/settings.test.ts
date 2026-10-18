@@ -1,6 +1,7 @@
 import {
   getActiveScope,
   getTaskFilter,
+  isReservedFieldName,
   hiddenFilterStrings,
   isPathInScope,
   matchesEntry,
@@ -422,6 +423,20 @@ describe("global task filter settings", () => {
   it("hands the parser the strings and the subtask choice as one filter", () => {
     const settings = { ...DEFAULT_SETTINGS, taskFilters: ["#task"], taskFilterIncludeSubtasks: true };
     expect(getTaskFilter(settings)).toEqual({ strings: ["#task"], includeSubtasks: true });
+  });
+
+  it("names the bucket field to the parser in inline-field mode only", () => {
+    const field = { ...DEFAULT_SETTINGS, storageMode: "inline-field" as const, tagPrefix: "horizon" };
+    expect(getTaskFilter(field).bucketField).toBe("horizon");
+    expect(getTaskFilter({ ...field, storageMode: "inline-tag" }).bucketField).toBeUndefined();
+  });
+
+  it("reserves Tasks' Dataview keys as tag / field names, in any case", () => {
+    expect(isReservedFieldName("due")).toBe(true);
+    expect(isReservedFieldName("Due")).toBe(true);
+    expect(isReservedFieldName("ONCOMPLETION")).toBe(true);
+    expect(isReservedFieldName("gtd")).toBe(false);
+    expect(isReservedFieldName("dueDate")).toBe(false);
   });
 
   it("gives the panel strings to hide only while hiding is on", () => {

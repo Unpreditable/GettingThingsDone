@@ -19,7 +19,7 @@ import {
   computeArrivalRanks,
   applyManualOrder,
   wasCompletionWitnessed,
-  isRecurring,
+  replacedRecurrences,
 } from "./TaskOrder";
 import { computeDueStatus, computeMisplacement, matchesRule } from "./DueStatus";
 import type { DueStatus } from "./DueStatus";
@@ -42,7 +42,8 @@ export interface BucketGroup {
   /** Which date field placed each auto-placed task, keyed by task id. */
   autoPlacedFrom: Record<string, "due" | "scheduled">;
   /** Completed tasks the panel hides: anything whose completion this session
-   *  didn't witness, plus every completed recurrence (already replaced). */
+   *  didn't witness, plus every completed recurrence its next occurrence has
+   *  already replaced. */
   agedCompletedTaskIds: string[];
   isSystem: boolean;
 }
@@ -139,6 +140,7 @@ export function groupTasksIntoBuckets(
   const savedOrder = settings.taskOrder ?? {};
   const arrivalRanks = computeArrivalRanks(orderKeys, savedOrder);
   const completionSeen = settings.completionSeen ?? {};
+  const replaced = replacedRecurrences(tasks);
   for (const group of bucketMap.values()) {
     // Always merged, never guarded on a non-empty saved array: with none, the
     // merge is what produces plain date order.
@@ -153,9 +155,9 @@ export function groupTasksIntoBuckets(
 
     for (const task of group.tasks) {
       if (!task.isCompleted) continue;
-      // A completed recurrence is always hidden: Tasks has already put its
-      // next occurrence in the list, so showing both is a confusing duplicate.
-      if (isRecurring(task) || !wasCompletionWitnessed(orderKeys.get(task.id), completionSeen, now.getTime())) {
+      // A replaced recurrence is hidden at once: its next occurrence is in the
+      // list, so showing both is a confusing duplicate.
+      if (replaced.has(task.id) || !wasCompletionWitnessed(orderKeys.get(task.id), completionSeen, now.getTime())) {
         group.agedCompletedTaskIds.push(task.id);
       }
     }

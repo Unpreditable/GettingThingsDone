@@ -6,15 +6,18 @@ export type TasksField =
 
 export interface TokenSpan {
   field: TasksField;
-  /** Index of the marker emoji in the scanned string. */
+  /** Index of the marker emoji, or of a Dataview field's opening bracket. */
   start: number;
-  /** Index one past the last character of the token (marker + value). */
+  /** Index one past the last character of the token (marker + value, or the closing bracket). */
   end: number;
   /** Date fields: "YYYY-MM-DD". Priority: the level. Others: the raw value. */
   value: string | null;
+  /** Which of Tasks' two formats the token is written in. */
+  format: "emoji" | "dataview";
 }
 
-type TokenKind = "date" | "level" | "freeText" | "id";
+/** "level" is an emoji that is the value itself; "levelName" spells the level out. */
+type TokenKind = "date" | "level" | "levelName" | "freeText" | "id";
 
 interface TokenDef {
   field: TasksField;
@@ -22,6 +25,8 @@ interface TokenDef {
   /** Only for kind "level". */
   level?: TaskPriority;
 }
+
+const LEVELS: readonly string[] = ["highest", "high", "medium", "low", "lowest"];
 
 /**
  * The single source of truth for Tasks-plugin syntax. Adding a marker here is
@@ -46,8 +51,36 @@ const TOKENS: Record<string, TokenDef> = {
   "⛔": { field: "dependsOn",    kind: "id" },
 };
 
+/**
+ * The same fields in Tasks' Dataview format, written `[key:: value]` or
+ * `(key:: value)`, with spaces allowed inside the brackets and a comma after
+ * them. Keys match in their exact case, as they do in Tasks.
+ */
+const DATAVIEW_TOKENS: Record<string, TokenDef> = {
+  due:          { field: "due",          kind: "date" },
+  completion:   { field: "done",         kind: "date" },
+  scheduled:    { field: "scheduled",    kind: "date" },
+  start:        { field: "start",        kind: "date" },
+  created:      { field: "created",      kind: "date" },
+  cancelled:    { field: "cancelled",    kind: "date" },
+  priority:     { field: "priority",     kind: "levelName" },
+  repeat:       { field: "recurrence",   kind: "freeText" },
+  onCompletion: { field: "onCompletion", kind: "freeText" },
+  id:           { field: "id",           kind: "id" },
+  dependsOn:    { field: "dependsOn",    kind: "id" },
+};
+
+/** The keys of Tasks' Dataview format. */
+export const DATAVIEW_KEYS: readonly string[] = Object.keys(DATAVIEW_TOKENS);
+
 /** Alternation over every marker. The `u` flag keeps non-BMP markers intact. */
 const MARKER_REGEX = new RegExp(Object.keys(TOKENS).join("|"), "gu");
+
+const DATAVIEW_KEY_GROUP = `(${DATAVIEW_KEYS.join("|")})`;
+const DATAVIEW_FIELD_REGEX = new RegExp(
+  `(?:\\[ *${DATAVIEW_KEY_GROUP}::([^\\]]*)\\]|\\( *${DATAVIEW_KEY_GROUP}::([^)]*)\\))(?: *,)?`,
+  "g"
+);
 
 const DATE_VALUE_REGEX = /^\s*(\d{4}-\d{2}-\d{2})/;
 const ID_VALUE_REGEX = /^\s*([A-Za-z0-9_-]+(?:\s*,\s*[A-Za-z0-9_-]+)*)/;
@@ -69,6 +102,29 @@ function toDate(value: string | null): Date | null {
     return null;
   }
   return d;
+}
+
+/**
+ * A date or id value at the start of `slice`, and how much of `slice` it
+ * covers. Null if there is none, or the date is not a real calendar day.
+ */
+function leadingValue(kind: TokenKind, slice: string): { value: string; length: number } | null {
+  const m = slice.match(kind === "date" ? DATE_VALUE_REGEX : ID_VALUE_REGEX);
+  if (!m) return null;
+  if (kind === "date") return toDate(m[1]) === null ? null : { value: m[1], length: m[0].length };
+  return { value: m[1].replace(/\s*,\s*/g, ","), length: m[0].length };
+}
+
+/**
+ * A Dataview field's value, or null to reject it. The value has to fill the
+ * brackets: `[due:: 2026-10-20 or so]` is not a due date.
+ */
+function dataviewValue(def: TokenDef, inner: string): string | null {
+  const trimmed = inner.trim();
+  if (def.kind === "freeText") return trimmed === "" ? null : trimmed;
+  if (def.kind === "levelName") return LEVELS.includes(trimmed) ? trimmed : null;
+  const v = leadingValue(def.kind, inner);
+  return v && inner.slice(v.length).trim() === "" ? v.value : null;
 }
 
 /** A half-open [start, end) range of the scanned string. */
@@ -114,25 +170,63 @@ function readFreeText(
   return result.replace(/\s{2,}/g, " ").trim();
 }
 
+interface Marker {
+  def: TokenDef;
+  format: "emoji" | "dataview";
+  start: number;
+  /** One past the emoji, or past a Dataview field's closing bracket and comma. */
+  end: number;
+  /** Dataview only: what stands between `::` and the closing bracket. */
+  inner?: string;
+}
+
 /**
- * Locates every Tasks-plugin token in `text`.
+ * Every emoji marker and Dataview field in `text`, in order. An emoji inside a
+ * Dataview field's brackets is part of that field's value, not a marker.
+ */
+function findMarkers(text: string, ignoreKey: string | undefined): Marker[] {
+  const ignored = ignoreKey?.toLowerCase();
+  const fields: Marker[] = [];
+  for (const m of text.matchAll(DATAVIEW_FIELD_REGEX)) {
+    const key = m[1] ?? m[3];
+    if (key.toLowerCase() === ignored) continue;
+    fields.push({
+      def: DATAVIEW_TOKENS[key],
+      format: "dataview",
+      start: m.index,
+      end: m.index + m[0].length,
+      inner: m[2] ?? m[4],
+    });
+  }
+  const emoji: Marker[] = [];
+  for (const m of text.matchAll(MARKER_REGEX)) {
+    if (fields.some((f) => m.index >= f.start && m.index < f.end)) continue;
+    emoji.push({ def: TOKENS[m[0]], format: "emoji", start: m.index, end: m.index + m[0].length });
+  }
+  return [...fields, ...emoji].sort((a, b) => a.start - b.start);
+}
+
+/**
+ * Locates every Tasks-plugin token in `text`, in either of Tasks' formats.
  *
  * Runs in two phases, and the split is what fixes the bug this replaced. Phase
- * 1 records the index of every marker emoji, so the complete set of boundaries
- * exists before any value is interpreted. Phase 2 then reads each marker's
- * value bounded by the NEXT marker's index — so a free-text value (🔁, 🏁) ends
- * at a known position instead of at whatever characters a hand-maintained
- * stop-list happened to list. The old code's recurrence regex listed four stop
- * characters and silently ate 🏁, 🛫 and ⏳ along with their values.
+ * 1 records the index of every marker emoji and Dataview field, so the
+ * complete set of boundaries exists before any value is interpreted. Phase 2
+ * then reads each emoji's value bounded by the NEXT marker's index — so a
+ * free-text value (🔁, 🏁) ends at a known position instead of at whatever
+ * characters a hand-maintained stop-list happened to list. The old code's
+ * recurrence regex listed four stop characters and silently ate 🏁, 🛫 and ⏳
+ * along with their values. A Dataview field's value is bounded by its own
+ * brackets and needs no such help.
  *
  * A marker whose value fails to parse is REJECTED: it yields no span, so it is
  * not stripped and stays visible to the user. It is still a phase-1 boundary,
  * which is what stops `🔁 every week 📅 soon` from letting the recurrence value
  * run to end of line.
  *
- * `holes` are ranges of `text` that free-text VALUES must exclude — other
- * modules' syntax, which a Tasks token cannot know the shape of, so the caller
- * that owns that syntax passes it in rather than this scanner growing a
+ * `holes` are ranges of `text` that free-text emoji VALUES must exclude —
+ * other modules' syntax, which a Tasks token cannot know the shape of, so the
+ * caller that owns that syntax passes it in rather than this scanner growing a
  * stop-list describing it. Only the value changes; the SPAN is unaffected, so
  * stripping behaviour is identical with or without holes. It matters because
  * the last Tasks marker on a line has no next marker to bound it, so its value
@@ -141,41 +235,42 @@ function readFreeText(
  * position. That makes a nominally read-only field transitively writable, and
  * `recurrence` is in `computeOrderKeys`' disambiguator: without holes, every
  * cross-bucket move of a recurring task rehashes it and orphans the user's
- * saved manual order (see the invariant at TaskOrder.ts).
+ * saved manual order (see the invariant at TaskOrder.ts). Holes are not
+ * applied to Dataview values: a square-bracket field is itself a hole.
+ *
+ * `ignoreKey` is the bucket field's key, compared in any case the way the
+ * bucket reader compares it. Settings refuse a Tasks key as the bucket field,
+ * but one saved before that rule would otherwise be read as a Tasks field too,
+ * and turn the same transitively-writable problem into a direct one.
  */
-export function scanTasksMetadata(text: string, holes: Hole[] = []): TokenSpan[] {
-  const markers = [...text.matchAll(MARKER_REGEX)];
+export function scanTasksMetadata(text: string, holes: Hole[] = [], ignoreKey?: string): TokenSpan[] {
+  const markers = findMarkers(text, ignoreKey);
   const spans: TokenSpan[] = [];
 
   for (let i = 0; i < markers.length; i++) {
     const marker = markers[i];
-    const def = TOKENS[marker[0]];
-    const start = marker.index;
-    const valueStart = start + marker[0].length;
-    const bound = i + 1 < markers.length ? markers[i + 1].index : text.length;
+    const { def, format, start } = marker;
+
+    if (format === "dataview") {
+      const value = dataviewValue(def, marker.inner!);
+      if (value === null) continue; // rejected
+      spans.push({ field: def.field, start, end: marker.end, value, format });
+      continue;
+    }
+
+    const valueStart = marker.end;
+    const bound = i + 1 < markers.length ? markers[i + 1].start : text.length;
     const slice = text.slice(valueStart, bound);
 
     if (def.kind === "level") {
-      spans.push({ field: def.field, start, end: valueStart, value: def.level! });
+      spans.push({ field: def.field, start, end: valueStart, value: def.level!, format });
       continue;
     }
 
-    if (def.kind === "date") {
-      const m = slice.match(DATE_VALUE_REGEX);
-      if (!m || toDate(m[1]) === null) continue; // rejected
-      spans.push({ field: def.field, start, end: valueStart + m[0].length, value: m[1] });
-      continue;
-    }
-
-    if (def.kind === "id") {
-      const m = slice.match(ID_VALUE_REGEX);
-      if (!m) continue; // rejected
-      spans.push({
-        field: def.field,
-        start,
-        end: valueStart + m[0].length,
-        value: m[1].replace(/\s*,\s*/g, ","),
-      });
+    if (def.kind === "date" || def.kind === "id") {
+      const v = leadingValue(def.kind, slice);
+      if (!v) continue; // rejected
+      spans.push({ field: def.field, start, end: valueStart + v.length, value: v.value, format });
       continue;
     }
 
@@ -188,6 +283,7 @@ export function scanTasksMetadata(text: string, holes: Hole[] = []): TokenSpan[]
       start,
       end: valueStart + slice.trimEnd().length,
       value,
+      format,
     });
   }
 
@@ -206,11 +302,17 @@ export interface TasksFields {
   onCompletion: string | null;
 }
 
-/** Folds spans into fields. First occurrence wins, matching Tasks' own behavior. */
+/**
+ * Folds spans into fields. Emoji outrank Dataview field by field, so a line
+ * mixing the two formats keeps every field either one gives. Within a format
+ * the first occurrence wins, matching Tasks' own behavior.
+ */
 export function foldTasksFields(spans: TokenSpan[]): TasksFields {
   const first = new Map<TasksField, string | null>();
-  for (const span of spans) {
-    if (!first.has(span.field)) first.set(span.field, span.value);
+  for (const format of ["emoji", "dataview"] as const) {
+    for (const span of spans) {
+      if (span.format === format && !first.has(span.field)) first.set(span.field, span.value);
+    }
   }
   const get = (f: TasksField) => first.get(f) ?? null;
 

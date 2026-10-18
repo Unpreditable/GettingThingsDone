@@ -1,4 +1,5 @@
 import {
+  replacedRecurrences,
   computeOrderKeys,
   computeLegacyOrderKeys,
   applyManualOrder,
@@ -396,5 +397,26 @@ describe("isRecurring", () => {
     // recurrence — where the old rawLine.includes("🔁") test said it was.
     const task = parseFile("test.md", "- [ ] Explain the 🔁")[0];
     expect(isRecurring(task)).toBe(false);
+  });
+});
+
+describe("replacedRecurrences", () => {
+  it("names a completed recurrence whose next occurrence is open in the same file", () => {
+    const tasks = parseFile(
+      "a.md",
+      "- [ ] Water 🔁 every week 📅 2026-08-09\n- [x] Water 🔁 every week 📅 2026-08-02 ✅ 2026-08-02\n"
+    );
+    expect([...replacedRecurrences(tasks)]).toEqual([tasks[1].id]);
+  });
+
+  it("leaves out a completed recurrence nothing replaced, or one replaced only in another file", () => {
+    const here = parseFile("a.md", "- [x] Water [repeat:: every week] ✅ 2026-08-02\n");
+    const there = parseFile("b.md", "- [ ] Water [repeat:: every week]\n");
+    expect(replacedRecurrences([...here, ...there]).size).toBe(0);
+  });
+
+  it("leaves out a completed task without a recurrence, even beside an open twin", () => {
+    const tasks = parseFile("a.md", "- [ ] Water\n- [x] Water ✅ 2026-08-02\n");
+    expect(replacedRecurrences(tasks).size).toBe(0);
   });
 });

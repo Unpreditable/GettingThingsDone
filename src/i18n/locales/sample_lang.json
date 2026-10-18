@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "",
       "description": "",
-      "placeholder": ""
+      "placeholder": "",
+      "reserved": ""
     },
     "filesToScan": {
       "name": "",

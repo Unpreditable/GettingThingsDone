@@ -75,6 +75,42 @@ describe("purgeAgedEntries", () => {
     expect(after.taskOrder.today).toEqual([entry]);
   });
 
+  it("purges a witnessed completed recurrence whose next occurrence is open", () => {
+    const next = makeTask({ id: "n", text: "Water", recurrence: "every week" });
+    const done = makeTask({
+      id: "a", lineNumber: 1, text: "Water", recurrence: "every week",
+      isCompleted: true, completedAt: new Date(TODAY_MIDNIGHT),
+    });
+    const tasks = [next, done];
+    const entry = entryFor(done, tasks);
+
+    const { state: after } = purgeAgedEntries(
+      state({ taskOrder: { today: [entry] }, completionSeen: { [`a.md::${entry.key}`]: TODAY_MIDNIGHT + 1000 } }),
+      tasks,
+      NOW,
+      "due-only"
+    );
+
+    expect(after.taskOrder.today).toEqual([]);
+  });
+
+  it("keeps a witnessed completed recurrence that nothing replaced", () => {
+    const done = makeTask({
+      id: "a", text: "Water", recurrence: "every week",
+      isCompleted: true, completedAt: new Date(TODAY_MIDNIGHT),
+    });
+    const entry = entryFor(done, [done]);
+
+    const { state: after } = purgeAgedEntries(
+      state({ taskOrder: { today: [entry] }, completionSeen: { [`a.md::${entry.key}`]: TODAY_MIDNIGHT + 1000 } }),
+      [done],
+      NOW,
+      "due-only"
+    );
+
+    expect(after.taskOrder.today).toEqual([entry]);
+  });
+
   it("purges a ✅-dated task this session never witnessed (a reload dropped the record)", () => {
     const task = makeTask({ id: "a", text: "Done", isCompleted: true, completedAt: new Date(TODAY_MIDNIGHT) });
     const entry = entryFor(task, [task]);

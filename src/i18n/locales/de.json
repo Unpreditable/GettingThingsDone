@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "Tag- / Feldname",
       "description": "Wird als Tag-Präfix im Inline-Tag-Modus (#<Name>/Kategorie-ID) und als Feldschlüssel im Inline-Feld-Modus ([<Name>:: Kategorie-ID]) verwendet.",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "\"{{name}}\" ist ein Feldname von Tasks. Wähle einen anderen Tag- / Feldnamen."
     },
     "filesToScan": {
       "name": "Zu durchsuchende Dateien",

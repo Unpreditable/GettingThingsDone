@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "タグ / フィールド名",
       "description": "インラインタグモードではタグプレフィックス (#<名前>/カテゴリID)、インラインフィールドモードではフィールドキー ([<名前>:: カテゴリID]) として使用されます。",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "「{{name}}」は Tasks のフィールド名です。別のタグ / フィールド名を選んでください。"
     },
     "filesToScan": {
       "name": "スキャン対象ファイル",

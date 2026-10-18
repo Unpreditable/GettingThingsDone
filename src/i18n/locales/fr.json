@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "Nom de l'étiquette / du champ",
       "description": "Utilisé comme préfixe d'étiquette en mode Étiquette en ligne (#<nom>/id-catégorie) et comme clé de champ en mode Champ en ligne ([<nom>:: id-catégorie]).",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "« {{name}} » est un nom de champ de Tasks. Choisissez un autre nom d'étiquette / de champ."
     },
     "filesToScan": {
       "name": "Fichiers à analyser",

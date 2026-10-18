@@ -169,7 +169,8 @@
     "tagFieldName": {
       "name": "Nombre de etiqueta / campo",
       "description": "Usado como prefijo de etiqueta en el modo Etiqueta en línea (#<nombre>/id-categoría) y como clave de campo en el modo Campo en línea ([<nombre>:: id-categoría]).",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "\"{{name}}\" es un nombre de campo de Tasks. Elige otro nombre de etiqueta / campo."
     },
     "filesToScan": {
       "name": "Archivos a escanear",

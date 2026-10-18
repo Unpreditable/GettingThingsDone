@@ -29,6 +29,7 @@ meanwhile.
 | `specs/panel.e2e.ts` | The panel by itself: what it lists, and what ticking or moving a task writes |
 | `specs/settings.e2e.ts` | Settings that change what the panel lists or what a move writes |
 | `specs/tasks.e2e.ts` | The panel with Tasks installed: a tick goes through Tasks, as it does in the editor |
+| `specs/dataview.e2e.ts` | Tasks' Dataview-format fields: what the panel reads from them, the tag / field name that may not reuse their keys, and ticking and editing them through Tasks |
 | `specs/status.e2e.ts` | The "Toggle task in progress" and "Toggle task cancelled" commands in the editor, with and without Tasks |
 | `tsconfig.json` | Type-checks the specs |
 | `harness.d.ts` | The harness's declarations of everything a spec can use. A copy: do not edit it |

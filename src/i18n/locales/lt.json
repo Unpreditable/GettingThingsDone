@@ -177,7 +177,8 @@
     "tagFieldName": {
       "name": "Žymos / lauko pavadinimas",
       "description": "Naudojamas kaip žymos prefiksas eilutinio žymos režime (#<pavadinimas>/kategorijos-id) ir kaip lauko raktas eilutinio lauko režime ([<pavadinimas>:: kategorijos-id]).",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved": "\"{{name}}\" yra Tasks lauko pavadinimas. Pasirinkite kitą žymos / lauko pavadinimą."
     },
     "filesToScan": {
       "name": "Nuskaityti failai",

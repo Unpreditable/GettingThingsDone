@@ -642,7 +642,8 @@
   text-align: right;
 }
 
-.gtd-settings-buckets input.gtd-input-error {
+.gtd-settings-buckets input.gtd-input-error,
+.setting-item-control input.gtd-input-error {
   border-color: var(--text-error);
   outline: 1px solid var(--text-error);
 }

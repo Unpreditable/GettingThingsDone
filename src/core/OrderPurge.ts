@@ -1,5 +1,5 @@
 import { TaskRecord } from "./TaskParser";
-import { computeOrderKeys, entryId, isOrderEntry, isRecurring, wasCompletionWitnessed } from "./TaskOrder";
+import { computeOrderKeys, entryId, isOrderEntry, replacedRecurrences, wasCompletionWitnessed } from "./TaskOrder";
 import type { OrderEntry, OrderKeyScheme } from "./TaskOrder";
 import type { OrderState } from "./OrderMigration";
 
@@ -38,6 +38,7 @@ export function purgeAgedEntries(
 ): { state: OrderState; changed: boolean } {
   const midnight = startOfDay(now);
   const byId = indexByEntryId(tasks, scheme);
+  const replaced = replacedRecurrences(tasks);
   let changed = false;
 
   const taskOrder: Record<string, OrderEntry[]> = {};
@@ -48,7 +49,7 @@ export function purgeAgedEntries(
       if (!found || !found.task.isCompleted) return true;
       // Same rule the panel renders by: a completed task keeps its slot only
       // while it is still on screen, i.e. while this session witnessed it.
-      return !isRecurring(found.task) && wasCompletionWitnessed(entry, state.completionSeen, midnight);
+      return !replaced.has(found.task.id) && wasCompletionWitnessed(entry, state.completionSeen, midnight);
     });
     if (kept.length !== entries.length) changed = true;
     taskOrder[bucketId] = kept;

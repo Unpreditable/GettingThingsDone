@@ -693,25 +693,54 @@ describe("agedCompletedTaskIds", () => {
     expect(review.agedCompletedTaskIds).toEqual([]);
   });
 
-  it("always marks a completed recurrence, even when witnessed this session", () => {
+  it("marks a completed recurrence whose next occurrence is open in its file, even when witnessed", () => {
     // Tasks has already inserted the next occurrence; showing the completed
     // one too is a confusing near-duplicate row.
-    const task = makeTask({
+    const next = makeTask({
+      id: "n",
+      text: "Water plants",
+      rawLine: "- [ ] Water plants 🔁 every week",
+      recurrence: "every week",
+    });
+    const done = makeTask({
       id: "a",
+      lineNumber: 1,
       text: "Water plants",
       rawLine: "- [x] Water plants 🔁 every week ✅ 2026-02-23",
       recurrence: "every week",
       isCompleted: true,
       completedAt: new Date("2026-02-23T00:00:00"),
     });
-    const entry = computeOrderKeys([task], "due-only").get("a")!;
+    const entry = computeOrderKeys([next, done], "due-only").get("a")!;
     const witnessed = {
       ...settings,
       completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
     };
 
-    const review = groupTasksIntoBuckets([task], witnessed).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    const review = groupTasksIntoBuckets([next, done], witnessed).find((g) => g.bucketId === TO_REVIEW_ID)!;
     expect(review.agedCompletedTaskIds).toEqual(["a"]);
+  });
+
+  it("keeps a witnessed completed recurrence that no open occurrence replaced", () => {
+    // Tasks set to emoji reads `[repeat:: …]` as text, so ticking it writes no
+    // next occurrence; the row then behaves like any other completed task.
+    const done = makeTask({
+      id: "a",
+      text: "Water plants",
+      rawLine: "- [x] Water plants [repeat:: every week] ✅ 2026-02-23",
+      recurrence: "every week",
+      isCompleted: true,
+      completedAt: new Date("2026-02-23T00:00:00"),
+    });
+    const elsewhere = makeTask({ id: "o", filePath: "other.md", text: "Water plants", recurrence: "every week" });
+    const entry = computeOrderKeys([done, elsewhere], "due-only").get("a")!;
+    const witnessed = {
+      ...settings,
+      completionSeen: { [entryId(entry)]: new Date("2026-02-23T09:00:00").getTime() },
+    };
+
+    const review = groupTasksIntoBuckets([done, elsewhere], witnessed).find((g) => g.bucketId === TO_REVIEW_ID)!;
+    expect(review.agedCompletedTaskIds).toEqual([]);
   });
 
   it("marks a task whose ✅ date is before today", () => {

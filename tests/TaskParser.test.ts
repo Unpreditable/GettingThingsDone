@@ -764,3 +764,42 @@ describe("hideFilterText", () => {
     expect(hideFilterText("Buy  milk", ["TODO"])).toBe("Buy  milk");
   });
 });
+
+describe("parseFile — Dataview-format Tasks fields", () => {
+  it("removes round-bracket fields from the text, as square ones already are", () => {
+    const task = parseFile("test.md", "- [ ] Pay rent (due:: 2026-10-20) [priority:: high]")[0];
+    expect(task.text).toBe("Pay rent");
+    expect(task.dueDate!.getDate()).toBe(20);
+    expect(task.priority).toBe("high");
+  });
+
+  it("keeps a rejected round-bracket field visible", () => {
+    const task = parseFile("test.md", "- [ ] Pay rent (due:: soon)")[0];
+    expect(task.text).toBe("Pay rent (due:: soon)");
+    expect(task.dueDate).toBeNull();
+  });
+
+  it("removes the Dataview field an emoji outranks", () => {
+    const task = parseFile("test.md", "- [ ] Pay rent 📅 2026-10-20 (due:: 2026-10-01)")[0];
+    expect(task.text).toBe("Pay rent");
+    expect(task.dueDate!.getDate()).toBe(20);
+  });
+
+  it("keeps this plugin's own bucket tag and field out of a repeat value", () => {
+    const task = parseFile("test.md", "- [ ] Foo [repeat:: every week] #gtd/today [gtd:: today]")[0];
+    expect(task.recurrence).toBe("every week");
+    expect(task.text).toBe("Foo");
+  });
+
+  it("does not read the bucket field as a Tasks field when their keys collide", () => {
+    const filter = { strings: [], includeSubtasks: false, bucketField: "repeat" };
+    const task = parseFile("test.md", "- [ ] Foo [repeat:: today]", filter)[0];
+    expect(task.recurrence).toBeNull();
+  });
+});
+
+describe("parseFile — commas between Dataview fields", () => {
+  it("leaves no comma behind in the text", () => {
+    expect(parseFile("t.md", "- [ ] Pay rent [due:: 2026-10-20], [priority:: high]")[0].text).toBe("Pay rent");
+  });
+});

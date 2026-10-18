@@ -254,7 +254,9 @@
       "name": "Tag / field name",
       "description": "Used as the tag prefix in Inline tag mode (#<name>/bucket-id) and as the field key in Inline field mode ([<name>:: bucket-id]).",
       "placeholder_comment": "Placeholder text inside the prefix input showing the default value.",
-      "placeholder": "gtd"
+      "placeholder": "gtd",
+      "reserved_comment": "Inline validation error under the tag/field name input when the typed name is one of the Tasks plugin's Dataview field keys (due, start, priority…). {{name}} = the name typed. The name is not saved while this shows.",
+      "reserved": "\"{{name}}\" is a Tasks field name. Pick another tag / field name."
     },
     "filesToScan": {
       "name_comment": "Setting name for the scope selector — determines which files are scanned for tasks.",

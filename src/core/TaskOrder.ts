@@ -338,7 +338,22 @@ export function wasCompletionWitnessed(
   return typeof seen === "number" && seen >= midnight;
 }
 
-/** A completed recurrence has already been replaced by its next occurrence. */
+/** Whether the task carries a recurrence rule (🔁, or `[repeat:: …]`). */
 export function isRecurring(task: TaskRecord): boolean {
   return task.recurrence !== null;
+}
+
+/**
+ * The ids of completed recurrences Tasks has already replaced: an open task
+ * with the same text is in the same file, the next occurrence it wrote. A
+ * recurrence completed without one is an ordinary completed task. That is what
+ * ticking `[repeat:: …]` gives while Tasks is set to emoji: Tasks reads the
+ * field as text and writes no next occurrence, though this plugin reads it.
+ */
+export function replacedRecurrences(tasks: TaskRecord[]): Set<string> {
+  const place = (task: TaskRecord) => JSON.stringify([task.filePath, task.text]);
+  const open = new Set(tasks.filter((task) => !task.isCompleted).map(place));
+  return new Set(
+    tasks.filter((task) => task.isCompleted && isRecurring(task) && open.has(place(task))).map((task) => task.id)
+  );
 }

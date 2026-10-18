@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, TFile, TFolder, SettingDefinitionItem, debounce, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, normalizeTaskFilters } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, isReservedFieldName, normalizeTaskFilters } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { renderIcon } from "./views/icon";
@@ -303,6 +303,9 @@ export class GtdSettingsTab extends PluginSettingTab {
    */
   private applyTaskFilterWhenTypingStops = debounce(() => void this.applyTaskFilter(), 2000, true);
 
+  /** Saves the tag / field name as typed. Run on leaving the field, and by hide(): closing settings need not blur it. */
+  private commitTagPrefix: (() => void) | null = null;
+
   /**
    * Settling the path lists happens here rather than on open because 1.13+
    * never calls display() for a tab that returns setting definitions — it
@@ -310,6 +313,7 @@ export class GtdSettingsTab extends PluginSettingTab {
    */
   hide(): void {
     this.applyTaskFilterWhenTypingStops.run();
+    this.commitTagPrefix?.();
     const settings = this.plugin.settings;
     const before = JSON.stringify([settings.scopePaths, settings.ignoredPaths]);
     settings.scopePaths = tidyPathList(settings.scopePaths);
@@ -569,18 +573,40 @@ export class GtdSettingsTab extends PluginSettingTab {
     ul.createEl("li", { text: t("settings.annotationStyle.descInlineTag") });
     ul.createEl("li", { text: t("settings.annotationStyle.descInlineField") });
 
-    // Tag / Field name
-    new Setting(containerEl)
+    // Tag / Field name. Saved when the field is left, not on each keystroke:
+    // every name typed on the way would otherwise be the live prefix in turn,
+    // and stopping at a refused one ("due") would leave "du" saved. A Tasks
+    // Dataview key is refused, and leaving puts the saved name back. A refused
+    // name already in data.json is shown with the same error.
+    const prefixErrorEl = createEl("p", { cls: "gtd-field-error" });
+    const prefixSetting = new Setting(containerEl)
       .setName(t("settings.tagFieldName.name"))
       .setDesc(t("settings.tagFieldName.description"))
       .addText((txt) => {
+        const showError = (name: string) => {
+          const reserved = isReservedFieldName(name);
+          prefixErrorEl.setText(reserved ? t("settings.tagFieldName.reserved", { name }) : "");
+          prefixErrorEl.toggleClass("gtd-field-error-visible", reserved);
+          txt.inputEl.toggleClass("gtd-input-error", reserved);
+        };
         txt.setValue(this.plugin.settings.tagPrefix);
         txt.setPlaceholder(t("settings.tagFieldName.placeholder"));
-        txt.onChange(async (val) => {
-          this.plugin.settings.tagPrefix = val.trim() || "gtd";
-          await this.plugin.saveSettings();
-        });
+        showError(this.plugin.settings.tagPrefix);
+        txt.onChange((val) => showError(val.trim() || "gtd"));
+        this.commitTagPrefix = () => {
+          const name = txt.getValue().trim() || "gtd";
+          if (isReservedFieldName(name)) {
+            txt.setValue(this.plugin.settings.tagPrefix);
+            showError(this.plugin.settings.tagPrefix);
+            return;
+          }
+          if (name === this.plugin.settings.tagPrefix) return;
+          this.plugin.settings.tagPrefix = name;
+          void this.plugin.saveSettings();
+        };
+        txt.inputEl.addEventListener("blur", () => this.commitTagPrefix?.());
       });
+    prefixSetting.settingEl.after(prefixErrorEl);
 
     // Scope type selector. The description carries the polarity of the list
     // below it, so it swaps with the mode rather than describing both at once.
