@@ -241,6 +241,11 @@ describe("toggleTaskLine", () => {
     ]);
   });
 
+  it("strips a ✅ or ❌ date written with a variation selector, as Tasks reads it", () => {
+    expect(toggleTaskLine("- [x] Test task ✅\uFE0F 2026-08-02", "test.md", true, null)).toEqual(["- [ ] Test task"]);
+    expect(toggleTaskLine("- [-] Test task ❌\uFE0F 2026-08-02", "test.md", true, null)).toEqual(["- [ ] Test task"]);
+  });
+
   it("preserves other metadata on the line in the fallback path", () => {
     expect(toggleTaskLine("- [ ] Test task 📅 2026-08-09 #gtd/today", "test.md", false, null)).toEqual([
       "- [x] Test task 📅 2026-08-09 #gtd/today",

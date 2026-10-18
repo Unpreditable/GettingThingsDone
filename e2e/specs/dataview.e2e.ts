@@ -231,6 +231,20 @@ describe("Dataview-format fields, without Tasks", () => {
     expect(await tasksIn("today")).toContain("Fallback 📅 soon");
   });
 
+  it("places tasks by the due and scheduled emoji Tasks reads but does not write", async () => {
+    // U+FE0F, the variation selector emoji pickers add after a marker.
+    const vs16 = String.fromCodePoint(0xfe0f);
+    await writeNote(
+      "Spellings.md",
+      `- [ ] Tear-off calendar 📆 ${dayFromToday(0)}\n` +
+        `- [ ] Spiral calendar 🗓${vs16} ${dayFromToday(0)}\n` +
+        `- [ ] Hourglass ⌛ ${dayFromToday(0)}\n` +
+        `- [ ] Selector 📅${vs16} ${dayFromToday(0)}\n`,
+      "Selector",
+    );
+    expect(await tasksIn("today")).toEqual(expect.arrayContaining(["Tear-off calendar", "Spiral calendar", "Hourglass", "Selector"]));
+  });
+
   it("keeps a round-bracket field it cannot read in the row's text", async () => {
     await writeNote("Dataview.md", "- [ ] Pay rent (due:: soon)\n", "Pay rent (due:: soon)");
     expect(await tasksIn("to-review")).toContain("Pay rent (due:: soon)");

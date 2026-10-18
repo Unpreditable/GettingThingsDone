@@ -253,3 +253,25 @@ describe("Dataview fields laid out as Tasks also accepts them", () => {
     ]);
   });
 });
+
+describe("spellings Tasks reads but does not write", () => {
+  it("reads 📆 and 🗓 as due, and ⌛ as scheduled", () => {
+    expect(fields("Task 📆 2026-10-20").dueDate!.getDate()).toBe(20);
+    expect(fields("Task 🗓 2026-10-21").dueDate!.getDate()).toBe(21);
+    expect(fields("Task ⌛ 2026-10-22").scheduledDate!.getDate()).toBe(22);
+  });
+
+  it("accepts a variation selector after any marker", () => {
+    const f = fields("Task 📅\uFE0F 2026-10-20 ⏳\uFE0F 2026-10-21 ⏫\uFE0F 🔁\uFE0F every week 🗓\uFE0F 2026-10-01");
+    expect(f.dueDate!.getDate()).toBe(20);
+    expect(f.scheduledDate!.getDate()).toBe(21);
+    expect(f.priority).toBe("high");
+    expect(f.recurrence).toBe("every week");
+  });
+
+  it("covers the variation selector in the span, so none is left in the text", () => {
+    const text = "Pay rent 📅\uFE0F 2026-10-20";
+    const [span] = scanTasksMetadata(text);
+    expect(text.slice(span.start, span.end)).toBe("📅\uFE0F 2026-10-20");
+  });
+});

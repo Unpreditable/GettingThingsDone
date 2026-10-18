@@ -72,8 +72,8 @@ export function toggleTaskLine(
     return [
       rawLine
         .replace(CHECKBOX_REGEX, "$1[ ]")
-        .replace(/\s*✅\s*\d{4}-\d{2}-\d{2}/, "")
-        .replace(/\s*❌\s*\d{4}-\d{2}-\d{2}/, "")
+        .replace(/\s*✅\uFE0F?\s*\d{4}-\d{2}-\d{2}/, "")
+        .replace(/\s*❌\uFE0F?\s*\d{4}-\d{2}-\d{2}/, "")
         .trimEnd(),
     ];
   }

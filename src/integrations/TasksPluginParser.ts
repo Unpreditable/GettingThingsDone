@@ -32,11 +32,17 @@ const LEVELS: readonly string[] = ["highest", "high", "medium", "low", "lowest"]
  * The single source of truth for Tasks-plugin syntax. Adding a marker here is
  * the whole cost of supporting it — no other pattern in the codebase needs to
  * learn about it, which is the property the old per-field regexes lacked.
+ *
+ * 📆 and 🗓 for due, and ⌛ for scheduled, are spellings Tasks reads but never
+ * writes.
  */
 const TOKENS: Record<string, TokenDef> = {
   "📅": { field: "due",          kind: "date" },
+  "📆": { field: "due",          kind: "date" },
+  "🗓": { field: "due",          kind: "date" },
   "✅": { field: "done",         kind: "date" },
   "⏳": { field: "scheduled",    kind: "date" },
+  "⌛": { field: "scheduled",    kind: "date" },
   "🛫": { field: "start",        kind: "date" },
   "➕": { field: "created",      kind: "date" },
   "❌": { field: "cancelled",    kind: "date" },
@@ -73,8 +79,12 @@ const DATAVIEW_TOKENS: Record<string, TokenDef> = {
 /** The keys of Tasks' Dataview format. */
 export const DATAVIEW_KEYS: readonly string[] = Object.keys(DATAVIEW_TOKENS);
 
-/** Alternation over every marker. The `u` flag keeps non-BMP markers intact. */
-const MARKER_REGEX = new RegExp(Object.keys(TOKENS).join("|"), "gu");
+/**
+ * Alternation over every marker, each with the variation selector (U+FE0F)
+ * that emoji pickers often add and Tasks tolerates. The `u` flag keeps non-BMP
+ * markers intact.
+ */
+const MARKER_REGEX = new RegExp(`(${Object.keys(TOKENS).join("|")})\\uFE0F?`, "gu");
 
 const DATAVIEW_KEY_GROUP = `(${DATAVIEW_KEYS.join("|")})`;
 const DATAVIEW_FIELD_REGEX = new RegExp(
@@ -201,7 +211,7 @@ function findMarkers(text: string, ignoreKey: string | undefined): Marker[] {
   const emoji: Marker[] = [];
   for (const m of text.matchAll(MARKER_REGEX)) {
     if (fields.some((f) => m.index >= f.start && m.index < f.end)) continue;
-    emoji.push({ def: TOKENS[m[0]], format: "emoji", start: m.index, end: m.index + m[0].length });
+    emoji.push({ def: TOKENS[m[1]], format: "emoji", start: m.index, end: m.index + m[0].length });
   }
   return [...fields, ...emoji].sort((a, b) => a.start - b.start);
 }

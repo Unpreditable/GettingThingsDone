@@ -829,3 +829,9 @@ describe("parseFile — commas between Dataview fields", () => {
     expect(parseFile("t.md", "- [ ] Pay rent [due:: 2026-10-20], [priority:: high]")[0].text).toBe("Pay rent");
   });
 });
+
+describe("parseFile — a variation selector after an emoji", () => {
+  it("leaves no selector behind in the text", () => {
+    expect(parseFile("t.md", "- [ ] Pay rent 📅\uFE0F 2026-10-20")[0].text).toBe("Pay rent");
+  });
+});
