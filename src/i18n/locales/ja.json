@@ -28,7 +28,8 @@
       "unpin": "固定を解除（→ {{name}}）",
       "unpinHere": "固定を解除",
       "setInProgress": "進行中にする",
-      "cancelTask": "タスクをキャンセル"
+      "cancelTask": "タスクをキャンセル",
+      "goToBlocker": "ブロック中のタスクへ移動: {{task}}"
     },
     "languageBanner": {
       "message": "Obsidianの言語が変更されました。可能な場合はカテゴリ名を更新しました — 必要に応じて設定を確認してください。",
@@ -83,7 +84,10 @@
       "done": "完了日 {{date}}",
       "onCompletion": "完了時: {{action}}",
       "pinnedTo": "{{bucket}} に固定中",
-      "belongsIn": "{{bucket}} に該当"
+      "belongsIn": "{{bucket}} に該当",
+      "notStarted": "まだ開始できません",
+      "blockedBy": "ブロック元: {{task}}",
+      "dependencyMissing": "依存先のタスクが範囲内に見つかりません"
     }
   },
   "commands": {

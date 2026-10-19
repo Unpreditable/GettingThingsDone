@@ -5,6 +5,8 @@
   import type { BucketConfig, PriorityDisplay } from "../settings";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { DueStatus } from "../core/DueStatus";
+  import type { WaitingInfo } from "../core/Waiting";
+  import { isDimmed } from "../core/Waiting";
   import { t } from "../i18n/i18n";
   import { isRecurring } from "../core/TaskOrder";
   import { isDragging } from "./dragState";
@@ -26,6 +28,8 @@
   export let misfiledIn: BucketConfig | null = null;
   /** The bucket this task is pinned to, or null when it follows its dates. */
   export let pinnedIn: BucketConfig | null = null;
+  /** Why this task can't be done yet, or null when nothing holds it back. */
+  export let waiting: WaitingInfo | null = null;
   /** Global-filter strings to cut from the text shown; empty while hiding is off. */
   export let hiddenFilterStrings: string[] = [];
 
@@ -38,8 +42,12 @@
   // The row glyphs obey their settings; the popover always tells the truth,
   // so it is gated only by its own toggle.
   $: fieldRows = showTasksFieldsInPopover
-    ? formatTasksFields(task, dueStatus, { autoPlacedFrom, pinnedIn, misfiledIn })
+    ? formatTasksFields(task, dueStatus, { autoPlacedFrom, pinnedIn, misfiledIn }, waiting, hiddenFilterStrings)
     : [];
+  // Unlike the due flags, not behind showDueFlags: the badge says why the row
+  // is dimmed. Blocked wins, since a start date passes by itself and a blocker doesn't.
+  $: dimmed = waiting !== null && isDimmed(waiting);
+  $: waitingIcon = !dimmed ? null : waiting?.blockedBy.length ? "construction" : "snail";
   $: isRecurringTask = isRecurring(task);
 
   /** Levels each dropdown entry admits, highest first. */
@@ -206,6 +214,7 @@
   class="gtd-task task-list-item"
   class:is-checked={checkboxChecked}
   class:is-completed={task.isCompleted && showCompleted}
+  class:is-waiting={dimmed}
   data-task={symbol}
   style="padding-left: {12 + visualIndentLevel * 16}px"
   on:mouseenter={onMouseEnter}
@@ -232,6 +241,10 @@
 
   {#if showMisfiledBadge}
     <span class="gtd-misfiled-badge" use:icon={"flag"}></span>
+  {/if}
+
+  {#if waitingIcon}
+    <span class="gtd-waiting-badge" use:icon={waitingIcon}></span>
   {/if}
 
   {#if priorityEmoji}
@@ -287,7 +300,7 @@
               {:else}
                 <span class="gtd-tooltip-field-emoji">{row.emoji}</span>
               {/if}
-              <span class="gtd-tooltip-field-text">{row.text}</span>
+              <span class="gtd-tooltip-field-text" class:is-truncated={row.truncate}>{row.text}</span>
               {#if row.marker}
                 <span
                   class="gtd-tooltip-field-marker"
@@ -341,7 +354,8 @@
   /* Sizing lives in styles.css: the injected SVG carries no Svelte scope class
      and is out of reach here. This block owns the span around it. */
   .gtd-overdue-badge,
-  .gtd-misfiled-badge {
+  .gtd-misfiled-badge,
+  .gtd-waiting-badge {
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -356,6 +370,10 @@
 
   .gtd-misfiled-badge {
     color: var(--gtd-flag-misfiled);
+  }
+
+  .gtd-waiting-badge {
+    color: var(--text-muted);
   }
 
   .gtd-priority-badge {
@@ -420,6 +438,14 @@
        against, and rows lead with either kind. */
     align-items: center;
     color: var(--text-normal);
+  }
+
+  /* min-width: 0 lets the flex item shrink below its text, so the ellipsis shows. */
+  span.gtd-tooltip-field-text.is-truncated {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .gtd-tooltip-field-emoji {

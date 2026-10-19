@@ -1,5 +1,7 @@
 import { t } from "../i18n/i18n";
 import type { TaskRecord, TaskPriority } from "./TaskParser";
+import { stripWikilinks, hideFilterText } from "./TaskParser";
+import type { WaitingInfo } from "./Waiting";
 import type { DueStatus } from "./DueStatus";
 import type { BucketConfig } from "../settings";
 import { formatDate, formatDueLine, formatMisfiledLine } from "./DueStatusText";
@@ -21,6 +23,8 @@ export interface FieldRow {
   tone?: "overdue" | "misfiled";
   /** Trailing Lucide marker, set on the date row currently driving placement. */
   marker?: string;
+  /** Kept to one line, cut with an ellipsis, so a long task name can't swell the popover. */
+  truncate?: boolean;
 }
 
 /** How the task came to be in the bucket it's rendered under. */
@@ -40,6 +44,16 @@ export const PRIORITY_EMOJI: Record<TaskPriority, string> = {
 };
 
 /**
+ * A blocking task as the popover and the context menu name it: its 🆔, then its
+ * text. The id is what the waiting task's ⛔ names, and it still shows for a
+ * blocker with no text.
+ */
+export function blockerLabel(task: TaskRecord, hiddenStrings: string[]): string {
+  const name = stripWikilinks(hideFilterText(task.text, hiddenStrings));
+  return `(${task.tasksId ?? ""}) ${name}`.trim();
+}
+
+/**
  * The metadata rows for a task's hover popover, already in display order and
  * already filtered to fields that are present. TaskItem renders these with an
  * {#each} and owns no ordering logic of its own.
@@ -50,11 +64,16 @@ export const PRIORITY_EMOJI: Record<TaskPriority, string> = {
  *
  * `dueStatus` is null when the panel has no status for this task; the due row is
  * then omitted, since its text is entirely status-derived.
+ *
+ * `waiting` explains a dimmed row: blocked rows join the flags at the top, and
+ * the not-started row sits directly above the 🛫 row that gives its date.
  */
 export function formatTasksFields(
   task: TaskRecord,
   dueStatus: DueStatus | null,
-  placement: PlacementInfo
+  placement: PlacementInfo,
+  waiting: WaitingInfo | null = null,
+  hiddenStrings: string[] = []
 ): FieldRow[] {
   const rows: FieldRow[] = [];
   const { autoPlacedFrom, pinnedIn, misfiledIn } = placement;
@@ -64,6 +83,16 @@ export function formatTasksFields(
   }
   if (misfiledIn) {
     rows.push({ icon: "flag", tone: "misfiled", text: formatMisfiledLine(misfiledIn) });
+  }
+  for (const blocker of waiting?.blockedBy ?? []) {
+    rows.push({
+      icon: "construction",
+      text: t("task.fields.blockedBy", { task: blockerLabel(blocker, hiddenStrings) }),
+      truncate: true,
+    });
+  }
+  if (waiting?.missingDependency) {
+    rows.push({ icon: "badge-alert", text: t("task.fields.dependencyMissing") });
   }
 
   if (task.dueDate && dueStatus) {
@@ -88,6 +117,7 @@ export function formatTasksFields(
     });
   }
   if (task.startDate) {
+    if (waiting?.startsOn) rows.push({ icon: "snail", text: t("task.fields.notStarted") });
     rows.push({ emoji: "🛫", text: t("task.fields.start", { date: formatDate(task.startDate) }) });
   }
   if (task.createdDate) {

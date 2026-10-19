@@ -28,7 +28,8 @@
       "unpin": "Desafixar (→ {{name}})",
       "unpinHere": "Desafixar",
       "setInProgress": "Marcar como em andamento",
-      "cancelTask": "Cancelar tarefa"
+      "cancelTask": "Cancelar tarefa",
+      "goToBlocker": "Ir para a tarefa bloqueante: {{task}}"
     },
     "languageBanner": {
       "message": "O idioma do Obsidian foi alterado. Os nomes das categorias foram atualizados sempre que possível — verifique as definições se necessário.",
@@ -83,7 +84,10 @@
       "done": "concluída {{date}}",
       "onCompletion": "ao concluir: {{action}}",
       "pinnedTo": "Fixada em {{bucket}}",
-      "belongsIn": "Pertence a {{bucket}}"
+      "belongsIn": "Pertence a {{bucket}}",
+      "notStarted": "Ainda não pode começar",
+      "blockedBy": "Bloqueada por: {{task}}",
+      "dependencyMissing": "Depende de uma tarefa fora do âmbito"
     }
   },
   "commands": {

@@ -19,6 +19,8 @@ function makeTask(id: string, text: string, isCompleted = false): TaskRecord {
     createdDate: null,
     cancelledDate: null,
     onCompletion: null,
+    tasksId: null,
+    dependsOn: [],
     blockId: null,
     tags: [],
     inlineField: null,
@@ -37,6 +39,7 @@ function makeGroup(bucketId: string, tasks: TaskRecord[], agedCompletedTaskIds: 
     dueStatuses: {},
     misfiledIn: {},
     autoPlacedFrom: {},
+    waiting: {},
     agedCompletedTaskIds,
     isSystem: false,
   };

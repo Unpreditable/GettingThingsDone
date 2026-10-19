@@ -28,7 +28,8 @@
       "unpin": "Atspraust (→ {{name}})",
       "unpinHere": "Atspraust",
       "setInProgress": "Atzīmēt kā procesā",
-      "cancelTask": "Atcelt uzdevumu"
+      "cancelTask": "Atcelt uzdevumu",
+      "goToBlocker": "Doties uz bloķējošo uzdevumu: {{task}}"
     },
     "languageBanner": {
       "message": "Obsidian valoda ir mainīta. Kategoriju nosaukumi atjaunināti, kur iespējams — pārbaudiet iestatījumus, ja nepieciešams.",
@@ -86,7 +87,10 @@
       "done": "pabeigts {{date}}",
       "onCompletion": "pabeidzot: {{action}}",
       "pinnedTo": "Piesprausts: {{bucket}}",
-      "belongsIn": "Pieder {{bucket}}"
+      "belongsIn": "Pieder {{bucket}}",
+      "notStarted": "Vēl nevar sākt",
+      "blockedBy": "Bloķē: {{task}}",
+      "dependencyMissing": "Uzdevums, no kura tas atkarīgs, nav atrasts"
     }
   },
   "commands": {

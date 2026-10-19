@@ -65,6 +65,12 @@
   margin-right: 0;
 }
 
+/* A task that can't be done yet. Children only, and never the popover: the
+   tooltip lives inside the row, and dimming the row itself would fade it too. */
+.gtd-task.is-waiting > :not(.gtd-tooltip) {
+  opacity: 0.5;
+}
+
 /* The marker beside the date driving placement is deliberately smaller than the
    field glyph it trails — it annotates that row rather than labelling it. */
 .gtd-tooltip .gtd-tooltip-field-marker .svg-icon {
@@ -1005,4 +1011,16 @@ div.gtd-hidden {
 
 .cm-line.gtd-line-flash {
   animation: gtd-line-flash 2s ease-out forwards;
+}
+
+/* A context-menu title that may hold a task's text ("Go to blocking task: …").
+   Capped in em so it stays the same width in every language: a longer
+   translation cuts more of the task text instead of widening the menu. */
+.menu-item-title span.gtd-menu-title-capped {
+  display: inline-block;
+  max-width: 20em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }

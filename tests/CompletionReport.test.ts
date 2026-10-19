@@ -29,6 +29,8 @@ function done(date: Date | null, overrides: Partial<TaskRecord> = {}): TaskRecor
     createdDate: null,
     cancelledDate: null,
     onCompletion: null,
+    tasksId: null,
+    dependsOn: [],
     blockId: null,
     tags: [],
     inlineField: null,

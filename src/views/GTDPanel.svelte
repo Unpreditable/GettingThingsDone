@@ -7,6 +7,7 @@
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
   import { getTagValue, getInlineFieldValue, statusSymbol } from "../core/TaskParser";
+  import { blockerLabel } from "../core/TasksFieldText";
   import type { SettableStatus } from "../core/TaskWriter";
   import { countShown, searchBuckets, shownTasks, visibleCompleted } from "../core/PanelVisibility";
   import type { BucketConfig, PluginSettings } from "../settings";
@@ -74,6 +75,9 @@
         return bucket ? [[task.id, bucket] as [string, BucketConfig]] : [];
       })
   );
+
+  /** Task id → why it can't be done yet, across every bucket. */
+  $: waitingMap = new Map(bucketGroups.flatMap((g) => Object.entries(g.waiting)));
 
   let searchQuery = '';
 
@@ -253,6 +257,17 @@
     });
 
     menu.addSeparator();
+    for (const blocker of waitingMap.get(task.id)?.blockedBy ?? []) {
+      // A fragment, so styles.css can cap the item's width: a long task name
+      // or a long translation is cut with an ellipsis instead of widening the menu.
+      const title = createFragment((f) =>
+        f.createSpan({
+          cls: "gtd-menu-title-capped",
+          text: t("panel.contextMenu.goToBlocker", { task: blockerLabel(blocker, hiddenStrings) }),
+        })
+      );
+      menu.addItem((item) => item.setTitle(title).setIcon("construction").onClick(() => onNavigate(blocker)));
+    }
     menu.addItem((item) =>
       item
         .setTitle(t("panel.contextMenu.openFile"))
@@ -429,6 +444,7 @@
         emoji={group.emoji}
         tasks={group.tasks}
         dueStatuses={group.dueStatuses}
+        waiting={group.waiting}
         showDueFlags={settings.staleIndicatorEnabled}
         priorityDisplay={settings.priorityDisplay}
         showRecurrenceBadge={settings.showRecurrenceBadge}

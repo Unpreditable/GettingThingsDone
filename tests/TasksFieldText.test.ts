@@ -2,6 +2,7 @@ import { parseFile } from "../src/core/TaskParser";
 import { formatTasksFields } from "../src/core/TasksFieldText";
 import type { PlacementInfo } from "../src/core/TasksFieldText";
 import type { DueStatus } from "../src/core/DueStatus";
+import type { WaitingInfo } from "../src/core/Waiting";
 import { DEFAULT_BUCKETS } from "../src/settings";
 
 const onTrack: DueStatus = { kind: "on-track", diffDays: 3 };
@@ -131,5 +132,62 @@ describe("placement rows", () => {
     const rows = rowsFor("- [ ] Pay bill 📅 2026-09-01", onTrack, pinned);
     expect(rows[0].icon).toBe("pin");
     expect(rows[1].emoji).toBe("📅");
+  });
+});
+
+describe("formatTasksFields — waiting rows", () => {
+  const NOT_WAITING: WaitingInfo = { startsOn: null, blockedBy: [], missingDependency: false };
+  const blocker = (text: string) => parseFile("b.md", `- [ ] ${text} 🆔 x`)[0];
+
+  function rowsWaiting(line: string, waiting: WaitingInfo, placement: PlacementInfo = UNPLACED) {
+    return formatTasksFields(parseFile("test.md", line)[0], onTrack, placement, waiting);
+  }
+
+  it("puts the snail row directly above the start date row", () => {
+    const rows = rowsWaiting("- [ ] T 🔁 every week 🛫 2026-10-20 ➕ 2026-10-01", {
+      ...NOT_WAITING,
+      startsOn: new Date(2026, 9, 20),
+    });
+    const start = rows.findIndex((r) => r.emoji === "🛫");
+    expect(rows[start - 1]).toEqual({ icon: "snail", text: "Can't start yet" });
+    expect(rows[start + 1].emoji).toBe("➕");
+  });
+
+  it("names each open blocker, after the misfiled row and before the due row", () => {
+    const rows = rowsWaiting(
+      "- [ ] T 📅 2026-10-25",
+      { ...NOT_WAITING, blockedBy: [blocker("A"), blocker("B")] },
+      { ...UNPLACED, misfiledIn: today }
+    );
+    expect(rows.map((r) => r.icon ?? r.emoji)).toEqual(["flag", "construction", "construction", "📅"]);
+    expect(rows[1]).toEqual({ icon: "construction", text: "Blocked by: (x) A", truncate: true });
+    expect(rows[2].text).toBe("Blocked by: (x) B");
+  });
+
+  it("shows a blocker's link text, not its brackets", () => {
+    const rows = rowsWaiting("- [ ] T", { ...NOT_WAITING, blockedBy: [blocker("Read [[Spec|the spec]]")] });
+    expect(rows[0].text).toBe("Blocked by: (x) Read the spec");
+  });
+
+  it("hides the global filter text in a blocker's name", () => {
+    const task = parseFile("test.md", "- [ ] T")[0];
+    const waiting = { ...NOT_WAITING, blockedBy: [blocker("todo Write docs")] };
+    const rows = formatTasksFields(task, onTrack, UNPLACED, waiting, ["todo"]);
+    expect(rows[0].text).toBe("Blocked by: (x) Write docs");
+  });
+
+  it("shows just the id for a blocker with no text", () => {
+    const rows = rowsWaiting("- [ ] T", { ...NOT_WAITING, blockedBy: [blocker("")] });
+    expect(rows[0].text).toBe("Blocked by: (x)");
+  });
+
+  it("says when a dependency isn't found, after any blocked rows", () => {
+    const rows = rowsWaiting("- [ ] T", { ...NOT_WAITING, blockedBy: [blocker("A")], missingDependency: true });
+    expect(rows[1]).toEqual({ icon: "badge-alert", text: "Depends on task not found in scope" });
+  });
+
+  it("adds nothing without a waiting state", () => {
+    const line = "- [ ] T 🛫 2026-10-20";
+    expect(formatTasksFields(parseFile("test.md", line)[0], null, UNPLACED, null)).toEqual(rowsFor(line));
   });
 });

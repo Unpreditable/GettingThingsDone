@@ -28,7 +28,8 @@
       "unpin": "",
       "unpinHere": "",
       "setInProgress": "",
-      "cancelTask": ""
+      "cancelTask": "",
+      "goToBlocker": ""
     },
     "languageBanner": {
       "message": "",
@@ -83,7 +84,10 @@
       "done": "",
       "onCompletion": "",
       "pinnedTo": "",
-      "belongsIn": ""
+      "belongsIn": "",
+      "notStarted": "",
+      "blockedBy": "",
+      "dependencyMissing": ""
     }
   },
   "commands": {

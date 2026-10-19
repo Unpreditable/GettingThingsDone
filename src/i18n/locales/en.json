@@ -51,7 +51,9 @@
       "setInProgress_comment": "Right-click context menu item on a task. Marks the task as in progress (checkbox [/]). Shown on open and cancelled tasks.",
       "setInProgress": "Mark in progress",
       "cancelTask_comment": "Right-click context menu item on a task. Marks the task as cancelled (checkbox [-]). Shown on open and in-progress tasks.",
-      "cancelTask": "Cancel task"
+      "cancelTask": "Cancel task",
+      "goToBlocker_comment": "Right-click context menu item on a task that waits on another, unfinished task (Tasks' ⛔ dependency); one item per such task. Opens the file at the line of the task it waits on. {{task}} = that task's id in parentheses, then its text. The item is cut to a fixed width, so a long translation shortens the task text rather than widening the menu.",
+      "goToBlocker": "Go to blocking task: {{task}}"
     },
     "languageBanner": {
       "message_comment": "Dismissable info banner shown once after the user changes their Obsidian interface language and restarts. 'Bucket names' are the GTD time-horizon categories (Today, This Week, etc.) — their display names may have been auto-renamed to match the new language.",
@@ -125,7 +127,13 @@
       "pinnedTo_comment": "Popover row on a task that is pinned to a bucket. It stays there regardless of its dates until unpinned. {{bucket}} = that bucket's display name.",
       "pinnedTo": "Pinned to {{bucket}}",
       "belongsIn_comment": "Popover row on a task filed further out than its date warrants. {{bucket}} = the earlier bucket its date points to.",
-      "belongsIn": "Belongs in {{bucket}}"
+      "belongsIn": "Belongs in {{bucket}}",
+      "notStarted_comment": "Popover row on a task whose Tasks start date (🛫) is still in the future, so it can't be worked on yet. Sits directly above the 'Starts {{date}}' row, which gives the date.",
+      "notStarted": "Can't start yet",
+      "blockedBy_comment": "Popover row on a task that waits on another, unfinished task (Tasks' ⛔ dependency). {{task}} = that task's id in parentheses, then its text. One row per such task, kept to one line and cut with an ellipsis.",
+      "blockedBy": "Blocked by: {{task}}",
+      "dependencyMissing_comment": "Popover row on a task whose Tasks dependency (⛔) names an id that no task in the folders this panel reads carries. The task is NOT treated as blocked.",
+      "dependencyMissing": "Depends on task not found in scope"
     }
   },
   "commands": {

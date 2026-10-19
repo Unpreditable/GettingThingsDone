@@ -28,7 +28,8 @@
       "unpin": "取消固定（→ {{name}}）",
       "unpinHere": "取消固定",
       "setInProgress": "标记为进行中",
-      "cancelTask": "取消任务"
+      "cancelTask": "取消任务",
+      "goToBlocker": "转到阻塞任务：{{task}}"
     },
     "languageBanner": {
       "message": "您的 Obsidian 语言已更改。已尽可能更新分类名称——如需要请在设置中查看。",
@@ -83,7 +84,10 @@
       "done": "完成于 {{date}}",
       "onCompletion": "完成时：{{action}}",
       "pinnedTo": "已固定到 {{bucket}}",
-      "belongsIn": "应属于 {{bucket}}"
+      "belongsIn": "应属于 {{bucket}}",
+      "notStarted": "尚不能开始",
+      "blockedBy": "受阻于：{{task}}",
+      "dependencyMissing": "范围内未找到所依赖的任务"
     }
   },
   "commands": {

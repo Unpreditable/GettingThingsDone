@@ -28,7 +28,8 @@
       "unpin": "Lösen (→ {{name}})",
       "unpinHere": "Lösen",
       "setInProgress": "Als in Bearbeitung markieren",
-      "cancelTask": "Aufgabe abbrechen"
+      "cancelTask": "Aufgabe abbrechen",
+      "goToBlocker": "Zur blockierenden Aufgabe: {{task}}"
     },
     "languageBanner": {
       "message": "Deine Obsidian-Sprache hat sich geändert. Kategorienamen wurden wenn möglich aktualisiert — überprüfe die Einstellungen falls nötig.",
@@ -83,7 +84,10 @@
       "done": "erledigt {{date}}",
       "onCompletion": "bei Abschluss: {{action}}",
       "pinnedTo": "An {{bucket}} angeheftet",
-      "belongsIn": "Gehört zu {{bucket}}"
+      "belongsIn": "Gehört zu {{bucket}}",
+      "notStarted": "Kann noch nicht beginnen",
+      "blockedBy": "Blockiert durch: {{task}}",
+      "dependencyMissing": "Abhängigkeit im Bereich nicht gefunden"
     }
   },
   "commands": {

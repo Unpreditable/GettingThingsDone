@@ -28,7 +28,8 @@
       "unpin": "Відкріпити (→ {{name}})",
       "unpinHere": "Відкріпити",
       "setInProgress": "Позначити «в роботі»",
-      "cancelTask": "Скасувати завдання"
+      "cancelTask": "Скасувати завдання",
+      "goToBlocker": "Перейти до блокувального завдання: {{task}}"
     },
     "languageBanner": {
       "message": "Мову Obsidian змінено. Назви категорій оновлено там, де це можливо — перевірте налаштування за потреби.",
@@ -89,7 +90,10 @@
       "done": "виконано {{date}}",
       "onCompletion": "після завершення: {{action}}",
       "pinnedTo": "Закріплено в {{bucket}}",
-      "belongsIn": "Належить до {{bucket}}"
+      "belongsIn": "Належить до {{bucket}}",
+      "notStarted": "Ще не можна почати",
+      "blockedBy": "Блокує: {{task}}",
+      "dependencyMissing": "Завдання, від якого залежить, не знайдено"
     }
   },
   "commands": {

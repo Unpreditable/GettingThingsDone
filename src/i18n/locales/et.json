@@ -28,7 +28,8 @@
       "unpin": "Vabasta (→ {{name}})",
       "unpinHere": "Vabasta",
       "setInProgress": "Märgi pooleliolevaks",
-      "cancelTask": "Tühista ülesanne"
+      "cancelTask": "Tühista ülesanne",
+      "goToBlocker": "Mine blokeerivale ülesandele: {{task}}"
     },
     "languageBanner": {
       "message": "Obsidiani keel on muutunud. Kategooriate nimed uuendati võimalusel — vaata vajadusel seadetest üle.",
@@ -83,7 +84,10 @@
       "done": "valmis {{date}}",
       "onCompletion": "lõpetamisel: {{action}}",
       "pinnedTo": "Kinnitatud: {{bucket}}",
-      "belongsIn": "Kuulub kategooriasse {{bucket}}"
+      "belongsIn": "Kuulub kategooriasse {{bucket}}",
+      "notStarted": "Ei saa veel alustada",
+      "blockedBy": "Blokeerib: {{task}}",
+      "dependencyMissing": "Ülesannet, millest see sõltub, ei leitud"
     }
   },
   "commands": {

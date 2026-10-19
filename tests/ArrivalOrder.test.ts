@@ -19,6 +19,8 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
     createdDate: null,
     cancelledDate: null,
     onCompletion: null,
+    tasksId: null,
+    dependsOn: [],
     blockId: null,
     tags: [],
     inlineField: null,

@@ -24,6 +24,8 @@ import {
 import { computeDueStatus, computeMisplacement, matchesRule } from "./DueStatus";
 import type { DueStatus } from "./DueStatus";
 import { planningDate } from "./PlanningDate";
+import { computeWaiting } from "./Waiting";
+import type { WaitingInfo } from "./Waiting";
 
 export const TO_REVIEW_ID = "to-review";
 
@@ -41,6 +43,8 @@ export interface BucketGroup {
   misfiledIn: Record<string, BucketConfig>;
   /** Which date field placed each auto-placed task, keyed by task id. */
   autoPlacedFrom: Record<string, "due" | "scheduled">;
+  /** Why each open task here can't be done yet, keyed by task id. */
+  waiting: Record<string, WaitingInfo>;
   /** Completed tasks the panel hides: anything whose completion this session
    *  didn't witness, plus every completed recurrence its next occurrence has
    *  already replaced. */
@@ -64,6 +68,7 @@ export function groupTasksIntoBuckets(
     dueStatuses: {},
     misfiledIn: {},
     autoPlacedFrom: {},
+    waiting: {},
     agedCompletedTaskIds: [],
     isSystem: true,
   });
@@ -77,6 +82,7 @@ export function groupTasksIntoBuckets(
       dueStatuses: {},
       misfiledIn: {},
       autoPlacedFrom: {},
+      waiting: {},
       agedCompletedTaskIds: [],
       isSystem: false,
     });
@@ -116,6 +122,7 @@ export function groupTasksIntoBuckets(
     }
   }
 
+  const waiting = computeWaiting(tasks, now);
   for (const task of tasks) {
     const bucketId = effectiveBucket.get(task.id) ?? null;
     const group =
@@ -129,6 +136,9 @@ export function groupTasksIntoBuckets(
 
     const status = computeDueStatus(task, now);
     if (status) group.dueStatuses[task.id] = status;
+
+    const waits = waiting.get(task.id);
+    if (waits) group.waiting[task.id] = waits;
 
     const belongsIn = computeMisplacement(
       task, group.bucketId, settings.buckets, settings.planBy, now, settings.weekStartsOn

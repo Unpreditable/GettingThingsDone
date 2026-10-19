@@ -295,7 +295,7 @@ describe("indentLevel and buildTaskHierarchy", () => {
       rawLine: "- [ ] A root", text: "A root", isCompleted: false,
       completedAt: null, dueDate: null,
       priority: null, recurrence: null, scheduledDate: null, startDate: null,
-      createdDate: null, cancelledDate: null, onCompletion: null, blockId: null,
+      createdDate: null, cancelledDate: null, onCompletion: null, tasksId: null, dependsOn: [], blockId: null,
       tags: [], inlineField: null,
       parentId: null, childIds: [],
     };
@@ -304,7 +304,7 @@ describe("indentLevel and buildTaskHierarchy", () => {
       rawLine: "  - [ ] A child", text: "A child", isCompleted: false,
       completedAt: null, dueDate: null,
       priority: null, recurrence: null, scheduledDate: null, startDate: null,
-      createdDate: null, cancelledDate: null, onCompletion: null, blockId: null,
+      createdDate: null, cancelledDate: null, onCompletion: null, tasksId: null, dependsOn: [], blockId: null,
       tags: [], inlineField: null,
       parentId: null, childIds: [],
     };
@@ -313,7 +313,7 @@ describe("indentLevel and buildTaskHierarchy", () => {
       rawLine: "- [ ] B root", text: "B root", isCompleted: false,
       completedAt: null, dueDate: null,
       priority: null, recurrence: null, scheduledDate: null, startDate: null,
-      createdDate: null, cancelledDate: null, onCompletion: null, blockId: null,
+      createdDate: null, cancelledDate: null, onCompletion: null, tasksId: null, dependsOn: [], blockId: null,
       tags: [], inlineField: null,
       parentId: null, childIds: [],
     };
@@ -833,5 +833,33 @@ describe("parseFile — commas between Dataview fields", () => {
 describe("parseFile — a variation selector after an emoji", () => {
   it("leaves no selector behind in the text", () => {
     expect(parseFile("t.md", "- [ ] Pay rent 📅\uFE0F 2026-10-20")[0].text).toBe("Pay rent");
+  });
+});
+
+describe("parseFile — Tasks dependencies", () => {
+  it("reads the Tasks id and its dependencies", () => {
+    const [t] = parseFile("a.md", "- [ ] Ship 🆔 ship1 ⛔ docs2, qa_3");
+    expect(t.tasksId).toBe("ship1");
+    expect(t.dependsOn).toEqual(["docs2", "qa_3"]);
+  });
+
+  it("reads them from Dataview fields too", () => {
+    const [t] = parseFile("a.md", "- [ ] Ship [id:: ship1] [dependsOn:: docs2]");
+    expect(t.tasksId).toBe("ship1");
+    expect(t.dependsOn).toEqual(["docs2"]);
+  });
+
+  it("keeps only the first of several ids", () => {
+    expect(parseFile("a.md", "- [ ] Ship 🆔 a, b")[0].tasksId).toBe("a");
+  });
+
+  it("splits a Dataview dependsOn list", () => {
+    expect(parseFile("a.md", "- [ ] Ship [dependsOn:: a, b]")[0].dependsOn).toEqual(["a", "b"]);
+  });
+
+  it("leaves them empty when absent", () => {
+    const [t] = parseFile("a.md", "- [ ] Ship");
+    expect(t.tasksId).toBeNull();
+    expect(t.dependsOn).toEqual([]);
   });
 });

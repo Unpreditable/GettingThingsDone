@@ -28,6 +28,8 @@ function makeTask(overrides: Partial<TaskRecord>): TaskRecord {
     createdDate: null,
     cancelledDate: null,
     onCompletion: null,
+    tasksId: null,
+    dependsOn: [],
     blockId: null,
     tags: [],
     inlineField: null,
@@ -853,5 +855,14 @@ describe("in-bucket ordering by planning date", () => {
 
     expect(nextWeek([a, b], { planBy: "due-only", orderKeyScheme: "due-only" })).toEqual(["b", "a"]);
     expect(nextWeek([a, b])).toEqual(["a", "b"]);
+  });
+});
+
+describe("waiting state", () => {
+  it("is attached to the group holding a task that can't start yet", () => {
+    const task = makeTask({ startDate: daysFromMonday(1) });
+    const groups = groupTasksIntoBuckets([task], { ...DEFAULT_SETTINGS, buckets: DEFAULT_BUCKETS });
+    const group = groups.find((g) => g.tasks.includes(task))!;
+    expect(group.waiting[task.id]?.startsOn).toEqual(daysFromMonday(1));
   });
 });

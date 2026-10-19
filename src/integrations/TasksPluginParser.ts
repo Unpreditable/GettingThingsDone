@@ -310,6 +310,10 @@ export interface TasksFields {
   priority: TaskPriority | null;
   recurrence: string | null;
   onCompletion: string | null;
+  /** The 🆔 value. */
+  tasksId: string | null;
+  /** The ⛔ ids, in line order. */
+  dependsOn: string[];
 }
 
 /**
@@ -325,6 +329,8 @@ export function foldTasksFields(spans: TokenSpan[]): TasksFields {
     }
   }
   const get = (f: TasksField) => first.get(f) ?? null;
+  const ids = (f: TasksField) =>
+    (get(f) ?? "").split(",").map((id) => id.trim()).filter((id) => id !== "");
 
   return {
     dueDate: toDate(get("due")),
@@ -336,6 +342,9 @@ export function foldTasksFields(spans: TokenSpan[]): TasksFields {
     priority: (get("priority") as TaskPriority | null) ?? null,
     recurrence: get("recurrence"),
     onCompletion: get("onCompletion"),
+    // The value scan admits a list for either kind, but Tasks gives a task one id.
+    tasksId: ids("id")[0] ?? null,
+    dependsOn: ids("dependsOn"),
   };
 }
 

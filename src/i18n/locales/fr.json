@@ -28,7 +28,8 @@
       "unpin": "Détacher (→ {{name}})",
       "unpinHere": "Détacher",
       "setInProgress": "Marquer en cours",
-      "cancelTask": "Annuler la tâche"
+      "cancelTask": "Annuler la tâche",
+      "goToBlocker": "Aller à la tâche bloquante : {{task}}"
     },
     "languageBanner": {
       "message": "Votre langue Obsidian a changé. Les noms des catégories ont été mis à jour si possible — vérifiez les paramètres si nécessaire.",
@@ -83,7 +84,10 @@
       "done": "terminée {{date}}",
       "onCompletion": "à l'achèvement : {{action}}",
       "pinnedTo": "Épinglée à {{bucket}}",
-      "belongsIn": "Appartient à {{bucket}}"
+      "belongsIn": "Appartient à {{bucket}}",
+      "notStarted": "Ne peut pas encore commencer",
+      "blockedBy": "Bloquée par : {{task}}",
+      "dependencyMissing": "Dépend d'une tâche introuvable dans la portée"
     }
   },
   "commands": {

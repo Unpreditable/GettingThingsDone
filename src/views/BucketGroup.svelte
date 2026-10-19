@@ -7,6 +7,7 @@
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import { TO_REVIEW_ID } from "../core/BucketManager";
   import type { DueStatus } from "../core/DueStatus";
+  import type { WaitingInfo } from "../core/Waiting";
   import { isInsertionAllowed } from "../core/DragConstraints";
   import type { BucketTree } from "../core/DragConstraints";
   import { isDragging } from "./dragState";
@@ -16,6 +17,8 @@
   export let emoji: string = "";
   export let tasks: TaskRecord[];
   export let dueStatuses: Record<string, DueStatus> = {};
+  /** Why each open task here can't be done yet, keyed by task id. */
+  export let waiting: Record<string, WaitingInfo> = {};
   export let showDueFlags: boolean = true;
   export let priorityDisplay: PriorityDisplay = "all";
   export let showRecurrenceBadge: boolean = true;
@@ -334,6 +337,7 @@
           {task}
           {quickMoveTargets}
           dueStatus={dueStatuses[task.id] ?? null}
+          waiting={waiting[task.id] ?? null}
           {showDueFlags}
           {priorityDisplay}
           {showRecurrenceBadge}

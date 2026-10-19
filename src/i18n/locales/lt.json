@@ -28,7 +28,8 @@
       "unpin": "Atsegti (→ {{name}})",
       "unpinHere": "Atsegti",
       "setInProgress": "Pažymėti kaip vykdomą",
-      "cancelTask": "Atšaukti užduotį"
+      "cancelTask": "Atšaukti užduotį",
+      "goToBlocker": "Eiti į blokuojančią užduotį: {{task}}"
     },
     "languageBanner": {
       "message": "Obsidian kalba pasikeitė. Kategorijų pavadinimai atnaujinti ten, kur buvo įmanoma — patikrinkite nustatymus, jei reikia.",
@@ -89,7 +90,10 @@
       "done": "atlikta {{date}}",
       "onCompletion": "užbaigus: {{action}}",
       "pinnedTo": "Prisegta prie {{bucket}}",
-      "belongsIn": "Priklauso {{bucket}}"
+      "belongsIn": "Priklauso {{bucket}}",
+      "notStarted": "Dar negalima pradėti",
+      "blockedBy": "Blokuoja: {{task}}",
+      "dependencyMissing": "Užduotis, nuo kurios priklauso, nerasta"
     }
   },
   "commands": {

@@ -27,6 +27,10 @@ export interface TaskRecord {
   cancelledDate: Date | null;
   /** Tasks-plugin on-completion action, e.g. "delete". */
   onCompletion: string | null;
+  /** Tasks-plugin 🆔 value. Not to be confused with `id`, this plugin's own. */
+  tasksId: string | null;
+  /** Tasks-plugin ⛔ ids: the 🆔 values of the tasks this one waits on. */
+  dependsOn: string[];
   /** Trailing Obsidian block reference, without the leading ^. */
   blockId: string | null;
   /** All tags found on this task line (without #). */
@@ -181,6 +185,8 @@ export function parseFile(filePath: string, content: string, filter?: TaskFilter
       createdDate: fields.createdDate,
       cancelledDate: fields.cancelledDate,
       onCompletion: fields.onCompletion,
+      tasksId: fields.tasksId,
+      dependsOn: fields.dependsOn,
       blockId: blockRef ? blockRef[1] : null,
       tags,
       inlineField,
