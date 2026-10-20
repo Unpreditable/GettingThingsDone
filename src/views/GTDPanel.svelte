@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import type { Readable } from "svelte/store";
   import { Menu } from "obsidian";
+  import type { MenuItem } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
   import Celebration from "./Celebration.svelte";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
@@ -9,9 +10,15 @@
   import { getTagValue, getInlineFieldValue, statusSymbol } from "../core/TaskParser";
   import { blockerLabel } from "../core/TasksFieldText";
   import type { SettableStatus } from "../core/TaskWriter";
+  import { dateEntries, datePresets } from "../core/DateMenu";
+  import type { DateEntry, DateField, PresetId } from "../core/DateMenu";
+  import { dayKey } from "../core/DueStatus";
+  import { formatDate } from "../core/DueStatusText";
+  import { today } from "../integrations/TasksPluginParser";
+  import type { DatePicker } from "../integrations/Kalendae";
   import { countShown, searchBuckets, shownTasks, visibleCompleted } from "../core/PanelVisibility";
   import type { BucketConfig, PluginSettings } from "../settings";
-  import { shouldRecommendCatchAll, hiddenFilterStrings } from "../settings";
+  import { shouldRecommendCatchAll, hiddenFilterStrings, weekStartIndex } from "../settings";
   import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
   import { icon } from "./icon";
   import { t } from "../i18n/i18n";
@@ -38,6 +45,9 @@
   export let canEditTask: () => boolean;
   export let onEdit: (task: TaskRecord) => void;
   export let onSetStatus: (task: TaskRecord, symbol: SettableStatus) => Promise<void>;
+  export let onSetDate: (task: TaskRecord, field: DateField, date: string, unpin: boolean) => Promise<void>;
+  /** Asked each time the menu opens, since Kalendae can be enabled or disabled while the panel is up. */
+  export let getDatePicker: () => DatePicker | null;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onDismiss: (tasks: TaskRecord[]) => void;
   export let onOpenSettings: () => void;
@@ -246,15 +256,29 @@
     // The panel shows To Review first, then the buckets in settings order, so
     // To Review's -1 puts every bucket below it.
     const currentIndex = settings.buckets.findIndex((b) => b.id === currentBucketId);
-    settings.buckets.forEach((b, index) => {
-      if (b.id === currentBucketId) return;
-      menu.addItem((item) =>
-        item
-          .setTitle(t("panel.contextMenu.moveTo", { name: `${b.emoji} ${b.name}` }))
-          .setIcon(index < currentIndex ? "arrow-up-from-line" : "arrow-down-from-line")
-          .onClick(() => onMove(task, b.id))
-      );
-    });
+    const targets = settings.buckets.map((b, index) => ({ b, index })).filter(({ b }) => b.id !== currentBucketId);
+    if (targets.length > 0) {
+      menu.addItem((item) => {
+        item.setTitle(t("panel.contextMenu.moveToMenu")).setIcon("arrow-right-left");
+        const moveMenu = submenu(item);
+        for (const { b, index } of targets) {
+          moveMenu.addItem((sub) =>
+            sub
+              .setTitle(`${b.emoji} ${b.name}`)
+              .setIcon(index < currentIndex ? "arrow-up-from-line" : "arrow-down-from-line")
+              .onClick(() => onMove(task, b.id))
+          );
+        }
+      });
+    }
+
+    const picker = getDatePicker();
+    for (const entry of dateEntries(task, settings.planBy, pinnedIn.has(task.id))) {
+      menu.addItem((item) => {
+        item.setTitle(t(ENTRY_TITLES[entry.kind][entry.field])).setIcon("calendar-clock");
+        addDateRows(submenu(item), task, entry, picker);
+      });
+    }
 
     menu.addSeparator();
     for (const blocker of waitingMap.get(task.id)?.blockedBy ?? []) {
@@ -276,6 +300,63 @@
     );
 
     menu.showAtMouseEvent(lastContextMenuEvent ?? new MouseEvent("click"));
+  }
+
+  const ENTRY_TITLES: Record<DateEntry["kind"], Record<DateField, string>> = {
+    change: { due: "panel.contextMenu.changeDue", scheduled: "panel.contextMenu.changeScheduled" },
+    set: { due: "panel.contextMenu.setDue", scheduled: "panel.contextMenu.setScheduled" },
+  };
+
+  const PRESET_TITLES: Record<PresetId, string> = {
+    today: "panel.contextMenu.presetToday",
+    tomorrow: "panel.contextMenu.presetTomorrow",
+    startOfNextWeek: "panel.contextMenu.presetStartOfNextWeek",
+    inOneWeek: "panel.contextMenu.presetInOneWeek",
+    inTwoWeeks: "panel.contextMenu.presetInTwoWeeks",
+  };
+
+  /** `MenuItem.setSubmenu()` exists at runtime, and Obsidian uses it itself, but obsidian.d.ts leaves it out. */
+  function submenu(item: MenuItem): Menu {
+    return (item as MenuItem & { setSubmenu(): Menu }).setSubmenu();
+  }
+
+  function addDateRows(dateMenu: Menu, task: TaskRecord, entry: DateEntry, picker: DatePicker | null) {
+    const pinnedTo = pinnedIn.get(task.id);
+    if (entry.unpins && pinnedTo) {
+      dateMenu.addItem((item) =>
+        item.setTitle(t("panel.contextMenu.updateUnpins", { name: `${pinnedTo.emoji} ${pinnedTo.name}` })).setIsLabel(true)
+      );
+    }
+
+    const current = entry.kind === "change" ? (entry.field === "due" ? task.dueDate : task.scheduledDate) : null;
+    const now = today();
+    for (const preset of datePresets(now, weekStartIndex(settings.weekStartsOn), current)) {
+      // Two columns, as Kalendae's suggestions have: the step, and the day it lands on.
+      // Native menus take only the text, so the hidden separator keeps the two apart there.
+      const title = createFragment((f) => {
+        const row = f.createSpan({ cls: "gtd-date-row" });
+        row.createSpan({ cls: "gtd-date-step", text: t(PRESET_TITLES[preset.id]) });
+        row.createSpan({ cls: "gtd-date-separator", text: " · " });
+        row.createSpan({ cls: "gtd-date-day", text: formatDate(preset.date) });
+      });
+      dateMenu.addItem((item) =>
+        item
+          .setTitle(title)
+          .onClick(() => onSetDate(task, entry.field, preset.key, entry.unpins))
+      );
+    }
+
+    if (picker) {
+      const event = lastContextMenuEvent ?? new MouseEvent("click");
+      const row = event.target instanceof Element ? event.target.closest<HTMLElement>(".gtd-task") : null;
+      dateMenu.addItem((item) =>
+        item.setTitle(t("panel.contextMenu.customDate")).onClick(async () => {
+          // A redraw since the menu opened may have replaced the row; the click point still stands.
+          const day = await picker(dayKey(current ?? now), row?.isConnected ? row : event);
+          if (day) await onSetDate(task, entry.field, day, entry.unpins);
+        })
+      );
+    }
   }
 
   let lastContextMenuEvent: MouseEvent | null = null;

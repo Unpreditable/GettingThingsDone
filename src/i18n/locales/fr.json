@@ -21,7 +21,18 @@
       "confirmButton": "Créer"
     },
     "contextMenu": {
-      "moveTo": "Déplacer vers : {{name}}",
+      "moveToMenu": "Déplacer vers",
+      "changeDue": "Modifier l’échéance",
+      "changeScheduled": "Modifier la date prévue",
+      "setDue": "Définir l’échéance",
+      "setScheduled": "Définir la date prévue",
+      "presetToday": "Aujourd’hui",
+      "presetTomorrow": "Demain",
+      "presetStartOfNextWeek": "Début de la semaine prochaine",
+      "presetInOneWeek": "Dans 1 semaine",
+      "presetInTwoWeeks": "Dans 2 semaines",
+      "customDate": "Personnalisée…",
+      "updateUnpins": "La modifier la détache de {{name}}",
       "editTask": "Modifier la tâche",
       "openFile": "Ouvrir le fichier",
       "pinTo": "Épingler à {{name}}",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks : Basculement échoué — {{error}}",
     "statusFailed": "GTD Tasks : Changement de statut échoué — {{error}}",
     "editFailed": "GTD Tasks : Modification échouée — {{error}}",
+    "dateFailed": "GTD Tasks : Changement de date échoué — {{error}}",
     "confirmFailed": "GTD Tasks : Confirmation échouée — {{error}}",
     "migrationComplete": "GTD Tasks : Migration terminée. {{migrated}} tâches mises à jour, {{failed}} ignorées."
   },

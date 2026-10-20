@@ -21,7 +21,18 @@
       "confirmButton": "Создать"
     },
     "contextMenu": {
-      "moveTo": "Переместить в: {{name}}",
+      "moveToMenu": "Переместить в",
+      "changeDue": "Изменить срок",
+      "changeScheduled": "Изменить запланированную дату",
+      "setDue": "Задать срок",
+      "setScheduled": "Задать запланированную дату",
+      "presetToday": "Сегодня",
+      "presetTomorrow": "Завтра",
+      "presetStartOfNextWeek": "Начало следующей недели",
+      "presetInOneWeek": "Через 1 неделю",
+      "presetInTwoWeeks": "Через 2 недели",
+      "customDate": "Выбрать…",
+      "updateUnpins": "Изменение открепит от {{name}}",
       "editTask": "Редактировать задачу",
       "openFile": "Открыть файл",
       "pinTo": "Закрепить в {{name}}",
@@ -148,6 +159,7 @@
     "toggleFailed": "GTD Tasks: Ошибка переключения — {{error}}",
     "statusFailed": "GTD Tasks: Ошибка смены статуса — {{error}}",
     "editFailed": "GTD Tasks: Ошибка редактирования — {{error}}",
+    "dateFailed": "GTD Tasks: Ошибка изменения даты — {{error}}",
     "confirmFailed": "GTD Tasks: Ошибка подтверждения — {{error}}",
     "migrationComplete": "GTD Tasks: Миграция завершена. Обновлено {{migrated}} задач, пропущено {{failed}}."
   },

@@ -60,7 +60,8 @@ Vault files (*.md)
 
 User move action
   → TaskWriter      locates line by lineNumber/rawLine, rewrites the bucket tag / inline field
-                    (it never writes a 📅 date — 📅 is read-only to this plugin)
+                    (a bucket move never touches a date; 📅 and ⏳ are written only by the row
+                    menu's Change/Set date items)
   → vault.modify()  triggers vault event → TaskIndex re-indexes → UI refreshes
 ```
 
@@ -76,6 +77,8 @@ User move action
 | [src/core/StorageMigrator.ts](src/core/StorageMigrator.ts) | Rewrites bucket assignments when switching between storage modes |
 | [src/integrations/TasksPluginParser.ts](src/integrations/TasksPluginParser.ts) | Token table + two-phase scanner for all Tasks-plugin metadata; sole owner of that syntax |
 | [src/core/TasksFieldText.ts](src/core/TasksFieldText.ts) | Formats a task's Tasks-plugin fields into ordered hover-popover rows |
+| [src/core/DateMenu.ts](src/core/DateMenu.ts) | Which Change/Set date items and preset days a task row's menu offers, and which one unpins |
+| [src/integrations/Kalendae.ts](src/integrations/Kalendae.ts) | Finds the Kalendae plugin's calendar for the menu's Custom… item |
 | [src/views/GTDPanel.svelte](src/views/GTDPanel.svelte) | Root sidebar; handles context menu and drag-drop coordination |
 | [src/views/BucketGroup.svelte](src/views/BucketGroup.svelte) | Collapsible bucket section; SortableJS drag-and-drop |
 | [src/views/TaskItem.svelte](src/views/TaskItem.svelte) | Task row; checkbox, truncated text (tooltip on hover), quick-move buttons |
@@ -102,7 +105,7 @@ Migration between modes via the settings tab.
 
 ### Tests
 
-Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, `BucketManager`, `TaskWriter`, and `StorageMigrator` — pure logic with no Obsidian API dependency. The mock at `tests/__mocks__/obsidian.ts` stubs the `obsidian` module for Jest.
+Unit tests in `tests/` cover `TaskParser`, `TasksPluginParser`, `BucketManager`, `TaskWriter`, `StorageMigrator`, `DateMenu` and the `Kalendae` bridge, among others — pure logic with no Obsidian API dependency. The mock at `tests/__mocks__/obsidian.ts` stubs the `obsidian` module for Jest.
 
 Timing tests live in `tests/perf/` and are excluded from `npm test`: run in parallel with the
 other suites they fail on CPU load, not on real regressions. `npm run test:perf` runs them alone

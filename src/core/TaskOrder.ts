@@ -19,11 +19,12 @@ export function hashString(s: string): string {
 /**
  * Content used to distinguish tasks with identical visible text.
  *
- * HARD INVARIANT: only fields this plugin's own actions NEVER write may appear
- * here. Every field below is read-only today — no GTD-Tasks action mutates a
- * priority, a recurrence rule, or any date but 📅 — but that is incidental to
- * current scope, not structural. Adding a write path for one of them (a "bump
- * priority" quick action, say) reintroduces the bug fixed on 2026-07-22:
+ * HARD INVARIANT: a field this plugin's own actions write may appear here only
+ * if that write records a known-line diffForEdit before the reindex, as
+ * handleEdit and handleSetDate do (main.ts settleLineWrite). 📅 and ⏳ are
+ * hashed (both under "dual-date", the planning one otherwise) and written
+ * that way. Every other field below is read-only today. Adding a write path for one of them (a "bump priority"
+ * quick action, say) without that diff reintroduces the bug fixed on 2026-07-22:
  * `tags`/`inlineField` were in this hash while `moveTaskToBucket` writes
  * exactly those, so computeOrderKeys — called once right after the write, with
  * TaskIndex's async reindex not yet caught up, and again on the next render

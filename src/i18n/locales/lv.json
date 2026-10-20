@@ -21,7 +21,18 @@
       "confirmButton": "Izveidot"
     },
     "contextMenu": {
-      "moveTo": "Pārvietot uz: {{name}}",
+      "moveToMenu": "Pārvietot uz",
+      "changeDue": "Mainīt termiņu",
+      "changeScheduled": "Mainīt plānoto datumu",
+      "setDue": "Iestatīt termiņu",
+      "setScheduled": "Iestatīt plānoto datumu",
+      "presetToday": "Šodien",
+      "presetTomorrow": "Rīt",
+      "presetStartOfNextWeek": "Nākamās nedēļas sākums",
+      "presetInOneWeek": "Pēc 1 nedēļas",
+      "presetInTwoWeeks": "Pēc 2 nedēļām",
+      "customDate": "Pielāgots…",
+      "updateUnpins": "Mainot tiek atsprausts no {{name}}",
       "editTask": "Rediģēt uzdevumu",
       "openFile": "Atvērt failu",
       "pinTo": "Piespraust {{name}}",
@@ -145,6 +156,7 @@
     "toggleFailed": "GTD Tasks: Pārslēgšana neizdevās — {{error}}",
     "statusFailed": "GTD Tasks: Statusa maiņa neizdevās — {{error}}",
     "editFailed": "GTD Tasks: Rediģēšana neizdevās — {{error}}",
+    "dateFailed": "GTD Tasks: Datuma maiņa neizdevās — {{error}}",
     "confirmFailed": "GTD Tasks: Apstiprināšana neizdevās — {{error}}",
     "migrationComplete": "GTD Tasks: Migrācija pabeigta. Atjaunināti {{migrated}} uzdevumi, izlaisti {{failed}}."
   },

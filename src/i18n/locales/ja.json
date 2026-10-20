@@ -21,7 +21,18 @@
       "confirmButton": "作成"
     },
     "contextMenu": {
-      "moveTo": "移動先: {{name}}",
+      "moveToMenu": "移動先",
+      "changeDue": "期日を変更",
+      "changeScheduled": "予定日を変更",
+      "setDue": "期日を設定",
+      "setScheduled": "予定日を設定",
+      "presetToday": "今日",
+      "presetTomorrow": "明日",
+      "presetStartOfNextWeek": "来週の始め",
+      "presetInOneWeek": "1週間後",
+      "presetInTwoWeeks": "2週間後",
+      "customDate": "カスタム…",
+      "updateUnpins": "変更すると {{name}} への固定を解除",
       "editTask": "タスクを編集",
       "openFile": "ファイルを開く",
       "pinTo": "{{name}} に固定",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks: 切り替えに失敗しました — {{error}}",
     "statusFailed": "GTD Tasks: ステータスの変更に失敗しました — {{error}}",
     "editFailed": "GTD Tasks: 編集に失敗しました — {{error}}",
+    "dateFailed": "GTD Tasks: 日付の変更に失敗しました — {{error}}",
     "confirmFailed": "GTD Tasks: 確認に失敗しました — {{error}}",
     "migrationComplete": "GTD Tasks: 移行完了。{{migrated}}件更新、{{failed}}件スキップ。"
   },

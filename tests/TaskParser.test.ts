@@ -1,4 +1,4 @@
-import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn, hideFilterText } from "../src/core/TaskParser";
+import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn, hideFilterText, setTaskDate } from "../src/core/TaskParser";
 
 describe("parseFile", () => {
   it("parses simple unchecked tasks", () => {
@@ -861,5 +861,104 @@ describe("parseFile — Tasks dependencies", () => {
     const [t] = parseFile("a.md", "- [ ] Ship");
     expect(t.tasksId).toBeNull();
     expect(t.dependsOn).toEqual([]);
+  });
+});
+
+describe("setTaskDate", () => {
+  const D = "2026-10-25";
+
+  it("rewrites an emoji due date in place", () => {
+    expect(setTaskDate("- [ ] a 📅 2026-10-10", "due", D)).toBe("- [ ] a 📅 2026-10-25");
+  });
+
+  it.each(["📆", "🗓", "📅️"])("keeps the %s spelling of due", (marker) => {
+    expect(setTaskDate(`- [ ] a ${marker} 2026-10-10`, "due", D)).toBe(`- [ ] a ${marker} 2026-10-25`);
+  });
+
+  it("keeps the ⌛ spelling of scheduled", () => {
+    expect(setTaskDate("- [ ] a ⌛ 2026-10-10", "scheduled", D)).toBe("- [ ] a ⌛ 2026-10-25");
+  });
+
+  it("rewrites a Dataview field in its own brackets", () => {
+    expect(setTaskDate("- [ ] a [due:: 2026-10-10]", "due", D)).toBe("- [ ] a [due:: 2026-10-25]");
+    expect(setTaskDate("- [ ] a (due:: 2026-10-10)", "due", D)).toBe("- [ ] a (due:: 2026-10-25)");
+  });
+
+  it("rewrites only the occurrence the parser reads", () => {
+    expect(setTaskDate("- [ ] a 📅 2026-10-10 📅 2026-10-11", "due", D)).toBe("- [ ] a 📅 2026-10-25 📅 2026-10-11");
+    expect(setTaskDate("- [ ] a [due:: 2026-10-11] 📅 2026-10-10", "due", D)).toBe(
+      "- [ ] a [due:: 2026-10-11] 📅 2026-10-25"
+    );
+  });
+
+  it("adds a missing date after the line's Tasks fields", () => {
+    expect(setTaskDate("- [ ] a 📅 2026-10-10", "scheduled", D)).toBe("- [ ] a 📅 2026-10-10 ⏳ 2026-10-25");
+  });
+
+  it("adds a Dataview field to a line whose fields are all Dataview", () => {
+    expect(setTaskDate("- [ ] a [priority:: high]", "due", D)).toBe("- [ ] a [priority:: high] [due:: 2026-10-25]");
+  });
+
+  it("adds a date before a block reference", () => {
+    expect(setTaskDate("- [ ] a ^abc", "due", D)).toBe("- [ ] a 📅 2026-10-25 ^abc");
+  });
+
+  it("keeps a block reference last after a trailing recurrence", () => {
+    expect(setTaskDate("- [ ] a 🔁 every week ^abc", "due", D)).toBe("- [ ] a 🔁 every week 📅 2026-10-25 ^abc");
+  });
+
+  it("leaves the bucket field alone in inline-field mode", () => {
+    expect(setTaskDate("- [ ] a [gtd:: today] 📅 2026-10-10", "due", D, "gtd")).toBe(
+      "- [ ] a [gtd:: today] 📅 2026-10-25"
+    );
+    expect(setTaskDate("- [ ] a [gtd:: today]", "due", D, "gtd")).toBe("- [ ] a [gtd:: today] 📅 2026-10-25");
+  });
+
+  it("reads back as the new date", () => {
+    const [t] = parseFile("a.md", setTaskDate("- [ ] a [priority:: high] ⌛ 2026-10-10", "scheduled", D));
+    expect(t.scheduledDate).toEqual(new Date(2026, 9, 25));
+  });
+});
+
+describe("Tasks markers inside links and code spans", () => {
+  it("ignores a date inside a wikilink", () => {
+    const [t] = parseFile("a.md", "- [ ] see [[Note 📅 2026-10-10]] 📅 2026-10-20");
+    expect(t.dueDate).toEqual(new Date(2026, 9, 20));
+    expect(t.text).toBe("see [[Note 📅 2026-10-10]]");
+  });
+
+  it("ignores a date inside a markdown link", () => {
+    const [t] = parseFile("a.md", "- [ ] see [Note 📅 2026-10-10](https://example.com) ⏳ 2026-10-20");
+    expect(t.dueDate).toBeNull();
+    expect(t.scheduledDate).toEqual(new Date(2026, 9, 20));
+  });
+
+  it("ignores a date inside a code span", () => {
+    const [t] = parseFile("a.md", "- [ ] write `📅 2026-10-10` in the docs");
+    expect(t.dueDate).toBeNull();
+    expect(t.text).toBe("write `📅 2026-10-10` in the docs");
+  });
+
+  it("ignores a Dataview field inside a code span", () => {
+    const [t] = parseFile("a.md", "- [ ] write `[due:: 2026-10-10]` in the docs");
+    expect(t.dueDate).toBeNull();
+  });
+
+  it("changes the real date, not the one in a link", () => {
+    expect(setTaskDate("- [ ] see [[Note 📅 2026-10-10]] 📅 2026-10-20", "due", "2026-10-25")).toBe(
+      "- [ ] see [[Note 📅 2026-10-10]] 📅 2026-10-25"
+    );
+  });
+
+  it("adds a date rather than touch one in a code span", () => {
+    expect(setTaskDate("- [ ] write `📅 2026-10-10` in the docs", "due", "2026-10-25")).toBe(
+      "- [ ] write `📅 2026-10-10` in the docs 📅 2026-10-25"
+    );
+  });
+
+  it("puts the bucket field before the real fields, not before a link", () => {
+    expect(setInlineFieldValue("- [ ] see [[Note 📅 2026-10-10]] 📅 2026-10-20", "gtd", "today")).toBe(
+      "- [ ] see [[Note 📅 2026-10-10]] [gtd:: today] 📅 2026-10-20"
+    );
   });
 });

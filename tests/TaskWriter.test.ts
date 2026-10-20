@@ -1,6 +1,7 @@
-import { editedLines, findTaskLine, moveTaskToBucket, replaceTaskLine, setStatusLine, toggleTaskCompletion, toggleTaskLine } from "../src/core/TaskWriter";
+import { editedLines, findTaskLine, moveTaskToBucket, replaceTaskLine, setStatusLine, toggleTaskCompletion, toggleTaskLine, setDateLine } from "../src/core/TaskWriter";
 import { DEFAULT_SETTINGS } from "../src/settings";
 import { TFile } from "obsidian";
+import * as obsidian from "obsidian";
 import type { TaskRecord } from "../src/core/TaskParser";
 import type { BucketConfig } from "../src/settings";
 
@@ -143,6 +144,17 @@ describe("moveTaskToBucket", () => {
     const result = await moveTaskToBucket(app, task, todayBucket, settings);
     expect(result.success).toBe(false);
     expect(result.error).toContain("stale index");
+  });
+
+  it("leaves the notice to its caller, which reports the error itself", async () => {
+    const notice = jest.spyOn(obsidian, "Notice").mockImplementation(() => ({}) as obsidian.Notice);
+    const { app } = makeMockApp("- [ ] Different task");
+
+    const result = await moveTaskToBucket(app, makeTask({ rawLine: "- [ ] Test task" }), todayBucket, settings);
+
+    expect(result.success).toBe(false);
+    expect(notice).not.toHaveBeenCalled();
+    notice.mockRestore();
   });
 
   it("replaces existing tag when moving between buckets", async () => {
@@ -423,6 +435,17 @@ describe("replaceTaskLine", () => {
     expect(result.success).toBe(false);
     expect(getContent()).toBe("- [ ] Something else");
   });
+
+  it("leaves the notice to its caller, which reports the error itself", async () => {
+    const notice = jest.spyOn(obsidian, "Notice").mockImplementation(() => ({}) as obsidian.Notice);
+    const { app } = makeMockApp("- [ ] Something else");
+
+    const result = await replaceTaskLine(app, makeTask({ lineNumber: 5 }), () => ["- [ ] Edited"]);
+
+    expect(result.error).toBe("Task line not found in file (stale index)");
+    expect(notice).not.toHaveBeenCalled();
+    notice.mockRestore();
+  });
 });
 
 describe("editedLines", () => {
@@ -449,3 +472,25 @@ describe("editedLines", () => {
   });
 });
 
+
+describe("setDateLine", () => {
+  const D = "2026-10-25";
+  const tagMode = { ...DEFAULT_SETTINGS, storageMode: "inline-tag" as const, tagPrefix: "gtd" };
+  const fieldMode = { ...DEFAULT_SETTINGS, storageMode: "inline-field" as const, tagPrefix: "gtd" };
+
+  it("unpins a tag in the same line change", () => {
+    expect(setDateLine("- [ ] a #gtd/today 📅 2026-10-10", "due", D, true, tagMode)).toBe("- [ ] a 📅 2026-10-25");
+  });
+
+  it("unpins a field in the same line change", () => {
+    expect(setDateLine("- [ ] a [gtd:: today] 📅 2026-10-10", "due", D, true, fieldMode)).toBe(
+      "- [ ] a 📅 2026-10-25"
+    );
+  });
+
+  it("keeps the pin when not unpinning", () => {
+    expect(setDateLine("- [ ] a #gtd/today 📅 2026-10-10", "due", D, false, tagMode)).toBe(
+      "- [ ] a #gtd/today 📅 2026-10-25"
+    );
+  });
+});

@@ -21,7 +21,18 @@
       "confirmButton": "Sukurti"
     },
     "contextMenu": {
-      "moveTo": "Perkelti į: {{name}}",
+      "moveToMenu": "Perkelti į",
+      "changeDue": "Keisti terminą",
+      "changeScheduled": "Keisti suplanuotą datą",
+      "setDue": "Nustatyti terminą",
+      "setScheduled": "Nustatyti suplanuotą datą",
+      "presetToday": "Šiandien",
+      "presetTomorrow": "Rytoj",
+      "presetStartOfNextWeek": "Kitos savaitės pradžia",
+      "presetInOneWeek": "Po 1 savaitės",
+      "presetInTwoWeeks": "Po 2 savaičių",
+      "customDate": "Pasirinkti…",
+      "updateUnpins": "Pakeitus atsegama nuo {{name}}",
       "editTask": "Redaguoti užduotį",
       "openFile": "Atidaryti failą",
       "pinTo": "Prisegti prie {{name}}",
@@ -148,6 +159,7 @@
     "toggleFailed": "GTD Tasks: Perjungimas nepavyko — {{error}}",
     "statusFailed": "GTD Tasks: Būsenos keitimas nepavyko — {{error}}",
     "editFailed": "GTD Tasks: Redagavimas nepavyko — {{error}}",
+    "dateFailed": "GTD Tasks: Datos pakeisti nepavyko — {{error}}",
     "confirmFailed": "GTD Tasks: Patvirtinimas nepavyko — {{error}}",
     "migrationComplete": "GTD Tasks: Migracija baigta. Atnaujinta {{migrated}} užduočių, praleista {{failed}}."
   },

@@ -3,6 +3,7 @@ import {
   foldTasksFields,
 } from "../integrations/TasksPluginParser";
 import type { TokenSpan, TaskPriority } from "../integrations/TasksPluginParser";
+import type { DateField } from "./DateMenu";
 export type { TaskPriority };
 
 export interface TaskRecord {
@@ -162,7 +163,7 @@ export function parseFile(filePath: string, content: string, filter?: TaskFilter
     // run to end of line and absorb this plugin's own bucket tag, making a
     // read-only field transitively writable. See scanTasksMetadata's comment.
     const obsidianSpans = scanObsidianMetadata(rawRest);
-    const tasksSpans = scanTasksMetadata(rawRest, obsidianSpans, filter?.bucketField);
+    const tasksSpans = scanTasksMetadata(rawRest, obsidianSpans, filter?.bucketField, scanOpaqueText(rawRest));
     const fields = foldTasksFields(tasksSpans);
     const tags = extractTags(rawRest);
     const inlineField = extractInlineField(rawRest);
@@ -295,6 +296,16 @@ function scanObsidianMetadata(text: string): Span[] {
     spans.push({ start: blockRef.index!, end: blockRef.index! + blockRef[0].length });
   }
   return spans;
+}
+
+const CODE_SPAN_REGEX = /`[^`]+`/g;
+
+/** Links and code spans: the user's own text, where a Tasks marker is not one. */
+function scanOpaqueText(text: string): Span[] {
+  return [...text.matchAll(LINK_REGEX), ...text.matchAll(CODE_SPAN_REGEX)].map((m) => ({
+    start: m.index,
+    end: m.index + m[0].length,
+  }));
 }
 
 /** Sorts, merges overlaps, and removes back-to-front so earlier indices stay valid. */
@@ -510,10 +521,42 @@ export function setInlineFieldValue(
  * every one of them from Tasks.
  */
 function insertBeforeTasksFields(line: string, token: string, bucketKey: string): string {
-  const spans = scanTasksMetadata(line, [], bucketKey);
+  const spans = scanTasksMetadata(line, [], bucketKey, scanOpaqueText(line));
   if (spans.length === 0) return insertBeforeBlockRef(line, token);
   const at = Math.min(...spans.map((span) => span.start));
   return `${line.slice(0, at).trimEnd()} ${token} ${line.slice(at)}`;
+}
+
+const DATE_TOKEN: Record<DateField, { emoji: string; key: string }> = {
+  due: { emoji: "📅", key: "due" },
+  scheduled: { emoji: "⏳", key: "scheduled" },
+};
+
+/**
+ * Sets a task's due or scheduled date to `date` (YYYY-MM-DD). The occurrence
+ * the parser reads is rewritten in place, keeping its spelling; a missing
+ * date is added after the line's last Tasks field, in Dataview form only if
+ * every field there already is. `bucketKey` is the inline bucket field's
+ * key, which is not a Tasks field.
+ */
+export function setTaskDate(line: string, field: DateField, date: string, bucketKey?: string): string {
+  const blockRef = line.match(BLOCK_REF_REGEX);
+  const body = blockRef ? line.slice(0, blockRef.index) : line;
+  const tail = blockRef ? blockRef[0] : "";
+
+  const spans = scanTasksMetadata(body, scanObsidianMetadata(body), bucketKey, scanOpaqueText(body));
+  const own = spans.filter((span) => span.field === field);
+  const target = own.find((span) => span.format === "emoji") ?? own[0];
+  if (target) {
+    const token = body.slice(target.start, target.end).replace(/\d{4}-\d{2}-\d{2}/, date);
+    return body.slice(0, target.start) + token + body.slice(target.end) + tail;
+  }
+
+  const { emoji, key } = DATE_TOKEN[field];
+  if (spans.length === 0) return insertBeforeBlockRef(line, `${emoji} ${date}`);
+  const token = spans.every((span) => span.format === "dataview") ? `[${key}:: ${date}]` : `${emoji} ${date}`;
+  const at = Math.max(...spans.map((span) => span.end));
+  return `${body.slice(0, at).trimEnd()} ${token}${body.slice(at)}${tail}`;
 }
 
 export function getTagValue(rawLine: string, prefix: string): string | null {

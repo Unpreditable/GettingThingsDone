@@ -21,7 +21,18 @@
       "confirmButton": "Loo"
     },
     "contextMenu": {
-      "moveTo": "Teisalda: {{name}}",
+      "moveToMenu": "Teisalda",
+      "changeDue": "Muuda tähtaega",
+      "changeScheduled": "Muuda planeeritud kuupäeva",
+      "setDue": "Määra tähtaeg",
+      "setScheduled": "Määra planeeritud kuupäev",
+      "presetToday": "Täna",
+      "presetTomorrow": "Homme",
+      "presetStartOfNextWeek": "Järgmise nädala algus",
+      "presetInOneWeek": "1 nädala pärast",
+      "presetInTwoWeeks": "2 nädala pärast",
+      "customDate": "Kohandatud…",
+      "updateUnpins": "Muutmine vabastab kategooriast {{name}}",
       "editTask": "Muuda ülesannet",
       "openFile": "Ava fail",
       "pinTo": "Kinnita kategooriasse {{name}}",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks: Lülitamine ebaõnnestus — {{error}}",
     "statusFailed": "GTD Tasks: Oleku muutmine ebaõnnestus — {{error}}",
     "editFailed": "GTD Tasks: Muutmine ebaõnnestus — {{error}}",
+    "dateFailed": "GTD Tasks: Kuupäeva muutmine ebaõnnestus — {{error}}",
     "confirmFailed": "GTD Tasks: Kinnitamine ebaõnnestus — {{error}}",
     "migrationComplete": "GTD Tasks: Migratsioon lõpetatud. {{migrated}} ülesannet uuendatud, {{failed}} vahele jäetud."
   },

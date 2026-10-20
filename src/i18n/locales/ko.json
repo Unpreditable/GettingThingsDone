@@ -21,7 +21,18 @@
       "confirmButton": "만들기"
     },
     "contextMenu": {
-      "moveTo": "이동: {{name}}",
+      "moveToMenu": "이동",
+      "changeDue": "마감일 변경",
+      "changeScheduled": "예정일 변경",
+      "setDue": "마감일 설정",
+      "setScheduled": "예정일 설정",
+      "presetToday": "오늘",
+      "presetTomorrow": "내일",
+      "presetStartOfNextWeek": "다음 주 시작",
+      "presetInOneWeek": "1주 후",
+      "presetInTwoWeeks": "2주 후",
+      "customDate": "사용자 지정…",
+      "updateUnpins": "변경하면 {{name}} 고정이 해제됨",
       "editTask": "작업 편집",
       "openFile": "파일 열기",
       "pinTo": "{{name}}에 고정",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks: 전환 실패 — {{error}}",
     "statusFailed": "GTD Tasks: 상태 변경 실패 — {{error}}",
     "editFailed": "GTD Tasks: 편집 실패 — {{error}}",
+    "dateFailed": "GTD Tasks: 날짜 변경 실패 — {{error}}",
     "confirmFailed": "GTD Tasks: 확인 실패 — {{error}}",
     "migrationComplete": "GTD Tasks: 마이그레이션 완료. {{migrated}}개 업데이트, {{failed}}개 건너뜀."
   },

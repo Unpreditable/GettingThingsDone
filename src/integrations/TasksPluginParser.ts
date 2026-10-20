@@ -192,14 +192,16 @@ interface Marker {
 
 /**
  * Every emoji marker and Dataview field in `text`, in order. An emoji inside a
- * Dataview field's brackets is part of that field's value, not a marker.
+ * Dataview field's brackets is part of that field's value, not a marker, and
+ * nothing that starts inside an `opaque` range is a marker at all.
  */
-function findMarkers(text: string, ignoreKey: string | undefined): Marker[] {
+function findMarkers(text: string, ignoreKey: string | undefined, opaque: Hole[]): Marker[] {
   const ignored = ignoreKey?.toLowerCase();
+  const inOpaque = (index: number) => opaque.some((o) => index >= o.start && index < o.end);
   const fields: Marker[] = [];
   for (const m of text.matchAll(DATAVIEW_FIELD_REGEX)) {
     const key = m[1] ?? m[3];
-    if (key.toLowerCase() === ignored) continue;
+    if (key.toLowerCase() === ignored || inOpaque(m.index)) continue;
     fields.push({
       def: DATAVIEW_TOKENS[key],
       format: "dataview",
@@ -210,7 +212,7 @@ function findMarkers(text: string, ignoreKey: string | undefined): Marker[] {
   }
   const emoji: Marker[] = [];
   for (const m of text.matchAll(MARKER_REGEX)) {
-    if (fields.some((f) => m.index >= f.start && m.index < f.end)) continue;
+    if (fields.some((f) => m.index >= f.start && m.index < f.end) || inOpaque(m.index)) continue;
     emoji.push({ def: TOKENS[m[1]], format: "emoji", start: m.index, end: m.index + m[0].length });
   }
   return [...fields, ...emoji].sort((a, b) => a.start - b.start);
@@ -252,9 +254,18 @@ function findMarkers(text: string, ignoreKey: string | undefined): Marker[] {
  * bucket reader compares it. Settings refuse a Tasks key as the bucket field,
  * but one saved before that rule would otherwise be read as a Tasks field too,
  * and turn the same transitively-writable problem into a direct one.
+ *
+ * `opaque` ranges are other syntax whose text is the user's own words: a link
+ * or a code span. A marker inside one is part of that text, so it is neither
+ * read nor stripped. Like `holes`, the caller that owns that syntax passes it.
  */
-export function scanTasksMetadata(text: string, holes: Hole[] = [], ignoreKey?: string): TokenSpan[] {
-  const markers = findMarkers(text, ignoreKey);
+export function scanTasksMetadata(
+  text: string,
+  holes: Hole[] = [],
+  ignoreKey?: string,
+  opaque: Hole[] = []
+): TokenSpan[] {
+  const markers = findMarkers(text, ignoreKey, opaque);
   const spans: TokenSpan[] = [];
 
   for (let i = 0; i < markers.length; i++) {

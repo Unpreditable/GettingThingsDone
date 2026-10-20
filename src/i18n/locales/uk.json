@@ -21,7 +21,18 @@
       "confirmButton": "Створити"
     },
     "contextMenu": {
-      "moveTo": "Перемістити до: {{name}}",
+      "moveToMenu": "Перемістити в",
+      "changeDue": "Змінити термін",
+      "changeScheduled": "Змінити заплановану дату",
+      "setDue": "Задати термін",
+      "setScheduled": "Задати заплановану дату",
+      "presetToday": "Сьогодні",
+      "presetTomorrow": "Завтра",
+      "presetStartOfNextWeek": "Початок наступного тижня",
+      "presetInOneWeek": "Через 1 тиждень",
+      "presetInTwoWeeks": "Через 2 тижні",
+      "customDate": "Вибрати…",
+      "updateUnpins": "Зміна відкріпить від {{name}}",
       "editTask": "Редагувати завдання",
       "openFile": "Відкрити файл",
       "pinTo": "Закріпити в {{name}}",
@@ -148,6 +159,7 @@
     "toggleFailed": "GTD Tasks: Помилка перемикання — {{error}}",
     "statusFailed": "GTD Tasks: Помилка зміни статусу — {{error}}",
     "editFailed": "GTD Tasks: Помилка редагування — {{error}}",
+    "dateFailed": "GTD Tasks: Помилка зміни дати — {{error}}",
     "confirmFailed": "GTD Tasks: Помилка підтвердження — {{error}}",
     "migrationComplete": "GTD Tasks: Міграцію завершено. Оновлено {{migrated}} завдань, пропущено {{failed}}."
   },

@@ -18,8 +18,10 @@ import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
-import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setStatusLine, setTaskStatus, toggleTaskCompletion } from "./core/TaskWriter";
-import type { SettableStatus } from "./core/TaskWriter";
+import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setDateLine, setStatusLine, setTaskStatus, toggleTaskCompletion } from "./core/TaskWriter";
+import type { ReplaceResult, SettableStatus } from "./core/TaskWriter";
+import type { DateField } from "./core/DateMenu";
+import { getDatePicker } from "./integrations/Kalendae";
 import { parseFile } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
@@ -587,6 +589,8 @@ class GtdPanelView extends ItemView {
         canEditTask: () => getTaskEditor(this.app) !== null,
         onEdit: this.handleEdit.bind(this),
         onSetStatus: this.handleSetStatus.bind(this),
+        onSetDate: this.handleSetDate.bind(this),
+        getDatePicker: () => getDatePicker(this.app),
         onReorder: this.handleReorder.bind(this),
         onDismiss: (tasks: TaskRecord[]) => this.plugin.dismissCompleted(tasks),
         onOpenSettings: openSettings,
@@ -703,10 +707,6 @@ class GtdPanelView extends ItemView {
    * Tasks' modal may never settle its promise (see editTaskLineModal), so
    * nothing may wait on it: the write-back lives in .then(), and Cancel is a
    * no-op whether it settles with an empty string or not at all.
-   *
-   * The order-key diff is built here, where it's known which line became
-   * which, and applied before the reindex runs its own heuristic diff. That
-   * one then finds the old key already gone and changes nothing.
    */
   private handleEdit(task: TaskRecord) {
     const edit = getTaskEditor(this.app);
@@ -717,25 +717,41 @@ class GtdPanelView extends ItemView {
         const lines = editedLines(edited, task.rawLine);
         if (!lines) return;
         const result = await replaceTaskLine(this.app, task, () => lines);
-
-        if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
-          new Notice(t("notices.editFailed", { error: result.error }));
-          await this.plugin.taskIndex.reindexFile(task.filePath);
-          return;
-        }
-
-        const diff = diffForEdit(
-          parseFile(task.filePath, result.before, getTaskFilter(this.plugin.settings)),
-          parseFile(task.filePath, result.after, getTaskFilter(this.plugin.settings)),
-          result.lineIdx,
-          lines.length,
-          activeOrderKeyScheme(this.plugin.settings)
-        );
-        this.plugin.recordTaskDiff(task.filePath, diff);
-        await this.plugin.taskIndex.reindexFile(task.filePath);
+        await this.settleLineWrite(task, result, lines.length, "notices.editFailed");
       },
       (e: unknown) => new Notice(t("notices.editFailed", { error: String(e) }))
     );
+  }
+
+  /** Writes a date picked from the row's menu, unpinning in the same write when asked. */
+  private async handleSetDate(task: TaskRecord, field: DateField, date: string, unpin: boolean) {
+    const result = await replaceTaskLine(this.app, task, (line) => [
+      setDateLine(line, field, date, unpin, this.plugin.settings),
+    ]);
+    await this.settleLineWrite(task, result, 1, "notices.dateFailed");
+  }
+
+  /**
+   * The order-key diff is built here, where it's known which line became
+   * which, and applied before the reindex runs its own heuristic diff. That
+   * one then finds the old key already gone and changes nothing.
+   */
+  private async settleLineWrite(task: TaskRecord, result: ReplaceResult, lineCount: number, failNotice: string) {
+    if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
+      new Notice(t(failNotice, { error: result.error }));
+      await this.plugin.taskIndex.reindexFile(task.filePath);
+      return;
+    }
+
+    const diff = diffForEdit(
+      parseFile(task.filePath, result.before, getTaskFilter(this.plugin.settings)),
+      parseFile(task.filePath, result.after, getTaskFilter(this.plugin.settings)),
+      result.lineIdx,
+      lineCount,
+      activeOrderKeyScheme(this.plugin.settings)
+    );
+    this.plugin.recordTaskDiff(task.filePath, diff);
+    await this.plugin.taskIndex.reindexFile(task.filePath);
   }
 
   scrollToBucket(bucketId: string) {

@@ -21,7 +21,18 @@
       "confirmButton": "Criar"
     },
     "contextMenu": {
-      "moveTo": "Mover para: {{name}}",
+      "moveToMenu": "Mover para",
+      "changeDue": "Alterar data de vencimento",
+      "changeScheduled": "Alterar data agendada",
+      "setDue": "Definir data de vencimento",
+      "setScheduled": "Definir data agendada",
+      "presetToday": "Hoje",
+      "presetTomorrow": "Amanhã",
+      "presetStartOfNextWeek": "Início da próxima semana",
+      "presetInOneWeek": "Em 1 semana",
+      "presetInTwoWeeks": "Em 2 semanas",
+      "customDate": "Personalizada…",
+      "updateUnpins": "Alterar desafixa de {{name}}",
       "editTask": "Editar tarefa",
       "openFile": "Abrir ficheiro",
       "pinTo": "Fixar em {{name}}",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks: Falha ao alternar — {{error}}",
     "statusFailed": "GTD Tasks: Falha ao alterar o status — {{error}}",
     "editFailed": "GTD Tasks: Falha ao editar — {{error}}",
+    "dateFailed": "GTD Tasks: Falha ao alterar a data — {{error}}",
     "confirmFailed": "GTD Tasks: Falha ao confirmar — {{error}}",
     "migrationComplete": "GTD Tasks: Migração concluída. {{migrated}} tarefas atualizadas, {{failed}} ignoradas."
   },

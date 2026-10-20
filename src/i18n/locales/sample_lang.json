@@ -21,7 +21,18 @@
       "confirmButton": ""
     },
     "contextMenu": {
-      "moveTo": "",
+      "moveToMenu": "",
+      "changeDue": "",
+      "changeScheduled": "",
+      "setDue": "",
+      "setScheduled": "",
+      "presetToday": "",
+      "presetTomorrow": "",
+      "presetStartOfNextWeek": "",
+      "presetInOneWeek": "",
+      "presetInTwoWeeks": "",
+      "customDate": "",
+      "updateUnpins": "",
       "editTask": "",
       "openFile": "",
       "pinTo": "",
@@ -142,6 +153,7 @@
     "toggleFailed": "",
     "statusFailed": "",
     "editFailed": "",
+    "dateFailed": "",
     "confirmFailed": "",
     "migrationComplete": ""
   },

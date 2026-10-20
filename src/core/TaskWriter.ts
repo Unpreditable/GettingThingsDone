@@ -1,7 +1,8 @@
-import { App, TFile, Notice } from "obsidian";
+import { App, TFile } from "obsidian";
 import { TaskRecord } from "./TaskParser";
 import { BucketConfig, PluginSettings } from "../settings";
-import { setTagValue, setInlineFieldValue, splitLines, lineEnding, CHECKBOX_REGEX } from "./TaskParser";
+import { setTagValue, setInlineFieldValue, splitLines, lineEnding, CHECKBOX_REGEX, setTaskDate } from "./TaskParser";
+import type { DateField } from "./DateMenu";
 
 export interface MoveResult {
   success: boolean;
@@ -165,12 +166,8 @@ export async function moveTaskToBucket(
       const lines = splitLines(content);
       const lineIdx = findTaskLine(lines, task);
 
-      if (lineIdx === -1) {
-        new Notice(
-          `GTD Tasks: Could not locate task in ${file.basename}. Re-indexing…`
-        );
-        return content;
-      }
+      // The caller shows the notice and reindexes.
+      if (lineIdx === -1) return content;
 
       lines[lineIdx] = applyBucketChange(lines[lineIdx], targetBucket, settings);
       result = { success: true };
@@ -203,7 +200,7 @@ export interface ReplaceResult extends MoveResult {
 /**
  * Replaces the task's line with whatever `replace` returns: none, one or
  * several lines. Locates the line the same way as every other write, and
- * leaves the file untouched if it can't.
+ * leaves the file untouched if it can't; the caller shows the notice.
  */
 export async function replaceTaskLine(
   app: App,
@@ -222,10 +219,7 @@ export async function replaceTaskLine(
       const lines = splitLines(content);
       const lineIdx = findTaskLine(lines, task);
 
-      if (lineIdx === -1) {
-        new Notice(`GTD Tasks: Could not locate task in ${file.basename}.`);
-        return content;
-      }
+      if (lineIdx === -1) return content;
 
       lines.splice(lineIdx, 1, ...replace(lines[lineIdx]));
       const after = lines.join(lineEnding(content));
@@ -236,6 +230,19 @@ export async function replaceTaskLine(
   } catch (e) {
     return { success: false, error: String(e) };
   }
+}
+
+/** The line with its due or scheduled date set, and its pin removed when `unpin`. */
+export function setDateLine(
+  line: string,
+  field: DateField,
+  date: string,
+  unpin: boolean,
+  settings: PluginSettings
+): string {
+  const bucketKey = settings.storageMode === "inline-field" ? settings.tagPrefix : undefined;
+  const dated = setTaskDate(line, field, date, bucketKey);
+  return unpin ? applyBucketChange(dated, null, settings) : dated;
 }
 
 function applyBucketChange(

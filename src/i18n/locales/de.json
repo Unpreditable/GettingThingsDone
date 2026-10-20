@@ -21,7 +21,18 @@
       "confirmButton": "Erstellen"
     },
     "contextMenu": {
-      "moveTo": "Verschieben nach: {{name}}",
+      "moveToMenu": "Verschieben nach",
+      "changeDue": "Fälligkeitsdatum ändern",
+      "changeScheduled": "Geplantes Datum ändern",
+      "setDue": "Fälligkeitsdatum festlegen",
+      "setScheduled": "Geplantes Datum festlegen",
+      "presetToday": "Heute",
+      "presetTomorrow": "Morgen",
+      "presetStartOfNextWeek": "Anfang nächster Woche",
+      "presetInOneWeek": "In 1 Woche",
+      "presetInTwoWeeks": "In 2 Wochen",
+      "customDate": "Benutzerdefiniert…",
+      "updateUnpins": "Ändern löst die Anheftung an {{name}}",
       "editTask": "Aufgabe bearbeiten",
       "openFile": "Datei öffnen",
       "pinTo": "An {{name}} anheften",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks: Umschalten fehlgeschlagen — {{error}}",
     "statusFailed": "GTD Tasks: Statusänderung fehlgeschlagen — {{error}}",
     "editFailed": "GTD Tasks: Bearbeiten fehlgeschlagen — {{error}}",
+    "dateFailed": "GTD Tasks: Datumsänderung fehlgeschlagen — {{error}}",
     "confirmFailed": "GTD Tasks: Bestätigung fehlgeschlagen — {{error}}",
     "migrationComplete": "GTD Tasks: Migration abgeschlossen. {{migrated}} Aufgaben aktualisiert, {{failed}} übersprungen."
   },

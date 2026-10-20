@@ -1024,3 +1024,26 @@ div.gtd-hidden {
   white-space: nowrap;
   vertical-align: bottom;
 }
+
+/* A date-submenu item: the step on the left, the day it lands on at the right,
+   dimmed. The min-width lines the days up when one is shorter ("2 Nov"). */
+.menu-item-title span.gtd-date-row {
+  align-items: baseline;
+  display: flex;
+  gap: var(--size-4-4);
+}
+
+.menu-item-title span.gtd-date-step {
+  flex: 1 1 auto;
+}
+
+.menu-item-title span.gtd-date-separator {
+  display: none;
+}
+
+.menu-item-title span.gtd-date-day {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  min-width: 7ch;
+  text-align: end;
+}

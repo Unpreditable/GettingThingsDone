@@ -21,7 +21,18 @@
       "confirmButton": "创建"
     },
     "contextMenu": {
-      "moveTo": "移动到：{{name}}",
+      "moveToMenu": "移动到",
+      "changeDue": "更改截止日期",
+      "changeScheduled": "更改计划日期",
+      "setDue": "设置截止日期",
+      "setScheduled": "设置计划日期",
+      "presetToday": "今天",
+      "presetTomorrow": "明天",
+      "presetStartOfNextWeek": "下周初",
+      "presetInOneWeek": "1 周后",
+      "presetInTwoWeeks": "2 周后",
+      "customDate": "自定义…",
+      "updateUnpins": "更改将取消固定到 {{name}}",
       "editTask": "编辑任务",
       "openFile": "打开文件",
       "pinTo": "固定到 {{name}}",
@@ -142,6 +153,7 @@
     "toggleFailed": "GTD Tasks：切换失败——{{error}}",
     "statusFailed": "GTD Tasks：状态更改失败——{{error}}",
     "editFailed": "GTD Tasks：编辑失败——{{error}}",
+    "dateFailed": "GTD Tasks: 日期更改失败 — {{error}}",
     "confirmFailed": "GTD Tasks：确认失败——{{error}}",
     "migrationComplete": "GTD Tasks：迁移完成。已更新 {{migrated}} 个任务，跳过 {{failed}} 个。"
   },
