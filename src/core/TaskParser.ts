@@ -52,7 +52,7 @@ export interface TaskRecord {
  * closed are done (x, X) and cancelled (-). Any other symbol is not a task.
  */
 const TASK_REGEX = /^(\s*[-*+]|\s*\d+[.)]) \[([ xX/><-])\] (.*)$/;
-const CLOSED_SYMBOLS = "xX-";
+export const CLOSED_SYMBOLS = "xX-";
 /** The checkbox of a task line, with the list marker before it. */
 export const CHECKBOX_REGEX = /^(\s*(?:[-*+]|\d+[.)]) )\[(.)\]/;
 

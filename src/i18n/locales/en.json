@@ -161,6 +161,8 @@
   "commands": {
     "openPanel_comment": "Label shown in Obsidian's command palette for the command that opens the GTD sidebar panel.",
     "openPanel": "Open panel",
+    "toggleDone_comment": "Command palette label. Marks the task on the cursor's line as done ([x]), or reopens a done or cancelled one ([ ]), the way ticking it in the panel does: through the Tasks plugin when it is installed. Worded like Obsidian's own 'Toggle checkbox status'.",
+    "toggleDone": "Toggle task done",
     "toggleInProgress_comment": "Command palette label. Marks the task on the cursor's line as in progress (checkbox [/]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",
     "toggleInProgress": "Toggle task in progress",
     "toggleCancelled_comment": "Command palette label. Marks the task on the cursor's line as cancelled (checkbox [-]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",

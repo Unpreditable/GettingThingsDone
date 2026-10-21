@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "Panel öffnen",
+    "toggleDone": "Aufgabe erledigt umschalten",
     "toggleInProgress": "Aufgabe in Bearbeitung umschalten",
     "toggleCancelled": "Aufgabe abgebrochen umschalten",
     "reviewCompleted": "Sehen, was du geschafft hast"

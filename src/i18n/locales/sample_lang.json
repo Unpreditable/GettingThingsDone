@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "",
+    "toggleDone": "",
     "toggleInProgress": "",
     "toggleCancelled": "",
     "reviewCompleted": ""

@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "Abrir painel",
+    "toggleDone": "Alternar tarefa concluída",
     "toggleInProgress": "Alternar tarefa em andamento",
     "toggleCancelled": "Alternar tarefa cancelada",
     "reviewCompleted": "Ver o que conseguiu fazer"

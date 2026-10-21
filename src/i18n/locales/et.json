@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "Ava paneel",
+    "toggleDone": "Lülita ülesanne tehtuks",
     "toggleInProgress": "Lülita ülesanne pooleliolevaks",
     "toggleCancelled": "Lülita ülesanne tühistatuks",
     "reviewCompleted": "Vaata, mis sai tehtud"

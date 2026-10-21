@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "パネルを開く",
+    "toggleDone": "タスクの完了を切り替え",
     "toggleInProgress": "タスクの進行中を切り替え",
     "toggleCancelled": "タスクのキャンセルを切り替え",
     "reviewCompleted": "やり遂げたことを見る"

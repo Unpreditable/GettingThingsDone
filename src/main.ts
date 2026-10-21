@@ -18,11 +18,11 @@ import { GtdSettingsTab } from "./settings-tab";
 import { TaskIndex } from "./core/TaskIndex";
 import { groupTasksIntoBuckets, TO_REVIEW_ID } from "./core/BucketManager";
 import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
-import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setDateLine, setStatusLine, setTaskStatus, toggleTaskCompletion } from "./core/TaskWriter";
-import type { ReplaceResult, SettableStatus } from "./core/TaskWriter";
+import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setDateLine, setStatusLine, setTaskStatus, toggleTaskCompletion, toggleTaskLine } from "./core/TaskWriter";
+import type { ReplaceResult, SettableStatus, TasksPluginApiV1 } from "./core/TaskWriter";
 import type { DateField } from "./core/DateMenu";
 import { getDatePicker } from "./integrations/Kalendae";
-import { parseFile } from "./core/TaskParser";
+import { CLOSED_SYMBOLS, parseFile, statusSymbol } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
 import {
@@ -102,12 +102,17 @@ export default class GtdTasksPlugin extends Plugin {
     });
 
     // Fill the gap Obsidian's own "Toggle checkbox status" leaves: it only
-    // knows [ ] and [x]. Each one sets its status, or clears it on a repeat.
-    const statusCommands: [string, string, SettableStatus][] = [
-      ["toggle-in-progress", t("commands.toggleInProgress"), "/"],
-      ["toggle-cancelled", t("commands.toggleCancelled"), "-"],
+    // knows [ ] and [x], and never calls Tasks. Each one sets its status, or
+    // clears it on a repeat; the done toggle is Tasks' own, as in the panel.
+    type LineChange = (line: string, path: string, api: TasksPluginApiV1 | null) => string[];
+    const toStatus = (symbol: SettableStatus): LineChange => (line, path, api) => setStatusLine(line, path, symbol, api);
+    const statusCommands: [string, string, LineChange][] = [
+      ["toggle-done", t("commands.toggleDone"), (line, path, api) =>
+        toggleTaskLine(line, path, CLOSED_SYMBOLS.includes(statusSymbol(line)), api)],
+      ["toggle-in-progress", t("commands.toggleInProgress"), toStatus("/")],
+      ["toggle-cancelled", t("commands.toggleCancelled"), toStatus("-")],
     ];
-    for (const [id, name, symbol] of statusCommands) {
+    for (const [id, name, change] of statusCommands) {
       this.addCommand({
         id,
         name,
@@ -117,7 +122,7 @@ export default class GtdTasksPlugin extends Plugin {
           const api = getTasksApi(this.app);
           const path = ctx.file?.path ?? "";
           const after = new Map(
-            lines.map((line) => [line, setStatusLine(editor.getLine(line), path, symbol, api).join("\n")])
+            lines.map((line) => [line, change(editor.getLine(line), path, api).join("\n")])
           );
           // Tasks may also drop a date from the end of the line, so the caret
           // is put back where it was rather than left to the replaced text.

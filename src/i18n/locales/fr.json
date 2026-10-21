@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "Ouvrir le panneau",
+    "toggleDone": "Basculer la tâche terminée",
     "toggleInProgress": "Basculer la tâche en cours",
     "toggleCancelled": "Basculer la tâche annulée",
     "reviewCompleted": "Voir ce que vous avez accompli"

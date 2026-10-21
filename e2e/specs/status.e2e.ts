@@ -1,5 +1,5 @@
-// The two status commands, run in the editor: "Toggle task in progress" and "Toggle task
-// cancelled". A task leaving [x] or [-] goes through Tasks, which owns the ✅ and ❌ dates.
+// The three status commands, run in the editor: "Toggle task done", "Toggle task in progress"
+// and "Toggle task cancelled". Done and reopen go through Tasks, which owns the ✅ and ❌ dates.
 
 // Written without imports: describe, it, expect, browser, $ and the helpers are globals the harness
 // provides.
@@ -77,6 +77,12 @@ function caret(): Promise<[number, number]> {
   });
 }
 
+/** Today as Tasks writes it in a ✅ date: YYYY-MM-DD, local time. */
+function today(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 /** Waits for the open note to read exactly `expected`, and fails showing what it read instead. */
 async function waitForText(expected: string): Promise<void> {
   try {
@@ -89,6 +95,34 @@ async function waitForText(expected: string): Promise<void> {
 describe("Status commands, with Tasks", () => {
   beforeEach(async () => {
     await resetState();
+  });
+
+  it("completes an open task through Tasks, which writes its ✅ date, and reopens it", async () => {
+    await openNote("- [ ] Draft the report\n");
+    await select(caretAt(0, 8));
+
+    await run("toggle-done");
+    await waitForText(`- [x] Draft the report ✅ ${today()}\n`);
+    await run("toggle-done");
+    await waitForText("- [ ] Draft the report\n");
+  });
+
+  it("completes an in-progress task and reopens a cancelled one through Tasks", async () => {
+    await openNote("- [/] Draft the report\n- [-] Book the venue ❌ 2026-10-01\n");
+    await select(caretAt(0, 8), caretAt(1, 8));
+
+    await run("toggle-done");
+    await waitForText(`- [x] Draft the report ✅ ${today()}\n- [ ] Book the venue\n`);
+  });
+
+  it("adds the next occurrence of a recurring task, as Tasks does", async () => {
+    await openNote("- [ ] Water plants 🔁 every day 📅 2026-10-01\n");
+    await select(caretAt(0, 8));
+
+    await run("toggle-done");
+    await waitForText(
+      `- [ ] Water plants 🔁 every day 📅 2026-10-02\n- [x] Water plants 🔁 every day 📅 2026-10-01 ✅ ${today()}\n`,
+    );
   });
 
   it("sets an open task in progress, and back to open when run again", async () => {
@@ -173,6 +207,14 @@ describe("Status commands, without Tasks", () => {
   beforeEach(async () => {
     await resetState();
     await obsidianPage.disablePlugin(TASKS);
+  });
+
+  it("toggles done by changing only the symbol, leaving the dates on the line", async () => {
+    await openNote("- [ ] Draft the report\n- [x] Book the venue ✅ 2026-10-01\n- [-] Ask Sam ❌ 2026-10-01\n");
+    await select(caretAt(0, 8), caretAt(1, 8), caretAt(2, 8));
+
+    await run("toggle-done");
+    await waitForText("- [x] Draft the report\n- [ ] Book the venue ✅ 2026-10-01\n- [ ] Ask Sam ❌ 2026-10-01\n");
   });
 
   it("changes only the symbol and leaves the dates on the line", async () => {

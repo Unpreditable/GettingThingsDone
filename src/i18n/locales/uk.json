@@ -109,6 +109,7 @@
   },
   "commands": {
     "openPanel": "Відкрити панель",
+    "toggleDone": "Перемкнути: завдання виконано",
     "toggleInProgress": "Перемкнути: завдання в роботі",
     "toggleCancelled": "Перемкнути: завдання скасовано",
     "reviewCompleted": "Переглянути, що зроблено"

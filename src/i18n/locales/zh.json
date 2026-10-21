@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "打开面板",
+    "toggleDone": "切换任务已完成状态",
     "toggleInProgress": "切换任务进行中状态",
     "toggleCancelled": "切换任务已取消状态",
     "reviewCompleted": "看看完成了什么"

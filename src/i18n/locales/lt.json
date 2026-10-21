@@ -109,6 +109,7 @@
   },
   "commands": {
     "openPanel": "Atidaryti skydelį",
+    "toggleDone": "Perjungti užduotį atlikta",
     "toggleInProgress": "Perjungti užduotį vykdoma",
     "toggleCancelled": "Perjungti užduotį atšaukta",
     "reviewCompleted": "Peržiūrėti, kas atlikta"

@@ -106,6 +106,7 @@
   },
   "commands": {
     "openPanel": "Atvērt paneli",
+    "toggleDone": "Pārslēgt uzdevumu izpildīts",
     "toggleInProgress": "Pārslēgt uzdevumu procesā",
     "toggleCancelled": "Pārslēgt uzdevumu atcelts",
     "reviewCompleted": "Skatīt, kas paveikts"

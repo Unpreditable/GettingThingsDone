@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "패널 열기",
+    "toggleDone": "작업 완료 전환",
     "toggleInProgress": "작업 진행 중 전환",
     "toggleCancelled": "작업 취소 전환",
     "reviewCompleted": "해낸 일 보기"

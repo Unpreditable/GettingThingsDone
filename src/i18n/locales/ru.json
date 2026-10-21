@@ -109,6 +109,7 @@
   },
   "commands": {
     "openPanel": "Открыть панель",
+    "toggleDone": "Переключить: задача выполнена",
     "toggleInProgress": "Переключить: задача в работе",
     "toggleCancelled": "Переключить: задача отменена",
     "reviewCompleted": "Посмотреть, что сделано"

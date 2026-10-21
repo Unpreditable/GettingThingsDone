@@ -103,6 +103,7 @@
   },
   "commands": {
     "openPanel": "Abrir panel",
+    "toggleDone": "Alternar tarea completada",
     "toggleInProgress": "Alternar tarea en curso",
     "toggleCancelled": "Alternar tarea cancelada",
     "reviewCompleted": "Ver lo que has logrado"

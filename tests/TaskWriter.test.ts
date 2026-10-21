@@ -237,9 +237,9 @@ describe("toggleTaskLine", () => {
     expect(toggleTaskLine("- [-] Test task", "test.md", true, null)).toEqual(["- [ ] Test task"]);
   });
 
-  it("strips an existing ❌ date on reopen when Tasks is absent", () => {
+  it("changes only the checkbox and leaves a ❌ date on reopen when Tasks is absent", () => {
     expect(toggleTaskLine("- [-] Test task ❌ 2026-09-27 #gtd/today", "test.md", true, null)).toEqual([
-      "- [ ] Test task #gtd/today",
+      "- [ ] Test task ❌ 2026-09-27 #gtd/today",
     ]);
   });
 
@@ -249,15 +249,10 @@ describe("toggleTaskLine", () => {
     ]);
   });
 
-  it("clears the checkbox and strips an existing ✅ date on reopen when Tasks is absent", () => {
+  it("changes only the checkbox and leaves a ✅ date on reopen when Tasks is absent", () => {
     expect(toggleTaskLine("- [x] Test task ✅ 2026-08-02", "test.md", true, null)).toEqual([
-      "- [ ] Test task",
+      "- [ ] Test task ✅ 2026-08-02",
     ]);
-  });
-
-  it("strips a ✅ or ❌ date written with a variation selector, as Tasks reads it", () => {
-    expect(toggleTaskLine("- [x] Test task ✅\uFE0F 2026-08-02", "test.md", true, null)).toEqual(["- [ ] Test task"]);
-    expect(toggleTaskLine("- [-] Test task ❌\uFE0F 2026-08-02", "test.md", true, null)).toEqual(["- [ ] Test task"]);
   });
 
   it("preserves other metadata on the line in the fallback path", () => {
@@ -363,7 +358,7 @@ describe("toggleTaskCompletion", () => {
     expect(getContent()).toBe("- [x] Test task");
   });
 
-  it("unchecks a completed task and strips its ✅ date", async () => {
+  it("unchecks a completed task and leaves its ✅ date when Tasks is absent", async () => {
     const { app, getContent } = makeMockApp("- [x] Test task ✅ 2026-08-02");
     const task = makeTask({
       rawLine: "- [x] Test task ✅ 2026-08-02",
@@ -373,7 +368,7 @@ describe("toggleTaskCompletion", () => {
     const result = await toggleTaskCompletion(app, task);
 
     expect(result.success).toBe(true);
-    expect(getContent()).toBe("- [ ] Test task");
+    expect(getContent()).toBe("- [ ] Test task ✅ 2026-08-02");
   });
 
   it("fails when file not found", async () => {

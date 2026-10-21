@@ -51,7 +51,7 @@ export function getTasksApi(app: App): TasksPluginApiV1 | null {
  * the panel behaves exactly like the editor does on the same device: Tasks
  * applies its own ✅-date setting, global filter, 🔁 recurrence (two lines
  * back) and 🏁 on-completion delete (no lines back). Without Tasks — or if
- * the call fails — this flips the checkbox and writes no date; visibility
+ * the call fails — this flips the checkbox and leaves any dates; visibility
  * still works, via the witnessed completionSeen clock.
  */
 export function toggleTaskLine(
@@ -69,16 +69,7 @@ export function toggleTaskLine(
     }
   }
 
-  if (isCompleted) {
-    return [
-      rawLine
-        .replace(CHECKBOX_REGEX, "$1[ ]")
-        .replace(/\s*✅\uFE0F?\s*\d{4}-\d{2}-\d{2}/, "")
-        .replace(/\s*❌\uFE0F?\s*\d{4}-\d{2}-\d{2}/, "")
-        .trimEnd(),
-    ];
-  }
-  return [rawLine.replace(CHECKBOX_REGEX, "$1[x]")];
+  return [rawLine.replace(CHECKBOX_REGEX, isCompleted ? "$1[ ]" : "$1[x]")];
 }
 
 /** The statuses the status commands and menu items set. */
