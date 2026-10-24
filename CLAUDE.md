@@ -78,6 +78,9 @@ User move action
 | [src/integrations/TasksPluginParser.ts](src/integrations/TasksPluginParser.ts) | Token table + two-phase scanner for all Tasks-plugin metadata; sole owner of that syntax |
 | [src/core/TasksFieldText.ts](src/core/TasksFieldText.ts) | Formats a task's Tasks-plugin fields into ordered hover-popover rows |
 | [src/core/DateMenu.ts](src/core/DateMenu.ts) | Which Change/Set date items and preset days a task row's menu offers, and which one unpins |
+| [src/core/PanelNotices.ts](src/core/PanelNotices.ts) | Picks the newest unsettled "what's new" note for the panel banner |
+| [src/notices.json](src/notices.json) | The list of what's new notes, oldest first; text in `en.json` under `whatsNew.notes` |
+| [src/changelog/](src/changelog/) | The changelog, one markdown file per locale; release.yml turns `## Unreleased` into the tag |
 | [src/integrations/Kalendae.ts](src/integrations/Kalendae.ts) | Finds the Kalendae plugin's calendar for the menu's Custom… item |
 | [src/views/GTDPanel.svelte](src/views/GTDPanel.svelte) | Root sidebar; handles context menu and drag-drop coordination |
 | [src/views/BucketGroup.svelte](src/views/BucketGroup.svelte) | Collapsible bucket section; SortableJS drag-and-drop |

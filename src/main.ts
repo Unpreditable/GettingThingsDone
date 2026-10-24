@@ -45,6 +45,8 @@ import { celebrationImages } from "./assets/celebrationImages";
 import { lineFlashField } from "./views/lineFlash";
 import { revealTaskLine } from "./views/revealTaskLine";
 import { CompletionReportModal } from "./views/CompletionReportModal";
+import { WhatsNewModal } from "./views/WhatsNewModal";
+import { PANEL_NOTICES, seedLastNoticeSeen, settleUnknownNotice } from "./core/PanelNotices";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
@@ -99,6 +101,12 @@ export default class GtdTasksPlugin extends Plugin {
       id: "review-completed-tasks",
       name: t("commands.reviewCompleted"),
       callback: () => new CompletionReportModal(this).open(),
+    });
+
+    this.addCommand({
+      id: "show-whats-new",
+      name: t("whatsNew.title"),
+      callback: () => this.openWhatsNew(),
     });
 
     // Fill the gap Obsidian's own "Toggle checkbox status" leaves: it only
@@ -238,6 +246,10 @@ export default class GtdTasksPlugin extends Plugin {
     if (this.midnightTimer !== undefined) window.clearTimeout(this.midnightTimer);
   }
 
+  openWhatsNew() {
+    new WhatsNewModal(this.app).open();
+  }
+
   async loadSettings() {
     const raw: unknown = await this.loadData();
     const migrated = migrateSettingsData(raw);
@@ -275,6 +287,10 @@ export default class GtdTasksPlugin extends Plugin {
     if (migrated.weekStartNoticeSeen === undefined) {
       this.settings.weekStartNoticeSeen = raw == null;
     }
+    if (migrated.lastNoticeSeen === undefined) {
+      this.settings.lastNoticeSeen = seedLastNoticeSeen(raw == null, PANEL_NOTICES);
+    }
+    this.settings.lastNoticeSeen = settleUnknownNotice(this.settings.lastNoticeSeen, PANEL_NOTICES);
     for (const bucket of this.settings.buckets) {
       if (!bucket.emoji) {
         const def = DEFAULT_BUCKETS.find((b) => b.id === bucket.id);
@@ -613,6 +629,11 @@ class GtdPanelView extends ItemView {
           this.plugin.settings.weekStartNoticeSeen = true;
           await this.plugin.saveSettings();
         },
+        onDismissNotice: async (id: string) => {
+          this.plugin.settings.lastNoticeSeen = id;
+          await this.plugin.saveSettings();
+        },
+        onOpenChangelog: () => this.plugin.openWhatsNew(),
       },
     });
   }

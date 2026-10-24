@@ -12,5 +12,6 @@ module.exports = {
   },
   transform: {
     "^.+\\.ts$": ["ts-jest", { tsconfig: "tsconfig.test.json" }],
+    "^.+\\.md$": "<rootDir>/tests/mdTransform.js",
   },
 };

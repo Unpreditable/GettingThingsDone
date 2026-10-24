@@ -358,5 +358,18 @@
   },
   "ribbon": {
     "openPanel": "Ava GTD Tasks paneel"
+  },
+  "whatsNew": {
+    "title": "Mis on uut",
+    "openChangelog": "Loe edasi",
+    "dismiss": "OK",
+    "openSettings": "Ava seaded",
+    "readInEnglish": "Loe inglise keeles",
+    "readTranslated": "Loe eesti keeles",
+    "notes": {
+      "1": {
+        "message": "See uuendus toob 5 uut funktsiooni, sealhulgas ülevaate sellest, mis sai tehtud (🏆), ja Tasksi Dataview-vormingu toe."
+      }
+    }
   }
 }

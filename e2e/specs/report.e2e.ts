@@ -226,3 +226,5 @@ describe("The completed-tasks modal", () => {
     );
   });
 });
+
+export {};

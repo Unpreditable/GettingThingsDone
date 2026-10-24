@@ -144,6 +144,10 @@ export interface PluginSettings {
    *  been settled for this install. Seeded once on load, like catchAllNoticeSeen:
    *  fresh installs never see the notice, since the setting is right there. */
   weekStartNoticeSeen: boolean;
+  /** Id of the newest "what's new" note (src/notices.json) this install has
+   *  settled. Seeded once on load, like weekStartNoticeSeen: a fresh install
+   *  settles every note already in the list. */
+  lastNoticeSeen: string;
   /** A click on a link in a task row opens the link; off, it reveals the task like any other click. */
   openLinksOnClick: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
@@ -250,6 +254,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   catchAllNoticeSeen: false,
   weekStartsOn: "monday",
   weekStartNoticeSeen: false,
+  lastNoticeSeen: "",
   openLinksOnClick: true,
   compactView: false,
   priorityDisplay: "all",

@@ -366,5 +366,18 @@
   },
   "ribbon": {
     "openPanel": "Atidaryti GTD Tasks skydelį"
+  },
+  "whatsNew": {
+    "title": "Kas naujo",
+    "openChangelog": "Skaityti daugiau",
+    "dismiss": "Gerai",
+    "openSettings": "Atidaryti nustatymus",
+    "readInEnglish": "Skaityti angliškai",
+    "readTranslated": "Skaityti lietuviškai",
+    "notes": {
+      "1": {
+        "message": "Šiame atnaujinime – 5 naujos funkcijos, tarp jų ataskaita, kas atlikta (🏆), ir Tasks Dataview formato palaikymas."
+      }
+    }
   }
 }

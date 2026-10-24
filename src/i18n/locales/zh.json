@@ -358,5 +358,18 @@
   },
   "ribbon": {
     "openPanel": "打开 GTD Tasks 面板"
+  },
+  "whatsNew": {
+    "title": "新功能",
+    "openChangelog": "了解更多",
+    "dismiss": "好的",
+    "openSettings": "打开设置",
+    "readInEnglish": "阅读英文版",
+    "readTranslated": "阅读中文版",
+    "notes": {
+      "1": {
+        "message": "此次更新带来 5 项新功能，包括你完成的事报告（🏆）以及对 Tasks Dataview 格式的支持。"
+      }
+    }
   }
 }

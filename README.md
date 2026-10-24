@@ -135,6 +135,10 @@ Click the 🏆 icon in the ribbon, or run **See what you got done**. The week ta
 
 The report reads the `✅` dates on your task lines. A task completed without one can't be placed on a day, so it isn't listed. Turn on Tasks' **Set done date on every completed task** to get them. Cancelled tasks are listed by their `❌` date but never counted.
 
+### What's new
+
+After an update with a new feature, a one-time note at the top of the panel says what changed. Run **What's new**, or click **What's new** at the top of the settings page, to see every release's highlights.
+
 ---
 
 ## Configuration

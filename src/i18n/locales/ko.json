@@ -358,5 +358,18 @@
   },
   "ribbon": {
     "openPanel": "GTD Tasks 패널 열기"
+  },
+  "whatsNew": {
+    "title": "새로운 기능",
+    "openChangelog": "자세히 보기",
+    "dismiss": "닫기",
+    "openSettings": "설정 열기",
+    "readInEnglish": "영어로 읽기",
+    "readTranslated": "한국어로 읽기",
+    "notes": {
+      "1": {
+        "message": "이번 업데이트에는 해낸 일 보고서(🏆)와 Tasks의 Dataview 형식 지원을 비롯한 5가지 새 기능이 있습니다."
+      }
+    }
   }
 }

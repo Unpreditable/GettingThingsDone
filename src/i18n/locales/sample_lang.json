@@ -368,5 +368,18 @@
   },
   "ribbon": {
     "openPanel": ""
+  },
+  "whatsNew": {
+    "title": "",
+    "openChangelog": "",
+    "dismiss": "",
+    "openSettings": "",
+    "readInEnglish": "",
+    "readTranslated": "",
+    "notes": {
+      "1": {
+        "message": ""
+      }
+    }
   }
 }

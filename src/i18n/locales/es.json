@@ -358,5 +358,18 @@
   },
   "ribbon": {
     "openPanel": "Abrir panel de GTD Tasks"
+  },
+  "whatsNew": {
+    "title": "Novedades",
+    "openChangelog": "Leer más",
+    "dismiss": "Descartar",
+    "openSettings": "Abrir ajustes",
+    "readInEnglish": "Leer en inglés",
+    "readTranslated": "Leer en español",
+    "notes": {
+      "1": {
+        "message": "Esta actualización trae 5 funciones nuevas, entre ellas un informe de lo que has logrado (🏆) y compatibilidad con el formato Dataview de Tasks."
+      }
+    }
   }
 }

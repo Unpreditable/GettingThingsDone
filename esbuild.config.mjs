@@ -31,7 +31,7 @@ const context = await esbuild.context({
   sourcemap: prod ? false : "inline",
   treeShaking: true,
   outfile: "main.js",
-  loader: { ".png": "dataurl" },
+  loader: { ".png": "dataurl", ".md": "text" },
   plugins: [
     esbuildSvelte({
       compilerOptions: { css: "injected" },

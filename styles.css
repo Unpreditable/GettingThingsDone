@@ -194,6 +194,11 @@
   text-decoration: underline;
 }
 
+.gtd-language-banner-sep {
+  color: var(--text-faint);
+  user-select: none;
+}
+
 /* Search status bar */
 .gtd-search-status {
   flex-shrink: 0;
@@ -508,9 +513,33 @@
   text-align: right;
 }
 
-.gtd-settings-banner-button {
+.gtd-settings-banner-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2);
   flex-shrink: 0;
+}
+
+.gtd-settings-banner-button {
   font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+}
+
+.gtd-whats-new-modal .modal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-4);
+}
+
+.gtd-whats-new-modal .modal-title {
+  margin-inline: 0;
+}
+
+/* Right-aligned in the header, short of the close button. */
+.gtd-whats-new-english {
+  margin-inline-start: auto;
+  margin-inline-end: var(--size-4-8);
+  font-size: var(--font-ui-small);
   white-space: nowrap;
 }
 

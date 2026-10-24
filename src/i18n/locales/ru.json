@@ -366,5 +366,18 @@
   },
   "ribbon": {
     "openPanel": "Открыть панель GTD Tasks"
+  },
+  "whatsNew": {
+    "title": "Что нового",
+    "openChangelog": "Подробнее",
+    "dismiss": "Принято",
+    "openSettings": "Открыть настройки",
+    "readInEnglish": "Читать на английском",
+    "readTranslated": "Читать на русском",
+    "notes": {
+      "1": {
+        "message": "В этом обновлении 5 новых функций, в том числе отчёт о том, что сделано (🏆), и поддержка формата Dataview из Tasks."
+      }
+    }
   }
 }

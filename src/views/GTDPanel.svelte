@@ -20,6 +20,7 @@
   import type { BucketConfig, PluginSettings } from "../settings";
   import { shouldRecommendCatchAll, hiddenFilterStrings, weekStartIndex } from "../settings";
   import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
+  import { PANEL_NOTICES, noticeToShow } from "../core/PanelNotices";
   import { icon } from "./icon";
   import { t } from "../i18n/i18n";
 
@@ -54,6 +55,8 @@
   export let onDismissLanguageBanner: () => void;
   export let onDismissCatchAllNotice: () => void;
   export let onDismissWeekStartNotice: () => void;
+  export let onDismissNotice: (id: string) => void;
+  export let onOpenChangelog: () => void;
 
   // Keyed off the shape of the rules rather than tasks actually piling up in To
   // Review, so the warning arrives before the mess does.
@@ -64,6 +67,9 @@
   // the only thing that hides it, and picking a first day counts as one (see
   // setControlValue), so it cannot key off the value and blink as that changes.
   $: showWeekStartBanner = !settings.weekStartNoticeSeen;
+
+  // Every button settles the note: the changelog keeps its text reachable.
+  $: panelNotice = noticeToShow(PANEL_NOTICES, settings.lastNoticeSeen);
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
@@ -476,7 +482,7 @@
   </div>
 
   <!-- One banner at a time: these are full-width and push the task list down, and
-       all three are once-ever events, so they queue instead of stacking. -->
+       all of them are once-ever events, so they queue instead of stacking. -->
   {#if showLanguageBanner}
     <div class="gtd-language-banner">
       <span class="gtd-language-banner-message">{t("panel.languageBanner.message")}</span>
@@ -505,6 +511,23 @@
         <span class="gtd-language-banner-btn" on:click={onOpenSettings}>{t("panel.weekStartBanner.openSettings")}</span>
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
         <span class="gtd-language-banner-btn" on:click={onDismissWeekStartNotice}>{t("panel.weekStartBanner.dismiss")}</span>
+      </div>
+    </div>
+  {:else if panelNotice}
+    {@const notice = panelNotice}
+    <div class="gtd-language-banner gtd-notice-banner">
+      <span class="gtd-language-banner-message">{t(`whatsNew.notes.${notice.id}.message`)}</span>
+      <div class="gtd-language-banner-actions">
+        {#if notice.action === "settings"}
+          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+          <span class="gtd-language-banner-btn" on:click={() => { onOpenSettings(); onDismissNotice(notice.id); }}>{t("whatsNew.openSettings")}</span>
+          <span class="gtd-language-banner-sep" aria-hidden="true">·</span>
+        {/if}
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={() => { onOpenChangelog(); onDismissNotice(notice.id); }}>{t("whatsNew.openChangelog")}</span>
+        <span class="gtd-language-banner-sep" aria-hidden="true">·</span>
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span class="gtd-language-banner-btn" on:click={() => onDismissNotice(notice.id)}>{t("whatsNew.dismiss")}</span>
       </div>
     </div>
   {/if}

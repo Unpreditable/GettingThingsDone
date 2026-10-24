@@ -65,6 +65,13 @@ jobs:
           jq --arg v "$TAG" --arg m "$MIN" '.[$v] = $m' versions.json > versions.tmp && mv versions.tmp versions.json
           echo "Recorded $TAG → minAppVersion $MIN in versions.json"
 
+      # Before the build, so the shipped main.js carries the stamped headings.
+      - name: Stamp the changelog
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          sed -i "s/^## Unreleased$/## $TAG/" src/changelog/*.md
+          echo "Stamped ## Unreleased → ## $TAG in src/changelog"
+
       - name: Sync package.json version
         run: |
           TAG="${{ steps.version.outputs.new }}"
@@ -96,7 +103,7 @@ jobs:
           TAG="${{ steps.version.outputs.new }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json versions.json package.json package-lock.json
+          git add manifest.json versions.json package.json package-lock.json src/changelog
           git commit -m "chore: release $TAG"
           git tag "$TAG"
           git push origin HEAD --tags

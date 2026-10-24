@@ -78,6 +78,70 @@ for (const file of files) {
   }
 }
 
+// The changelog is translated as a whole file per locale. Each translation
+// must have the same releases, in the same order, and under each the same
+// #### sections (Features, Fixes) with as many bullets in each as en.md; that
+// catches a missing entry, not stale wording. Section titles are translated,
+// so only their places are compared.
+const changelogDir = join(__dirname, '../src/changelog');
+
+function changelogOutline(text) {
+  const releases = [];
+  for (const line of text.split(/\r?\n/)) {
+    const release = releases[releases.length - 1];
+    if (line.startsWith('## ')) {
+      releases.push({ heading: line.slice(3).trim(), sections: [] });
+    } else if (!release) {
+      continue;
+    } else if (line.startsWith('#### ')) {
+      release.sections.push({ titled: true, bullets: 0 });
+    } else if (/^\s*[-*] /.test(line)) {
+      // Bullets straight under the release heading form an untitled section.
+      if (!release.sections.length) release.sections.push({ titled: false, bullets: 0 });
+      release.sections[release.sections.length - 1].bullets++;
+    }
+  }
+  return releases.map(r => ({
+    heading: r.heading,
+    shape: r.sections.map(s => `${s.titled ? '####' : '(untitled)'} ${s.bullets}`).join(', ') || '(empty)',
+  }));
+}
+
+const enOutline = changelogOutline(readFileSync(join(changelogDir, 'en.md'), 'utf8'));
+const enHeadings = enOutline.map(s => s.heading);
+const changelogIndex = readFileSync(join(changelogDir, 'index.ts'), 'utf8');
+
+for (const file of files.filter(f => !BLANK_ALLOWED.has(f))) {
+  const name = file.replace(/\.json$/, '.md');
+  let outline;
+  try {
+    outline = changelogOutline(readFileSync(join(changelogDir, name), 'utf8'));
+  } catch {
+    console.log(`❌ changelog/${name}: missing`);
+    allPassed = false;
+    continue;
+  }
+  const problems = [];
+  if (!changelogIndex.includes(`"./${name}"`)) problems.push(`not imported in changelog/index.ts`);
+  const headings = outline.map(s => s.heading);
+  if (headings.join('\n') !== enHeadings.join('\n')) {
+    problems.push(`releases: ${headings.join(', ') || '(none)'} — en.md has ${enHeadings.join(', ')}`);
+  } else {
+    outline.forEach((r, i) => {
+      if (r.shape !== enOutline[i].shape) {
+        problems.push(`${r.heading}: sections and bullets ${r.shape} — en.md has ${enOutline[i].shape}`);
+      }
+    });
+  }
+  if (problems.length) {
+    allPassed = false;
+    console.log(`❌ changelog/${name}`);
+    for (const p of problems) console.log(`   ${p}`);
+  } else {
+    console.log(`✅ changelog/${name}`);
+  }
+}
+
 if (!allPassed) {
   process.exit(1);
 }

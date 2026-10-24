@@ -539,5 +539,27 @@
   "ribbon": {
     "openPanel_comment": "Tooltip on the ribbon icon in Obsidian's left sidebar that opens the GTD panel. The plugin name stays untranslated, matching panel.title.",
     "openPanel": "Open GTD Tasks panel"
+  },
+  "whatsNew": {
+    "_comment": "One-time announcements of new features, shown as a banner at the top of the panel to people who upgraded, and a changelog of every release.",
+    "title_comment": "Title of the changelog dialog, the name of the command that opens it, and the button at the top of the plugin's settings page that opens it.",
+    "title": "What's new",
+    "openChangelog_comment": "Button in the announcement banner. Opens the changelog dialog (titled whatsNew.title), which says more about the announced features.",
+    "openChangelog": "Read more",
+    "dismiss_comment": "Button in the announcement banner. Closes the banner for good. Reuse the panel.languageBanner.dismiss wording.",
+    "dismiss": "Dismiss",
+    "openSettings_comment": "Button in the announcement banner when the news is about a setting. Opens the plugin's settings tab. Reuse the panel.languageBanner.openSettings wording.",
+    "openSettings": "Open Settings",
+    "readInEnglish_comment": "Link at the top of the changelog dialog, shown only when the changelog is translated. Replaces the translated changelog with the original English one.",
+    "readInEnglish": "Read in English",
+    "readTranslated_comment": "Link at the top of the changelog dialog, shown after the user clicked whatsNew.readInEnglish. Goes back to the translated changelog. Name YOUR language, e.g. 'Читать на русском', 'Auf Deutsch lesen'. The English value is never shown.",
+    "readTranslated": "Read in your language",
+    "notes_comment": "One announcement per key. Keys are numbers, newest highest; translate every one.",
+    "notes": {
+      "1": {
+        "message_comment": "Announcement banner. 🏆 is the ribbon icon of the 'See what you got done' report; keep it. 'Dataview format' is the Tasks plugin's name for writing fields as [due:: 2026-10-20] instead of emoji; use Tasks' own term if it is translated.",
+        "message": "This update brings 5 new features, including a report of what you got done (🏆) and support for Tasks' Dataview format."
+      }
+    }
   }
 }

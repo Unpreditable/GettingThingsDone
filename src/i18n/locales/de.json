@@ -358,5 +358,18 @@
   },
   "ribbon": {
     "openPanel": "GTD Tasks-Panel öffnen"
+  },
+  "whatsNew": {
+    "title": "Neuigkeiten",
+    "openChangelog": "Mehr lesen",
+    "dismiss": "OK",
+    "openSettings": "Einstellungen öffnen",
+    "readInEnglish": "Auf Englisch lesen",
+    "readTranslated": "Auf Deutsch lesen",
+    "notes": {
+      "1": {
+        "message": "Dieses Update bringt 5 neue Funktionen, darunter einen Bericht, was du geschafft hast (🏆), und Unterstützung für das Dataview-Format von Tasks."
+      }
+    }
   }
 }

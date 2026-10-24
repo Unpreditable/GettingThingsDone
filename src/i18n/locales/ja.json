@@ -358,5 +358,18 @@
   },
   "ribbon": {
     "openPanel": "GTD Tasks パネルを開く"
+  },
+  "whatsNew": {
+    "title": "新機能",
+    "openChangelog": "詳しく見る",
+    "dismiss": "閉じる",
+    "openSettings": "設定を開く",
+    "readInEnglish": "英語で読む",
+    "readTranslated": "日本語で読む",
+    "notes": {
+      "1": {
+        "message": "このアップデートでは、やり遂げたことのレポート（🏆）や Tasks の Dataview 形式への対応など、5つの新機能が加わりました。"
+      }
+    }
   }
 }

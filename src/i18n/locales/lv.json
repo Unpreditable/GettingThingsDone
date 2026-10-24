@@ -362,5 +362,18 @@
   },
   "ribbon": {
     "openPanel": "Atvērt GTD Tasks paneli"
+  },
+  "whatsNew": {
+    "title": "Kas jauns",
+    "openChangelog": "Lasīt vairāk",
+    "dismiss": "Aizvērt",
+    "openSettings": "Atvērt iestatījumus",
+    "readInEnglish": "Lasīt angliski",
+    "readTranslated": "Lasīt latviski",
+    "notes": {
+      "1": {
+        "message": "Šis atjauninājums ienes 5 jaunas funkcijas, tostarp pārskatu par to, kas paveikts (🏆), un Tasks Dataview formāta atbalstu."
+      }
+    }
   }
 }

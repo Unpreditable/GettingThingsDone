@@ -505,7 +505,8 @@ export class GtdSettingsTab extends PluginSettingTab {
     text.createDiv({ cls: "gtd-settings-banner-message", text: t("settings.banner.message") });
     text.createDiv({ cls: "gtd-settings-banner-signature", text: t("settings.banner.signature") });
 
-    banner.createEl("button", {
+    const buttons = banner.createDiv({ cls: "gtd-settings-banner-buttons" });
+    buttons.createEl("button", {
       cls: "mod-cta gtd-settings-banner-button",
       text: t("settings.banner.buttonText"),
     }).addEventListener("click", () => {
@@ -518,6 +519,10 @@ export class GtdSettingsTab extends PluginSettingTab {
         }
       ).open();
     });
+    buttons.createEl("button", {
+      cls: "gtd-settings-banner-button",
+      text: t("whatsNew.title"),
+    }).addEventListener("click", () => this.plugin.openWhatsNew());
   }
 
   private renderGeneralSection(containerEl: HTMLElement) {
