@@ -282,6 +282,13 @@ This plugin opens github.com in your default browser when you click **Share feed
 
 ---
 
+## More plugins by the author
+
+- **[Kalendae](https://community.obsidian.md/plugins/kalendae)** — Change any date or time in a note with a calendar or a clock instead of retyping it. Type new dates in plain words (`@next friday`), or step them with Ctrl/Option + ↑/↓. It also powers **Custom…** in this panel's date menu.
+- **[Littera Nexa](https://community.obsidian.md/plugins/littera-nexa)** — Link to a note by typing its name, with no `[[` needed. It suggests notes and aliases as you type.
+
+---
+
 ## License
 
 [GPL-3.0](LICENSE) © 2026 Vitaly Ditman
