@@ -18,14 +18,13 @@ Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) pl
 - **Time-horizon buckets** — Today ⚡, This Week 📌, Next Week 🔭, This Month 📅, Someday / Maybe 💭. Rename them, swap the emoji, reorder them, or write your own date rules.
 - **To Review inbox** 📥 — every task without a bucket lands here, so nothing slips through.
 - **Three ways to move a task** — quick-move buttons on the row, drag-and-drop between buckets, or right-click.
-- **Clickable links** — open a web link or a linked note straight from a task, without visiting its note first.
 - **Subtask-aware** — indented tasks track with their parent, with a count badge and a prompt to move them along.
 - **Overdue and misfiled flags** — <img src="assets/icons/overdue.svg" width="16" height="16" alt="overdue"> once a due date has passed, <img src="assets/icons/misfiled.svg" width="16" height="16" alt="misfiled"> when a task sits in a bucket that will make you miss it.
-- **Reads Tasks plugin fields** — due dates, priority, recurrence and the rest show up as badges and on hover.
+- **Reads Tasks plugin fields** — due dates, priority, recurrence and the rest show up as badges and on hover. Supports Emoji and Dataview formats.
+- **See what you got done** 🏆 — a report of tasks completed today, yesterday, this week or last week, with a 10-week graph.
 - **Celebration animations** — confetti, a pixel creature, both, or nothing.
-- **13 languages**, matching your Obsidian UI language.
 
-Also: search, scoping to folders or files, a global task filter, Dataview-friendly inline fields, per-bucket status bar counts, and a compact view. See [Configuration](#configuration).
+Also: search, clickable links, scoping to folders or files, a global task filter, Dataview-friendly inline fields, per-bucket status bar counts, a compact view, and 13 languages. See [Configuration](#configuration).
 
 ---
 
@@ -46,6 +45,8 @@ Pin a task (via the right-click menu, a quick-move button, or dragging it to ano
 Checking a task off in the panel does what checking it off in the editor does, including the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) plugin's recurrence and completion-date setting.
 
 With Tasks installed, right-click a task → **Edit task** to change it in Tasks' own edit dialog; saving writes it back to its note.
+
+Tasks that can't start yet (a `🛫` start date still ahead) or that wait on an unfinished task (`⛔`) are dimmed. Hover one to see why. Right-click a blocked task to jump to what's blocking it.
 
 If you use Tasks' global filter, enter the same text under **Global task filter** so both plugins agree on what a task is.
 
@@ -114,9 +115,25 @@ Moving a task by hand pins it to that bucket, so its dates no longer move it.
 - Right-click → **Pin to Today** to pin a task where it already sits.
 - Right-click → **Unpin** to let the task follow its date again.
 
+### Change a date
+
+Right-click → **Change due date** or **Change scheduled date**, then pick Today, Tomorrow, Start of next week, In 1 week or In 2 weeks. If the task has no date to place it by, you get **Set due date** or **Set scheduled date** instead, whichever **Auto-assignment date** goes by. With the [Kalendae](https://community.obsidian.md/plugins/kalendae) plugin installed, **Custom…** opens its calendar.
+
+If a task is pinned and you change the date that places it, the pin comes off. The menu warns you first. Changing its other date leaves the pin alone.
+
+### Change a task's status from the editor
+
+Three commands act on the task under the cursor, or on every task in a selection: **Toggle task done**, **Toggle task in progress** and **Toggle task cancelled**. Each one sets its status, and running it again sets the task back to open. With Tasks installed, they go through Tasks, so `✅` dates and recurrence still work.
+
 ### Search
 
 Type in the search box at the top of the panel to filter down to matching tasks. The status line below it shows how many tasks are currently visible; click it (or the × in the search box) to clear the search.
+
+### See what you got done
+
+Click the 🏆 icon in the ribbon, or run **See what you got done**. The week tabs list tasks by day, newest first. Click a task to open its line.
+
+The report reads the `✅` dates on your task lines. A task completed without one can't be placed on a day, so it isn't listed. Turn on Tasks' **Set done date on every completed task** to get them. Cancelled tasks are listed by their `❌` date but never counted.
 
 ---
 
