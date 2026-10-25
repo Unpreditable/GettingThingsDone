@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Neu
 - Sehen, was du geschafft hast: Klicke in der Seitenleiste auf 🏆, um die heute, gestern, diese oder letzte Woche erledigten Aufgaben zu sehen, mit einem Diagramm über 10 Wochen.

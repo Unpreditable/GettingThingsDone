@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Jaunums
 - Skatīt, kas paveikts: sānjoslā noklikšķiniet uz 🏆, lai redzētu šodien, vakar, šajā vai pagājušajā nedēļā izpildītos uzdevumus ar 10 nedēļu grafiku.

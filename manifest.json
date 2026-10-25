@@ -1,7 +1,7 @@
 {
   "id": "gtd-tasks",
   "name": "GTD Tasks",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "minAppVersion": "1.8.7",
   "description": "Gather tasks from across your notes into one sidebar, sorted into the Getting Things Done horizons: Today, This Week, Next Week, This Month and Someday. Works with the Tasks plugin.",
   "author": "Vitaly Ditman",

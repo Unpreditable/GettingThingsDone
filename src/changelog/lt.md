@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Nauja
 - Peržiūrėti, kas atlikta: šoninėje juostoje spustelėkite 🏆 ir pamatysite šiandien, vakar, šią ar praėjusią savaitę atliktas užduotis bei 10 savaičių grafiką.

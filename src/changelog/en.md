@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Features
 - See what you got done: click 🏆 in the ribbon for a report of tasks completed today, yesterday, this week or last week, with a 10-week graph.

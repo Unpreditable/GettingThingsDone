@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Novidades
 - Ver o que conseguiu fazer: clique em 🏆 na barra lateral para ver as tarefas concluídas hoje, ontem, esta semana ou na semana passada, com um gráfico de 10 semanas.

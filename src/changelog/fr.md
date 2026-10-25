@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Nouveautés
 - Voir ce que vous avez accompli : cliquez sur 🏆 dans le ruban pour voir les tâches terminées aujourd'hui, hier, cette semaine ou la semaine dernière, avec un graphique sur 10 semaines.

@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 #### Uus
 - Vaata, mis sai tehtud: klõpsa külgribal 🏆, et näha täna, eile, sel või eelmisel nädalal lõpetatud ülesandeid koos 10 nädala graafikuga.
