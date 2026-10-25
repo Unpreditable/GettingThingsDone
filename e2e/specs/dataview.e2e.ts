@@ -179,7 +179,7 @@ function fire(type: string, value?: string): Promise<void> {
     if (!input) throw new Error(`no input at ${inputSelector}`);
     // An undefined argument arrives as null.
     if (value != null) input.value = value;
-    const win = input.ownerDocument.defaultView as unknown as typeof globalThis;
+    const win = input.ownerDocument.defaultView as unknown as typeof window;
     input.dispatchEvent(new win.Event(type, { bubbles: true }));
   }, PREFIX_INPUT, type, value);
 }
