@@ -192,19 +192,14 @@ function openEmojiPicker(
   const pickerWidth = pickerRect.width;
   const pickerHeight = pickerRect.height;
 
-  // Calculate position with viewport constraints
   let top = rect.bottom + 4;
-  let left = rect.left;
-
-  // Check if picker would overflow bottom; if so, position above
-  if (top + pickerHeight > window.innerHeight) {
+  if (top + pickerHeight > activeWindow.innerHeight) {
     top = rect.top - pickerHeight - 4;
   }
 
-  // Check if picker would overflow right; if so, shift left
-  if (left + pickerWidth > window.innerWidth) {
-    left = Math.max(0, window.innerWidth - pickerWidth - 4);
-  }
+  // The button sits at the right edge of its row, so the picker opens leftward
+  // from the button's right edge, keeping it over the settings page.
+  const left = Math.max(4, rect.right - pickerWidth);
 
   picker.style.setProperty("--gtd-picker-top", `${top}px`);
   picker.style.setProperty("--gtd-picker-left", `${left}px`);

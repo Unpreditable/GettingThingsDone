@@ -809,7 +809,7 @@ button.gtd-bucket-order-btn {
 
 /* Emoji trigger button */
 .gtd-emoji-btn-display {
-  font-size: 22px;
+  font-size: var(--font-ui-medium);
   line-height: 1;
   padding: 2px 6px;
   border-radius: 4px;
