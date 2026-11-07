@@ -483,6 +483,47 @@
   content: none;
 }
 
+/* The rows of one section read as a set: no rules between them, and less air
+   than Obsidian's default. The divider is core's ::before on each row, drawn
+   at --setting-items-divider-width, so zeroing the variable is the switch.
+   General and Buckets render inside an escape hatch rather than a group of
+   their own, so the hatch carries the same variables. */
+.gtd-settings-group,
+.gtd-settings-escape-hatch {
+  --setting-items-divider-width: 0;
+}
+
+.gtd-settings-group .setting-item:not(.setting-item-heading),
+.gtd-settings-escape-hatch .setting-item:not(.setting-item-heading) {
+  padding-block: var(--size-2-3);
+}
+
+/* The rule sits between sections instead, on each heading after the first.
+   The base .setting-item rule rounds the corners, which would curve the
+   border into a box rather than a line. */
+.gtd-settings-group .setting-item.setting-item-heading,
+.gtd-settings-escape-hatch .setting-item.setting-item-heading {
+  border-radius: 0;
+  border-top: var(--border-width) solid var(--background-modifier-border);
+  padding-block-start: var(--size-4-4);
+}
+
+.gtd-settings-first-section .setting-item.setting-item-heading {
+  border-top: none;
+}
+
+/* Rows sit further in than their heading, so the two read apart. Only a
+   section's own rows: the rows inside a bucket card are already inset by the
+   card, and the banner has no heading to set off. */
+.gtd-settings-group .setting-item:not(.setting-item-heading),
+.gtd-settings-section > .setting-item:not(.setting-item-heading) {
+  padding-inline-start: var(--size-4-8);
+}
+
+.gtd-settings-section > *:not(.setting-item) {
+  margin-inline-start: var(--size-4-8);
+}
+
 .gtd-settings-banner {
   display: flex;
   align-items: center;
@@ -686,7 +727,7 @@
 .gtd-bucket-setting-item {
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
-  margin-bottom: 8px;
+  margin-bottom: var(--size-4-1);
   overflow: hidden;
 }
 
@@ -697,10 +738,11 @@
 .gtd-bucket-setting-header {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: var(--size-4-1) var(--size-4-3);
   cursor: pointer;
-  gap: 8px;
+  gap: var(--size-4-2);
   background: var(--background-secondary);
+  font-size: var(--font-ui-small);
 }
 
 .gtd-bucket-setting-header:hover {
@@ -708,7 +750,7 @@
 }
 
 .gtd-bucket-emoji-display {
-  font-size: 16px;
+  font-size: var(--font-ui-medium);
   line-height: 1;
   flex-shrink: 0;
 }
@@ -732,9 +774,11 @@
   flex-shrink: 0;
 }
 
-.gtd-bucket-order-btn {
-  padding: 2px 14px;
-  font-size: 13px;
+/* Core sizes every button to --input-height, which sets the header's height. */
+button.gtd-bucket-order-btn {
+  height: auto;
+  padding: 0 var(--size-4-3);
+  font-size: var(--font-ui-small);
   line-height: 1.5;
   border: 1px solid var(--background-modifier-border);
   border-radius: 4px;

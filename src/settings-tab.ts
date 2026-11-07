@@ -376,13 +376,14 @@ export class GtdSettingsTab extends PluginSettingTab {
       {
         name: t("settings.heading"),
         render: (setting) => {
-          setting.settingEl.addClass("gtd-settings-escape-hatch");
+          setting.settingEl.addClass("gtd-settings-escape-hatch", "gtd-settings-section", "gtd-settings-first-section");
           setting.settingEl.empty();
           this.renderGeneralSection(setting.settingEl);
         },
       },
       {
         type: "group",
+        cls: "gtd-settings-group",
         heading: t("settings.behaviour.heading"),
         items: [
           {
@@ -432,6 +433,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       },
       {
         type: "group",
+        cls: "gtd-settings-group",
         heading: t("settings.tasksIntegration.heading"),
         items: [
           {
@@ -490,7 +492,7 @@ export class GtdSettingsTab extends PluginSettingTab {
       {
         name: t("settings.buckets.heading"),
         render: (setting) => {
-          setting.settingEl.addClass("gtd-settings-escape-hatch");
+          setting.settingEl.addClass("gtd-settings-escape-hatch", "gtd-settings-section");
           setting.settingEl.empty();
           this.renderBucketsSection(setting.settingEl);
         },
