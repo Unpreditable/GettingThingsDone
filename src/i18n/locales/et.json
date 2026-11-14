@@ -20,6 +20,13 @@
       "message": "„{{name}}“ pole veel olemas. Kas luua see?",
       "confirmButton": "Loo"
     },
+    "dropMenu": {
+      "pinTo": "Kinnita kategooriasse {{name}}",
+      "today": "Täna",
+      "tomorrow": "Homme",
+      "inDays_one": "{{count}} päeva pärast",
+      "inDays_other": "{{count}} päeva pärast"
+    },
     "contextMenu": {
       "moveToMenu": "Teisalda",
       "changeDue": "Muuda tähtaega",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: Kinnitatud kategooriasse {{name}}. Lohistamise tühistamiseks vajuta Esc, kuni selle menüü on avatud.",
+    "dropDayOutside": "GTD Tasks: {{day}} jääb väljapoole kategooriat {{name}}. Ülesannet ei liigutatud.",
     "moveFailed": "GTD Tasks: Teisaldamine ebaõnnestus — {{error}}",
     "toggleFailed": "GTD Tasks: Lülitamine ebaõnnestus — {{error}}",
     "statusFailed": "GTD Tasks: Oleku muutmine ebaõnnestus — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "Näita lõpetatud ülesandeid kuni südaööni",
         "description": "Lõpetatud ülesanded jäävad paneelile läbikriipsutuna nähtavaks kuni südaööni, seejärel kaovad järgmisel laadimisel."
+      },
+      "dropIntoBucket": {
+        "name": "Ülesande lohistamine kategooriasse",
+        "description": "Kinnita see sinna või küsi kuupäeva kategooria vahemikust. Kuupäevavahemikuta kategooriad kinnitavad alati.",
+        "pin": "Kinnita",
+        "ask": "Küsi kuupäeva"
       },
       "markDueFlags": {
         "name": "Märgi tähtaja ületanud ja valesti paigutatud ülesanded",

@@ -20,6 +20,13 @@
       "message": "« {{name}} » n'existe pas encore. La créer ?",
       "confirmButton": "Créer"
     },
+    "dropMenu": {
+      "pinTo": "Épingler à {{name}}",
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain",
+      "inDays_one": "Dans {{count}} jour",
+      "inDays_other": "Dans {{count}} jours"
+    },
     "contextMenu": {
       "moveToMenu": "Déplacer vers",
       "changeDue": "Modifier l’échéance",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks : Épinglée à {{name}}. Pour annuler un dépôt, appuyez sur Échap tant que son menu est ouvert.",
+    "dropDayOutside": "GTD Tasks : {{day}} est en dehors de {{name}}. La tâche n'a pas été déplacée.",
     "moveFailed": "GTD Tasks : Déplacement échoué — {{error}}",
     "toggleFailed": "GTD Tasks : Basculement échoué — {{error}}",
     "statusFailed": "GTD Tasks : Changement de statut échoué — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "Afficher les tâches terminées jusqu'à minuit",
         "description": "Les tâches terminées restent visibles en barré dans le panneau jusqu'à minuit, puis disparaissent au prochain chargement."
+      },
+      "dropIntoBucket": {
+        "name": "Déposer une tâche dans une catégorie",
+        "description": "L'y épingler, ou demander une date dans la plage de la catégorie. Les catégories sans plage de dates épinglent toujours.",
+        "pin": "Épingler",
+        "ask": "Demander une date"
       },
       "markDueFlags": {
         "name": "Signaler les tâches en retard et mal classées",

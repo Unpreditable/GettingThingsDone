@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Novedades
+- Al soltar una tarea en una categoría, puede pedir una fecha del rango de esa categoría en lugar de fijarla (Ajustes → Al soltar una tarea en una categoría).
+
 ## 0.3.0
 
 #### Novedades

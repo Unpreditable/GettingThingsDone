@@ -20,6 +20,13 @@
       "message": "„{{name}}“ existiert noch nicht. Erstellen?",
       "confirmButton": "Erstellen"
     },
+    "dropMenu": {
+      "pinTo": "An {{name}} anheften",
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "inDays_one": "In {{count}} Tag",
+      "inDays_other": "In {{count}} Tagen"
+    },
     "contextMenu": {
       "moveToMenu": "Verschieben nach",
       "changeDue": "Fälligkeitsdatum ändern",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: An {{name}} angeheftet. Um ein Ablegen abzubrechen, drücke Esc, solange sein Menü offen ist.",
+    "dropDayOutside": "GTD Tasks: {{day}} liegt außerhalb von {{name}}. Die Aufgabe wurde nicht verschoben.",
     "moveFailed": "GTD Tasks: Verschieben fehlgeschlagen — {{error}}",
     "toggleFailed": "GTD Tasks: Umschalten fehlgeschlagen — {{error}}",
     "statusFailed": "GTD Tasks: Statusänderung fehlgeschlagen — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "Erledigte Aufgaben bis Mitternacht anzeigen",
         "description": "Erledigte Aufgaben bleiben bis Mitternacht durchgestrichen im Panel sichtbar und verschwinden beim nächsten Laden."
+      },
+      "dropIntoBucket": {
+        "name": "Aufgabe in eine Kategorie ziehen",
+        "description": "Dort anheften oder nach einem Datum aus dem Bereich der Kategorie fragen. Kategorien ohne Datumsbereich heften immer an.",
+        "pin": "Anheften",
+        "ask": "Nach Datum fragen"
       },
       "markDueFlags": {
         "name": "Überfällige und falsch einsortierte Aufgaben markieren",

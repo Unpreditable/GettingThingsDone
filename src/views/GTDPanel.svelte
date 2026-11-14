@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import type { Readable } from "svelte/store";
-  import { Menu } from "obsidian";
+  import { Menu, Notice } from "obsidian";
   import type { MenuItem } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
   import Celebration from "./Celebration.svelte";
@@ -12,7 +12,9 @@
   import type { SettableStatus } from "../core/TaskWriter";
   import { dateEntries, datePresets } from "../core/DateMenu";
   import type { DateEntry, DateField, PresetId } from "../core/DateMenu";
-  import { dayKey } from "../core/DueStatus";
+  import { dayKey, diffInDays } from "../core/DueStatus";
+  import { dropDateOptions, landsIn } from "../core/DropDates";
+  import type { DropDateOptions } from "../core/DropDates";
   import { formatDate } from "../core/DueStatusText";
   import { today } from "../integrations/TasksPluginParser";
   import type { DatePicker } from "../integrations/Kalendae";
@@ -22,6 +24,7 @@
   import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
   import { PANEL_NOTICES, noticeToShow } from "../core/PanelNotices";
   import { icon } from "./icon";
+  import { headerDragOver } from "./dragState";
   import { t } from "../i18n/i18n";
 
   export let bucketGroups$: Readable<BucketGroupData[]>;
@@ -47,6 +50,13 @@
   export let onEdit: (task: TaskRecord) => void;
   export let onSetStatus: (task: TaskRecord, symbol: SettableStatus) => Promise<void>;
   export let onSetDate: (task: TaskRecord, field: DateField, date: string, unpin: boolean) => Promise<void>;
+  export let onDropDate: (
+    task: TaskRecord,
+    field: DateField,
+    date: string,
+    targetBucketId: string,
+    orderedTaskIds: string[] | null
+  ) => Promise<void>;
   /** Asked each time the menu opens, since Kalendae can be enabled or disabled while the panel is up. */
   export let getDatePicker: () => DatePicker | null;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
@@ -161,7 +171,17 @@
     targetBucketId: string | null;
     explicitChildren: TaskRecord[];
     orderedTaskIds: string[] | null;
+    /** Set when the parent's drop gave it a date rather than a pin. */
+    date?: { field: DateField; day: string };
+    /** Run once the dialog is answered, whichever way: the drop menu's row copy waits on it. */
+    onSettled?: () => void;
   } | null = null;
+
+  function cancelMoveConfirm() {
+    const settled = pendingMoveConfirm?.onSettled;
+    pendingMoveConfirm = null;
+    settled?.();
+  }
 
   async function handleMove(
     task: TaskRecord,
@@ -173,14 +193,7 @@
       return;
     }
 
-    const descendants = getDescendants(task);
-    const targetId = targetBucketId ?? TO_REVIEW_ID;
-    // Only ask about children that are in a *different* bucket than the target.
-    // Children already in the target bucket need no action and should not trigger a dialog.
-    const explicitChildren = descendants.filter(
-      (t) => hasExplicitAssignment(t) && taskBucketMap.get(t.id) !== targetId
-    );
-
+    const explicitChildren = childrenToAsk(task, targetBucketId);
     if (explicitChildren.length > 0) {
       pendingMoveConfirm = { task, targetBucketId, explicitChildren, orderedTaskIds };
       return;
@@ -189,12 +202,51 @@
     await onMove(task, targetBucketId, orderedTaskIds);
   }
 
+  /** Children pinned to a bucket other than the target. Those already in it need no action. */
+  function childrenToAsk(task: TaskRecord, targetBucketId: string | null): TaskRecord[] {
+    const targetId = targetBucketId ?? TO_REVIEW_ID;
+    return getDescendants(task).filter((t) => hasExplicitAssignment(t) && taskBucketMap.get(t.id) !== targetId);
+  }
+
+  async function dropWithDate(
+    task: TaskRecord,
+    field: DateField,
+    day: string,
+    targetBucketId: string,
+    orderedTaskIds: string[] | null
+  ) {
+    const explicitChildren = childrenToAsk(task, targetBucketId);
+    if (explicitChildren.length > 0) {
+      pendingMoveConfirm = { task, targetBucketId, explicitChildren, orderedTaskIds, date: { field, day } };
+      return;
+    }
+    await onDropDate(task, field, day, targetBucketId, orderedTaskIds);
+  }
+
   async function confirmMoveChildren(moveChildren: boolean) {
     if (!pendingMoveConfirm) return;
-    const { task, targetBucketId, explicitChildren, orderedTaskIds } = pendingMoveConfirm;
+    const { task, targetBucketId, explicitChildren, orderedTaskIds, date, onSettled } = pendingMoveConfirm;
     pendingMoveConfirm = null;
+    try {
+      await applyMoveConfirm(task, targetBucketId, explicitChildren, orderedTaskIds, date, moveChildren);
+    } finally {
+      onSettled?.();
+    }
+  }
 
-    await onMove(task, targetBucketId, orderedTaskIds);
+  async function applyMoveConfirm(
+    task: TaskRecord,
+    targetBucketId: string | null,
+    explicitChildren: TaskRecord[],
+    orderedTaskIds: string[] | null,
+    date: { field: DateField; day: string } | undefined,
+    moveChildren: boolean
+  ) {
+    if (date && targetBucketId !== null) {
+      await onDropDate(task, date.field, date.day, targetBucketId, orderedTaskIds);
+    } else {
+      await onMove(task, targetBucketId, orderedTaskIds);
+    }
 
     if (moveChildren) {
       for (const child of explicitChildren) {
@@ -379,12 +431,175 @@
     e.preventDefault();
     if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
   }
+  // Where the drop menu opens. A mouse drag fires dragover, a touch drag pointermove.
+  let lastDropPoint: { x: number; y: number } | null = null;
+  function trackDropPoint(e: DragEvent | PointerEvent) {
+    lastDropPoint = { x: e.clientX, y: e.clientY };
+  }
   onMount(() => {
     panelEl.addEventListener("dragover", panelDragOver, true);
+    panelEl.addEventListener("dragover", trackDropPoint, true);
+    panelEl.addEventListener("pointermove", trackDropPoint, true);
   });
   onDestroy(() => {
     panelEl?.removeEventListener("dragover", panelDragOver, true);
+    panelEl?.removeEventListener("dragover", trackDropPoint, true);
+    panelEl?.removeEventListener("pointermove", trackDropPoint, true);
   });
+
+  function dropStepTitle(count: number): string {
+    if (count === 0) return t("panel.dropMenu.today");
+    if (count === 1) return t("panel.dropMenu.tomorrow");
+    return t("panel.dropMenu.inDays", { count });
+  }
+
+  function fromDayKey(key: string): Date {
+    const [y, m, d] = key.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  /**
+   * Shows the dropped row at its drop position while the drop menu is open.
+   * BucketGroup's onAdd already put the real row back in its source list, and
+   * it must stay Svelte's, so the row there is hidden and a copy stands in.
+   * A header drop has no position to show, its bucket being collapsed, so the
+   * header stays marked as the drop target instead.
+   */
+  function showPendingDrop(task: TaskRecord, targetBucketId: string, orderedTaskIds: string[] | null): () => void {
+    const origin = panelEl.querySelector<HTMLElement>(`.gtd-task[data-task-id="${task.id}"]`);
+    if (!origin) return () => {};
+
+    if (!orderedTaskIds) {
+      const header = panelEl.querySelector<HTMLElement>(`.gtd-bucket[data-bucket-id="${targetBucketId}"] .gtd-bucket-header`);
+      origin.addClass("gtd-drop-origin");
+      header?.addClass("gtd-drop-target");
+      return () => {
+        origin.removeClass("gtd-drop-origin");
+        header?.removeClass("gtd-drop-target");
+      };
+    }
+
+    const list = panelEl.querySelector<HTMLElement>(`.gtd-bucket-tasks[data-bucket-id="${targetBucketId}"]`);
+    if (!list) return () => {};
+
+    const copy = origin.cloneNode(true) as HTMLElement;
+    // Nothing may find the copy as the task: not the e2e row lookups, not SortableJS.
+    for (const attr of ["data-task-id", "data-file-path", "data-line-number"]) copy.removeAttribute(attr);
+    copy.addClass("gtd-drop-pending");
+    const nextId = orderedTaskIds[orderedTaskIds.indexOf(task.id) + 1];
+    const next = nextId ? list.querySelector<HTMLElement>(`.gtd-task[data-task-id="${nextId}"]`) : null;
+    list.insertBefore(copy, next);
+    origin.addClass("gtd-drop-origin");
+
+    return () => {
+      copy.remove();
+      origin.removeClass("gtd-drop-origin");
+    };
+  }
+
+  /**
+   * Pin, or one of the offered days. Escape cancels the drop, and the task goes
+   * back. Any other way of closing the menu, such as a click elsewhere, pins it,
+   * since a drop should not be lost to a stray click.
+   */
+  function showDropMenu(task: TaskRecord, target: BucketConfig, options: DropDateOptions, orderedTaskIds: string[] | null) {
+    const menu = new Menu();
+    const now = today();
+    const name = `${target.emoji} ${target.name}`;
+    const clearPending = showPendingDrop(task, target.id, orderedTaskIds);
+
+    // The copy stays until the drop is settled, which the move-children dialog
+    // can put off past the action's return.
+    const settle = async (action: () => Promise<void>) => {
+      try {
+        await action();
+      } finally {
+        if (pendingMoveConfirm?.task.id === task.id && !pendingMoveConfirm.onSettled) {
+          pendingMoveConfirm = { ...pendingMoveConfirm, onSettled: clearPending };
+        } else {
+          clearPending();
+        }
+      }
+    };
+
+    let chosen = false;
+    const choose = (action: () => Promise<void>) => () => {
+      chosen = true;
+      void settle(action);
+    };
+
+    menu.addItem((item) =>
+      item
+        .setTitle(t("panel.dropMenu.pinTo", { name }))
+        .setIcon("pin")
+        .onClick(choose(() => handleMove(task, target.id, orderedTaskIds)))
+    );
+    menu.addSeparator();
+
+    for (const key of options.days) {
+      const day = fromDayKey(key);
+      // The same two columns as the row menu's preset days.
+      const title = createFragment((f) => {
+        const row = f.createSpan({ cls: "gtd-date-row" });
+        row.createSpan({ cls: "gtd-date-step", text: dropStepTitle(diffInDays(day, now)) });
+        row.createSpan({ cls: "gtd-date-separator", text: " · " });
+        row.createSpan({ cls: "gtd-date-day", text: formatDate(day) });
+      });
+      menu.addItem((item) =>
+        item.setTitle(title).onClick(choose(() => dropWithDate(task, options.field, key, target.id, orderedTaskIds)))
+      );
+    }
+
+    const bucketEl = panelEl.querySelector<HTMLElement>(`.gtd-bucket[data-bucket-id="${target.id}"]`);
+    const rect = bucketEl?.getBoundingClientRect();
+    const point = lastDropPoint ?? { x: rect?.left ?? 0, y: rect?.top ?? 0 };
+
+    const picker = options.offersCustom ? getDatePicker() : null;
+    if (picker) {
+      menu.addItem((item) =>
+        item.setTitle(t("panel.contextMenu.customDate")).onClick(
+          choose(async () => {
+            const anchor = bucketEl?.isConnected ? bucketEl : new MouseEvent("click", { clientX: point.x, clientY: point.y });
+            const day = await picker(options.range.from, anchor, [options.range]);
+            if (!day) return;
+            // Kalendae may not yet honour `allowed`, and a day outside the bucket
+            // would send the task somewhere it was not dropped.
+            if (!landsIn(task, options.field, day, target.id, settings, today())) {
+              new Notice(t("notices.dropDayOutside", { day: formatDate(fromDayKey(day)), name }));
+              return;
+            }
+            await dropWithDate(task, options.field, day, target.id, orderedTaskIds);
+          })
+        )
+      );
+    }
+
+    let escaped = false;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") escaped = true;
+    };
+    // The panel's own window: in a pop-out, keys never reach the main one.
+    const win = panelEl.win;
+    win.addEventListener("keydown", onKey, true);
+
+    menu.onHide(() => {
+      // Obsidian closes the menu on Escape before this listener sees that same
+      // key, and an item's click may close it before the item's handler runs:
+      // both are settled only once the event is done.
+      setTimeout(() => {
+        win.removeEventListener("keydown", onKey, true);
+        if (chosen) return;
+        if (escaped) {
+          clearPending();
+          return;
+        }
+        new Notice(t("notices.dropPinned", { name }));
+        void settle(() => handleMove(task, target.id, orderedTaskIds));
+      }, 0);
+    });
+
+    menu.showAtPosition(point, panelEl.doc);
+  }
 
   type CelebrationState = "none" | "confetti" | "creature" | "creature-and-confetti";
   let celebration: CelebrationState = "none";
@@ -428,12 +643,21 @@
     targetBucketId: string;
     orderedTaskIds: string[] | null;
   }>) {
-    const { taskId, targetBucketId, orderedTaskIds } = event.detail;
+    const { taskId, sourceBucketId, targetBucketId, orderedTaskIds } = event.detail;
     const resolvedTarget = targetBucketId === TO_REVIEW_ID ? null : targetBucketId;
 
     for (const group of bucketGroups) {
       const task = group.tasks.find((t) => t.id === taskId);
       if (task) {
+        const target = resolvedTarget === null ? undefined : bucketConfigMap.get(resolvedTarget);
+        const options =
+          target && settings.dropIntoBucket === "ask" && sourceBucketId !== targetBucketId
+            ? dropDateOptions(task, target.id, settings, today())
+            : null;
+        if (target && options) {
+          showDropMenu(task, target, options, orderedTaskIds);
+          return;
+        }
         await handleMove(task, resolvedTarget, orderedTaskIds);
         return;
       }
@@ -445,7 +669,7 @@
   }
 </script>
 
-<div class="gtd-panel" class:gtd-compact={settings.compactView} bind:this={panelEl}>
+<div class="gtd-panel" class:gtd-compact={settings.compactView} class:gtd-header-drag-over={$headerDragOver} bind:this={panelEl}>
   <div class="gtd-panel-header">
     <h3>{t("panel.title")}</h3>
     <div class="gtd-search-wrapper">
@@ -582,14 +806,14 @@
 
   {#if pendingMoveConfirm}
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <div class="gtd-confirm-overlay" on:click={() => (pendingMoveConfirm = null)}>
+    <div class="gtd-confirm-overlay" on:click={cancelMoveConfirm}>
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <div class="gtd-confirm-dialog" on:click|stopPropagation>
         <p>{t("panel.moveConfirm.message", { count: pendingMoveConfirm.explicitChildren.length })}</p>
         <div class="gtd-confirm-buttons">
           <button class="mod-cta" on:click={() => confirmMoveChildren(true)}>{t("panel.moveConfirm.moveAll")}</button>
           <button on:click={() => confirmMoveChildren(false)}>{t("panel.moveConfirm.parentOnly")}</button>
-          <button on:click={() => (pendingMoveConfirm = null)}>{t("panel.moveConfirm.cancel")}</button>
+          <button on:click={cancelMoveConfirm}>{t("panel.moveConfirm.cancel")}</button>
         </div>
       </div>
     </div>

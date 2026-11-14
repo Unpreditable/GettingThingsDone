@@ -1,10 +1,27 @@
 import type { App } from "obsidian";
 
-/** Opens a calendar by `anchor` and resolves with the picked day, or null if none was picked. */
-export type DatePicker = (value: string, anchor: HTMLElement | MouseEvent) => Promise<string | null>;
+/** Inclusive YYYY-MM-DD bounds. */
+export interface DayRange {
+  from: string;
+  to: string;
+}
+
+/**
+ * Opens a calendar by `anchor` and resolves with the picked day, or null if none
+ * was picked. A Kalendae too old to know `allowed` ignores it.
+ */
+export type DatePicker = (
+  value: string,
+  anchor: HTMLElement | MouseEvent,
+  allowed?: DayRange[]
+) => Promise<string | null>;
 
 interface KalendaeApi {
-  pickDate?: (options: { value: string; anchor: HTMLElement | MouseEvent }) => Promise<string | null>;
+  pickDate?: (options: {
+    value: string;
+    anchor: HTMLElement | MouseEvent;
+    allowed?: DayRange[];
+  }) => Promise<string | null>;
 }
 
 const DAY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -21,9 +38,9 @@ export function getDatePicker(app: App): DatePicker | null {
   const pickDate = api?.pickDate;
   if (typeof pickDate !== "function") return null;
 
-  return async (value, anchor) => {
+  return async (value, anchor, allowed) => {
     try {
-      const day = await pickDate.call(api, { value, anchor });
+      const day = await pickDate.call(api, allowed ? { value, anchor, allowed } : { value, anchor });
       return typeof day === "string" && DAY_REGEX.test(day) ? day : null;
     } catch {
       return null;

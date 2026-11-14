@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Novidades
+- Ao largar uma tarefa numa categoria, pode ser pedida uma data do intervalo dessa categoria em vez de a fixar (Definições → Ao largar uma tarefa numa categoria).
+
 ## 0.3.0
 
 #### Novidades

@@ -20,6 +20,13 @@
       "message": "«{{name}}» aún no existe. ¿Crearla?",
       "confirmButton": "Crear"
     },
+    "dropMenu": {
+      "pinTo": "Fijar en {{name}}",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "inDays_one": "En {{count}} día",
+      "inDays_other": "En {{count}} días"
+    },
     "contextMenu": {
       "moveToMenu": "Mover a",
       "changeDue": "Cambiar fecha de vencimiento",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: Fijada en {{name}}. Para cancelar al soltar una tarea, pulsa Esc mientras su menú esté abierto.",
+    "dropDayOutside": "GTD Tasks: {{day}} está fuera de {{name}}. La tarea no se movió.",
     "moveFailed": "GTD Tasks: Error al mover — {{error}}",
     "toggleFailed": "GTD Tasks: Error al cambiar estado — {{error}}",
     "statusFailed": "GTD Tasks: Error al cambiar el estado de la tarea — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "Mostrar tareas completadas hasta medianoche",
         "description": "Las tareas completadas permanecen visibles con tachado en el panel hasta medianoche, luego desaparecen al siguiente cargado."
+      },
+      "dropIntoBucket": {
+        "name": "Al soltar una tarea en una categoría",
+        "description": "Fijarla allí o pedir una fecha del rango de la categoría. Las categorías sin rango de fechas siempre fijan.",
+        "pin": "Fijar",
+        "ask": "Pedir una fecha"
       },
       "markDueFlags": {
         "name": "Marcar tareas vencidas y mal clasificadas",

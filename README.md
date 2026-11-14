@@ -18,6 +18,7 @@ Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) pl
 - **Time-horizon buckets** — Today ⚡, This Week 📌, Next Week 🔭, This Month 📅, Someday / Maybe 💭. Rename them, swap the emoji, reorder them, or write your own date rules.
 - **To Review inbox** 📥 — every task without a bucket lands here, so nothing slips through.
 - **Three ways to move a task** — quick-move buttons on the row, drag-and-drop between buckets, or right-click.
+- **Drop to date** — drop a task into a bucket and pick a day from that bucket's range, instead of pinning it there.
 - **Subtask-aware** — indented tasks track with their parent, with a count badge and a prompt to move them along.
 - **Overdue and misfiled flags** — <img src="assets/icons/overdue.svg" width="16" height="16" alt="overdue"> once a due date has passed, <img src="assets/icons/misfiled.svg" width="16" height="16" alt="misfiled"> when a task sits in a bucket that will make you miss it.
 - **Reads Tasks plugin fields** — due dates, priority, recurrence and the rest show up as badges and on hover. Supports Emoji and Dataview formats.

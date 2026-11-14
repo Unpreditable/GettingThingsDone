@@ -31,7 +31,7 @@ meanwhile.
 | `specs/tasks.e2e.ts` | The panel with Tasks installed: a tick goes through Tasks, as it does in the editor |
 | `specs/dataview.e2e.ts` | Tasks' Dataview-format fields: what the panel reads from them, the tag / field name that may not reuse their keys, and ticking and editing them through Tasks |
 | `specs/waiting.e2e.ts` | Tasks that can't be done yet: a 🛫 date after today or an open ⛔ blocker dims the row; the popover explains, and the menu jumps to the blocker |
-| `specs/dates.e2e.ts` | Changing or setting a due or scheduled date from the row's menu: what each Plan by mode offers, what a pick writes, which date unpins; and the "Move to" submenu |
+| `specs/dates.e2e.ts` | Changing or setting a due or scheduled date from the row's menu: what each Plan by mode offers, what a pick writes, which date unpins; the "Move to" submenu; and a drop that gives the task a date from the bucket's range |
 | `specs/status.e2e.ts` | The "Toggle task done", "Toggle task in progress" and "Toggle task cancelled" commands in the editor, with and without Tasks |
 | `specs/notices.e2e.ts` | The what's new note: shown once to an upgraded install, never to a fresh one, queued behind the other banners; and the changelog it, the command and the settings page open |
 | `tsconfig.json` | Type-checks the specs |

@@ -24,6 +24,17 @@ describe("getDatePicker", () => {
     expect(pickDate).toHaveBeenCalledWith({ value: "2026-10-18", anchor });
   });
 
+  it("passes an allowed range through to pickDate", async () => {
+    const pickDate = jest.fn().mockResolvedValue("2026-11-13");
+    const pick = getDatePicker(appWith({ api: { pickDate } }))!;
+    await pick("2026-11-12", anchor, [{ from: "2026-11-12", to: "2026-11-15" }]);
+    expect(pickDate).toHaveBeenCalledWith({
+      value: "2026-11-12",
+      anchor,
+      allowed: [{ from: "2026-11-12", to: "2026-11-15" }],
+    });
+  });
+
   it("resolves null when the picker is closed", async () => {
     const pick = getDatePicker(appWith({ api: { pickDate: () => Promise.resolve(null) } }))!;
     await expect(pick("2026-10-18", anchor)).resolves.toBeNull();

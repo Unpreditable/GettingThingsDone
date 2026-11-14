@@ -20,6 +20,13 @@
       "message": "「{{name}}」はまだ存在しません。作成しますか？",
       "confirmButton": "作成"
     },
+    "dropMenu": {
+      "pinTo": "{{name}} に固定",
+      "today": "今日",
+      "tomorrow": "明日",
+      "inDays_one": "{{count}} 日後",
+      "inDays_other": "{{count}} 日後"
+    },
     "contextMenu": {
       "moveToMenu": "移動先",
       "changeDue": "期日を変更",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: {{name}} に固定しました。ドロップを取り消すには、メニューが開いている間に Esc を押してください。",
+    "dropDayOutside": "GTD Tasks: {{day}} は {{name}} の範囲外です。タスクは移動されませんでした。",
     "moveFailed": "GTD Tasks: 移動に失敗しました — {{error}}",
     "toggleFailed": "GTD Tasks: 切り替えに失敗しました — {{error}}",
     "statusFailed": "GTD Tasks: ステータスの変更に失敗しました — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "完了タスクを深夜まで表示",
         "description": "完了したタスクは深夜まで取り消し線付きでパネルに表示され、次回読み込み時に消えます。"
+      },
+      "dropIntoBucket": {
+        "name": "タスクをカテゴリにドロップしたとき",
+        "description": "そこに固定するか、カテゴリの期間から日付を尋ねます。日付範囲のないカテゴリは常に固定します。",
+        "pin": "固定",
+        "ask": "日付を尋ねる"
       },
       "markDueFlags": {
         "name": "期限切れ・分類ミスのタスクに印を付ける",

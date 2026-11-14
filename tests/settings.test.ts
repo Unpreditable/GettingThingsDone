@@ -257,6 +257,15 @@ describe("normalizeSettingsShapes", () => {
     expect(normalizeSettingsShapes(junk).weekStartsOn).toBe("monday");
   });
 
+  it("defaults dropIntoBucket to pin, and keeps a saved value", () => {
+    expect(DEFAULT_SETTINGS.dropIntoBucket).toBe("pin");
+    const ask = { ...DEFAULT_SETTINGS, dropIntoBucket: "ask" as const };
+    expect(normalizeSettingsShapes(ask).dropIntoBucket).toBe("ask");
+
+    const junk = { ...DEFAULT_SETTINGS, dropIntoBucket: "maybe" } as unknown as PluginSettings;
+    expect(normalizeSettingsShapes(junk).dropIntoBucket).toBe("pin");
+  });
+
   it("drops taskOrder bucket values that are not arrays", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

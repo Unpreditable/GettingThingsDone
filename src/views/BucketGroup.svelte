@@ -10,7 +10,7 @@
   import type { WaitingInfo } from "../core/Waiting";
   import { isInsertionAllowed } from "../core/DragConstraints";
   import type { BucketTree } from "../core/DragConstraints";
-  import { isDragging } from "./dragState";
+  import { headerDrop, headerDragOver as anyHeaderDragOver, isDragging } from "./dragState";
 
   export let bucketId: string;
   export let name: string;
@@ -76,6 +76,7 @@
     if (!collapsed || bucketId === TO_REVIEW_ID) return;
     e.preventDefault();
     headerDragOver = true;
+    anyHeaderDragOver.set(true);
   }
 
   function handleHeaderDragOver(e: DragEvent) {
@@ -87,18 +88,22 @@
   function handleHeaderDragLeave(e: DragEvent) {
     if (!collapsed || bucketId === TO_REVIEW_ID) return;
     headerDragOver = false;
+    anyHeaderDragOver.set(false);
   }
 
   function handleHeaderDrop(e: DragEvent) {
     if (!collapsed || bucketId === TO_REVIEW_ID) return;
     e.preventDefault();
     headerDragOver = false;
+    anyHeaderDragOver.set(false);
     const dragged = Sortable.dragged;
     if (!dragged) return;
     const taskId = dragged.dataset.taskId ?? "";
-    const sourceBucketId =
-      (dragged.parentElement as HTMLElement)?.dataset?.bucketId ?? "";
+    // The bucket the drag started in. The row's current parent may be a list it
+    // only crossed on the way here.
+    const sourceBucketId = Sortable.active?.el.dataset.bucketId ?? "";
     if (!taskId || sourceBucketId === bucketId) return;
+    headerDrop.taskId = taskId;
     dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId, orderedTaskIds: null });
   }
 
@@ -172,9 +177,11 @@
       chosenClass: "sortable-chosen",
       dataIdAttr: "data-task-id",
       onStart() {
+        headerDrop.taskId = null;
         isDragging.set(true);
       },
       onEnd() {
+        anyHeaderDragOver.set(false);
         isDragging.set(false);
       },
       onMove(evt) {
@@ -269,6 +276,10 @@
         // evt.to right now, so evt.from's indices are unshifted and oldIndex
         // addresses the node that follows it directly.
         evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex ?? 0] ?? null);
+        if (headerDrop.taskId === taskId) {
+          headerDrop.taskId = null;
+          return;
+        }
         dispatch("drop", { taskId, sourceBucketId, targetBucketId: bucketId, orderedTaskIds });
       },
       onUpdate(evt) {
@@ -289,6 +300,12 @@
         // visibly misplaced and creeping one more slot per repeat drag.
         evt.item.remove();
         evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex ?? 0] ?? null);
+        // A drag that passed its own siblings on the way to a collapsed header
+        // ends in a header drop, not a reorder.
+        if (headerDrop.taskId === taskId) {
+          headerDrop.taskId = null;
+          return;
+        }
         dispatch("reorder", { bucketId, orderedTaskIds });
       },
     });

@@ -35,6 +35,18 @@
       "confirmButton_comment": "Button: create the missing note and open it.",
       "confirmButton": "Create"
     },
+    "dropMenu": {
+      "_comment": "Menu that opens when a task is dragged into a bucket with a date range and the 'Dropping a task into a bucket' setting is 'Ask for a date'. Each date item shows the day itself (e.g. 'Sun, 18 Oct') dimmed at the right, so keep these short.",
+      "pinTo_comment": "First item: keep the task in the bucket with a tag instead of giving it a date. {{name}} is the bucket's emoji and name, e.g. '📅 This Week'.",
+      "pinTo": "Pin to {{name}}",
+      "today_comment": "Date item: today.",
+      "today": "Today",
+      "tomorrow_comment": "Date item: tomorrow.",
+      "tomorrow": "Tomorrow",
+      "inDays_comment": "Date item: {{count}} days from today. i18next plural forms: _one for exactly 1, _other for all other counts.",
+      "inDays_one": "In {{count}} day",
+      "inDays_other": "In {{count}} days"
+    },
     "contextMenu": {
       "moveToMenu_comment": "Right-click context menu item on a task. Opens a submenu listing the other buckets by name; choosing one moves the task there.",
       "moveToMenu": "Move to",
@@ -228,6 +240,10 @@
     }
   },
   "notices": {
+    "dropPinned_comment": "Shown when the date menu that opens on dropping a task into a bucket was closed by a click elsewhere: the task was pinned to that bucket. {{name}} is the bucket's emoji and name, e.g. '📌 This Week'. Esc is the Escape key.",
+    "dropPinned": "GTD Tasks: Pinned to {{name}}. To cancel a drop, press Esc while its menu is open.",
+    "dropDayOutside_comment": "Shown when the day picked from the calendar after dropping a task into a bucket is outside that bucket's dates. {{day}} is a short date, e.g. 'Sun, 18 Oct'; {{name}} is the bucket's emoji and name.",
+    "dropDayOutside": "GTD Tasks: {{day}} is outside {{name}}. The task was not moved.",
     "_comment": "Toast notifications shown in Obsidian's notification area. All prefixed with 'GTD Tasks:' so users can identify their source. {{error}} is the raw error message from the failed operation.",
     "moveFailed": "GTD Tasks: Move failed — {{error}}",
     "toggleFailed": "GTD Tasks: Toggle failed — {{error}}",
@@ -353,6 +369,17 @@
         "name": "Show completed tasks until midnight",
         "description_comment": "The 'strikethrough' refers to the visual style of completed tasks in the panel.",
         "description": "Completed tasks remain visible as strikethrough in the panel until midnight, then disappear on next load."
+      },
+      "dropIntoBucket": {
+        "_comment": "Dropdown for what dragging a task into another bucket does. 'Pin' keeps the task in that bucket with a tag; 'Ask for a date' opens a menu of dates from the bucket's date range.",
+        "name_comment": "Setting name.",
+        "name": "Dropping a task into a bucket",
+        "description_comment": "Setting description. 'Range' is the span of dates a bucket such as This Week covers.",
+        "description": "Pin it there, or ask for a date from the bucket's range. Buckets without a date range always pin.",
+        "pin_comment": "Dropdown option: the task is pinned to the bucket it was dropped into.",
+        "pin": "Pin",
+        "ask_comment": "Dropdown option: a menu asks for a date when the task is dropped.",
+        "ask": "Ask for a date"
       },
       "markDueFlags": {
         "_comment": "Toggle for the two due-date badges on task rows. Settings renders each badge icon in its own coloured span, so neither description below names it. Each description must read as a continuation of the icon that precedes it.",

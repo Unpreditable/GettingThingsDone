@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Features
+- Dropping a task into a bucket can ask for a date from that bucket's range instead of pinning it (Settings → Dropping a task into a bucket).
+
 ## 0.3.0
 
 #### Features

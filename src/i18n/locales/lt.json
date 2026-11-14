@@ -20,6 +20,15 @@
       "message": "„{{name}}“ dar neegzistuoja. Sukurti?",
       "confirmButton": "Sukurti"
     },
+    "dropMenu": {
+      "pinTo": "Prisegti prie {{name}}",
+      "today": "Šiandien",
+      "tomorrow": "Rytoj",
+      "inDays_one": "Po {{count}} dienos",
+      "inDays_few": "Po {{count}} dienų",
+      "inDays_many": "Po {{count}} dienos",
+      "inDays_other": "Po {{count}} dienų"
+    },
     "contextMenu": {
       "moveToMenu": "Perkelti į",
       "changeDue": "Keisti terminą",
@@ -156,6 +165,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: Prisegta prie {{name}}. Norėdami atšaukti nutempimą, paspauskite Esc, kol jo meniu atidarytas.",
+    "dropDayOutside": "GTD Tasks: {{day}} nepatenka į {{name}}. Užduotis nebuvo perkelta.",
     "moveFailed": "GTD Tasks: Perkėlimas nepavyko — {{error}}",
     "toggleFailed": "GTD Tasks: Perjungimas nepavyko — {{error}}",
     "statusFailed": "GTD Tasks: Būsenos keitimas nepavyko — {{error}}",
@@ -235,6 +246,12 @@
       "showCompleted": {
         "name": "Rodyti atliktas užduotis iki vidurnakčio",
         "description": "Atliktos užduotys lieka matomos skydelyje su perbraukimu iki vidurnakčio, tada dingsta kitą kartą įkėlus."
+      },
+      "dropIntoBucket": {
+        "name": "Užduoties nutempimas į kategoriją",
+        "description": "Prisegti ją ten arba paklausti datos iš kategorijos intervalo. Kategorijos be datų intervalo visada prisega.",
+        "pin": "Prisegti",
+        "ask": "Paklausti datos"
       },
       "markDueFlags": {
         "name": "Žymėti vėluojančias ir netinkamai priskirtas užduotis",

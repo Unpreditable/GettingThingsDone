@@ -20,6 +20,13 @@
       "message": "“{{name}}” 노트가 아직 없습니다. 만드시겠습니까?",
       "confirmButton": "만들기"
     },
+    "dropMenu": {
+      "pinTo": "{{name}}에 고정",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "inDays_one": "{{count}}일 후",
+      "inDays_other": "{{count}}일 후"
+    },
     "contextMenu": {
       "moveToMenu": "이동",
       "changeDue": "마감일 변경",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: {{name}}에 고정했습니다. 놓기를 취소하려면 메뉴가 열려 있는 동안 Esc를 누르세요.",
+    "dropDayOutside": "GTD Tasks: {{day}}은(는) {{name}} 범위 밖입니다. 작업을 옮기지 않았습니다.",
     "moveFailed": "GTD Tasks: 이동 실패 — {{error}}",
     "toggleFailed": "GTD Tasks: 전환 실패 — {{error}}",
     "statusFailed": "GTD Tasks: 상태 변경 실패 — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "자정까지 완료된 작업 표시",
         "description": "완료된 작업은 자정까지 패널에 취소선으로 표시되며, 다음 로드 시 사라집니다."
+      },
+      "dropIntoBucket": {
+        "name": "작업을 카테고리에 놓을 때",
+        "description": "그곳에 고정하거나 카테고리 범위의 날짜를 묻습니다. 날짜 범위가 없는 카테고리는 항상 고정합니다.",
+        "pin": "고정",
+        "ask": "날짜 묻기"
       },
       "markDueFlags": {
         "name": "기한 초과 및 잘못 분류된 작업 표시",

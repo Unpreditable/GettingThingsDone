@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Nauja
+- Į kategoriją nutempta užduotis gali paklausti datos iš tos kategorijos intervalo, užuot ją prisegusi (Nustatymai → Užduoties nutempimas į kategoriją).
+
 ## 0.3.0
 
 #### Nauja

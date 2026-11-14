@@ -20,6 +20,13 @@
       "message": "",
       "confirmButton": ""
     },
+    "dropMenu": {
+      "pinTo": "",
+      "today": "",
+      "tomorrow": "",
+      "inDays_one": "",
+      "inDays_other": ""
+    },
     "contextMenu": {
       "moveToMenu": "",
       "changeDue": "",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "",
+    "dropDayOutside": "",
     "moveFailed": "",
     "toggleFailed": "",
     "statusFailed": "",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "",
         "description": ""
+      },
+      "dropIntoBucket": {
+        "name": "",
+        "description": "",
+        "pin": "",
+        "ask": ""
       },
       "markDueFlags": {
         "name": "",

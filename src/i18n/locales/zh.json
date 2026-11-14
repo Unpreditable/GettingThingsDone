@@ -20,6 +20,13 @@
       "message": "“{{name}}”尚不存在。要创建吗？",
       "confirmButton": "创建"
     },
+    "dropMenu": {
+      "pinTo": "固定到 {{name}}",
+      "today": "今天",
+      "tomorrow": "明天",
+      "inDays_one": "{{count}} 天后",
+      "inDays_other": "{{count}} 天后"
+    },
     "contextMenu": {
       "moveToMenu": "移动到",
       "changeDue": "更改截止日期",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: 已固定到 {{name}}。要取消拖放，请在其菜单打开时按 Esc。",
+    "dropDayOutside": "GTD Tasks: {{day}} 不在 {{name}} 范围内。任务未移动。",
     "moveFailed": "GTD Tasks：移动失败——{{error}}",
     "toggleFailed": "GTD Tasks：切换失败——{{error}}",
     "statusFailed": "GTD Tasks：状态更改失败——{{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "在午夜前显示已完成任务",
         "description": "已完成的任务将以删除线形式在面板中显示至午夜，之后在下次加载时消失。"
+      },
+      "dropIntoBucket": {
+        "name": "将任务拖入分类时",
+        "description": "固定到该分类，或从该分类的日期范围中询问日期。没有日期范围的分类始终固定。",
+        "pin": "固定",
+        "ask": "询问日期"
       },
       "markDueFlags": {
         "name": "标记逾期和归类错误的任务",

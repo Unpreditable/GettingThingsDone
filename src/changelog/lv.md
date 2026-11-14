@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Jaunums
+- Kategorijā nomests uzdevums var jautāt datumu no tās diapazona, nevis to piespraust (Iestatījumi → Uzdevuma nomešana kategorijā).
+
 ## 0.3.0
 
 #### Jaunums

@@ -611,6 +611,7 @@ class GtdPanelView extends ItemView {
         onEdit: this.handleEdit.bind(this),
         onSetStatus: this.handleSetStatus.bind(this),
         onSetDate: this.handleSetDate.bind(this),
+        onDropDate: this.handleDropDate.bind(this),
         getDatePicker: () => getDatePicker(this.app),
         onReorder: this.handleReorder.bind(this),
         onDismiss: (tasks: TaskRecord[]) => this.plugin.dismissCompleted(tasks),
@@ -699,6 +700,44 @@ class GtdPanelView extends ItemView {
     // Always refresh once here, now that the index and taskOrder are both
     // settled — the moved task's bucket assignment changed regardless of
     // whether taskOrder itself did, so the panel always needs to redraw.
+    await this.plugin.saveSettings();
+  }
+
+  /**
+   * A drop that gives the task a date from the target bucket's range. Unpins in
+   * the same write, since a pin would override the date, then settles the index
+   * and the drop position before the one refresh, as handleMove does.
+   */
+  async handleDropDate(
+    task: TaskRecord,
+    field: DateField,
+    date: string,
+    targetBucketId: string,
+    orderedTaskIds: string[] | null
+  ) {
+    const settings = this.plugin.settings;
+    const result = await replaceTaskLine(this.app, task, (line) => [setDateLine(line, field, date, true, settings)]);
+    if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
+      new Notice(t("notices.dateFailed", { error: result.error }));
+      await this.plugin.taskIndex.reindexFile(task.filePath);
+      return;
+    }
+
+    const diff = diffForEdit(
+      parseFile(task.filePath, result.before, getTaskFilter(settings)),
+      parseFile(task.filePath, result.after, getTaskFilter(settings)),
+      result.lineIdx,
+      1,
+      activeOrderKeyScheme(settings)
+    );
+    this.plugin.recordTaskDiff(task.filePath, diff);
+    await this.plugin.taskIndex.reindexFileSilently(task.filePath);
+
+    const orderEntries = computeOrderKeys(this.plugin.taskIndex.getAllTasks(), activeOrderKeyScheme(settings));
+    const entry = orderEntries.get(task.id);
+    if (entry) settings.taskOrder = purgeOrderEntry(settings.taskOrder, entry).taskOrder;
+    if (orderedTaskIds) settings.taskOrder[targetBucketId] = mapToOrderEntries(orderedTaskIds, orderEntries);
+
     await this.plugin.saveSettings();
   }
 

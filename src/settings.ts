@@ -42,6 +42,8 @@ export type PlanBy =
   | "scheduled-only"
   | "earliest";
 
+export type DropIntoBucket = "pin" | "ask";
+
 export type CelebrationMode = "off" | "confetti" | "creature" | "all";
 
 /** Which Tasks-plugin priority levels get an emoji badge on the task row. */
@@ -123,6 +125,8 @@ export interface PluginSettings {
   tagPrefix: string;
   /** Completed tasks remain visible (as strikethrough) until midnight. */
   completedVisibilityUntilMidnight: boolean;
+  /** What dropping a task into a bucket with a date range does: pin it, or ask for a date. */
+  dropIntoBucket: DropIntoBucket;
   /** Show the overdue and misfiled badges on task rows. The field name
    *  predates the two-state split; it stays because it is persisted in
    *  data.json and renaming it would need a migration for no visible gain. */
@@ -247,6 +251,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   panelOpenedOnce: false,
   tagPrefix: "gtd",
   completedVisibilityUntilMidnight: true,
+  dropIntoBucket: "pin",
   staleIndicatorEnabled: true,
   toReviewEmoji: "📥",
   toReviewQuickMoveTargets: ["today", "this-week"],
@@ -496,6 +501,7 @@ export function normalizeSettingsShapes(settings: PluginSettings): PluginSetting
     orderKeyScheme:
       scheme !== null && knownSchemes.includes(scheme) ? scheme : null,
     weekStartsOn: WEEK_STARTS.includes(weekStart) ? weekStart : "monday",
+    dropIntoBucket: settings.dropIntoBucket === "ask" ? "ask" : "pin",
     scopePaths: normalizePathEntries(settings.scopePaths),
     ignoredPaths: normalizePathEntries(settings.ignoredPaths),
     taskFilters: normalizeTaskFilters(settings.taskFilters),

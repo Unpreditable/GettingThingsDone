@@ -20,6 +20,14 @@
       "message": "„{{name}}” vēl nepastāv. Izveidot?",
       "confirmButton": "Izveidot"
     },
+    "dropMenu": {
+      "pinTo": "Piespraust {{name}}",
+      "today": "Šodien",
+      "tomorrow": "Rīt",
+      "inDays_zero": "Pēc {{count}} dienām",
+      "inDays_one": "Pēc {{count}} dienas",
+      "inDays_other": "Pēc {{count}} dienām"
+    },
     "contextMenu": {
       "moveToMenu": "Pārvietot uz",
       "changeDue": "Mainīt termiņu",
@@ -153,6 +161,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: Piesprausts kategorijai {{name}}. Lai atceltu nomešanu, nospiediet Esc, kamēr tās izvēlne ir atvērta.",
+    "dropDayOutside": "GTD Tasks: {{day}} ir ārpus {{name}}. Uzdevums netika pārvietots.",
     "moveFailed": "GTD Tasks: Pārvietošana neizdevās — {{error}}",
     "toggleFailed": "GTD Tasks: Pārslēgšana neizdevās — {{error}}",
     "statusFailed": "GTD Tasks: Statusa maiņa neizdevās — {{error}}",
@@ -231,6 +241,12 @@
       "showCompleted": {
         "name": "Rādīt paveiktos uzdevumus līdz pusnaktij",
         "description": "Paveiktie uzdevumi paliek redzami paneļa ar pārsvītrojumu līdz pusnaktij, pēc tam pazūd nākamajā ielādē."
+      },
+      "dropIntoBucket": {
+        "name": "Uzdevuma nomešana kategorijā",
+        "description": "Piespraust to tur vai jautāt datumu no kategorijas diapazona. Kategorijas bez datumu diapazona vienmēr piesprauž.",
+        "pin": "Piespraust",
+        "ask": "Jautāt datumu"
       },
       "markDueFlags": {
         "name": "Atzīmēt nokavētos un nepareizi sakārtotos uzdevumus",

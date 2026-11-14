@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Nouveautés
+- Déposer une tâche dans une catégorie peut demander une date dans la plage de cette catégorie au lieu de l'épingler (Paramètres → Déposer une tâche dans une catégorie).
+
 ## 0.3.0
 
 #### Nouveautés

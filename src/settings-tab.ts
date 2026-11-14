@@ -396,6 +396,18 @@ export class GtdSettingsTab extends PluginSettingTab {
             control: { type: "toggle", key: "completedVisibilityUntilMidnight" },
           },
           {
+            name: t("settings.behaviour.dropIntoBucket.name"),
+            desc: t("settings.behaviour.dropIntoBucket.description"),
+            control: {
+              type: "dropdown",
+              key: "dropIntoBucket",
+              options: {
+                pin: t("settings.behaviour.dropIntoBucket.pin"),
+                ask: t("settings.behaviour.dropIntoBucket.ask"),
+              },
+            },
+          },
+          {
             name: t("settings.behaviour.markDueFlags.name"),
             desc: markDueFlagsDesc(),
             control: { type: "toggle", key: "staleIndicatorEnabled" },
@@ -842,6 +854,18 @@ export class GtdSettingsTab extends PluginSettingTab {
         tog.setValue(this.plugin.settings.completedVisibilityUntilMidnight);
         tog.onChange(async (val) => {
           await this.setControlValue("completedVisibilityUntilMidnight", val);
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(t("settings.behaviour.dropIntoBucket.name"))
+      .setDesc(t("settings.behaviour.dropIntoBucket.description"))
+      .addDropdown((dd) => {
+        dd.addOption("pin", t("settings.behaviour.dropIntoBucket.pin"));
+        dd.addOption("ask", t("settings.behaviour.dropIntoBucket.ask"));
+        dd.setValue(this.plugin.settings.dropIntoBucket ?? "pin");
+        dd.onChange(async (val) => {
+          await this.setControlValue("dropIntoBucket", val);
         });
       });
 

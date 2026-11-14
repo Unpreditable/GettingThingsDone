@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Neu
+- Eine Aufgabe, die in eine Kategorie gezogen wird, kann nach einem Datum aus deren Bereich fragen, statt sie anzuheften (Einstellungen → Aufgabe in eine Kategorie ziehen).
+
 ## 0.3.0
 
 #### Neu

@@ -20,6 +20,13 @@
       "message": "«{{name}}» ainda não existe. Criar?",
       "confirmButton": "Criar"
     },
+    "dropMenu": {
+      "pinTo": "Fixar em {{name}}",
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "inDays_one": "Daqui a {{count}} dia",
+      "inDays_other": "Daqui a {{count}} dias"
+    },
     "contextMenu": {
       "moveToMenu": "Mover para",
       "changeDue": "Alterar data de vencimento",
@@ -150,6 +157,8 @@
     }
   },
   "notices": {
+    "dropPinned": "GTD Tasks: Fixada em {{name}}. Para cancelar ao largar uma tarefa, prima Esc enquanto o menu estiver aberto.",
+    "dropDayOutside": "GTD Tasks: {{day}} está fora de {{name}}. A tarefa não foi movida.",
     "moveFailed": "GTD Tasks: Falha ao mover — {{error}}",
     "toggleFailed": "GTD Tasks: Falha ao alternar — {{error}}",
     "statusFailed": "GTD Tasks: Falha ao alterar o status — {{error}}",
@@ -227,6 +236,12 @@
       "showCompleted": {
         "name": "Mostrar tarefas concluídas até à meia-noite",
         "description": "As tarefas concluídas permanecem visíveis com riscado no painel até à meia-noite, desaparecendo no próximo carregamento."
+      },
+      "dropIntoBucket": {
+        "name": "Ao largar uma tarefa numa categoria",
+        "description": "Fixá-la aí ou pedir uma data do intervalo da categoria. Categorias sem intervalo de datas fixam sempre.",
+        "pin": "Fixar",
+        "ask": "Pedir uma data"
       },
       "markDueFlags": {
         "name": "Sinalizar tarefas atrasadas e mal classificadas",

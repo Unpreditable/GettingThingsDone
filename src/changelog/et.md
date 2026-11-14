@@ -1,3 +1,8 @@
+## Unreleased
+
+#### Uus
+- Kategooriasse lohistatud ülesanne võib kinnitamise asemel küsida kuupäeva selle kategooria vahemikust (Seaded → Ülesande lohistamine kategooriasse).
+
 ## 0.3.0
 
 #### Uus
