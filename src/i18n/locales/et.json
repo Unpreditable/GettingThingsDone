@@ -192,6 +192,21 @@
       "none": "Migreerida pole midagi",
       "inProgress": "Migreeritakse…"
     },
+    "pinning": {
+      "pageName": "Kinnitamine",
+      "intro": "Ülesande kinnitamisel kategooriasse lisatakse selle rea lõppu märgis. Need seaded määravad märgise vormingu.",
+      "format": {
+        "name": "Vorming",
+        "tag": "Silt",
+        "field": "Väli",
+        "tagBullet": "Silt — #{{name}}/bucket-id, nt #{{name}}/today",
+        "fieldBullet": "Väli — [{{name}}:: bucket-id], nt [{{name}}:: today], Dataview loeb seda"
+      },
+      "name": {
+        "name": "Nimi",
+        "reserved": "\"{{name}}\" on Tasksi välja nimi. Vali teine nimi."
+      }
+    },
     "tagFieldName": {
       "name": "Sildi / välja nimi",
       "description": "Kasutatakse sildi eesliitena reasisese sildi režiimis (#<nimi>/kategooria-id) ja välja võtmena reasisese välja režiimis ([<nimi>:: kategooria-id]).",
@@ -214,10 +229,24 @@
       "folderNotFound": "Kausta ei leitud",
       "fileNotFound": "Faili ei leitud"
     },
+    "filterPage": {
+      "intro": "Hoia paneelilt eemal kontrollnimekirjad, mis pole ülesanded, näiteks pakkimisnimekirjad. Ülesanneteks loetakse ainult märkeruudud, mis sisaldavad sinu valitud silti või sõna. See toimib sarnaselt Tasks pistikprogrammi globaalse filtriga.",
+      "name": "Filter",
+      "description": "Üks rea kohta, tõstutundlik. Tühjana näidatakse kõiki.",
+      "includeSubtasks": {
+        "name": "Kaasa alamülesanded",
+        "description": "Sobiva ülesande alamülesanded loevad samuti, isegi ilma sildi või sõnata."
+      },
+      "hideText": {
+        "name": "Peida filtri tekst",
+        "description": "Ainult paneelil; sinu märkmed ei muutu."
+      }
+    },
     "taskFilter": {
       "name": "Globaalne ülesannete filter",
       "description": "Ülesanneteks saavad ainult märkeruudud, mis sisaldavad mõnda neist tekstidest. Üks rea kohta, tõstutundlik. Tühjaks jätmisel kaasatakse kõik märkeruudud.",
       "placeholder": "nt #task või TODO",
+      "summaryOff": "Väljas",
       "includeSubtasks": {
         "name": "Arvesta sobiva ülesande alamülesandeid ülesanneteks",
         "description": "Filtrile vastava ülesande all olev alamülesanne on samuti ülesanne, isegi kui see ise filtriteksti ei sisalda."
@@ -231,34 +260,34 @@
       "heading": "Käitumine",
       "weekStart": {
         "name": "Nädala esimene päev",
-        "description": "Kehtib ainult kuupäevareeglitele „See nädal“ ja „Järgmine nädal“."
+        "description": "Kasutavad kuupäevareeglid „See nädal“ ja „Järgmine nädal“."
       },
       "showCompleted": {
         "name": "Näita lõpetatud ülesandeid kuni südaööni",
-        "description": "Lõpetatud ülesanded jäävad paneelile läbikriipsutuna nähtavaks kuni südaööni, seejärel kaovad järgmisel laadimisel."
+        "description": "Hoiab täna tehtu läbikriipsutatuna nähtaval."
       },
       "dropIntoBucket": {
         "name": "Ülesande lohistamine kategooriasse",
-        "description": "Kinnita see sinna või küsi kuupäeva kategooria vahemikust. Kuupäevavahemikuta kategooriad kinnitavad alati.",
+        "description": "Kinnita või küsi kuupäeva kategooria vahemikust. Vahemikuta kategooriad kinnitavad alati.",
         "pin": "Kinnita",
         "ask": "Küsi kuupäeva"
       },
       "markDueFlags": {
         "name": "Märgi tähtaja ületanud ja valesti paigutatud ülesanded",
-        "descriptionOverdue": "märgib ülesanded, mille tähtaeg on möödas.",
-        "descriptionMisfiled": "soovitab paremat kategooriat, et tähtaeg ei jääks märkamata: täna tähtaja saabuv ülesanne kategoorias {{later}} kuulub kategooriasse {{sooner}}."
+        "descriptionOverdue": "tähtaeg on möödas.",
+        "descriptionMisfiled": "tähtaeg on varasem kui kategoorial, nt tähtaeg täna, aga kategoorias {{later}}."
       },
       "openLinks": {
         "name": "Ava lingid paneelilt",
-        "description": "Ülesandes olevale lingile klõpsamine avab lingi, selle asemel et näidata ülesannet selle märkmes."
+        "description": "Lingile klõpsamine avab lingi, mitte ülesande märkme."
       },
       "compactView": {
         "name": "Kompaktne vaade",
-        "description": "Vähenda kategooriate päiste ja ülesannete ridade täidist, et ekraanil mahutada rohkem ülesandeid."
+        "description": "Vähem täidist, rohkem ülesandeid ekraanil."
       },
       "celebration": {
         "name": "Tähistamise animatsioonid",
-        "description": "Vali animatsioonid, mis mängivad ülesande lõpetamisel.",
+        "description": "Mängivad ülesande lõpetamisel.",
         "off": "Väljas",
         "confettiOnly": "Ainult konfetti",
         "celebrationOnly": "Ainult tähistamine",
@@ -334,7 +363,7 @@
       "blurb": "Kuidas see plugin kohtleb metaandmeid, mida Tasks plugin ülesannete ridadele kirjutab.",
       "planBy": {
         "name": "Ülesande kuupäev",
-        "description": "Milline Tasks pistikprogrammi kuupäev määrab ülesande kategooria ja järjekorra selle sees.",
+        "description": "Milline kuupäev määrab ülesande kategooria ja järjekorra selle sees.",
         "descriptionPinned": "Kinnitatud ülesanded eiravad seda seadet.",
         "manual": "Eira kuupäevi",
         "dueOnly": "Tähtaeg",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "Näita prioriteeti",
-        "description": "Millised prioriteeditasemed saavad ülesande reale emoji märgise.",
         "all": "Kõik prioriteedid",
         "mediumUp": "Keskmine ja kõrgem",
         "highUp": "Kõrge ja kõrgem",
         "hidden": "Peidetud"
       },
       "recurrence": {
-        "name": "Näita kordumise märgist",
-        "description": "Märgi korduvad ülesanded 🔁 sümboliga ülesande real."
+        "name": "Näita kordumise märgist"
       },
       "popoverFields": {
         "name": "Näita Tasks välju hüpikaknas",
-        "description": "Kuva tähtaeg, prioriteet, kordumine ja teised Tasks väljad, kui hõljutad hiirt ülesande kohal."
+        "description": "Ülesande kohal hõljutamisel loetletakse selle kuupäevad, prioriteet ja teised Tasks väljad."
       }
     }
   },

@@ -192,6 +192,21 @@
       "none": "마이그레이션할 작업 없음",
       "inProgress": "마이그레이션 중…"
     },
+    "pinning": {
+      "pageName": "고정",
+      "intro": "작업을 카테고리에 고정하면 해당 줄 끝에 표시가 추가됩니다. 이 설정은 표시의 형식을 정합니다.",
+      "format": {
+        "name": "형식",
+        "tag": "태그",
+        "field": "필드",
+        "tagBullet": "태그 — #{{name}}/bucket-id, 예: #{{name}}/today",
+        "fieldBullet": "필드 — [{{name}}:: bucket-id], 예: [{{name}}:: today], Dataview에서 읽을 수 있음"
+      },
+      "name": {
+        "name": "이름",
+        "reserved": "\"{{name}}\"은(는) Tasks의 필드 이름입니다. 다른 이름을 선택하세요."
+      }
+    },
     "tagFieldName": {
       "name": "태그 / 필드 이름",
       "description": "인라인 태그 모드에서는 태그 접두사(#<이름>/카테고리ID), 인라인 필드 모드에서는 필드 키([<이름>:: 카테고리ID])로 사용됩니다.",
@@ -214,10 +229,24 @@
       "folderNotFound": "폴더를 찾을 수 없음",
       "fileNotFound": "파일을 찾을 수 없음"
     },
+    "filterPage": {
+      "intro": "짐 목록처럼 작업이 아닌 체크리스트를 패널에서 제외하세요. 선택한 태그나 단어가 포함된 체크박스만 작업으로 간주됩니다. Tasks 플러그인의 전역 필터와 비슷하게 작동합니다.",
+      "name": "필터",
+      "description": "한 줄에 하나씩, 대소문자를 구분합니다. 비워 두면 모두 표시합니다.",
+      "includeSubtasks": {
+        "name": "하위 작업 포함",
+        "description": "일치하는 작업의 하위 작업은 태그나 단어가 없어도 포함됩니다."
+      },
+      "hideText": {
+        "name": "필터 텍스트 숨기기",
+        "description": "패널에서만 적용되며 노트는 바뀌지 않습니다."
+      }
+    },
     "taskFilter": {
       "name": "전역 작업 필터",
       "description": "이 중 하나를 포함하는 체크박스만 작업이 됩니다. 한 줄에 하나씩, 대소문자를 구분합니다. 비워 두면 모든 체크박스가 포함됩니다.",
       "placeholder": "예: #task 또는 TODO",
+      "summaryOff": "끔",
       "includeSubtasks": {
         "name": "일치하는 작업의 하위 작업도 작업으로 간주",
         "description": "필터와 일치하는 작업 아래의 하위 작업은 필터 텍스트를 직접 포함하지 않아도 작업이 됩니다."
@@ -231,34 +260,34 @@
       "heading": "동작",
       "weekStart": {
         "name": "주 시작 요일",
-        "description": "'이번 주'와 '다음 주' 날짜 규칙에만 적용됩니다."
+        "description": "'이번 주'와 '다음 주' 날짜 규칙에 사용됩니다."
       },
       "showCompleted": {
         "name": "자정까지 완료된 작업 표시",
-        "description": "완료된 작업은 자정까지 패널에 취소선으로 표시되며, 다음 로드 시 사라집니다."
+        "description": "오늘 완료한 작업을 취소선으로 계속 보여 줍니다."
       },
       "dropIntoBucket": {
-        "name": "작업을 카테고리에 놓을 때",
-        "description": "그곳에 고정하거나 카테고리 범위의 날짜를 묻습니다. 날짜 범위가 없는 카테고리는 항상 고정합니다.",
+        "name": "작업을 카테고리로 드래그할 때",
+        "description": "고정하거나 카테고리 범위의 날짜를 묻습니다. 범위가 없는 카테고리는 항상 고정합니다.",
         "pin": "고정",
         "ask": "날짜 묻기"
       },
       "markDueFlags": {
         "name": "기한 초과 및 잘못 분류된 작업 표시",
-        "descriptionOverdue": "는 마감일이 지난 작업을 표시합니다.",
-        "descriptionMisfiled": "는 마감일을 놓치지 않도록 더 적합한 버킷을 제안합니다. 오늘 마감인데 '{{later}}'에 있는 작업은 '{{sooner}}'에 있어야 합니다."
+        "descriptionOverdue": "는 마감일이 지났음을 뜻합니다.",
+        "descriptionMisfiled": "는 카테고리보다 마감일이 빠름을 뜻합니다. 예: 오늘 마감인데 '{{later}}'에 있음."
       },
       "openLinks": {
         "name": "패널에서 링크 열기",
-        "description": "작업의 링크를 클릭하면 노트에서 작업을 표시하는 대신 링크를 엽니다."
+        "description": "링크를 클릭하면 작업의 노트가 아닌 링크를 엽니다."
       },
       "compactView": {
         "name": "컴팩트 보기",
-        "description": "카테고리 헤더와 작업 행의 여백을 줄여 화면에 더 많은 작업을 표시합니다."
+        "description": "여백을 줄여 화면에 더 많은 작업을 표시합니다."
       },
       "celebration": {
         "name": "축하 애니메이션",
-        "description": "작업 완료 시 재생할 애니메이션을 선택합니다.",
+        "description": "작업을 완료할 때 재생됩니다.",
         "off": "끄기",
         "confettiOnly": "색종이만",
         "celebrationOnly": "축하만",
@@ -334,7 +363,7 @@
       "blurb": "Tasks 플러그인이 작업 줄에 기록하는 메타데이터를 이 플러그인이 처리하는 방식입니다.",
       "planBy": {
         "name": "작업 날짜",
-        "description": "Tasks 플러그인의 어떤 날짜가 작업의 카테고리와 그 안에서의 순서를 결정하는지.",
+        "description": "어떤 날짜가 작업의 카테고리와 그 안에서의 순서를 결정하는지.",
         "descriptionPinned": "고정된 작업은 이 설정을 무시합니다.",
         "manual": "날짜 무시",
         "dueOnly": "마감일",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "우선순위 표시",
-        "description": "작업 행에 이모지 배지로 표시할 우선순위 수준입니다.",
         "all": "모든 우선순위",
         "mediumUp": "보통 이상",
         "highUp": "높음 이상",
         "hidden": "숨김"
       },
       "recurrence": {
-        "name": "반복 배지 표시",
-        "description": "반복되는 작업의 작업 행에 🔁를 표시합니다."
+        "name": "반복 배지 표시"
       },
       "popoverFields": {
         "name": "팝오버에 Tasks 필드 표시",
-        "description": "작업에 마우스를 올렸을 때 마감일, 우선순위, 반복 등의 Tasks 필드를 나열합니다."
+        "description": "작업에 마우스를 올리면 날짜, 우선순위 및 기타 Tasks 필드를 나열합니다."
       }
     }
   },

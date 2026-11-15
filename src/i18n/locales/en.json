@@ -299,6 +299,31 @@
       "inProgress_comment": "Shown on the migrate button while the migration is running.",
       "inProgress": "Migrating…"
     },
+    "pinning": {
+      "_comment": "The Obsidian 1.13+ settings page for how a pinned task's bucket is written on its line. Older Obsidian shows the same two settings with the strings under annotationStyle and tagFieldName instead. To pin a task is to place it in a bucket by hand, so that no date moves it.",
+      "pageName_comment": "Name of the entry that opens this page. Beside it the entry shows the current format, e.g. #gtd/bucket-id or [gtd:: bucket-id], which is not translated.",
+      "pageName": "Pinning",
+      "intro_comment": "Shown at the top of the page, above the 'Format' and 'Name' settings, which choose the marker's format: a tag like #gtd/today or a field like [gtd:: today].",
+      "intro": "Pinning a task to a bucket adds a marker to the end of its line. These settings choose the marker's format.",
+      "format": {
+        "name_comment": "Setting name for the dropdown that picks a tag or a field as the marker.",
+        "name": "Format",
+        "tag_comment": "Dropdown option: the marker is a hashtag like #gtd/today.",
+        "tag": "Tag",
+        "field_comment": "Dropdown option: the marker is a Dataview-compatible field like [gtd:: today].",
+        "field": "Field",
+        "tagBullet_comment": "First of two bullets under the setting, one per dropdown option; it starts with that option's label. {{name}} = the 'Name' setting below (default: gtd), shown as typed. 'bucket-id' is a placeholder for a bucket's id and 'today' is the id of the Today bucket; neither is translated.",
+        "tagBullet": "Tag — #{{name}}/bucket-id, e.g. #{{name}}/today",
+        "fieldBullet_comment": "Second bullet, for the Field option; see tagBullet. Dataview is a popular Obsidian plugin for querying notes.",
+        "fieldBullet": "Field — [{{name}}:: bucket-id], e.g. [{{name}}:: today], readable by Dataview"
+      },
+      "name": {
+        "name_comment": "Setting name for the text box holding the 'gtd' part of #gtd/today or [gtd:: today].",
+        "name": "Name",
+        "reserved_comment": "Inline validation error under the Name box when the typed name is one of the Tasks plugin's Dataview field keys (due, start, priority…). {{name}} = the name typed. The name is not saved while this shows.",
+        "reserved": "\"{{name}}\" is a Tasks field name. Pick another name."
+      }
+    },
     "tagFieldName": {
       "name_comment": "Setting name for the tag/field prefix input (e.g. the 'gtd' part of #gtd/today).",
       "name": "Tag / field name",
@@ -338,6 +363,25 @@
       "fileNotFound_comment": "Tooltip on the warning icon shown when a file entry's path no longer exists in the vault — renamed, moved, or deleted. The path itself is visible in the input beside it, so it is not repeated here.",
       "fileNotFound": "File not found"
     },
+    "filterPage": {
+      "_comment": "The Obsidian 1.13+ page holding the global task filter and its two toggles. Older Obsidian shows the same three settings with the strings under taskFilter instead. The entry that opens this page keeps taskFilter.name.",
+      "intro_comment": "Shown at the top of the page. A packing list is an example of checkboxes that are not tasks. The 'global filter' is a setting of the community Tasks plugin; if Tasks is translated into your language, use its wording.",
+      "intro": "Keep checklists that aren't tasks, like packing lists, out of the panel. Only checkboxes containing a tag or a word you choose count as tasks. It works similarly to the Tasks plugin's global filter.",
+      "name_comment": "Setting name for the multi-line text box holding the tags or words.",
+      "name": "Filter",
+      "description_comment": "'One per line' refers to the text box. 'Empty shows all': with nothing in the box, every checkbox is a task.",
+      "description": "One per line, case-sensitive. Empty shows all.",
+      "includeSubtasks": {
+        "_comment": "Toggle. A subtask is a checkbox indented under another checkbox, at any depth. On: a subtask of a task that contains the filter text is a task too, whether or not it contains the text itself.",
+        "name": "Include subtasks",
+        "description": "Subtasks of a matching task count too, even without the tag or word."
+      },
+      "hideText": {
+        "_comment": "Toggle. Display only: the note file is never edited. Hides the filter text from the task's text in the panel.",
+        "name": "Hide filter text",
+        "description": "In the panel only; your notes don't change."
+      }
+    },
     "taskFilter": {
       "_comment": "Three settings that narrow which checkbox lines count as tasks, shown directly under 'Files to scan'. Named after the 'Global task filter' of the community Tasks plugin so its users recognise it, but independent of that plugin. 'The panel' is the plugin's sidebar.",
       "name_comment": "Setting name for a multi-line text box. Same name as the equivalent setting in the Tasks plugin; if Tasks is translated into your language, use its wording.",
@@ -346,6 +390,8 @@
       "description": "Only checkboxes that contain one of these become tasks. One per line, case-sensitive. Leave empty to include every checkbox.",
       "placeholder_comment": "Placeholder inside the empty text box showing example values. #task is a tag; TODO is plain text.",
       "placeholder": "e.g. #task or TODO",
+      "summaryOff_comment": "Description of the entry that opens the global task filter's own page, shown while the filter is empty. When it is set, the entry lists the filter text instead.",
+      "summaryOff": "Off",
       "includeSubtasks": {
         "_comment": "Toggle. A subtask is a checkbox indented under another checkbox, at any depth. On: such a checkbox is treated exactly like one that contains the filter text — it appears in the panel and can be moved between buckets. Off: each checkbox needs the text itself.",
         "name": "Count subtasks of a matching task as tasks",
@@ -363,19 +409,19 @@
       "weekStart": {
         "_comment": "Dropdown listing the seven weekdays. The day names themselves are generated by the browser in the user's language and are NOT translated here. Only this-week and next-week bucket rules read it.",
         "name": "First day of the week",
-        "description": "Applies to the This week and Next week date rules only."
+        "description": "Used by the This week and Next week date rules."
       },
       "showCompleted": {
         "name": "Show completed tasks until midnight",
-        "description_comment": "The 'strikethrough' refers to the visual style of completed tasks in the panel.",
-        "description": "Completed tasks remain visible as strikethrough in the panel until midnight, then disappear on next load."
+        "description_comment": "'Struck through' is how completed tasks look in the panel. 'Today' is why the setting stops at midnight.",
+        "description": "Keeps what you've done today in view, struck through."
       },
       "dropIntoBucket": {
         "_comment": "Dropdown for what dragging a task into another bucket does. 'Pin' keeps the task in that bucket with a tag; 'Ask for a date' opens a menu of dates from the bucket's date range.",
         "name_comment": "Setting name.",
-        "name": "Dropping a task into a bucket",
+        "name": "Dragging a task into a bucket",
         "description_comment": "Setting description. 'Range' is the span of dates a bucket such as This Week covers.",
-        "description": "Pin it there, or ask for a date from the bucket's range. Buckets without a date range always pin.",
+        "description": "Pin, or ask for a date in the bucket's range. Buckets with no range always pin.",
         "pin_comment": "Dropdown option: the task is pinned to the bucket it was dropped into.",
         "pin": "Pin",
         "ask_comment": "Dropdown option: a menu asks for a date when the task is dropped.",
@@ -386,23 +432,23 @@
         "name_comment": "Setting name for the toggle that shows both due-date badges.",
         "name": "Flag overdue and misfiled tasks",
         "descriptionOverdue_comment": "Follows the red overdue icon on its own line.",
-        "descriptionOverdue": "marks tasks whose due date has passed.",
-        "descriptionMisfiled_comment": "Follows the amber misfiled icon on its own line. {{later}} and {{sooner}} are bucket display names injected by the plugin.",
-        "descriptionMisfiled": "suggests a better bucket so you don't miss the due date: a task due today in {{later}} belongs in {{sooner}}."
+        "descriptionOverdue": "due date has passed.",
+        "descriptionMisfiled_comment": "Follows the amber misfiled icon on its own line: the task sits in a bucket later than its due date. {{later}} is a bucket display name injected by the plugin (This week).",
+        "descriptionMisfiled": "due sooner than its bucket, e.g. due today but in {{later}}."
       },
       "openLinks": {
         "_comment": "Toggle for links inside a task's text in the sidebar panel (web links, and links to other notes). On: clicking such a link opens it. Off: the click does what a click anywhere else on the task does, which is open the task's note at that task. 'The panel' is the plugin's sidebar, named so the setting is not read as being about links in the user's notes.",
         "name": "Open links from the panel",
-        "description": "Clicking a link in a task opens it instead of showing the task in its note."
+        "description": "Clicking a link opens it, not the task's note."
       },
       "compactView": {
         "name": "Compact view",
-        "description": "Reduce padding on bucket headers and task rows to fit more tasks on screen."
+        "description": "Less padding, more tasks on screen."
       },
       "celebration": {
         "name": "Celebration animations",
         "description_comment": "Dropdown description. Two independent animation types can play on task completion: confetti (particles raining down) and a celebration image (an animal illustration bouncing in).",
-        "description": "Choose which animations play when you complete a task.",
+        "description": "Play when you complete a task.",
         "off": "Off",
         "confettiOnly_comment": "Dropdown option: play only the confetti particle effect.",
         "confettiOnly": "Confetti only",
@@ -514,7 +560,7 @@
         "name_comment": "Dropdown choosing which Tasks-plugin date the plugin treats as a task's own date. That one date does two jobs: it decides the bucket a task lands in, and its position within that bucket. Deliberately names the thing being chosen rather than its effects — the description carries those.",
         "name": "Auto-assignment date",
         "description_comment": "The emoji live here rather than in the option labels, so 📅 and ⏳ are introduced once and the list below stays plain words. Both are Tasks-plugin syntax and must stay as emoji in every language. 'Pinned' tasks are ones the user filed by hand; they carry a tag and ignore their dates.",
-        "description": "Which Tasks plugin date determines a task's bucket and its order within that bucket.",
+        "description": "Which date determines a task's bucket and its order within it.",
         "descriptionPinned_comment": "Second line of the same description, rendered as its own row. Kept separate so the caveat reads as a caveat instead of trailing off the end of the sentence above it.",
         "descriptionPinned": "Pinned tasks ignore this setting.",
         "manual_comment": "Option: dates play no part at all — neither choosing the bucket nor ordering within it. The user files everything by hand.",
@@ -529,8 +575,7 @@
       },
       "priority": {
         "name": "Show priority",
-        "description_comment": "Dropdown controlling which Tasks-plugin priority levels get an emoji badge on the task row. Levels, highest to lowest: 🔺 Highest, ⏫ High, 🔼 Medium, 🔽 Low, ⏬ Lowest. The hover popover always shows the priority regardless of this setting.",
-        "description": "Which priority levels show an emoji badge on the task row.",
+        "name_comment": "Dropdown controlling which Tasks-plugin priority levels get an emoji badge on the task row. Levels, highest to lowest: 🔺 Highest, ⏫ High, 🔼 Medium, 🔽 Low, ⏬ Lowest. The hover popover always shows the priority regardless of this setting.",
         "all": "All priorities",
         "mediumUp": "Medium and above",
         "highUp": "High and above",
@@ -538,13 +583,12 @@
       },
       "recurrence": {
         "name": "Show recurrence badge",
-        "description_comment": "Toggle for the 🔁 badge on rows of tasks that repeat. The hover popover shows the recurrence rule regardless of this setting.",
-        "description": "Mark repeating tasks with 🔁 on the task row."
+        "name_comment": "Toggle for the 🔁 badge on rows of tasks that repeat. The hover popover shows the recurrence rule regardless of this setting."
       },
       "popoverFields": {
         "name": "Show Tasks fields in popover",
         "description_comment": "Toggle for the block of Tasks-plugin metadata rows (due, priority, recurrence, scheduled, start, created, cancelled, done, on-completion) shown in the popover that appears after hovering a task row.",
-        "description": "List due date, priority, recurrence and the other Tasks fields when hovering a task."
+        "description": "Hovering a task lists its dates, priority and other Tasks fields."
       }
     }
   },

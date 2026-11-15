@@ -192,6 +192,21 @@
       "none": "No hay tareas para migrar",
       "inProgress": "Migrando…"
     },
+    "pinning": {
+      "pageName": "Fijado",
+      "intro": "Al fijar una tarea en una categoría, se añade una marca al final de su línea. Estos ajustes eligen el formato de esa marca.",
+      "format": {
+        "name": "Formato",
+        "tag": "Etiqueta",
+        "field": "Campo",
+        "tagBullet": "Etiqueta — #{{name}}/bucket-id, p. ej. #{{name}}/today",
+        "fieldBullet": "Campo — [{{name}}:: bucket-id], p. ej. [{{name}}:: today], legible por Dataview"
+      },
+      "name": {
+        "name": "Nombre",
+        "reserved": "\"{{name}}\" es un nombre de campo de Tasks. Elige otro nombre."
+      }
+    },
     "tagFieldName": {
       "name": "Nombre de etiqueta / campo",
       "description": "Usado como prefijo de etiqueta en el modo Etiqueta en línea (#<nombre>/id-categoría) y como clave de campo en el modo Campo en línea ([<nombre>:: id-categoría]).",
@@ -214,10 +229,24 @@
       "folderNotFound": "Carpeta no encontrada",
       "fileNotFound": "Archivo no encontrado"
     },
+    "filterPage": {
+      "intro": "Mantén fuera del panel las listas que no son tareas, como las listas de equipaje. Solo las casillas que contienen una etiqueta o una palabra que elijas cuentan como tareas. Funciona de forma similar al filtro global del plugin Tasks.",
+      "name": "Filtro",
+      "description": "Uno por línea; distingue mayúsculas y minúsculas. Vacío muestra todas.",
+      "includeSubtasks": {
+        "name": "Incluir subtareas",
+        "description": "Las subtareas de una tarea coincidente también cuentan, aunque no tengan la etiqueta o la palabra."
+      },
+      "hideText": {
+        "name": "Ocultar el texto del filtro",
+        "description": "Solo en el panel; tus notas no cambian."
+      }
+    },
     "taskFilter": {
       "name": "Filtro global de tareas",
       "description": "Solo las casillas que contienen alguno de estos textos se convierten en tareas. Uno por línea; distingue mayúsculas y minúsculas. Si se deja vacío, se incluyen todas las casillas.",
       "placeholder": "p. ej. #task o TODO",
+      "summaryOff": "Desactivado",
       "includeSubtasks": {
         "name": "Contar las subtareas de una tarea coincidente como tareas",
         "description": "Una subtarea de una tarea que coincide con el filtro también es una tarea, aunque no contenga el texto del filtro."
@@ -231,34 +260,34 @@
       "heading": "Comportamiento",
       "weekStart": {
         "name": "Primer día de la semana",
-        "description": "Se aplica solo a las reglas de fecha «Esta semana» y «Próxima semana»."
+        "description": "Lo usan las reglas de fecha «Esta semana» y «Próxima semana»."
       },
       "showCompleted": {
         "name": "Mostrar tareas completadas hasta medianoche",
-        "description": "Las tareas completadas permanecen visibles con tachado en el panel hasta medianoche, luego desaparecen al siguiente cargado."
+        "description": "Mantiene a la vista, tachado, lo que has hecho hoy."
       },
       "dropIntoBucket": {
-        "name": "Al soltar una tarea en una categoría",
-        "description": "Fijarla allí o pedir una fecha del rango de la categoría. Las categorías sin rango de fechas siempre fijan.",
+        "name": "Al arrastrar una tarea a una categoría",
+        "description": "Fijarla o pedir una fecha del rango de la categoría. Las categorías sin rango siempre fijan.",
         "pin": "Fijar",
         "ask": "Pedir una fecha"
       },
       "markDueFlags": {
         "name": "Marcar tareas vencidas y mal clasificadas",
-        "descriptionOverdue": "marca las tareas cuya fecha de vencimiento ya pasó.",
-        "descriptionMisfiled": "sugiere una categoría mejor para no perder la fecha: una tarea que vence hoy en {{later}} pertenece a {{sooner}}."
+        "descriptionOverdue": "la fecha de vencimiento ya pasó.",
+        "descriptionMisfiled": "vence antes que su categoría, p. ej. vence hoy pero está en {{later}}."
       },
       "openLinks": {
         "name": "Abrir enlaces desde el panel",
-        "description": "Al hacer clic en un enlace de una tarea, se abre el enlace en lugar de mostrar la tarea en su nota."
+        "description": "Al hacer clic en un enlace se abre el enlace, no la nota de la tarea."
       },
       "compactView": {
         "name": "Vista compacta",
-        "description": "Reducir el relleno en los encabezados de categorías y filas de tareas para mostrar más tareas en pantalla."
+        "description": "Menos relleno, más tareas en pantalla."
       },
       "celebration": {
         "name": "Animaciones de celebración",
-        "description": "Elige qué animaciones se reproducen cuando completas una tarea.",
+        "description": "Se reproducen cuando completas una tarea.",
         "off": "Desactivado",
         "confettiOnly": "Solo confeti",
         "celebrationOnly": "Solo celebración",
@@ -334,7 +363,7 @@
       "blurb": "Cómo trata este plugin los metadatos que el plugin Tasks escribe en las líneas de tarea.",
       "planBy": {
         "name": "Fecha de la tarea",
-        "description": "Qué fecha del plugin Tasks determina la categoría de una tarea y su orden dentro de ella.",
+        "description": "Qué fecha determina la categoría de una tarea y su orden dentro de ella.",
         "descriptionPinned": "Las tareas fijadas ignoran este ajuste.",
         "manual": "Ignorar fechas",
         "dueOnly": "Vencimiento",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "Mostrar prioridad",
-        "description": "Qué niveles de prioridad muestran una insignia de emoji en la fila de la tarea.",
         "all": "Todas las prioridades",
         "mediumUp": "Media y superior",
         "highUp": "Alta y superior",
         "hidden": "Oculta"
       },
       "recurrence": {
-        "name": "Mostrar insignia de repetición",
-        "description": "Marcar las tareas repetidas con 🔁 en la fila de la tarea."
+        "name": "Mostrar insignia de repetición"
       },
       "popoverFields": {
         "name": "Mostrar campos de Tasks en la ventana emergente",
-        "description": "Mostrar la fecha de vencimiento, prioridad, repetición y los demás campos de Tasks al pasar el cursor sobre una tarea."
+        "description": "Al pasar el cursor sobre una tarea se listan sus fechas, prioridad y demás campos de Tasks."
       }
     }
   },

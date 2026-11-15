@@ -144,19 +144,18 @@ After an update with a new feature, a one-time note at the top of the panel says
 
 ## Configuration
 
-### Annotation style
+### Pinning
 
-Controls how bucket assignments are stored on the task line:
+Pinning a task to a bucket adds a marker to the end of its line. **Format** picks the marker:
 
-| Mode | Example |
+| Format | Example |
 |---|---|
-| **Inline tag** (default) | `- [ ] Buy milk #gtd/today` |
-| **Inline field** | `- [ ] Buy milk [gtd:: today]` |
-You can migrate all existing assignments between modes from the settings tab.
+| **Tag** (default) | `- [ ] Buy milk #gtd/today` |
+| **Field** | `- [ ] Buy milk [gtd:: today]`, readable by Dataview |
 
-### Tag / field name
+You can migrate all existing pins between formats from the same page.
 
-The prefix used in both storage modes. Default: `gtd`. Changing this also changes the tag/field name written to your files.
+**Name** is the `gtd` part of both formats. Default: `gtd`. Changing it also changes the name written to your files.
 
 ### Files to scan
 

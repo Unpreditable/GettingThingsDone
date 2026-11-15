@@ -2,6 +2,14 @@
 
 #### Nauja
 - Į kategoriją nutempta užduotis gali paklausti datos iš tos kategorijos intervalo, užuot ją prisegusi (Nustatymai → Užduoties nutempimas į kategoriją).
+- Trumpesnis nustatymų puslapis: Prisegimas ir Visuotinis užduočių filtras atsidaro atskiruose puslapiuose, šalia rodoma dabartinė žyma ar filtras.
+- Visur trumpesni nustatymų aprašymai.
+
+## 0.3.1
+
+#### Pataisymai
+- Jaustukų parinkiklis kategorijų nustatymuose lieka ekrane, o jo mygtukas mažesnis.
+- Kompaktiškesnis nustatymų puslapis.
 
 ## 0.3.0
 

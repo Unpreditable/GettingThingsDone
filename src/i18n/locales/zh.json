@@ -192,6 +192,21 @@
       "none": "没有需要迁移的任务",
       "inProgress": "迁移中…"
     },
+    "pinning": {
+      "pageName": "固定",
+      "intro": "将任务固定到分类时，会在其行末添加一个标记。这些设置用于选择标记的格式。",
+      "format": {
+        "name": "格式",
+        "tag": "标签",
+        "field": "字段",
+        "tagBullet": "标签——#{{name}}/bucket-id，例如 #{{name}}/today",
+        "fieldBullet": "字段——[{{name}}:: bucket-id]，例如 [{{name}}:: today]，可被 Dataview 读取"
+      },
+      "name": {
+        "name": "名称",
+        "reserved": "「{{name}}」是 Tasks 的字段名称。请选择其他名称。"
+      }
+    },
     "tagFieldName": {
       "name": "标签 / 字段名称",
       "description": "在内联标签模式下用作标签前缀（#<名称>/分类ID），在内联字段模式下用作字段键（[<名称>:: 分类ID]）。",
@@ -214,10 +229,24 @@
       "folderNotFound": "未找到文件夹",
       "fileNotFound": "未找到文件"
     },
+    "filterPage": {
+      "intro": "让不是任务的清单（例如行李清单）不出现在面板中。只有包含你选定的标签或词语的复选框才算作任务。其作用类似于 Tasks 插件的全局筛选器。",
+      "name": "筛选器",
+      "description": "每行一个，区分大小写。留空则显示全部。",
+      "includeSubtasks": {
+        "name": "包含子任务",
+        "description": "匹配任务的子任务也算作任务，即使不含该标签或词语。"
+      },
+      "hideText": {
+        "name": "隐藏筛选文本",
+        "description": "仅在面板中；笔记不会改变。"
+      }
+    },
     "taskFilter": {
       "name": "全局任务筛选器",
       "description": "只有包含其中任一文本的复选框才会成为任务。每行一个，区分大小写。留空则包含所有复选框。",
       "placeholder": "例如：#task 或 TODO",
+      "summaryOff": "关闭",
       "includeSubtasks": {
         "name": "将匹配任务的子任务视为任务",
         "description": "位于匹配筛选器的任务下的子任务也是任务，即使它本身不包含筛选文本。"
@@ -231,34 +260,34 @@
       "heading": "行为",
       "weekStart": {
         "name": "每周的第一天",
-        "description": "仅适用于「本周」和「下周」日期规则。"
+        "description": "用于「本周」和「下周」日期规则。"
       },
       "showCompleted": {
         "name": "在午夜前显示已完成任务",
-        "description": "已完成的任务将以删除线形式在面板中显示至午夜，之后在下次加载时消失。"
+        "description": "以删除线保留今天完成的任务。"
       },
       "dropIntoBucket": {
         "name": "将任务拖入分类时",
-        "description": "固定到该分类，或从该分类的日期范围中询问日期。没有日期范围的分类始终固定。",
+        "description": "固定，或从分类的日期范围中询问日期。没有范围的分类始终固定。",
         "pin": "固定",
         "ask": "询问日期"
       },
       "markDueFlags": {
         "name": "标记逾期和归类错误的任务",
-        "descriptionOverdue": "标记已过期的任务。",
-        "descriptionMisfiled": "建议更合适的分组，避免错过到期日：今天到期却放在「{{later}}」的任务应放入「{{sooner}}」。"
+        "descriptionOverdue": "已过到期日。",
+        "descriptionMisfiled": "到期早于所在分类，例如今天到期却在「{{later}}」中。"
       },
       "openLinks": {
         "name": "从面板打开链接",
-        "description": "点击任务中的链接会打开该链接，而不是在笔记中显示该任务。"
+        "description": "点击链接会打开链接，而不是任务所在的笔记。"
       },
       "compactView": {
         "name": "紧凑视图",
-        "description": "减少分类标题和任务行的内边距，以在屏幕上显示更多任务。"
+        "description": "更少内边距，屏幕上显示更多任务。"
       },
       "celebration": {
         "name": "庆祝动画",
-        "description": "选择完成任务时播放的动画。",
+        "description": "完成任务时播放。",
         "off": "关闭",
         "confettiOnly": "仅彩纸",
         "celebrationOnly": "仅庆祝",
@@ -334,7 +363,7 @@
       "blurb": "本插件如何处理 Tasks 插件写入任务行的元数据。",
       "planBy": {
         "name": "任务日期",
-        "description": "Tasks 插件的哪个日期决定任务的分类，以及在分类中的排序。",
+        "description": "哪个日期决定任务的分类，以及在分类中的排序。",
         "descriptionPinned": "已固定的任务会忽略此设置。",
         "manual": "忽略日期",
         "dueOnly": "到期日",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "显示优先级",
-        "description": "哪些优先级在任务行显示表情符号徽章。",
         "all": "所有优先级",
         "mediumUp": "中及以上",
         "highUp": "高及以上",
         "hidden": "隐藏"
       },
       "recurrence": {
-        "name": "显示重复徽章",
-        "description": "在任务行用 🔁 标记重复任务。"
+        "name": "显示重复徽章"
       },
       "popoverFields": {
         "name": "在弹出窗口中显示 Tasks 字段",
-        "description": "将鼠标悬停在任务上时列出到期日期、优先级、重复等 Tasks 字段。"
+        "description": "悬停在任务上时列出其日期、优先级和其他 Tasks 字段。"
       }
     }
   },

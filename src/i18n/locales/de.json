@@ -192,6 +192,21 @@
       "none": "Keine Aufgaben zu migrieren",
       "inProgress": "Migriere…"
     },
+    "pinning": {
+      "pageName": "Anheften",
+      "intro": "Wenn du eine Aufgabe an eine Kategorie anheftest, wird am Ende ihrer Zeile eine Markierung angefügt. Diese Einstellungen legen deren Format fest.",
+      "format": {
+        "name": "Format",
+        "tag": "Tag",
+        "field": "Feld",
+        "tagBullet": "Tag — #{{name}}/bucket-id, z. B. #{{name}}/today",
+        "fieldBullet": "Feld — [{{name}}:: bucket-id], z. B. [{{name}}:: today], von Dataview lesbar"
+      },
+      "name": {
+        "name": "Name",
+        "reserved": "\"{{name}}\" ist ein Feldname von Tasks. Wähle einen anderen Namen."
+      }
+    },
     "tagFieldName": {
       "name": "Tag- / Feldname",
       "description": "Wird als Tag-Präfix im Inline-Tag-Modus (#<Name>/Kategorie-ID) und als Feldschlüssel im Inline-Feld-Modus ([<Name>:: Kategorie-ID]) verwendet.",
@@ -214,10 +229,24 @@
       "folderNotFound": "Ordner nicht gefunden",
       "fileNotFound": "Datei nicht gefunden"
     },
+    "filterPage": {
+      "intro": "Halte Checklisten, die keine Aufgaben sind, etwa Packlisten, aus dem Panel heraus. Nur Checkboxen mit einem Tag oder Wort deiner Wahl zählen als Aufgaben. Das funktioniert ähnlich wie der globale Filter des Tasks-Plugins.",
+      "name": "Filter",
+      "description": "Einer pro Zeile, Groß-/Kleinschreibung wird beachtet. Leer zeigt alle.",
+      "includeSubtasks": {
+        "name": "Unteraufgaben einbeziehen",
+        "description": "Unteraufgaben einer passenden Aufgabe zählen auch ohne das Tag oder Wort."
+      },
+      "hideText": {
+        "name": "Filtertext ausblenden",
+        "description": "Nur im Panel; deine Notizen bleiben unverändert."
+      }
+    },
     "taskFilter": {
       "name": "Globaler Aufgabenfilter",
       "description": "Nur Checkboxen, die einen dieser Einträge enthalten, werden zu Aufgaben. Einer pro Zeile, Groß-/Kleinschreibung wird beachtet. Leer lassen, um alle Checkboxen einzubeziehen.",
       "placeholder": "z. B. #task oder TODO",
+      "summaryOff": "Aus",
       "includeSubtasks": {
         "name": "Unteraufgaben einer passenden Aufgabe als Aufgaben zählen",
         "description": "Eine Unteraufgabe unter einer Aufgabe, die zum Filter passt, ist ebenfalls eine Aufgabe, auch wenn sie den Filtertext selbst nicht enthält."
@@ -231,34 +260,34 @@
       "heading": "Verhalten",
       "weekStart": {
         "name": "Erster Tag der Woche",
-        "description": "Gilt nur für die Datumsregeln „Diese Woche“ und „Nächste Woche“."
+        "description": "Wird von den Datumsregeln „Diese Woche“ und „Nächste Woche“ verwendet."
       },
       "showCompleted": {
         "name": "Erledigte Aufgaben bis Mitternacht anzeigen",
-        "description": "Erledigte Aufgaben bleiben bis Mitternacht durchgestrichen im Panel sichtbar und verschwinden beim nächsten Laden."
+        "description": "Behält durchgestrichen im Blick, was du heute erledigt hast."
       },
       "dropIntoBucket": {
         "name": "Aufgabe in eine Kategorie ziehen",
-        "description": "Dort anheften oder nach einem Datum aus dem Bereich der Kategorie fragen. Kategorien ohne Datumsbereich heften immer an.",
+        "description": "Anheften oder nach einem Datum im Bereich der Kategorie fragen. Kategorien ohne Bereich heften immer an.",
         "pin": "Anheften",
         "ask": "Nach Datum fragen"
       },
       "markDueFlags": {
         "name": "Überfällige und falsch einsortierte Aufgaben markieren",
-        "descriptionOverdue": "markiert Aufgaben, deren Fälligkeitsdatum verstrichen ist.",
-        "descriptionMisfiled": "schlägt einen besseren Bereich vor, damit keine Fälligkeit verpasst wird: eine heute fällige Aufgabe in {{later}} gehört in {{sooner}}."
+        "descriptionOverdue": "Fälligkeitsdatum ist verstrichen.",
+        "descriptionMisfiled": "früher fällig als ihre Kategorie, z. B. heute fällig, aber in {{later}}."
       },
       "openLinks": {
         "name": "Links aus dem Panel öffnen",
-        "description": "Ein Klick auf einen Link in einer Aufgabe öffnet ihn, statt die Aufgabe in ihrer Notiz anzuzeigen."
+        "description": "Ein Klick auf einen Link öffnet ihn, nicht die Notiz der Aufgabe."
       },
       "compactView": {
         "name": "Kompakte Ansicht",
-        "description": "Abstände bei Kategorieüberschriften und Aufgabenzeilen reduzieren, um mehr Aufgaben auf dem Bildschirm anzuzeigen."
+        "description": "Weniger Abstand, mehr Aufgaben auf dem Bildschirm."
       },
       "celebration": {
         "name": "Feieranimationen",
-        "description": "Wähle, welche Animationen beim Abschließen einer Aufgabe abgespielt werden.",
+        "description": "Werden abgespielt, wenn du eine Aufgabe abschließt.",
         "off": "Aus",
         "confettiOnly": "Nur Konfetti",
         "celebrationOnly": "Nur Feier",
@@ -334,7 +363,7 @@
       "blurb": "Wie dieses Plugin mit den Metadaten umgeht, die das Tasks-Plugin auf Aufgabenzeilen schreibt.",
       "planBy": {
         "name": "Aufgabendatum",
-        "description": "Welches Datum des Tasks-Plugins die Kategorie einer Aufgabe und ihre Position darin bestimmt.",
+        "description": "Welches Datum die Kategorie einer Aufgabe und ihre Position darin bestimmt.",
         "descriptionPinned": "Angeheftete Aufgaben ignorieren diese Einstellung.",
         "manual": "Daten ignorieren",
         "dueOnly": "Fälligkeit",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "Priorität anzeigen",
-        "description": "Welche Prioritätsstufen ein Emoji-Abzeichen in der Aufgabenzeile erhalten.",
         "all": "Alle Prioritäten",
         "mediumUp": "Mittel und höher",
         "highUp": "Hoch und höher",
         "hidden": "Ausgeblendet"
       },
       "recurrence": {
-        "name": "Wiederholungsabzeichen anzeigen",
-        "description": "Wiederkehrende Aufgaben mit 🔁 in der Aufgabenzeile markieren."
+        "name": "Wiederholungsabzeichen anzeigen"
       },
       "popoverFields": {
         "name": "Tasks-Felder im Popover anzeigen",
-        "description": "Fälligkeitsdatum, Priorität, Wiederholung und die anderen Tasks-Felder beim Überfahren einer Aufgabe auflisten."
+        "description": "Beim Überfahren einer Aufgabe werden ihre Daten, Priorität und weitere Tasks-Felder aufgelistet."
       }
     }
   },

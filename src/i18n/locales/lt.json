@@ -202,6 +202,21 @@
       "none": "Nėra užduočių migracijai",
       "inProgress": "Migruojama…"
     },
+    "pinning": {
+      "pageName": "Prisegimas",
+      "intro": "Prisegus užduotį prie kategorijos, jos eilutės gale pridedama žyma. Šie nustatymai parenka žymos formatą.",
+      "format": {
+        "name": "Formatas",
+        "tag": "Žyma",
+        "field": "Laukas",
+        "tagBullet": "Žyma — #{{name}}/bucket-id, pvz. #{{name}}/today",
+        "fieldBullet": "Laukas — [{{name}}:: bucket-id], pvz. [{{name}}:: today], skaitomas Dataview"
+      },
+      "name": {
+        "name": "Pavadinimas",
+        "reserved": "\"{{name}}\" yra Tasks lauko pavadinimas. Pasirinkite kitą pavadinimą."
+      }
+    },
     "tagFieldName": {
       "name": "Žymos / lauko pavadinimas",
       "description": "Naudojamas kaip žymos prefiksas eilutinio žymos režime (#<pavadinimas>/kategorijos-id) ir kaip lauko raktas eilutinio lauko režime ([<pavadinimas>:: kategorijos-id]).",
@@ -224,10 +239,24 @@
       "folderNotFound": "Aplankas nerastas",
       "fileNotFound": "Failas nerastas"
     },
+    "filterPage": {
+      "intro": "Neleiskite į skydelį sąrašų, kurie nėra užduotys, pvz., kelionės daiktų sąrašų. Užduotimis laikomi tik žymimieji langeliai su jūsų pasirinkta žyma ar žodžiu. Veikia panašiai kaip Tasks papildinio visuotinis filtras.",
+      "name": "Filtras",
+      "description": "Po vieną eilutėje, skiriamos didžiosios ir mažosios raidės. Tuščias rodo viską.",
+      "includeSubtasks": {
+        "name": "Įtraukti použduotis",
+        "description": "Atitinkančios užduoties použduotys irgi skaičiuojamos, net be žymos ar žodžio."
+      },
+      "hideText": {
+        "name": "Slėpti filtro tekstą",
+        "description": "Tik skydelyje; jūsų užrašai nesikeičia."
+      }
+    },
     "taskFilter": {
       "name": "Visuotinis užduočių filtras",
       "description": "Užduotimis tampa tik žymimieji langeliai, kuriuose yra bent vienas iš šių tekstų. Po vieną eilutėje, skiriamos didžiosios ir mažosios raidės. Palikite tuščią, kad būtų įtraukti visi žymimieji langeliai.",
       "placeholder": "pvz. #task arba TODO",
+      "summaryOff": "Išjungta",
       "includeSubtasks": {
         "name": "Laikyti atitinkančios užduoties použduotis užduotimis",
         "description": "Použduotis, esanti po filtrą atitinkančia užduotimi, taip pat yra užduotis, net jei pati neturi filtro teksto."
@@ -241,34 +270,34 @@
       "heading": "Elgsena",
       "weekStart": {
         "name": "Pirmoji savaitės diena",
-        "description": "Taikoma tik datų taisyklėms „Šią savaitę“ ir „Kitą savaitę“."
+        "description": "Naudojama datų taisyklėse „Šią savaitę“ ir „Kitą savaitę“."
       },
       "showCompleted": {
         "name": "Rodyti atliktas užduotis iki vidurnakčio",
-        "description": "Atliktos užduotys lieka matomos skydelyje su perbraukimu iki vidurnakčio, tada dingsta kitą kartą įkėlus."
+        "description": "Šiandien atlikti darbai lieka matomi, perbraukti."
       },
       "dropIntoBucket": {
         "name": "Užduoties nutempimas į kategoriją",
-        "description": "Prisegti ją ten arba paklausti datos iš kategorijos intervalo. Kategorijos be datų intervalo visada prisega.",
+        "description": "Prisegti arba paklausti datos iš kategorijos intervalo. Kategorijos be intervalo visada prisega.",
         "pin": "Prisegti",
         "ask": "Paklausti datos"
       },
       "markDueFlags": {
         "name": "Žymėti vėluojančias ir netinkamai priskirtas užduotis",
-        "descriptionOverdue": "žymi užduotis, kurių terminas praėjo.",
-        "descriptionMisfiled": "siūlo tinkamesnę grupę, kad nepraleistumėte termino: šiandien pasibaigiančio termino užduotis grupėje {{later}} turi būti grupėje {{sooner}}."
+        "descriptionOverdue": "terminas praėjo.",
+        "descriptionMisfiled": "terminas ankstesnis nei kategorijos, pvz., terminas šiandien, bet grupėje {{later}}."
       },
       "openLinks": {
         "name": "Atidaryti nuorodas iš skydelio",
-        "description": "Spustelėjus nuorodą užduotyje, ji atidaroma, užuot rodžius užduotį jos užraše."
+        "description": "Spustelėjus nuorodą atidaroma ji, o ne užduoties užrašas."
       },
       "compactView": {
         "name": "Kompaktiškas rodinys",
-        "description": "Sumažinti kategorijų antraščių ir užduočių eilučių atstumus, kad ekrane tilptų daugiau užduočių."
+        "description": "Mažiau tarpų, daugiau užduočių ekrane."
       },
       "celebration": {
         "name": "Šventimo animacijos",
-        "description": "Pasirinkite animacijas, kurios groja atlikus užduotį.",
+        "description": "Groja atlikus užduotį.",
         "off": "Išjungta",
         "confettiOnly": "Tik konfeti",
         "celebrationOnly": "Tik šventimas",
@@ -344,7 +373,7 @@
       "blurb": "Kaip šis įskiepis apdoroja metaduomenis, kuriuos Tasks įskiepis įrašo užduočių eilutėse.",
       "planBy": {
         "name": "Užduoties data",
-        "description": "Kuri Tasks papildinio data nustato užduoties kategoriją ir jos vietą joje.",
+        "description": "Kuri data nustato užduoties kategoriją ir jos vietą joje.",
         "descriptionPinned": "Prisegtos užduotys šio nustatymo nepaiso.",
         "manual": "Nepaisyti datų",
         "dueOnly": "Terminas",
@@ -355,19 +384,17 @@
       },
       "priority": {
         "name": "Rodyti prioritetą",
-        "description": "Kurie prioriteto lygiai rodomi kaip emoji ženkliukas užduoties eilutėje.",
         "all": "Visi prioritetai",
         "mediumUp": "Vidutinis ir aukštesnis",
         "highUp": "Aukštas ir aukštesnis",
         "hidden": "Paslėptas"
       },
       "recurrence": {
-        "name": "Rodyti pasikartojimo ženkliuką",
-        "description": "Pažymėti pasikartojančias užduotis 🔁 užduoties eilutėje."
+        "name": "Rodyti pasikartojimo ženkliuką"
       },
       "popoverFields": {
         "name": "Rodyti Tasks laukus iššokančiajame lange",
-        "description": "Užvedus pelę ant užduoties, rodyti terminą, prioritetą, pasikartojimą ir kitus Tasks laukus."
+        "description": "Užvedus pelę ant užduoties, išvardijamos jos datos, prioritetas ir kiti Tasks laukai."
       }
     }
   },

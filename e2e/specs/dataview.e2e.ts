@@ -158,13 +158,15 @@ async function clickModalButton(label: string): Promise<void> {
 }
 
 /**
- * The tag / field name input and the error message under it. Settings open in a window of their
- * own, out of reach of `$`, so this goes through the open tab's element. The key is not `error`:
- * WebDriver reads a returned object with one as a failure.
+ * The tag / field name input and the error message under it, on the Pinning page. Settings open in
+ * a window of their own, out of reach of `$`, so this searches that window's modal, found through
+ * the open tab's element. The key is not `error`: WebDriver reads a returned object with one as a
+ * failure.
  */
 function prefixField(): Promise<{ value: string | null; message: string | null }> {
   return browser.executeObsidian(({ app }, inputSelector, errorSelector) => {
-    const root = (app as unknown as { setting: SettingsWindow }).setting.activeTab.containerEl;
+    const tabEl = (app as unknown as { setting: SettingsWindow }).setting.activeTab.containerEl;
+    const root = tabEl.closest(".modal") ?? tabEl.ownerDocument.body;
     return {
       value: root.querySelector<HTMLInputElement>(inputSelector)?.value ?? null,
       message: root.querySelector(errorSelector)?.textContent ?? null,
@@ -175,7 +177,8 @@ function prefixField(): Promise<{ value: string | null; message: string | null }
 /** Fires an event on the tag / field name input, built in the settings window's own realm. */
 function fire(type: string, value?: string): Promise<void> {
   return browser.executeObsidian(({ app }, inputSelector, type, value) => {
-    const input = (app as unknown as { setting: SettingsWindow }).setting.activeTab.containerEl.querySelector<HTMLInputElement>(inputSelector);
+    const tabEl = (app as unknown as { setting: SettingsWindow }).setting.activeTab.containerEl;
+    const input = (tabEl.closest(".modal") ?? tabEl.ownerDocument.body).querySelector<HTMLInputElement>(inputSelector);
     if (!input) throw new Error(`no input at ${inputSelector}`);
     // An undefined argument arrives as null.
     if (value != null) input.value = value;
@@ -268,6 +271,14 @@ describe("The tag / field name setting", () => {
       setting.open();
       setting.openTabById(id);
     }, GTD);
+    // On Obsidian 1.13+ the name is on a page of its own, opened from its row in the tab.
+    await browser.executeObsidian(({ app }, pageName) => {
+      const tabEl = (app as unknown as { setting: SettingsWindow }).setting.activeTab.containerEl;
+      const row = Array.from(tabEl.querySelectorAll<HTMLElement>(".setting-item"))
+        .find((el) => el.querySelector(".setting-item-name")?.textContent?.trim() === pageName);
+      if (!row) throw new Error(`the settings tab has no ${pageName} row`);
+      row.click();
+    }, "Pinning");
     await browser.waitUntil(async () => (await prefixField()).value !== null, {
       timeoutMsg: "the settings tab never showed the tag / field name",
     });
@@ -280,7 +291,7 @@ describe("The tag / field name setting", () => {
   it("refuses a Tasks key in any case, and says why", async () => {
     for (const name of ["due", "Due", "onCompletion"]) {
       await enter(name);
-      expect(await prefixField()).toEqual({ value: name, message: `"${name}" is a Tasks field name. Pick another tag / field name.` });
+      expect(await prefixField()).toEqual({ value: name, message: `"${name}" is a Tasks field name. Pick another name.` });
       expect(await savedPrefix()).toBe("gtd");
     }
   });

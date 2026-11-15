@@ -192,6 +192,21 @@
       "none": "Aucune tâche à migrer",
       "inProgress": "Migration en cours…"
     },
+    "pinning": {
+      "pageName": "Épinglage",
+      "intro": "Épingler une tâche à une catégorie ajoute un marqueur à la fin de sa ligne. Ces réglages en choisissent le format.",
+      "format": {
+        "name": "Format",
+        "tag": "Étiquette",
+        "field": "Champ",
+        "tagBullet": "Étiquette — #{{name}}/bucket-id, ex. #{{name}}/today",
+        "fieldBullet": "Champ — [{{name}}:: bucket-id], ex. [{{name}}:: today], lisible par Dataview"
+      },
+      "name": {
+        "name": "Nom",
+        "reserved": "« {{name}} » est un nom de champ de Tasks. Choisissez un autre nom."
+      }
+    },
     "tagFieldName": {
       "name": "Nom de l'étiquette / du champ",
       "description": "Utilisé comme préfixe d'étiquette en mode Étiquette en ligne (#<nom>/id-catégorie) et comme clé de champ en mode Champ en ligne ([<nom>:: id-catégorie]).",
@@ -214,10 +229,24 @@
       "folderNotFound": "Dossier introuvable",
       "fileNotFound": "Fichier introuvable"
     },
+    "filterPage": {
+      "intro": "Gardez hors du panneau les listes qui ne sont pas des tâches, comme les listes de bagages. Seules les cases à cocher contenant une étiquette ou un mot de votre choix comptent comme des tâches. Fonctionne de manière similaire au filtre global du plugin Tasks.",
+      "name": "Filtre",
+      "description": "Un par ligne, sensible à la casse. Vide : tout s'affiche.",
+      "includeSubtasks": {
+        "name": "Inclure les sous-tâches",
+        "description": "Les sous-tâches d'une tâche correspondante comptent aussi, même sans l'étiquette ou le mot."
+      },
+      "hideText": {
+        "name": "Masquer le texte du filtre",
+        "description": "Dans le panneau uniquement ; vos notes ne changent pas."
+      }
+    },
     "taskFilter": {
       "name": "Filtre global des tâches",
       "description": "Seules les cases à cocher contenant l'un de ces textes deviennent des tâches. Un par ligne, sensible à la casse. Laissez vide pour inclure toutes les cases à cocher.",
       "placeholder": "ex. #task ou TODO",
+      "summaryOff": "Désactivé",
       "includeSubtasks": {
         "name": "Compter les sous-tâches d'une tâche correspondante comme des tâches",
         "description": "Une sous-tâche d'une tâche qui correspond au filtre est aussi une tâche, même si elle ne contient pas elle-même le texte du filtre."
@@ -231,34 +260,34 @@
       "heading": "Comportement",
       "weekStart": {
         "name": "Premier jour de la semaine",
-        "description": "S'applique uniquement aux règles de date « Cette semaine » et « Semaine prochaine »."
+        "description": "Utilisé par les règles de date « Cette semaine » et « Semaine prochaine »."
       },
       "showCompleted": {
         "name": "Afficher les tâches terminées jusqu'à minuit",
-        "description": "Les tâches terminées restent visibles en barré dans le panneau jusqu'à minuit, puis disparaissent au prochain chargement."
+        "description": "Garde sous les yeux, barré, ce que vous avez fait aujourd'hui."
       },
       "dropIntoBucket": {
-        "name": "Déposer une tâche dans une catégorie",
-        "description": "L'y épingler, ou demander une date dans la plage de la catégorie. Les catégories sans plage de dates épinglent toujours.",
+        "name": "Glisser une tâche dans une catégorie",
+        "description": "Épingler, ou demander une date dans la plage de la catégorie. Les catégories sans plage épinglent toujours.",
         "pin": "Épingler",
         "ask": "Demander une date"
       },
       "markDueFlags": {
         "name": "Signaler les tâches en retard et mal classées",
-        "descriptionOverdue": "signale les tâches dont l'échéance est passée.",
-        "descriptionMisfiled": "suggère une meilleure catégorie pour ne pas manquer l'échéance : une tâche due aujourd'hui dans {{later}} a sa place dans {{sooner}}."
+        "descriptionOverdue": "l'échéance est passée.",
+        "descriptionMisfiled": "échéance plus proche que sa catégorie, ex. due aujourd'hui mais dans {{later}}."
       },
       "openLinks": {
         "name": "Ouvrir les liens depuis le panneau",
-        "description": "Cliquer sur un lien dans une tâche l'ouvre au lieu d'afficher la tâche dans sa note."
+        "description": "Cliquer sur un lien l'ouvre, au lieu de la note de la tâche."
       },
       "compactView": {
         "name": "Vue compacte",
-        "description": "Réduire les marges des en-têtes de catégories et des lignes de tâches pour afficher plus de tâches à l'écran."
+        "description": "Moins de marges, plus de tâches à l'écran."
       },
       "celebration": {
         "name": "Animations de célébration",
-        "description": "Choisissez les animations qui se jouent lorsque vous terminez une tâche.",
+        "description": "Se jouent lorsque vous terminez une tâche.",
         "off": "Désactivé",
         "confettiOnly": "Confettis uniquement",
         "celebrationOnly": "Célébration uniquement",
@@ -334,7 +363,7 @@
       "blurb": "Comment ce plugin traite les métadonnées que le plugin Tasks écrit sur les lignes de tâche.",
       "planBy": {
         "name": "Date de la tâche",
-        "description": "Quelle date du plugin Tasks détermine la catégorie d'une tâche et son ordre à l'intérieur.",
+        "description": "Quelle date détermine la catégorie d'une tâche et son ordre à l'intérieur.",
         "descriptionPinned": "Les tâches épinglées ignorent ce réglage.",
         "manual": "Ignorer les dates",
         "dueOnly": "Échéance",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "Afficher la priorité",
-        "description": "Quels niveaux de priorité affichent un badge emoji sur la ligne de tâche.",
         "all": "Toutes les priorités",
         "mediumUp": "Moyenne et plus",
         "highUp": "Haute et plus",
         "hidden": "Masquée"
       },
       "recurrence": {
-        "name": "Afficher le badge de récurrence",
-        "description": "Marquer les tâches récurrentes avec 🔁 sur la ligne de tâche."
+        "name": "Afficher le badge de récurrence"
       },
       "popoverFields": {
         "name": "Afficher les champs Tasks dans l'infobulle",
-        "description": "Lister l'échéance, la priorité, la récurrence et les autres champs Tasks au survol d'une tâche."
+        "description": "Le survol d'une tâche liste ses dates, sa priorité et les autres champs Tasks."
       }
     }
   },

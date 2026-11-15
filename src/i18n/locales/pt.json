@@ -192,6 +192,21 @@
       "none": "Sem tarefas para migrar",
       "inProgress": "A migrar…"
     },
+    "pinning": {
+      "pageName": "Fixação",
+      "intro": "Fixar uma tarefa numa categoria adiciona um marcador ao fim da sua linha. Estas definições escolhem o formato do marcador.",
+      "format": {
+        "name": "Formato",
+        "tag": "Etiqueta",
+        "field": "Campo",
+        "tagBullet": "Etiqueta — #{{name}}/bucket-id, ex. #{{name}}/today",
+        "fieldBullet": "Campo — [{{name}}:: bucket-id], ex. [{{name}}:: today], legível pelo Dataview"
+      },
+      "name": {
+        "name": "Nome",
+        "reserved": "\"{{name}}\" é um nome de campo do Tasks. Escolha outro nome."
+      }
+    },
     "tagFieldName": {
       "name": "Nome da etiqueta / campo",
       "description": "Usado como prefixo de etiqueta no modo Etiqueta inline (#<nome>/id-categoria) e como chave de campo no modo Campo inline ([<nome>:: id-categoria]).",
@@ -214,10 +229,24 @@
       "folderNotFound": "Pasta não encontrada",
       "fileNotFound": "Ficheiro não encontrado"
     },
+    "filterPage": {
+      "intro": "Mantenha fora do painel as listas que não são tarefas, como listas de bagagem. Só as caixas de verificação com uma etiqueta ou palavra à sua escolha contam como tarefas. Funciona de forma semelhante ao filtro global do plugin Tasks.",
+      "name": "Filtro",
+      "description": "Um por linha, distingue maiúsculas de minúsculas. Vazio mostra todas.",
+      "includeSubtasks": {
+        "name": "Incluir subtarefas",
+        "description": "As subtarefas de uma tarefa correspondente também contam, mesmo sem a etiqueta ou palavra."
+      },
+      "hideText": {
+        "name": "Ocultar o texto do filtro",
+        "description": "Só no painel; as suas notas não mudam."
+      }
+    },
     "taskFilter": {
       "name": "Filtro global de tarefas",
       "description": "Só as caixas de verificação que contêm um destes textos se tornam tarefas. Um por linha, distingue maiúsculas de minúsculas. Deixe vazio para incluir todas as caixas de verificação.",
       "placeholder": "ex. #task ou TODO",
+      "summaryOff": "Desligado",
       "includeSubtasks": {
         "name": "Contar as subtarefas de uma tarefa correspondente como tarefas",
         "description": "Uma subtarefa sob uma tarefa que corresponde ao filtro também é uma tarefa, mesmo que não contenha o texto do filtro."
@@ -231,34 +260,34 @@
       "heading": "Comportamento",
       "weekStart": {
         "name": "Primeiro dia da semana",
-        "description": "Aplica-se apenas às regras de data «Esta semana» e «Próxima semana»."
+        "description": "Usado pelas regras de data «Esta semana» e «Próxima semana»."
       },
       "showCompleted": {
         "name": "Mostrar tarefas concluídas até à meia-noite",
-        "description": "As tarefas concluídas permanecem visíveis com riscado no painel até à meia-noite, desaparecendo no próximo carregamento."
+        "description": "Mantém à vista, riscado, o que fez hoje."
       },
       "dropIntoBucket": {
-        "name": "Ao largar uma tarefa numa categoria",
-        "description": "Fixá-la aí ou pedir uma data do intervalo da categoria. Categorias sem intervalo de datas fixam sempre.",
+        "name": "Ao arrastar uma tarefa para uma categoria",
+        "description": "Fixar, ou pedir uma data no intervalo da categoria. Categorias sem intervalo fixam sempre.",
         "pin": "Fixar",
         "ask": "Pedir uma data"
       },
       "markDueFlags": {
         "name": "Sinalizar tarefas atrasadas e mal classificadas",
-        "descriptionOverdue": "marca tarefas cuja data de vencimento já passou.",
-        "descriptionMisfiled": "sugere uma categoria melhor para não perder a data: uma tarefa que vence hoje em {{later}} pertence a {{sooner}}."
+        "descriptionOverdue": "a data de vencimento já passou.",
+        "descriptionMisfiled": "vence antes da sua categoria, ex. vence hoje mas está em {{later}}."
       },
       "openLinks": {
         "name": "Abrir ligações a partir do painel",
-        "description": "Clicar numa ligação de uma tarefa abre-a em vez de mostrar a tarefa na respetiva nota."
+        "description": "Clicar numa ligação abre-a, não a nota da tarefa."
       },
       "compactView": {
         "name": "Vista compacta",
-        "description": "Reduzir o espaçamento nos cabeçalhos de categorias e nas linhas de tarefas para mostrar mais tarefas no ecrã."
+        "description": "Menos espaçamento, mais tarefas no ecrã."
       },
       "celebration": {
         "name": "Animações de celebração",
-        "description": "Escolha as animações que são reproduzidas quando conclui uma tarefa.",
+        "description": "São reproduzidas quando conclui uma tarefa.",
         "off": "Desligado",
         "confettiOnly": "Apenas confetti",
         "celebrationOnly": "Apenas celebração",
@@ -334,7 +363,7 @@
       "blurb": "Como este plugin trata os metadados que o plugin Tasks escreve nas linhas de tarefa.",
       "planBy": {
         "name": "Data da tarefa",
-        "description": "Que data do plugin Tasks determina a categoria de uma tarefa e a sua ordem dentro dela.",
+        "description": "Que data determina a categoria de uma tarefa e a sua ordem dentro dela.",
         "descriptionPinned": "As tarefas fixadas ignoram esta definição.",
         "manual": "Ignorar datas",
         "dueOnly": "Vencimento",
@@ -345,19 +374,17 @@
       },
       "priority": {
         "name": "Mostrar prioridade",
-        "description": "Que níveis de prioridade mostram um emblema de emoji na linha da tarefa.",
         "all": "Todas as prioridades",
         "mediumUp": "Média e superior",
         "highUp": "Alta e superior",
         "hidden": "Oculta"
       },
       "recurrence": {
-        "name": "Mostrar emblema de repetição",
-        "description": "Assinalar tarefas repetidas com 🔁 na linha da tarefa."
+        "name": "Mostrar emblema de repetição"
       },
       "popoverFields": {
         "name": "Mostrar campos do Tasks na janela sobreposta",
-        "description": "Listar data de vencimento, prioridade, repetição e os outros campos do Tasks ao pairar sobre uma tarefa."
+        "description": "Pairar sobre uma tarefa lista as suas datas, prioridade e outros campos do Tasks."
       }
     }
   },

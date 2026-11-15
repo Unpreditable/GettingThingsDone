@@ -192,6 +192,21 @@
       "none": "",
       "inProgress": ""
     },
+    "pinning": {
+      "pageName": "",
+      "intro": "",
+      "format": {
+        "name": "",
+        "tag": "",
+        "field": "",
+        "tagBullet": "",
+        "fieldBullet": ""
+      },
+      "name": {
+        "name": "",
+        "reserved": ""
+      }
+    },
     "tagFieldName": {
       "name": "",
       "description": "",
@@ -214,10 +229,24 @@
       "folderNotFound": "",
       "fileNotFound": ""
     },
+    "filterPage": {
+      "intro": "",
+      "name": "",
+      "description": "",
+      "includeSubtasks": {
+        "name": "",
+        "description": ""
+      },
+      "hideText": {
+        "name": "",
+        "description": ""
+      }
+    },
     "taskFilter": {
       "name": "",
       "description": "",
       "placeholder": "",
+      "summaryOff": "",
       "includeSubtasks": {
         "name": "",
         "description": ""
@@ -345,15 +374,13 @@
       },
       "priority": {
         "name": "",
-        "description": "",
         "all": "",
         "mediumUp": "",
         "highUp": "",
         "hidden": ""
       },
       "recurrence": {
-        "name": "",
-        "description": ""
+        "name": ""
       },
       "popoverFields": {
         "name": "",

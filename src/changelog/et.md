@@ -2,6 +2,14 @@
 
 #### Uus
 - Kategooriasse lohistatud ülesanne võib kinnitamise asemel küsida kuupäeva selle kategooria vahemikust (Seaded → Ülesande lohistamine kategooriasse).
+- Lühem seadete leht: Kinnitamine ja Globaalne ülesannete filter avanevad omaette lehtedel, praegune märgis või filter kõrval.
+- Kõikjal lühemad seadete kirjeldused.
+
+## 0.3.1
+
+#### Parandused
+- Emoji valija kategooriate seadetes jääb ekraanile ja selle nupp on väiksem.
+- Kompaktsem seadete leht.
 
 ## 0.3.0
 

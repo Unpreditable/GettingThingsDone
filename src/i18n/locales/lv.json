@@ -197,6 +197,21 @@
       "none": "Nav uzdevumu migrācijai",
       "inProgress": "Notiek migrācija…"
     },
+    "pinning": {
+      "pageName": "Piespraušana",
+      "intro": "Piespraužot uzdevumu kategorijai, tā rindas beigās tiek pievienota atzīme. Šie iestatījumi nosaka atzīmes formātu.",
+      "format": {
+        "name": "Formāts",
+        "tag": "Birka",
+        "field": "Lauks",
+        "tagBullet": "Birka — #{{name}}/bucket-id, piem. #{{name}}/today",
+        "fieldBullet": "Lauks — [{{name}}:: bucket-id], piem. [{{name}}:: today], nolasāms ar Dataview"
+      },
+      "name": {
+        "name": "Nosaukums",
+        "reserved": "«{{name}}» ir Tasks lauka nosaukums. Izvēlieties citu nosaukumu."
+      }
+    },
     "tagFieldName": {
       "name": "Birkas / lauka nosaukums",
       "description": "Izmanto kā birkas prefiksu iekļautās birkas režīmā (#<nosaukums>/kategorijas-id) un kā lauka atslēgu iekļautā lauka režīmā ([<nosaukums>:: kategorijas-id]).",
@@ -219,10 +234,24 @@
       "folderNotFound": "Mape nav atrasta",
       "fileNotFound": "Fails nav atrasts"
     },
+    "filterPage": {
+      "intro": "Neļaujiet panelī nonākt sarakstiem, kas nav uzdevumi, piemēram, ceļojuma mantu sarakstiem. Par uzdevumiem tiek uzskatītas tikai izvēles rūtiņas ar jūsu izvēlētu birku vai vārdu. Darbojas līdzīgi kā Tasks spraudņa globālais filtrs.",
+      "name": "Filtrs",
+      "description": "Pa vienam rindā, reģistrjutīgi. Tukšs rāda visu.",
+      "includeSubtasks": {
+        "name": "Iekļaut apakšuzdevumus",
+        "description": "Atbilstoša uzdevuma apakšuzdevumi arī tiek skaitīti, pat bez birkas vai vārda."
+      },
+      "hideText": {
+        "name": "Slēpt filtra tekstu",
+        "description": "Tikai panelī; jūsu piezīmes nemainās."
+      }
+    },
     "taskFilter": {
       "name": "Globālais uzdevumu filtrs",
       "description": "Par uzdevumiem kļūst tikai izvēles rūtiņas, kas satur kādu no šiem tekstiem. Pa vienam rindā, reģistrjutīgi. Atstājiet tukšu, lai iekļautu visas izvēles rūtiņas.",
       "placeholder": "piem. #task vai TODO",
+      "summaryOff": "Izslēgts",
       "includeSubtasks": {
         "name": "Uzskatīt atbilstoša uzdevuma apakšuzdevumus par uzdevumiem",
         "description": "Apakšuzdevums zem uzdevuma, kas atbilst filtram, arī ir uzdevums, pat ja tas pats nesatur filtra tekstu."
@@ -236,34 +265,34 @@
       "heading": "Uzvedība",
       "weekStart": {
         "name": "Nedēļas pirmā diena",
-        "description": "Attiecas tikai uz datumu kārtulām “Šī nedēļa” un “Nākamā nedēļa”."
+        "description": "Izmanto datumu kārtulas “Šī nedēļa” un “Nākamā nedēļa”."
       },
       "showCompleted": {
         "name": "Rādīt paveiktos uzdevumus līdz pusnaktij",
-        "description": "Paveiktie uzdevumi paliek redzami paneļa ar pārsvītrojumu līdz pusnaktij, pēc tam pazūd nākamajā ielādē."
+        "description": "Šodien paveiktais paliek redzams, pārsvītrots."
       },
       "dropIntoBucket": {
-        "name": "Uzdevuma nomešana kategorijā",
-        "description": "Piespraust to tur vai jautāt datumu no kategorijas diapazona. Kategorijas bez datumu diapazona vienmēr piesprauž.",
+        "name": "Uzdevuma vilkšana kategorijā",
+        "description": "Piespraust vai jautāt datumu no kategorijas diapazona. Kategorijas bez diapazona vienmēr piesprauž.",
         "pin": "Piespraust",
         "ask": "Jautāt datumu"
       },
       "markDueFlags": {
         "name": "Atzīmēt nokavētos un nepareizi sakārtotos uzdevumus",
-        "descriptionOverdue": "atzīmē uzdevumus, kuriem termiņš ir pagājis.",
-        "descriptionMisfiled": "iesaka piemērotāku grupu, lai nepalaistu garām termiņu: uzdevums ar šodienas termiņu grupā {{later}} pieder grupai {{sooner}}."
+        "descriptionOverdue": "termiņš ir pagājis.",
+        "descriptionMisfiled": "termiņš agrāks nekā kategorijai, piem., termiņš šodien, bet grupā {{later}}."
       },
       "openLinks": {
         "name": "Atvērt saites no paneļa",
-        "description": "Noklikšķinot uz saites uzdevumā, tā tiek atvērta, nevis parādīts uzdevums tā piezīmē."
+        "description": "Noklikšķinot uz saites, tiek atvērta saite, nevis uzdevuma piezīme."
       },
       "compactView": {
         "name": "Kompakts skats",
-        "description": "Samazināt atkāpes kategoriju virsrakstos un uzdevumu rindās, lai ekrānā rādītu vairāk uzdevumu."
+        "description": "Mazāk atkāpju, vairāk uzdevumu ekrānā."
       },
       "celebration": {
         "name": "Svinību animācijas",
-        "description": "Izvēlieties animācijas, kas tiek atskaņotas uzdevuma izpildes brīdī.",
+        "description": "Tiek atskaņotas, kad izpildāt uzdevumu.",
         "off": "Izslēgts",
         "confettiOnly": "Tikai konfeti",
         "celebrationOnly": "Tikai svinības",
@@ -339,7 +368,7 @@
       "blurb": "Kā šis spraudnis apstrādā metadatus, ko Tasks spraudnis pievieno uzdevumu rindām.",
       "planBy": {
         "name": "Uzdevuma datums",
-        "description": "Kurš Tasks spraudņa datums nosaka uzdevuma kategoriju un tā secību tajā.",
+        "description": "Kurš datums nosaka uzdevuma kategoriju un tā secību tajā.",
         "descriptionPinned": "Piespraustie uzdevumi ignorē šo iestatījumu.",
         "manual": "Ignorēt datumus",
         "dueOnly": "Termiņš",
@@ -350,19 +379,17 @@
       },
       "priority": {
         "name": "Rādīt prioritāti",
-        "description": "Kuri prioritātes līmeņi rāda emocijzīmes nozīmīti uzdevuma rindā.",
         "all": "Visas prioritātes",
         "mediumUp": "Vidēja un augstāka",
         "highUp": "Augsta un augstāka",
         "hidden": "Paslēpta"
       },
       "recurrence": {
-        "name": "Rādīt atkārtošanās nozīmīti",
-        "description": "Atzīmēt atkārtotus uzdevumus ar 🔁 uzdevuma rindā."
+        "name": "Rādīt atkārtošanās nozīmīti"
       },
       "popoverFields": {
         "name": "Rādīt Tasks laukus uznirstošajā logā",
-        "description": "Uzrādīt izpildes termiņu, prioritāti, atkārtošanos un citus Tasks laukus, novietojot kursoru virs uzdevuma."
+        "description": "Novietojot kursoru virs uzdevuma, tiek uzskaitīti tā datumi, prioritāte un citi Tasks lauki."
       }
     }
   },

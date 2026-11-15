@@ -1,7 +1,15 @@
 ## Unreleased
 
 #### Nouveautés
-- Déposer une tâche dans une catégorie peut demander une date dans la plage de cette catégorie au lieu de l'épingler (Paramètres → Déposer une tâche dans une catégorie).
+- Déposer une tâche dans une catégorie peut demander une date dans la plage de cette catégorie au lieu de l'épingler (Paramètres → Glisser une tâche dans une catégorie).
+- Une page de réglages plus courte : Épinglage et Filtre global des tâches ouvrent leur propre page, avec le marqueur ou le filtre actuel à côté.
+- Des descriptions de réglages plus courtes partout.
+
+## 0.3.1
+
+#### Corrections
+- Le sélecteur d'emoji des réglages de catégories reste à l'écran, et son bouton est plus petit.
+- Une page de réglages plus compacte.
 
 ## 0.3.0
 

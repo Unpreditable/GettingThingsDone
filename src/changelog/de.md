@@ -2,6 +2,14 @@
 
 #### Neu
 - Eine Aufgabe, die in eine Kategorie gezogen wird, kann nach einem Datum aus deren Bereich fragen, statt sie anzuheften (Einstellungen → Aufgabe in eine Kategorie ziehen).
+- Eine kürzere Einstellungsseite: Anheften und Globaler Aufgabenfilter öffnen eigene Seiten, mit der aktuellen Markierung bzw. dem Filter daneben.
+- Durchgehend kürzere Beschreibungen der Einstellungen.
+
+## 0.3.1
+
+#### Behoben
+- Die Emoji-Auswahl in den Kategorie-Einstellungen bleibt auf dem Bildschirm, und ihre Schaltfläche ist kleiner.
+- Eine kompaktere Einstellungsseite.
 
 ## 0.3.0
 

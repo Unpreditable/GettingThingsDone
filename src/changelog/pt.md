@@ -1,7 +1,15 @@
 ## Unreleased
 
 #### Novidades
-- Ao largar uma tarefa numa categoria, pode ser pedida uma data do intervalo dessa categoria em vez de a fixar (Definições → Ao largar uma tarefa numa categoria).
+- Ao largar uma tarefa numa categoria, pode ser pedida uma data do intervalo dessa categoria em vez de a fixar (Definições → Ao arrastar uma tarefa para uma categoria).
+- Uma página de definições mais curta: Fixação e Filtro global de tarefas abrem as suas próprias páginas, com o marcador ou filtro atual ao lado.
+- Descrições das definições mais curtas em todo o lado.
+
+## 0.3.1
+
+#### Correções
+- O seletor de emoji nas definições de categorias mantém-se no ecrã, e o seu botão é mais pequeno.
+- Uma página de definições mais compacta.
 
 ## 0.3.0
 

@@ -1,7 +1,15 @@
 ## Unreleased
 
 #### Novedades
-- Al soltar una tarea en una categoría, puede pedir una fecha del rango de esa categoría en lugar de fijarla (Ajustes → Al soltar una tarea en una categoría).
+- Al soltar una tarea en una categoría, puede pedir una fecha del rango de esa categoría en lugar de fijarla (Ajustes → Al arrastrar una tarea a una categoría).
+- Una página de ajustes más corta: Fijado y Filtro global de tareas abren sus propias páginas, con la marca o el filtro actual al lado.
+- Descripciones de ajustes más cortas en todas partes.
+
+## 0.3.1
+
+#### Correcciones
+- El selector de emoji en los ajustes de categorías se mantiene en pantalla, y su botón es más pequeño.
+- Una página de ajustes más compacta.
 
 ## 0.3.0
 

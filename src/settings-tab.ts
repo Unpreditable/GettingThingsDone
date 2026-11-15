@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, TFile, TFolder, SettingDefinitionItem, debounce, requireApiVersion } from "obsidian";
+import { App, PluginSettingTab, Setting, SettingGroup, SettingPage, TFile, TFolder, SettingDefinitionItem, debounce, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
 import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, isReservedFieldName, normalizeTaskFilters } from "./settings";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
@@ -40,7 +40,6 @@ function markDueFlagsDesc(): DocumentFragment {
     line("gtd-flag-overdue", "alert-triangle", t("settings.behaviour.markDueFlags.descriptionOverdue"));
     line("gtd-flag-misfiled", "flag", t("settings.behaviour.markDueFlags.descriptionMisfiled", {
       later: t("buckets.defaults.this-week.name"),
-      sooner: t("buckets.defaults.today.name"),
     }));
   });
 }
@@ -323,7 +322,10 @@ export class GtdSettingsTab extends PluginSettingTab {
     containerEl.empty();
 
     this.renderBanner(containerEl);
-    this.renderGeneralSection(containerEl);
+    new Setting(containerEl).setName(t("settings.heading")).setHeading();
+    this.renderAnnotation(containerEl, false);
+    this.renderFilesToScan(containerEl, false);
+    this.renderTaskFilter(containerEl, false);
     this.renderLegacyBehaviourFallback(containerEl);
     this.renderLegacyTasksIntegrationFallback(containerEl);
     this.renderBucketsSection(containerEl);
@@ -339,6 +341,8 @@ export class GtdSettingsTab extends PluginSettingTab {
   private rerender(): void {
     if (requireApiVersion("1.13.0")) {
       this.update();
+      // update() leaves a page built by a SettingPage factory as it was.
+      this.openPage?.display();
     } else {
       this.refresh();
     }
@@ -369,12 +373,31 @@ export class GtdSettingsTab extends PluginSettingTab {
         },
       },
       {
-        name: t("settings.heading"),
-        render: (setting) => {
-          setting.settingEl.addClass("gtd-settings-escape-hatch", "gtd-settings-section", "gtd-settings-first-section");
-          setting.settingEl.empty();
-          this.renderGeneralSection(setting.settingEl);
-        },
+        type: "group",
+        cls: "gtd-settings-group gtd-settings-first-section",
+        heading: t("settings.heading"),
+        items: [
+          {
+            type: "page",
+            name: t("settings.pinning.pageName"),
+            desc: this.annotationSummary(),
+            page: () => this.createSubPage((el) => this.renderAnnotation(el, true)),
+          },
+          {
+            name: t("settings.filesToScan.name"),
+            render: (setting) => {
+              setting.settingEl.addClass("gtd-settings-escape-hatch", "gtd-settings-section");
+              setting.settingEl.empty();
+              this.renderFilesToScan(setting.settingEl, true);
+            },
+          },
+          {
+            type: "page",
+            name: t("settings.taskFilter.name"),
+            desc: this.plugin.settings.taskFilters.join(", ") || t("settings.taskFilter.summaryOff"),
+            page: () => this.createSubPage((el) => this.renderTaskFilter(el, true)),
+          },
+        ],
       },
       {
         type: "group",
@@ -472,7 +495,6 @@ export class GtdSettingsTab extends PluginSettingTab {
           },
           {
             name: t("settings.tasksIntegration.priority.name"),
-            desc: t("settings.tasksIntegration.priority.description"),
             control: {
               type: "dropdown",
               key: "priorityDisplay",
@@ -486,7 +508,6 @@ export class GtdSettingsTab extends PluginSettingTab {
           },
           {
             name: t("settings.tasksIntegration.recurrence.name"),
-            desc: t("settings.tasksIntegration.recurrence.description"),
             control: { type: "toggle", key: "showRecurrenceBadge" },
           },
           {
@@ -534,8 +555,19 @@ export class GtdSettingsTab extends PluginSettingTab {
     }).addEventListener("click", () => this.plugin.openWhatsNew());
   }
 
-  private renderGeneralSection(containerEl: HTMLElement) {
-    new Setting(containerEl).setName(t("settings.heading")).setHeading();
+  /** The Pinning entry's value: the marker a pin writes, with a placeholder for the bucket. */
+  private annotationSummary(): string {
+    const { storageMode, tagPrefix } = this.plugin.settings;
+    return storageMode === "inline-tag" ? `#${tagPrefix}/bucket-id` : `[${tagPrefix}:: bucket-id]`;
+  }
+
+  /**
+   * Annotation style and the tag / field name. On the 1.13+ Pinning page they
+   * read as Format and Name under a line on what a pin writes; older Obsidian
+   * keeps the original wording, translations included.
+   */
+  private renderAnnotation(containerEl: HTMLElement, pinningPage: boolean) {
+    if (pinningPage) new Setting(containerEl).setDesc(t("settings.pinning.intro"));
 
     // Annotation Style (storage mode)
     const oppositeMode: StorageMode = this.plugin.settings.storageMode === "inline-tag" ? "inline-field" : "inline-tag";
@@ -548,10 +580,10 @@ export class GtdSettingsTab extends PluginSettingTab {
     }).length;
 
     const annotationSetting = new Setting(containerEl)
-      .setName(t("settings.annotationStyle.name"))
+      .setName(t(pinningPage ? "settings.pinning.format.name" : "settings.annotationStyle.name"))
       .addDropdown((dd) => {
-        dd.addOption("inline-tag", t("settings.annotationStyle.inlineTag"));
-        dd.addOption("inline-field", t("settings.annotationStyle.inlineField"));
+        dd.addOption("inline-tag", t(pinningPage ? "settings.pinning.format.tag" : "settings.annotationStyle.inlineTag"));
+        dd.addOption("inline-field", t(pinningPage ? "settings.pinning.format.field" : "settings.annotationStyle.inlineField"));
         dd.setValue(this.plugin.settings.storageMode);
         dd.onChange(async (val) => {
           this.plugin.settings.storageMode = val as StorageMode;
@@ -582,10 +614,22 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     annotationSetting.controlEl.addClass("gtd-annotation-control");
 
-    annotationSetting.descEl.appendText(t("settings.annotationStyle.descHeader"));
+    // On the Pinning page the bullets show the name as typed in the field
+    // below, before it is saved.
+    if (!pinningPage) annotationSetting.descEl.appendText(t("settings.annotationStyle.descHeader"));
     const ul = annotationSetting.descEl.createEl("ul", { cls: "gtd-desc-list" });
-    ul.createEl("li", { text: t("settings.annotationStyle.descInlineTag") });
-    ul.createEl("li", { text: t("settings.annotationStyle.descInlineField") });
+    const tagFormat = ul.createEl("li");
+    const fieldFormat = ul.createEl("li");
+    const showFormats = (name: string) => {
+      if (pinningPage) {
+        tagFormat.setText(t("settings.pinning.format.tagBullet", { name }));
+        fieldFormat.setText(t("settings.pinning.format.fieldBullet", { name }));
+      } else {
+        tagFormat.setText(t("settings.annotationStyle.descInlineTag"));
+        fieldFormat.setText(t("settings.annotationStyle.descInlineField"));
+      }
+    };
+    showFormats(this.plugin.settings.tagPrefix);
 
     // Tag / Field name. Saved when the field is left, not on each keystroke:
     // every name typed on the way would otherwise be the live prefix in turn,
@@ -594,24 +638,28 @@ export class GtdSettingsTab extends PluginSettingTab {
     // name already in data.json is shown with the same error.
     const prefixErrorEl = createEl("p", { cls: "gtd-field-error" });
     const prefixSetting = new Setting(containerEl)
-      .setName(t("settings.tagFieldName.name"))
-      .setDesc(t("settings.tagFieldName.description"))
+      .setName(t(pinningPage ? "settings.pinning.name.name" : "settings.tagFieldName.name"))
       .addText((txt) => {
         const showError = (name: string) => {
           const reserved = isReservedFieldName(name);
-          prefixErrorEl.setText(reserved ? t("settings.tagFieldName.reserved", { name }) : "");
+          const message = pinningPage ? "settings.pinning.name.reserved" : "settings.tagFieldName.reserved";
+          prefixErrorEl.setText(reserved ? t(message, { name }) : "");
           prefixErrorEl.toggleClass("gtd-field-error-visible", reserved);
           txt.inputEl.toggleClass("gtd-input-error", reserved);
         };
         txt.setValue(this.plugin.settings.tagPrefix);
         txt.setPlaceholder(t("settings.tagFieldName.placeholder"));
         showError(this.plugin.settings.tagPrefix);
-        txt.onChange((val) => showError(val.trim() || "gtd"));
+        txt.onChange((val) => {
+          showError(val.trim() || "gtd");
+          showFormats(val.trim() || "gtd");
+        });
         this.commitTagPrefix = () => {
           const name = txt.getValue().trim() || "gtd";
           if (isReservedFieldName(name)) {
             txt.setValue(this.plugin.settings.tagPrefix);
             showError(this.plugin.settings.tagPrefix);
+            showFormats(this.plugin.settings.tagPrefix);
             return;
           }
           if (name === this.plugin.settings.tagPrefix) return;
@@ -620,18 +668,27 @@ export class GtdSettingsTab extends PluginSettingTab {
         };
         txt.inputEl.addEventListener("blur", () => this.commitTagPrefix?.());
       });
+    if (pinningPage) prefixSetting.settingEl.addClass("gtd-settings-undivided");
+    else prefixSetting.setDesc(t("settings.tagFieldName.description"));
     prefixSetting.settingEl.after(prefixErrorEl);
+  }
 
-    // Scope type selector. The description carries the polarity of the list
-    // below it, so it swaps with the mode rather than describing both at once.
+  /**
+   * Files to scan and its path list. On 1.13+ the dropdown's own options say
+   * enough; older Obsidian keeps a description, which carries the polarity of
+   * the list below it, so it swaps with the mode.
+   */
+  private renderFilesToScan(containerEl: HTMLElement, newLayout: boolean) {
     const scopeType = this.plugin.settings.scopeType;
-    new Setting(containerEl)
-      .setName(t("settings.filesToScan.name"))
-      .setDesc(
+    const scopeSetting = new Setting(containerEl).setName(t("settings.filesToScan.name"));
+    if (!newLayout) {
+      scopeSetting.setDesc(
         scopeType === "vault"
           ? t("settings.filesToScan.descriptionVault")
           : t("settings.filesToScan.descriptionPaths")
-      )
+      );
+    }
+    scopeSetting
       .addDropdown((dd) => {
         dd.addOption("vault", t("settings.filesToScan.entireVault"));
         dd.addOption("paths", t("settings.filesToScan.selectedPaths"));
@@ -645,14 +702,53 @@ export class GtdSettingsTab extends PluginSettingTab {
       });
 
     this.renderScopePathList(containerEl, scopeType);
-    this.renderTaskFilter(containerEl);
+  }
+
+  /** The sub-page open now, if any, so rerender() can redraw it. */
+  private openPage: SettingPage | null = null;
+
+  /**
+   * A sub-page on 1.13+. SettingPage does not exist before 1.13, so the
+   * subclass is made when the page opens, not at load.
+   */
+  private createSubPage(render: (el: HTMLElement) => void): SettingPage {
+    const setOpenPage = (page: SettingPage | null) => {
+      this.openPage = page;
+    };
+    // Obsidian reads the definitions only when told to, so the entries'
+    // values are rebuilt on the way back to them.
+    const close = () => {
+      this.applyTaskFilterWhenTypingStops.run();
+      this.commitTagPrefix?.();
+      this.rerender();
+    };
+    return new (class extends SettingPage {
+      display(): void {
+        setOpenPage(this);
+        // Always true here, since only 1.13+ opens a sub-page; the API linter needs to see it.
+        if (requireApiVersion("1.13.0")) {
+          this.containerEl.empty();
+          render(new SettingGroup(this.containerEl).listEl);
+        }
+      }
+
+      hide(): void {
+        setOpenPage(null);
+        close();
+      }
+    })();
   }
 
   /** The global task filter — one string per line — and its two toggles. */
-  private renderTaskFilter(containerEl: HTMLElement) {
+  private renderTaskFilter(containerEl: HTMLElement, filterPage: boolean) {
+    // The 1.13+ page opens with a line on what the filter is for, so its rows
+    // carry shorter names and descriptions; older Obsidian keeps the originals.
+    const key = (name: string) => (filterPage ? `settings.filterPage.${name}` : `settings.taskFilter.${name}`);
+    if (filterPage) new Setting(containerEl).setDesc(t("settings.filterPage.intro"));
+
     new Setting(containerEl)
-      .setName(t("settings.taskFilter.name"))
-      .setDesc(t("settings.taskFilter.description"))
+      .setName(t(key("name")))
+      .setDesc(t(key("description")))
       .addTextArea((area) => {
         area.setValue(this.plugin.settings.taskFilters.join("\n"));
         area.setPlaceholder(t("settings.taskFilter.placeholder"));
@@ -663,9 +759,9 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
 
-    new Setting(containerEl)
-      .setName(t("settings.taskFilter.includeSubtasks.name"))
-      .setDesc(t("settings.taskFilter.includeSubtasks.description"))
+    const includeSubtasks = new Setting(containerEl)
+      .setName(t(key("includeSubtasks.name")))
+      .setDesc(t(key("includeSubtasks.description")))
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.taskFilterIncludeSubtasks);
         tog.onChange(async (val) => {
@@ -674,9 +770,9 @@ export class GtdSettingsTab extends PluginSettingTab {
         });
       });
 
-    new Setting(containerEl)
-      .setName(t("settings.taskFilter.hideText.name"))
-      .setDesc(t("settings.taskFilter.hideText.description"))
+    const hideText = new Setting(containerEl)
+      .setName(t(key("hideText.name")))
+      .setDesc(t(key("hideText.description")))
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.taskFilterHideText);
         tog.onChange(async (val) => {
@@ -684,6 +780,11 @@ export class GtdSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    if (filterPage) {
+      includeSubtasks.settingEl.addClass("gtd-settings-undivided");
+      hideText.settingEl.addClass("gtd-settings-undivided");
+    }
   }
 
   /**
@@ -927,7 +1028,6 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName(t("settings.tasksIntegration.priority.name"))
-      .setDesc(t("settings.tasksIntegration.priority.description"))
       .addDropdown((dd) => {
         dd.addOption("all", t("settings.tasksIntegration.priority.all"));
         dd.addOption("medium-up", t("settings.tasksIntegration.priority.mediumUp"));
@@ -941,7 +1041,6 @@ export class GtdSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName(t("settings.tasksIntegration.recurrence.name"))
-      .setDesc(t("settings.tasksIntegration.recurrence.description"))
       .addToggle((tog) => {
         tog.setValue(this.plugin.settings.showRecurrenceBadge);
         tog.onChange(async (val) => {

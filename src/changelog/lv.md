@@ -1,7 +1,15 @@
 ## Unreleased
 
 #### Jaunums
-- Kategorijā nomests uzdevums var jautāt datumu no tās diapazona, nevis to piespraust (Iestatījumi → Uzdevuma nomešana kategorijā).
+- Kategorijā nomests uzdevums var jautāt datumu no tās diapazona, nevis to piespraust (Iestatījumi → Uzdevuma vilkšana kategorijā).
+- Īsāka iestatījumu lapa: Piespraušana un Globālais uzdevumu filtrs atveras atsevišķās lapās, blakus redzama pašreizējā atzīme vai filtrs.
+- Visur īsāki iestatījumu apraksti.
+
+## 0.3.1
+
+#### Labojumi
+- Emocijzīmju atlasītājs kategoriju iestatījumos paliek ekrānā, un tā poga ir mazāka.
+- Kompaktāka iestatījumu lapa.
 
 ## 0.3.0
 

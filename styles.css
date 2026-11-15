@@ -541,6 +541,45 @@
   margin-inline-start: var(--size-4-8);
 }
 
+/* A row with no description: its name sits level with the control, not at its top. */
+.gtd-settings-group .setting-item:has(> .setting-item-info > .setting-item-description:empty) {
+  align-items: center;
+}
+
+/* Rows on a sub-page that read as one set with the row above them: no rule
+   between, and no extra air. */
+.setting-group .setting-item.gtd-settings-undivided:not(.setting-item-heading) {
+  --setting-items-divider-width: 0;
+  padding-top: 0;
+}
+
+/* A sub-page entry shows its current value beside the chevron, the way core's
+   own entries do. The definition has only a description to carry it, so the
+   description moves up onto the name's line. */
+.gtd-settings-group .setting-item.mod-navigable .setting-item-info {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-4);
+  min-width: 0;
+}
+
+.gtd-settings-group .setting-item.mod-navigable .setting-item-name {
+  flex-shrink: 0;
+}
+
+.gtd-settings-group .setting-item.mod-navigable .setting-item-control {
+  flex: 0 0 auto;
+}
+
+.gtd-settings-group .setting-item.mod-navigable .setting-item-description {
+  margin-inline-start: auto;
+  padding-top: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .gtd-settings-banner {
   display: flex;
   align-items: center;
