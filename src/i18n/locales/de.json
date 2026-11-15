@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Abbrechen"
   },
+  "kalendae": {
+    "installMessage": "„Benutzerdefiniert…“ nutzt den Kalender von Kalendae, einem Begleit-Plugin vom selben Autor. Bitte installiere Kalendae, um ein beliebiges Datum zu wählen.",
+    "install": "Kalendae installieren",
+    "updateMessage": "„Benutzerdefiniert…“ braucht Kalendae 1.7.0 oder neuer, installiert ist {{version}}. Bitte aktualisiere Kalendae, um ein beliebiges Datum zu wählen.",
+    "update": "Kalendae aktualisieren",
+    "enableMessage": "„Benutzerdefiniert…“ nutzt den Kalender von Kalendae, das deaktiviert ist. Bitte aktiviere Kalendae, um ein beliebiges Datum zu wählen.",
+    "enable": "Kalendae aktivieren",
+    "enableFailed": "GTD Tasks: Kalendae konnte nicht aktiviert werden. Versuche es unter Einstellungen → Community-Plugins.",
+    "unloaded": "GTD Tasks: Kalendae wurde nicht geladen. Lade Obsidian neu."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Suchen…",

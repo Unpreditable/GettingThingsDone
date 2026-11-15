@@ -57,8 +57,8 @@
     targetBucketId: string,
     orderedTaskIds: string[] | null
   ) => Promise<void>;
-  /** Asked each time the menu opens, since Kalendae can be enabled or disabled while the panel is up. */
-  export let getDatePicker: () => DatePicker | null;
+  /** Custom…: Kalendae's calendar, or the popup that installs, updates, or enables it. */
+  export let pickDay: DatePicker;
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onDismiss: (tasks: TaskRecord[]) => void;
   export let onOpenSettings: () => void;
@@ -330,11 +330,10 @@
       });
     }
 
-    const picker = getDatePicker();
     for (const entry of dateEntries(task, settings.planBy, pinnedIn.has(task.id))) {
       menu.addItem((item) => {
         item.setTitle(t(ENTRY_TITLES[entry.kind][entry.field])).setIcon("calendar-clock");
-        addDateRows(submenu(item), task, entry, picker);
+        addDateRows(submenu(item), task, entry);
       });
     }
 
@@ -378,7 +377,7 @@
     return (item as MenuItem & { setSubmenu(): Menu }).setSubmenu();
   }
 
-  function addDateRows(dateMenu: Menu, task: TaskRecord, entry: DateEntry, picker: DatePicker | null) {
+  function addDateRows(dateMenu: Menu, task: TaskRecord, entry: DateEntry) {
     const pinnedTo = pinnedIn.get(task.id);
     if (entry.unpins && pinnedTo) {
       dateMenu.addItem((item) =>
@@ -404,17 +403,15 @@
       );
     }
 
-    if (picker) {
-      const event = lastContextMenuEvent ?? new MouseEvent("click");
-      const row = event.target instanceof Element ? event.target.closest<HTMLElement>(".gtd-task") : null;
-      dateMenu.addItem((item) =>
-        item.setTitle(t("panel.contextMenu.customDate")).onClick(async () => {
-          // A redraw since the menu opened may have replaced the row; the click point still stands.
-          const day = await picker(dayKey(current ?? now), row?.isConnected ? row : event);
-          if (day) await onSetDate(task, entry.field, day, entry.unpins);
-        })
-      );
-    }
+    const event = lastContextMenuEvent ?? new MouseEvent("click");
+    const row = event.target instanceof Element ? event.target.closest<HTMLElement>(".gtd-task") : null;
+    dateMenu.addItem((item) =>
+      item.setTitle(t("panel.contextMenu.customDate")).onClick(async () => {
+        // A redraw since the menu opened may have replaced the row; the click point still stands.
+        const day = await pickDay(dayKey(current ?? now), row?.isConnected ? row : event);
+        if (day) await onSetDate(task, entry.field, day, entry.unpins);
+      })
+    );
   }
 
   let lastContextMenuEvent: MouseEvent | null = null;
@@ -554,16 +551,15 @@
     const rect = bucketEl?.getBoundingClientRect();
     const point = lastDropPoint ?? { x: rect?.left ?? 0, y: rect?.top ?? 0 };
 
-    const picker = options.offersCustom ? getDatePicker() : null;
-    if (picker) {
+    if (options.offersCustom) {
       menu.addItem((item) =>
         item.setTitle(t("panel.contextMenu.customDate")).onClick(
           choose(async () => {
             const anchor = bucketEl?.isConnected ? bucketEl : new MouseEvent("click", { clientX: point.x, clientY: point.y });
-            const day = await picker(options.range.from, anchor, [options.range]);
+            const day = await pickDay(options.range.from, anchor, [options.range]);
             if (!day) return;
-            // Kalendae may not yet honour `allowed`, and a day outside the bucket
-            // would send the task somewhere it was not dropped.
+            // Kalendae honours `allowed`, but a day outside the bucket would send
+            // the task somewhere it was not dropped, so it is checked all the same.
             if (!landsIn(task, options.field, day, target.id, settings, today())) {
               new Notice(t("notices.dropDayOutside", { day: formatDate(fromDayKey(day)), name }));
               return;

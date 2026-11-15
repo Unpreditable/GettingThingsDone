@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Atcelt"
   },
+  "kalendae": {
+    "installMessage": "“Pielāgots…” izmanto Kalendae kalendāru – tas ir tā paša autora papildspraudnis. Lūdzu, instalējiet Kalendae, lai izvēlētos jebkuru dienu.",
+    "install": "Instalēt Kalendae",
+    "updateMessage": "“Pielāgots…” vajag Kalendae 1.7.0 vai jaunāku versiju, bet jums ir {{version}}. Lūdzu, atjauniniet Kalendae, lai izvēlētos jebkuru dienu.",
+    "update": "Atjaunināt Kalendae",
+    "enableMessage": "“Pielāgots…” izmanto Kalendae kalendāru, bet Kalendae ir atspējots. Lūdzu, iespējojiet Kalendae, lai izvēlētos jebkuru dienu.",
+    "enable": "Iespējot Kalendae",
+    "enableFailed": "GTD Tasks: Kalendae neizdevās iespējot. Mēģiniet Iestatījumi → Kopienas spraudņi.",
+    "unloaded": "GTD Tasks: Kalendae netika ielādēts. Mēģiniet pārlādēt Obsidian."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Meklēt…",

@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Annuler"
   },
+  "kalendae": {
+    "installMessage": "« Personnalisée… » utilise le calendrier de Kalendae, un plugin compagnon du même auteur. Installez Kalendae pour choisir n'importe quel jour.",
+    "install": "Installer Kalendae",
+    "updateMessage": "« Personnalisée… » nécessite Kalendae 1.7.0 ou plus récent, et vous avez la {{version}}. Mettez Kalendae à jour pour choisir n'importe quel jour.",
+    "update": "Mettre à jour Kalendae",
+    "enableMessage": "« Personnalisée… » utilise le calendrier de Kalendae, qui est désactivé. Activez Kalendae pour choisir n'importe quel jour.",
+    "enable": "Activer Kalendae",
+    "enableFailed": "GTD Tasks : impossible d'activer Kalendae. Essayez Paramètres → Modules complémentaires.",
+    "unloaded": "GTD Tasks : Kalendae ne s'est pas chargé. Essayez de recharger Obsidian."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Rechercher…",

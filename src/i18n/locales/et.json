@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Tühista"
   },
+  "kalendae": {
+    "installMessage": "„Kohandatud…“ kasutab Kalendae kalendrit – see on sama autori kaasplugin. Paigalda Kalendae, et valida ükskõik milline päev.",
+    "install": "Paigalda Kalendae",
+    "updateMessage": "„Kohandatud…“ vajab Kalendae versiooni 1.7.0 või uuemat, sul on {{version}}. Uuenda Kalendae, et valida ükskõik milline päev.",
+    "update": "Uuenda Kalendae",
+    "enableMessage": "„Kohandatud…“ kasutab Kalendae kalendrit, aga Kalendae on välja lülitatud. Lülita Kalendae sisse, et valida ükskõik milline päev.",
+    "enable": "Lülita Kalendae sisse",
+    "enableFailed": "GTD Tasks: Kalendae sisselülitamine ebaõnnestus. Proovi Seaded → Kogukonna pluginad.",
+    "unloaded": "GTD Tasks: Kalendae ei laadinud. Proovi Obsidian uuesti laadida."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Otsi…",

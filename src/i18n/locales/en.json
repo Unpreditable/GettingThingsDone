@@ -3,6 +3,24 @@
     "cancel_comment": "Generic cancel button label used in confirmation dialogs (move subtasks, delete bucket, reset to defaults).",
     "cancel": "Cancel"
   },
+  "kalendae": {
+    "installMessage_comment": "Popup shown on the Custom… date item when the Kalendae plugin is not installed. Kalendae is a plugin name; keep it as is.",
+    "installMessage": "\"Custom…\" relies on the calendar of Kalendae, a companion plugin by the same author. Please install Kalendae to pick a custom day.",
+    "install_comment": "Button in the Kalendae install popup. Opens Kalendae's page in Obsidian's community plugin browser.",
+    "install": "Install Kalendae",
+    "updateMessage_comment": "Popup shown on the Custom… date item when the installed Kalendae plugin is older than 1.7.0. {{version}} is the installed version, e.g. '1.5.0'.",
+    "updateMessage": "\"Custom…\" needs Kalendae 1.7.0 or later, and you have {{version}}. Please update Kalendae to pick a custom day.",
+    "update_comment": "Button in the Kalendae update popup. Opens Kalendae's page in Obsidian's community plugin browser.",
+    "update": "Update Kalendae",
+    "enableMessage_comment": "Popup shown on the Custom… date item when Kalendae is installed but disabled.",
+    "enableMessage": "\"Custom…\" relies on Kalendae's calendar, which is disabled. Please enable Kalendae to pick a custom day.",
+    "enable_comment": "Button in the Kalendae enable popup. Enables the Kalendae plugin and opens its calendar.",
+    "enable": "Enable Kalendae",
+    "enableFailed_comment": "Notice shown when enabling Kalendae from the popup did not work.",
+    "enableFailed": "GTD Tasks: Kalendae could not be enabled. Try Settings → Community plugins.",
+    "unloaded_comment": "Notice shown on the Custom… date item when Kalendae is enabled but did not load.",
+    "unloaded": "GTD Tasks: Kalendae did not load. Try reloading Obsidian."
+  },
   "panel": {
     "title_comment": "Plugin name shown as the sidebar panel tab title.",
     "title": "GTD Tasks",
@@ -68,7 +86,7 @@
       "presetInOneWeek": "In 1 week",
       "presetInTwoWeeks_comment": "Item in the date submenu: fourteen days from today. The day is shown beside it, as for 'presetToday'.",
       "presetInTwoWeeks": "In 2 weeks",
-      "customDate_comment": "Last item in the date submenu, shown only when the Kalendae plugin is installed. Opens its calendar to pick any day.",
+      "customDate_comment": "Last item in the date submenu and in the menu that opens when a task is dropped into a bucket. Opens the Kalendae plugin's calendar, or a popup to install, update, or enable Kalendae.",
       "customDate": "Custom…",
       "updateUnpins_comment": "Grey, unclickable first row of the date submenu on a pinned task, when that date decides its bucket. Warns that picking a date also removes the pin. {{name}} = the bucket the task is pinned to.",
       "updateUnpins": "Update unpins from {{name}}",

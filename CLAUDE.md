@@ -41,6 +41,7 @@ npm run test:all  # build, then npm test, then the end-to-end specs
 `test:e2e` and `test:all` run on this machine only, through `../ObsidianE2EHarness`; they are not
 part of `release-check` or CI. They open an Obsidian window that takes the keyboard until the run
 ends. The spec files in `e2e/specs/` must not gain imports — see [e2e/README.md](e2e/README.md).
+Before any commit, confirm a full `npm run test:e2e` ran after the last source change, and that its `Spec Files:` line shows 0 failed. If it hasn't run, say so and ask before committing. Never commit with a failing spec.
 
 **During development**: symlink this folder into `<vault>/.obsidian/plugins/gtd-tasks/` and install the [Hot Reload](https://github.com/pjeby/hot-reload) community plugin. With `npm run dev` running, any source change auto-reloads the plugin without restarting Obsidian.
 

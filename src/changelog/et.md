@@ -4,6 +4,7 @@
 - Kategooriasse lohistatud ülesanne võib kinnitamise asemel küsida kuupäeva selle kategooria vahemikust (Seaded → Ülesande lohistamine kategooriasse).
 - Lühem seadete leht: Kinnitamine ja Globaalne ülesannete filter avanevad omaette lehtedel, praegune märgis või filter kõrval.
 - Kõikjal lühemad seadete kirjeldused.
+- **Kohandatud…** on kuupäevamenüüdes nüüd alati olemas. Ilma Kalendae 1.7.0 või uuemata pakub see Kalendae paigaldamist, uuendamist või sisselülitamist.
 
 ## 0.3.1
 

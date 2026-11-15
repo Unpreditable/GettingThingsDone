@@ -228,7 +228,7 @@ describe("Changing dates from the menu", () => {
   it("opens Kalendae's calendar by the row from Custom…, and writes the day it picks", async () => {
     await writeNote(`- [ ] Far off 📅 ${dayFromToday(20)}\n`, "Far off");
     await menuItems(await rowOf("Far off"));
-    expect((await submenuItems("Change due date")).map((item) => item.title)).not.toContain("Custom…");
+    expect((await submenuItems("Change due date")).map((item) => item.title)).toContain("Custom…");
     await closeMenus();
 
     // A stand-in for Kalendae's API, which records what it was asked and picks a fixed day.
@@ -238,7 +238,7 @@ describe("Changing dates from the menu", () => {
       const calls: { value: string; anchorIsRow: boolean }[] = [];
       (window as unknown as { kalendaeCalls: typeof calls }).kalendaeCalls = calls;
       plugins["kalendae"] = {
-        manifest: { id: "kalendae", name: "Kalendae", version: "0.0.0" },
+        manifest: { id: "kalendae", name: "Kalendae", version: "1.7.0" },
         api: {
           pickDate: ({ value, anchor }: { value: string; anchor: unknown }) => {
             calls.push({ value, anchorIsRow: anchor instanceof HTMLElement && anchor.classList.contains("gtd-task") });
@@ -459,7 +459,7 @@ describe("a dated drop", () => {
       await browser.executeObsidian(({ app }, picked) => {
         const plugins = (app as unknown as { plugins: { plugins: Record<string, unknown> } }).plugins.plugins;
         plugins["kalendae"] = {
-          manifest: { id: "kalendae", name: "Kalendae", version: "0.0.0" },
+          manifest: { id: "kalendae", name: "Kalendae", version: "1.7.0" },
           api: { pickDate: () => Promise.resolve(picked) },
         };
       }, picked);

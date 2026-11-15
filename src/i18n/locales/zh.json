@@ -2,6 +2,16 @@
   "common": {
     "cancel": "取消"
   },
+  "kalendae": {
+    "installMessage": "「自定义…」使用 Kalendae 的日历，这是同一作者的配套插件。请安装 Kalendae 以选择任意日期。",
+    "install": "安装 Kalendae",
+    "updateMessage": "「自定义…」需要 Kalendae 1.7.0 或更高版本，你当前是 {{version}}。请更新 Kalendae 以选择任意日期。",
+    "update": "更新 Kalendae",
+    "enableMessage": "「自定义…」使用 Kalendae 的日历，但 Kalendae 已禁用。请启用 Kalendae 以选择任意日期。",
+    "enable": "启用 Kalendae",
+    "enableFailed": "GTD Tasks: 无法启用 Kalendae。请尝试 设置 → 第三方插件。",
+    "unloaded": "GTD Tasks: Kalendae 未加载。请尝试重新加载 Obsidian。"
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "搜索…",

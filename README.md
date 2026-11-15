@@ -118,7 +118,7 @@ Moving a task by hand pins it to that bucket, so its dates no longer move it.
 
 ### Change a date
 
-Right-click → **Change due date** or **Change scheduled date**, then pick Today, Tomorrow, Start of next week, In 1 week or In 2 weeks. If the task has no date to place it by, you get **Set due date** or **Set scheduled date** instead, whichever **Auto-assignment date** goes by. With the [Kalendae](https://community.obsidian.md/plugins/kalendae) plugin installed, **Custom…** opens its calendar.
+Right-click → **Change due date** or **Change scheduled date**, then pick Today, Tomorrow, Start of next week, In 1 week or In 2 weeks. If the task has no date to place it by, you get **Set due date** or **Set scheduled date** instead, whichever **Auto-assignment date** goes by. **Custom…** opens the calendar of [Kalendae](https://community.obsidian.md/plugins/kalendae), a companion plugin (1.7.0 or later). Without it, **Custom…** offers to install, update, or enable Kalendae.
 
 If a task is pinned and you change the date that places it, the pin comes off. The menu warns you first. Changing its other date leaves the pin alone.
 

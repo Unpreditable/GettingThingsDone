@@ -2,6 +2,16 @@
   "common": {
     "cancel": "キャンセル"
   },
+  "kalendae": {
+    "installMessage": "「カスタム…」は、同じ作者によるコンパニオンプラグイン Kalendae のカレンダーを使います。任意の日を選ぶには Kalendae をインストールしてください。",
+    "install": "Kalendae をインストール",
+    "updateMessage": "「カスタム…」には Kalendae 1.7.0 以降が必要です（現在は {{version}}）。任意の日を選ぶには Kalendae を更新してください。",
+    "update": "Kalendae を更新",
+    "enableMessage": "「カスタム…」は Kalendae のカレンダーを使いますが、Kalendae は無効になっています。任意の日を選ぶには Kalendae を有効にしてください。",
+    "enable": "Kalendae を有効化",
+    "enableFailed": "GTD Tasks: Kalendae を有効にできませんでした。設定 → コミュニティプラグイン から試してください。",
+    "unloaded": "GTD Tasks: Kalendae が読み込まれませんでした。Obsidian を再読み込みしてください。"
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "検索…",

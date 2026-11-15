@@ -2,6 +2,16 @@
   "common": {
     "cancel": ""
   },
+  "kalendae": {
+    "installMessage": "",
+    "install": "",
+    "updateMessage": "",
+    "update": "",
+    "enableMessage": "",
+    "enable": "",
+    "enableFailed": "",
+    "unloaded": ""
+  },
   "panel": {
     "title": "",
     "searchPlaceholder": "",

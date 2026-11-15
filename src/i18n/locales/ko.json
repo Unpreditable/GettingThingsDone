@@ -2,6 +2,16 @@
   "common": {
     "cancel": "취소"
   },
+  "kalendae": {
+    "installMessage": "'사용자 지정…'은 같은 제작자의 동반 플러그인인 Kalendae의 달력을 사용합니다. 원하는 날짜를 고르려면 Kalendae를 설치하세요.",
+    "install": "Kalendae 설치",
+    "updateMessage": "'사용자 지정…'에는 Kalendae 1.7.0 이상이 필요하며, 현재 버전은 {{version}}입니다. 원하는 날짜를 고르려면 Kalendae를 업데이트하세요.",
+    "update": "Kalendae 업데이트",
+    "enableMessage": "'사용자 지정…'은 Kalendae의 달력을 사용하지만, Kalendae가 비활성화되어 있습니다. 원하는 날짜를 고르려면 Kalendae를 활성화하세요.",
+    "enable": "Kalendae 활성화",
+    "enableFailed": "GTD Tasks: Kalendae를 활성화하지 못했습니다. 설정 → 커뮤니티 플러그인에서 시도해 보세요.",
+    "unloaded": "GTD Tasks: Kalendae가 로드되지 않았습니다. Obsidian을 다시 로드해 보세요."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "검색…",

@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Скасувати"
   },
+  "kalendae": {
+    "installMessage": "«Вибрати…» використовує календар Kalendae — плагіна-компаньйона від того ж автора. Встановіть Kalendae, щоб вибрати будь-який день.",
+    "install": "Встановити Kalendae",
+    "updateMessage": "Для «Вибрати…» потрібен Kalendae 1.7.0 або новіший, а у вас {{version}}. Оновіть Kalendae, щоб вибрати будь-який день.",
+    "update": "Оновити Kalendae",
+    "enableMessage": "«Вибрати…» використовує календар Kalendae, але Kalendae вимкнено. Увімкніть Kalendae, щоб вибрати будь-який день.",
+    "enable": "Увімкнути Kalendae",
+    "enableFailed": "GTD Tasks: не вдалося увімкнути Kalendae. Спробуйте Налаштування → Сторонні плагіни.",
+    "unloaded": "GTD Tasks: Kalendae не завантажився. Спробуйте перезавантажити Obsidian."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Пошук…",

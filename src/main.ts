@@ -21,7 +21,7 @@ import type { BucketGroup as BucketGroupData } from "./core/BucketManager";
 import { editedLines, getTaskEditor, getTasksApi, hasSettableStatus, moveTaskToBucket, replaceTaskLine, setDateLine, setStatusLine, setTaskStatus, toggleTaskCompletion, toggleTaskLine } from "./core/TaskWriter";
 import type { ReplaceResult, SettableStatus, TasksPluginApiV1 } from "./core/TaskWriter";
 import type { DateField } from "./core/DateMenu";
-import { getDatePicker } from "./integrations/Kalendae";
+import { pickWithKalendae } from "./views/KalendaeModal";
 import { CLOSED_SYMBOLS, parseFile, statusSymbol } from "./core/TaskParser";
 import type { TaskRecord } from "./core/TaskParser";
 import { computeOrderKeys, mapToOrderEntries, purgeOrderEntry } from "./core/TaskOrder";
@@ -612,7 +612,7 @@ class GtdPanelView extends ItemView {
         onSetStatus: this.handleSetStatus.bind(this),
         onSetDate: this.handleSetDate.bind(this),
         onDropDate: this.handleDropDate.bind(this),
-        getDatePicker: () => getDatePicker(this.app),
+        pickDay: pickWithKalendae(this.app),
         onReorder: this.handleReorder.bind(this),
         onDismiss: (tasks: TaskRecord[]) => this.plugin.dismissCompleted(tasks),
         onOpenSettings: openSettings,

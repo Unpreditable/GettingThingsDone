@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Atšaukti"
   },
+  "kalendae": {
+    "installMessage": "„Pasirinkti…“ naudoja Kalendae kalendorių – tai to paties autoriaus papildinys. Įdiekite Kalendae, kad galėtumėte pasirinkti bet kurią dieną.",
+    "install": "Įdiegti Kalendae",
+    "updateMessage": "„Pasirinkti…“ reikia Kalendae 1.7.0 ar naujesnės versijos, o jūsų versija – {{version}}. Atnaujinkite Kalendae, kad galėtumėte pasirinkti bet kurią dieną.",
+    "update": "Atnaujinti Kalendae",
+    "enableMessage": "„Pasirinkti…“ naudoja Kalendae kalendorių, bet Kalendae išjungtas. Įjunkite Kalendae, kad galėtumėte pasirinkti bet kurią dieną.",
+    "enable": "Įjungti Kalendae",
+    "enableFailed": "GTD Tasks: nepavyko įjungti Kalendae. Pabandykite Nustatymai → Bendruomenės papildiniai.",
+    "unloaded": "GTD Tasks: Kalendae neįsikėlė. Pabandykite iš naujo įkelti Obsidian."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Ieškoti…",

@@ -4,6 +4,7 @@
 - Déposer une tâche dans une catégorie peut demander une date dans la plage de cette catégorie au lieu de l'épingler (Paramètres → Glisser une tâche dans une catégorie).
 - Une page de réglages plus courte : Épinglage et Filtre global des tâches ouvrent leur propre page, avec le marqueur ou le filtre actuel à côté.
 - Des descriptions de réglages plus courtes partout.
+- **Personnalisée…** apparaît désormais toujours dans les menus de date. Sans Kalendae 1.7.0 ou plus récent, il propose de l'installer, de le mettre à jour ou de l'activer.
 
 ## 0.3.1
 

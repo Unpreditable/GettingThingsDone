@@ -4,6 +4,7 @@
 - Kategorijā nomests uzdevums var jautāt datumu no tās diapazona, nevis to piespraust (Iestatījumi → Uzdevuma vilkšana kategorijā).
 - Īsāka iestatījumu lapa: Piespraušana un Globālais uzdevumu filtrs atveras atsevišķās lapās, blakus redzama pašreizējā atzīme vai filtrs.
 - Visur īsāki iestatījumu apraksti.
+- **Pielāgots…** datumu izvēlnēs tagad redzams vienmēr. Bez Kalendae 1.7.0 vai jaunākas versijas tas piedāvā Kalendae instalēt, atjaunināt vai iespējot.
 
 ## 0.3.1
 

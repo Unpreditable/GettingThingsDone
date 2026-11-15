@@ -2,6 +2,16 @@
   "common": {
     "cancel": "Отмена"
   },
+  "kalendae": {
+    "installMessage": "«Выбрать…» использует календарь Kalendae — плагина-компаньона от того же автора. Установите Kalendae, чтобы выбрать любой день.",
+    "install": "Установить Kalendae",
+    "updateMessage": "Для «Выбрать…» нужен Kalendae 1.7.0 или новее, а у вас {{version}}. Обновите Kalendae, чтобы выбрать любой день.",
+    "update": "Обновить Kalendae",
+    "enableMessage": "«Выбрать…» использует календарь Kalendae, но Kalendae отключён. Включите Kalendae, чтобы выбрать любой день.",
+    "enable": "Включить Kalendae",
+    "enableFailed": "GTD Tasks: не удалось включить Kalendae. Попробуйте Настройки → Сторонние плагины.",
+    "unloaded": "GTD Tasks: Kalendae не загрузился. Попробуйте перезагрузить Obsidian."
+  },
   "panel": {
     "title": "GTD Tasks",
     "searchPlaceholder": "Поиск…",
