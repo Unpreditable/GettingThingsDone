@@ -1,16 +1,26 @@
 name: Release
 
+# On main: Patch, Minor or Major makes a release. The version files and the
+# changelog are committed, and the release is a draft to fill in by hand.
+#
+# On any other branch: a beta, x.y.z-<branch>.N, published as a pre-release
+# for BRAT. Nothing is committed. Obsidian offers updates from manifest.json on
+# main, so a beta version must never reach a committed manifest: merging the
+# branch would offer the beta to every user. Patch, Minor or Major starts a
+# branch's betas at .1 on top of main's released version; Beta raises N.
+
 on:
   workflow_dispatch:
     inputs:
       bump:
-        description: 'Version bump type'
+        description: 'Version bump type (Beta: on a branch other than main only)'
         required: true
         type: choice
         options:
           - Patch
           - Minor
           - Major
+          - Beta
 
 jobs:
   release:
@@ -29,20 +39,59 @@ jobs:
       - name: Compute new version
         id: version
         run: |
-          CURRENT=$(jq -r '.version' manifest.json)
-          MAJOR=$(echo "$CURRENT" | cut -d. -f1)
-          MINOR=$(echo "$CURRENT" | cut -d. -f2)
-          PATCH=$(echo "$CURRENT" | cut -d. -f3)
+          if [ "$GITHUB_REF_TYPE" != "branch" ]; then
+            echo "Error: run this on a branch, not on $GITHUB_REF_TYPE $GITHUB_REF_NAME."
+            exit 1
+          fi
 
-          case "${{ inputs.bump }}" in
-            Major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
-            Minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
-            Patch) PATCH=$((PATCH + 1)) ;;
-          esac
+          BUMP="${{ inputs.bump }}"
+          BRANCH="$GITHUB_REF_NAME"
 
-          NEW="$MAJOR.$MINOR.$PATCH"
+          if [ "$BRANCH" = "main" ]; then
+            BETA=false
+            if [ "$BUMP" = "Beta" ]; then
+              echo "Error: Beta runs on a branch other than main only."
+              exit 1
+            fi
+          else
+            BETA=true
+            # A version label allows letters, digits and hyphens only.
+            SLUG=$(echo "$BRANCH" | sed -E 's/[^0-9A-Za-z-]+/-/g; s/^-+//; s/-+$//')
+            if [ -z "$SLUG" ]; then
+              echo "Error: no usable characters in branch name $BRANCH."
+              exit 1
+            fi
+          fi
+
+          if [ "$BUMP" = "Beta" ]; then
+            # This branch's newest beta, read from the tags since nothing is committed.
+            LATEST=$(git tag --list | grep -E "^[0-9]+\.[0-9]+\.[0-9]+-${SLUG}\.[0-9]+$" | sort -V | tail -n 1)
+            if [ -z "$LATEST" ]; then
+              echo "Error: no beta of $BRANCH yet. Start with Patch, Minor or Major."
+              exit 1
+            fi
+            BASE="${LATEST%-"$SLUG".*}"
+            N="${LATEST##*.}"
+            NEW="$BASE-$SLUG.$((N + 1))"
+          else
+            CURRENT=$(jq -r '.version' manifest.json)
+            MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+            MINOR=$(echo "$CURRENT" | cut -d. -f2)
+            PATCH=$(echo "$CURRENT" | cut -d. -f3 | cut -d- -f1)
+
+            case "$BUMP" in
+              Major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+              Minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+              Patch) PATCH=$((PATCH + 1)) ;;
+            esac
+
+            NEW="$MAJOR.$MINOR.$PATCH"
+            if [ "$BETA" = "true" ]; then NEW="$NEW-$SLUG.1"; fi
+          fi
+
           echo "new=$NEW" >> "$GITHUB_OUTPUT"
-          echo "Bumping $CURRENT → $NEW"
+          echo "beta=$BETA" >> "$GITHUB_OUTPUT"
+          echo "Version: $NEW (beta: $BETA)"
 
       - name: Check tag does not already exist
         run: |
@@ -52,6 +101,7 @@ jobs:
             exit 1
           fi
 
+      # For a beta this changes only the runner's copy, which goes into the release.
       - name: Update manifest version
         run: |
           TAG="${{ steps.version.outputs.new }}"
@@ -59,6 +109,7 @@ jobs:
           echo "Updated manifest.json to version $TAG"
 
       - name: Record version in versions.json
+        if: steps.version.outputs.beta == 'false'
         run: |
           TAG="${{ steps.version.outputs.new }}"
           MIN=$(jq -r '.minAppVersion' manifest.json)
@@ -67,12 +118,14 @@ jobs:
 
       # Before the build, so the shipped main.js carries the stamped headings.
       - name: Stamp the changelog
+        if: steps.version.outputs.beta == 'false'
         run: |
           TAG="${{ steps.version.outputs.new }}"
           sed -i "s/^## Unreleased$/## $TAG/" src/changelog/*.md
           echo "Stamped ## Unreleased → ## $TAG in src/changelog"
 
       - name: Sync package.json version
+        if: steps.version.outputs.beta == 'false'
         run: |
           TAG="${{ steps.version.outputs.new }}"
           npm version "$TAG" --no-git-tag-version --allow-same-version
@@ -85,7 +138,9 @@ jobs:
       # development wording is in flux and translating every draft string is
       # wasted work, but a release must never ship a key some locale is missing.
       # The CI workflow's own check only posts a PR comment — it cannot fail.
+      # A beta skips it: its strings are still drafts, English only.
       - name: Validate translations
+        if: steps.version.outputs.beta == 'false'
         run: npm run validate-translations
 
       - name: Build
@@ -99,6 +154,7 @@ jobs:
             styles.css
 
       - name: Commit and tag
+        if: steps.version.outputs.beta == 'false'
         run: |
           TAG="${{ steps.version.outputs.new }}"
           git config user.name "github-actions[bot]"
@@ -109,6 +165,7 @@ jobs:
           git push origin HEAD --tags
 
       - name: Create release and upload assets
+        if: steps.version.outputs.beta == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -123,3 +180,19 @@ jobs:
           EDIT="${URL/\/releases\/tag\//\/releases\/edit\/}"
           echo "Edit the draft release: $EDIT"
           echo "### [Edit the $TAG draft release]($EDIT)" >> "$GITHUB_STEP_SUMMARY"
+
+      # Published at once, since BRAT cannot see a draft. Notes stay blank.
+      # Nothing is committed for a beta, so the tag marks the branch's own
+      # commit. GitHub creates it with the release: a git push of that tag was
+      # refused with a 403, likely because the commit can touch a workflow file,
+      # which the workflow's own token may not push.
+      - name: Create beta pre-release and upload assets
+        if: steps.version.outputs.beta == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.new }}"
+          URL=$(gh release create "$TAG" main.js styles.css manifest.json \
+            --title "$TAG" --notes "" --prerelease --latest=false --target "$GITHUB_SHA")
+          echo "Beta pre-release: $URL"
+          echo "### [$TAG pre-release]($URL)" >> "$GITHUB_STEP_SUMMARY"
