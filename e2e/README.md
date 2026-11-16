@@ -26,14 +26,14 @@ meanwhile.
 |---|---|
 | `e2e.config.json` | The Obsidian version, and the Tasks plugin version the specs run with |
 | `vault/` | The notes every run starts from |
-| `specs/panel.e2e.ts` | The panel by itself: what it lists, and what ticking or moving a task writes |
-| `specs/settings.e2e.ts` | Settings that change what the panel lists or what a move writes |
+| `specs/panel.e2e.ts` | The panel by itself: what it lists, and what ticking or moving a task writes; on mobile, where on a row each Drag tasks by choice starts a drag, and that desktop draws no grip |
+| `specs/settings.e2e.ts` | Settings that change what the panel lists or what a move writes; the Drag tasks by page, whose description and preview follow its dropdown |
 | `specs/tasks.e2e.ts` | The panel with Tasks installed: a tick goes through Tasks, as it does in the editor |
 | `specs/dataview.e2e.ts` | Tasks' Dataview-format fields: what the panel reads from them, the tag / field name that may not reuse their keys, and ticking and editing them through Tasks |
 | `specs/waiting.e2e.ts` | Tasks that can't be done yet: a 🛫 date after today or an open ⛔ blocker dims the row; the popover explains, and the menu jumps to the blocker |
 | `specs/dates.e2e.ts` | Changing or setting a due or scheduled date from the row's menu: what each Plan by mode offers, what a pick writes, which date unpins; the "Move to" submenu; and a drop that gives the task a date from the bucket's range |
 | `specs/status.e2e.ts` | The "Toggle task done", "Toggle task in progress" and "Toggle task cancelled" commands in the editor, with and without Tasks |
-| `specs/notices.e2e.ts` | The what's new note: shown once to an upgraded install, never to a fresh one, queued behind the other banners; and the changelog it, the command and the settings page open |
+| `specs/notices.e2e.ts` | The what's new note: shown once to an upgraded install, never to a fresh one, queued behind the other banners; its Open Settings button; and the changelog it, the command and the settings page open |
 | `tsconfig.json` | Type-checks the specs |
 | `harness.d.ts` | The harness's declarations of everything a spec can use. A copy: do not edit it |
 

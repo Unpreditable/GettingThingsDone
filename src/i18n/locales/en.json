@@ -445,6 +445,49 @@
         "ask_comment": "Dropdown option: a menu asks for a date when the task is dropped.",
         "ask": "Ask for a date"
       },
+      "dragBy": {
+        "_comment": "Mobile-only setting: where on a task row a drag starts, so a swipe elsewhere scrolls the panel. On Obsidian 1.13+ it is an entry that opens its own page; the entry's description shows the current choice's label.",
+        "name_comment": "Setting name. '(Mobile)' says it only takes effect on phones and tablets.",
+        "name": "Drag tasks by (Mobile)",
+        "intro_comment": "First line on the setting's own page: why the setting exists. 'Touchpad' is a laptop's trackpad.",
+        "intro": "On a phone, a swipe that starts on a task can move it instead of scrolling the panel. Choose where on a row a drag starts. A swipe anywhere else scrolls. On desktop the whole row drags, and you scroll with the mouse or touchpad.",
+        "choices_comment": "Dropdown options. A grip is a small six-dot icon; a bar is a thin vertical line along the row's edge. 'Half' means half of the row's width.",
+        "choices": {
+          "right-grip": "Right grip",
+          "left-grip": "Left grip",
+          "right-bar": "Right bar",
+          "left-bar": "Left bar",
+          "right-half": "Right half",
+          "left-half": "Left half",
+          "whole-row": "Whole row"
+        },
+        "descriptions_comment": "Description under the dropdown, one per option, swapped when the choice changes.",
+        "descriptions": {
+          "right-grip": "Drag by the grip at the right end of a row.",
+          "left-grip": "Drag by the grip at the left end of a row.",
+          "right-bar": "Drag by the thin bar along the right edge.",
+          "left-bar": "Drag by the thin bar along the left edge.",
+          "right-half": "Drag from the right half of a row. Swipe on the left half to scroll.",
+          "left-half": "Drag from the left half of a row. Swipe on the right half to scroll.",
+          "whole-row": "Drag from anywhere on a row. Scroll by swiping on the bucket headers or the scrollbar."
+        },
+        "previewHeading_comment": "Heading above the preview, a mock of three task rows in the panel.",
+        "previewHeading": "Preview",
+        "previewDescription_comment": "Line under the preview heading.",
+        "previewDescription": "How task rows look on a phone with this choice.",
+        "previewTask1_comment": "Sample task text in the settings preview, a mock of the panel. An everyday task, long enough to run past the middle of the row; the row cuts it off with an ellipsis.",
+        "previewTask1": "Call the dentist about moving Tuesday's appointment",
+        "previewTask2_comment": "Sample task text in the settings preview; it has a subtask below it. Long enough to run past the middle of the row.",
+        "previewTask2": "Draft the quarterly report for the team meeting",
+        "previewTask3_comment": "Sample subtask text in the settings preview. Long enough to run past the middle of the row.",
+        "previewTask3": "Collect the sales numbers from every region",
+        "previewDrag_comment": "Label under the preview, below the side of the dashed line where a drag starts.",
+        "previewDrag": "Drag area",
+        "previewScroll_comment": "Label under the preview, below the side of the dashed line where a swipe scrolls.",
+        "previewScroll": "Scroll area",
+        "previewCaption_comment": "Caption under the preview, shown for the half options. The dashed line splits the preview into its drag and scroll halves.",
+        "previewCaption": "The dashed line only appears in this preview."
+      },
       "markDueFlags": {
         "_comment": "Toggle for the two due-date badges on task rows. Settings renders each badge icon in its own coloured span, so neither description below names it. Each description must read as a continuation of the icon that precedes it.",
         "name_comment": "Setting name for the toggle that shows both due-date badges.",
@@ -648,6 +691,10 @@
       "1": {
         "message_comment": "Announcement banner. 🏆 is the ribbon icon of the 'See what you got done' report; keep it. 'Dataview format' is the Tasks plugin's name for writing fields as [due:: 2026-10-20] instead of emoji; use Tasks' own term if it is translated.",
         "message": "This update brings 5 new features, including a report of what you got done (🏆) and support for Tasks' Dataview format."
+      },
+      "2": {
+        "message_comment": "Announcement banner, shown on every device, with an Open Settings button. The setting is settings.behaviour.dragBy; a grip is a small six-dot icon at the right end of each task row.",
+        "message": "Scrolling on mobile is easier: tasks now drag by a grip on the right."
       }
     }
   }

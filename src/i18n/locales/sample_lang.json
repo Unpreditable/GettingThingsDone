@@ -282,6 +282,36 @@
         "pin": "",
         "ask": ""
       },
+      "dragBy": {
+        "name": "",
+        "intro": "",
+        "choices": {
+          "right-grip": "",
+          "left-grip": "",
+          "right-bar": "",
+          "left-bar": "",
+          "right-half": "",
+          "left-half": "",
+          "whole-row": ""
+        },
+        "descriptions": {
+          "right-grip": "",
+          "left-grip": "",
+          "right-bar": "",
+          "left-bar": "",
+          "right-half": "",
+          "left-half": "",
+          "whole-row": ""
+        },
+        "previewHeading": "",
+        "previewDescription": "",
+        "previewTask1": "",
+        "previewTask2": "",
+        "previewTask3": "",
+        "previewDrag": "",
+        "previewScroll": "",
+        "previewCaption": ""
+      },
       "markDueFlags": {
         "name": "",
         "descriptionOverdue": "",
@@ -430,6 +460,9 @@
     "readTranslated": "",
     "notes": {
       "1": {
+        "message": ""
+      },
+      "2": {
         "message": ""
       }
     }

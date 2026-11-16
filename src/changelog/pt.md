@@ -5,6 +5,7 @@
 - Uma página de definições mais curta: Fixação e Filtro global de tarefas abrem as suas próprias páginas, com o marcador ou filtro atual ao lado.
 - Descrições das definições mais curtas em todo o lado.
 - **Personalizada…** aparece agora sempre nos menus de data. Sem o Kalendae 1.7.0 ou posterior, oferece instalá-lo, atualizá-lo ou ativá-lo.
+- No telemóvel, deslizar sobre uma tarefa desloca o painel: as tarefas arrastam-se por uma pega à direita. Escolha pega, barra, meia linha ou a linha inteira em Definições → Como arrastar tarefas (telemóvel).
 
 ## 0.3.1
 

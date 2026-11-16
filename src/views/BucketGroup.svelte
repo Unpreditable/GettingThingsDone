@@ -10,6 +10,8 @@
   import type { WaitingInfo } from "../core/Waiting";
   import { isInsertionAllowed } from "../core/DragConstraints";
   import type { BucketTree } from "../core/DragConstraints";
+  import { sortableOptions } from "../core/DragZone";
+  import type { DragZone } from "../core/DragZone";
   import { headerDrop, headerDragOver as anyHeaderDragOver, isDragging } from "./dragState";
 
   export let bucketId: string;
@@ -37,6 +39,8 @@
   export let allTasksMap: Map<string, TaskRecord> = new Map();
   export let taskBucketMap: Map<string, string> = new Map();
   export let bucketGroups: BucketGroupData[] = [];
+  /** Where on a row a drag starts. */
+  export let zone: DragZone = { kind: "row" };
 
   const dispatch = createEventDispatcher<{
     move: { task: TaskRecord; targetBucketId: string | null };
@@ -57,6 +61,14 @@
   let headerDragOver = false;
   let taskListEl: HTMLElement;
   let sortable: Sortable;
+
+  // A settings change reaches a list that is already mounted.
+  $: if (sortable) {
+    const opts = sortableOptions(zone, taskListEl);
+    sortable.option("handle", opts.handle);
+    sortable.option("filter", opts.filter);
+    sortable.option("preventOnFilter", opts.preventOnFilter);
+  }
 
   $: agedSet = new Set(agedCompletedTaskIds);
   $: visibleTasks = tasks.filter((t) => {
@@ -176,6 +188,7 @@
       ghostClass: "sortable-ghost",
       chosenClass: "sortable-chosen",
       dataIdAttr: "data-task-id",
+      ...sortableOptions(zone, taskListEl),
       onStart() {
         headerDrop.taskId = null;
         isDragging.set(true);
@@ -370,6 +383,7 @@
           {visibleIds}
           {bucketGroups}
           currentBucketId={bucketId}
+          {zone}
           on:move={(e) => dispatch("move", e.detail)}
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}

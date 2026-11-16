@@ -292,6 +292,36 @@
         "pin": "Prisegti",
         "ask": "Paklausti datos"
       },
+      "dragBy": {
+        "name": "Kaip tempti užduotis (mobiliajame)",
+        "intro": "Telefone braukimas, pradėtas ant užduoties, gali ją perkelti, užuot slinkęs skydelį. Pasirinkite, kurioje eilutės vietoje prasideda tempimas. Kitur braukimas slenka. Kompiuteryje tempiama visa eilutė, o slenkama pele arba jutikliniu kilimėliu.",
+        "choices": {
+          "right-grip": "Rankenėlė dešinėje",
+          "left-grip": "Rankenėlė kairėje",
+          "right-bar": "Juostelė dešinėje",
+          "left-bar": "Juostelė kairėje",
+          "right-half": "Dešinė pusė",
+          "left-half": "Kairė pusė",
+          "whole-row": "Visa eilutė"
+        },
+        "descriptions": {
+          "right-grip": "Tempkite už rankenėlės dešiniajame eilutės gale.",
+          "left-grip": "Tempkite už rankenėlės kairiajame eilutės gale.",
+          "right-bar": "Tempkite už plonos juostelės prie dešiniojo krašto.",
+          "left-bar": "Tempkite už plonos juostelės prie kairiojo krašto.",
+          "right-half": "Tempkite nuo dešiniosios eilutės pusės. Norėdami slinkti, braukite kairiąja puse.",
+          "left-half": "Tempkite nuo kairiosios eilutės pusės. Norėdami slinkti, braukite dešiniąja puse.",
+          "whole-row": "Tempkite nuo bet kurios eilutės vietos. Norėdami slinkti, braukite kategorijų antraštėmis arba slinkties juosta."
+        },
+        "previewHeading": "Peržiūra",
+        "previewDescription": "Taip su šiuo pasirinkimu telefone atrodo užduočių eilutės.",
+        "previewTask1": "Paskambinti odontologui ir perkelti antradienio vizitą",
+        "previewTask2": "Parengti ketvirčio ataskaitos juodraštį komandos susitikimui",
+        "previewTask3": "Surinkti visų regionų pardavimų skaičius",
+        "previewDrag": "Tempimo sritis",
+        "previewScroll": "Slinkimo sritis",
+        "previewCaption": "Punktyrinė linija rodoma tik šioje peržiūroje."
+      },
       "markDueFlags": {
         "name": "Žymėti vėluojančias ir netinkamai priskirtas užduotis",
         "descriptionOverdue": "terminas praėjo.",
@@ -431,6 +461,9 @@
     "notes": {
       "1": {
         "message": "Šiame atnaujinime – 5 naujos funkcijos, tarp jų ataskaita, kas atlikta (🏆), ir Tasks Dataview formato palaikymas."
+      },
+      "2": {
+        "message": "Slinkti mobiliajame lengviau: užduotys dabar tempiamos už rankenėlės dešinėje."
       }
     }
   }

@@ -166,4 +166,94 @@ describe("Settings", () => {
 });
 
 // Keeps this file's names its own: a file with no import or export shares one scope with every other.
+/** What Obsidian keeps of its settings window that the specs reach for. */
+interface SettingsWindow {
+  open(): void;
+  openTabById(id: string): void;
+  close(): void;
+  activeTab: { containerEl: HTMLElement } | null;
+}
+
+/** What the Drag tasks by page shows: the dropdown's description, and what the preview draws. */
+interface DragPage {
+  description: string;
+  rightHandles: number;
+  leftHandles: number;
+  split: boolean;
+  /** The labels under the preview's border, left to right. */
+  labels: string[];
+  caption: boolean;
+}
+
+/** Reads the Drag tasks by page, which lives in the settings window, out of reach of $(). */
+function readDragPage(): Promise<DragPage | null> {
+  return browser.executeObsidian(({ app }) => {
+    const doc = (app as unknown as { setting: SettingsWindow }).setting.activeTab?.containerEl.ownerDocument;
+    const preview = doc?.querySelector(".gtd-drag-preview");
+    if (!preview) return null;
+    const setting = preview.previousElementSibling;
+    return {
+      description: setting?.querySelector(".setting-item-description")?.textContent ?? "",
+      rightHandles: preview.querySelectorAll(".gtd-drag-preview-handle.is-right").length,
+      leftHandles: preview.querySelectorAll(".gtd-drag-preview-handle.is-left").length,
+      split: preview.querySelector(".gtd-drag-preview-split") !== null,
+      labels: Array.from(preview.querySelectorAll(".gtd-drag-preview-labels span"), (el) => el.textContent ?? ""),
+      caption: preview.querySelector(".gtd-drag-preview-caption") !== null,
+    };
+  });
+}
+
+describe("The Drag tasks by page", () => {
+  beforeEach(async () => {
+    await resetState();
+  });
+
+  afterEach(async () => {
+    await browser.executeObsidian(({ app }) => (app as unknown as { setting: SettingsWindow }).setting.close());
+  });
+
+  it("opens from Behaviour, and its description and preview follow the dropdown", async () => {
+    const opened = await browser.executeObsidian(({ app }, id) => {
+      const setting = (app as unknown as { setting: SettingsWindow }).setting;
+      setting.open();
+      setting.openTabById(id);
+      const items = Array.from(setting.activeTab?.containerEl.querySelectorAll<HTMLElement>(".setting-item") ?? []);
+      const entry = items.find((el) => el.querySelector(".setting-item-name")?.textContent === "Drag tasks by (Mobile)");
+      if (!entry) return null;
+      const value = entry.querySelector(".setting-item-description")?.textContent ?? "";
+      entry.click();
+      return value;
+    }, GTD);
+    expect(opened).toBe("Right grip");
+    await browser.waitUntil(async () => (await readDragPage()) !== null, { timeoutMsg: "the entry opened no page" });
+
+    expect(await readDragPage()).toEqual({
+      description: "Drag by the grip at the right end of a row.",
+      rightHandles: 3,
+      leftHandles: 0,
+      split: false,
+      labels: [],
+      caption: false,
+    });
+
+    await browser.executeObsidian(({ app }) => {
+      const doc = (app as unknown as { setting: SettingsWindow }).setting.activeTab!.containerEl.ownerDocument;
+      const select = doc.querySelector(".gtd-drag-preview")!.previousElementSibling!.querySelector("select")!;
+      select.value = "left-half";
+      select.dispatchEvent(new Event("change"));
+    });
+    await browser.waitUntil(async () => (await readDragPage())?.split === true, { timeoutMsg: "the preview never drew the halves" });
+    expect(await readDragPage()).toEqual({
+      description: "Drag from the left half of a row. Swipe on the right half to scroll.",
+      rightHandles: 0,
+      leftHandles: 0,
+      split: true,
+      labels: ["Drag area", "Scroll area"],
+      caption: true,
+    });
+    const saved = await browser.executeObsidian(({ plugins }) => (plugins.gtdTasks as unknown as { settings: { mobileDragBy: string } }).settings.mobileDragBy);
+    expect(saved).toBe("left-half");
+  });
+});
+
 export {};

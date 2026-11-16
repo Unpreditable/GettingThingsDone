@@ -5,6 +5,7 @@
 - Trumpesnis nustatymų puslapis: Prisegimas ir Visuotinis užduočių filtras atsidaro atskiruose puslapiuose, šalia rodoma dabartinė žyma ar filtras.
 - Visur trumpesni nustatymų aprašymai.
 - **Pasirinkti…** datos meniu dabar rodomas visada. Be Kalendae 1.7.0 ar naujesnės versijos jis pasiūlo Kalendae įdiegti, atnaujinti arba įjungti.
+- Mobiliajame braukimas per užduotį slenka skydelį: užduotys tempiamos už rankenėlės dešinėje. Rankenėlę, juostelę, pusę eilutės ar visą eilutę pasirinkite: Nustatymai → Kaip tempti užduotis (mobiliajame).
 
 ## 0.3.1
 

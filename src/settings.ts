@@ -44,6 +44,27 @@ export type PlanBy =
 
 export type DropIntoBucket = "pin" | "ask";
 
+/** Where on a task row a drag starts, on phones and tablets. Desktop always drags the whole row. */
+export type MobileDragBy =
+  | "right-grip"
+  | "left-grip"
+  | "right-bar"
+  | "left-bar"
+  | "right-half"
+  | "left-half"
+  | "whole-row";
+
+/** In the order the settings dropdown lists them. */
+export const MOBILE_DRAG_CHOICES: MobileDragBy[] = [
+  "right-grip",
+  "left-grip",
+  "right-bar",
+  "left-bar",
+  "right-half",
+  "left-half",
+  "whole-row",
+];
+
 export type CelebrationMode = "off" | "confetti" | "creature" | "all";
 
 /** Which Tasks-plugin priority levels get an emoji badge on the task row. */
@@ -127,6 +148,8 @@ export interface PluginSettings {
   completedVisibilityUntilMidnight: boolean;
   /** What dropping a task into a bucket with a date range does: pin it, or ask for a date. */
   dropIntoBucket: DropIntoBucket;
+  /** Where on a row a drag starts, on mobile only. */
+  mobileDragBy: MobileDragBy;
   /** Show the overdue and misfiled badges on task rows. The field name
    *  predates the two-state split; it stays because it is persisted in
    *  data.json and renaming it would need a migration for no visible gain. */
@@ -252,6 +275,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   tagPrefix: "gtd",
   completedVisibilityUntilMidnight: true,
   dropIntoBucket: "pin",
+  mobileDragBy: "right-grip",
   staleIndicatorEnabled: true,
   toReviewEmoji: "📥",
   toReviewQuickMoveTargets: ["today", "this-week"],
@@ -502,6 +526,9 @@ export function normalizeSettingsShapes(settings: PluginSettings): PluginSetting
       scheme !== null && knownSchemes.includes(scheme) ? scheme : null,
     weekStartsOn: WEEK_STARTS.includes(weekStart) ? weekStart : "monday",
     dropIntoBucket: settings.dropIntoBucket === "ask" ? "ask" : "pin",
+    mobileDragBy: MOBILE_DRAG_CHOICES.includes(settings.mobileDragBy)
+      ? settings.mobileDragBy
+      : "right-grip",
     scopePaths: normalizePathEntries(settings.scopePaths),
     ignoredPaths: normalizePathEntries(settings.ignoredPaths),
     taskFilters: normalizeTaskFilters(settings.taskFilters),

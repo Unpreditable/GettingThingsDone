@@ -7,7 +7,7 @@
 
 const GTD = "gtd-tasks";
 const PANEL_VIEW = "gtd-tasks-panel";
-const NEWEST_NOTE = "1";
+const NEWEST_NOTE = "2";
 
 const ROW = ".gtd-task";
 const BANNER = ".gtd-language-banner";
@@ -146,6 +146,19 @@ describe("The what's new note", () => {
     await clickBannerButton("Read more");
     await $(CHANGELOG).waitForDisplayed({ timeoutMsg: "the banner's Read more button opened nothing" });
     await $(NOTE_BANNER).waitForExist({ reverse: true, timeoutMsg: "the note stayed up after Read more" });
+    expect(await lastNoticeSeen()).toBe(NEWEST_NOTE);
+  });
+
+  it("opens the settings from its Open Settings button, and that settles it too", async () => {
+    await setPluginSettings(GTD, { ...OTHER_BANNERS_SEEN, lastNoticeSeen: "" });
+    await $(NOTE_BANNER).waitForDisplayed();
+    await clickBannerButton("Open Settings");
+    await browser.waitUntil(
+      () => browser.executeObsidian(({ app }) => (app as unknown as { setting: SettingsWindow }).setting.activeTab?.containerEl.isConnected ?? false),
+      { timeoutMsg: "the banner's Open Settings button opened no settings" },
+    );
+    await browser.executeObsidian(({ app }) => (app as unknown as { setting: SettingsWindow }).setting.close());
+    await $(NOTE_BANNER).waitForExist({ reverse: true, timeoutMsg: "the note stayed up after Open Settings" });
     expect(await lastNoticeSeen()).toBe(NEWEST_NOTE);
   });
 

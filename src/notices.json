@@ -2,5 +2,9 @@
   {
     "id": "1",
     "action": "dismiss"
+  },
+  {
+    "id": "2",
+    "action": "settings"
   }
 ]

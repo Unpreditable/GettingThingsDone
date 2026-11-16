@@ -426,6 +426,183 @@
   font-size: 9px;
 }
 
+/* ── Mobile drag handle ─────────────────────────────────────────────────── */
+
+/* Pinned to the row's edge, never indented: the row's padding carries the
+   subtask indent, and an absolute box ignores it. The touch area is 32px wide
+   whatever the grip or bar draws inside it. */
+.gtd-panel .gtd-task.has-right-handle {
+  padding-right: 36px;
+}
+
+.gtd-drag-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  cursor: grab;
+  touch-action: none;
+}
+
+.gtd-drag-handle.is-left {
+  left: 0;
+}
+
+.gtd-drag-handle.is-right {
+  right: 0;
+}
+
+.gtd-drag-handle.is-bar::before {
+  content: "";
+  width: 3px;
+  height: 60%;
+  border-radius: var(--radius-s);
+  background: var(--text-faint);
+}
+
+.gtd-task .gtd-drag-grip .svg-icon {
+  --icon-size: var(--icon-s);
+}
+
+.sortable-chosen .gtd-drag-handle {
+  color: var(--interactive-accent);
+}
+
+.sortable-chosen .gtd-drag-handle.is-bar::before {
+  background: var(--interactive-accent);
+}
+
+/* The settings preview: three mock rows sized like the panel's. */
+.gtd-drag-preview {
+  padding: var(--size-4-2) 0 var(--size-4-4);
+}
+
+.gtd-drag-preview-heading {
+  font-size: var(--font-ui-medium);
+  color: var(--text-normal);
+}
+
+.gtd-drag-preview-description {
+  padding-bottom: var(--size-4-3);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.gtd-drag-preview-frame {
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.gtd-drag-preview-panel {
+  position: relative;
+  padding: var(--size-4-1) 0;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+.gtd-drag-preview-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 12px;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+.gtd-drag-preview-row.is-sub {
+  padding-left: 28px;
+}
+
+.gtd-drag-preview-row.has-left-handle {
+  padding-left: 36px;
+}
+
+.gtd-drag-preview-row.has-left-handle.is-sub {
+  padding-left: 52px;
+}
+
+.gtd-drag-preview-row.has-right-handle {
+  padding-right: 36px;
+}
+
+.gtd-drag-preview-checkbox {
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--checkbox-border-color);
+  border-radius: var(--checkbox-radius);
+}
+
+.gtd-drag-preview-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gtd-drag-preview-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+}
+
+.gtd-drag-preview-handle.is-left {
+  left: 0;
+}
+
+.gtd-drag-preview-handle.is-right {
+  right: 0;
+}
+
+.gtd-drag-preview-handle.is-bar::before {
+  content: "";
+  width: 3px;
+  height: 60%;
+  border-radius: var(--radius-s);
+  background: var(--text-faint);
+}
+
+.gtd-drag-preview-handle .svg-icon {
+  --icon-size: var(--icon-s);
+  opacity: 1;
+  margin-right: 0;
+}
+
+.gtd-drag-preview-split {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: 1px dashed var(--text-muted);
+}
+
+.gtd-drag-preview-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: var(--size-4-1);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.gtd-drag-preview-caption {
+  padding-top: var(--size-4-2);
+  text-align: center;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
 /* ── Settings tab ───────────────────────────────────────────────────────── */
 
 /* The flag preview in the settings description. Shares the row's colours via

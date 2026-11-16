@@ -282,6 +282,36 @@
         "pin": "Fijar",
         "ask": "Pedir una fecha"
       },
+      "dragBy": {
+        "name": "Cómo arrastrar tareas (móvil)",
+        "intro": "En el móvil, un deslizamiento que empieza sobre una tarea puede moverla en lugar de desplazar el panel. Elige dónde empieza el arrastre en una fila. Un deslizamiento en cualquier otro sitio desplaza. En el escritorio se arrastra la fila entera, y desplazas con el ratón o el panel táctil.",
+        "choices": {
+          "right-grip": "Asa a la derecha",
+          "left-grip": "Asa a la izquierda",
+          "right-bar": "Barra a la derecha",
+          "left-bar": "Barra a la izquierda",
+          "right-half": "Mitad derecha",
+          "left-half": "Mitad izquierda",
+          "whole-row": "Fila entera"
+        },
+        "descriptions": {
+          "right-grip": "Arrastra por el asa del extremo derecho de la fila.",
+          "left-grip": "Arrastra por el asa del extremo izquierdo de la fila.",
+          "right-bar": "Arrastra por la barra fina del borde derecho.",
+          "left-bar": "Arrastra por la barra fina del borde izquierdo.",
+          "right-half": "Arrastra desde la mitad derecha de la fila. Desliza en la mitad izquierda para desplazar.",
+          "left-half": "Arrastra desde la mitad izquierda de la fila. Desliza en la mitad derecha para desplazar.",
+          "whole-row": "Arrastra desde cualquier punto de la fila. Para desplazar, desliza sobre los encabezados de las categorías o la barra de desplazamiento."
+        },
+        "previewHeading": "Vista previa",
+        "previewDescription": "Así se ven las filas de tareas en un móvil con esta opción.",
+        "previewTask1": "Llamar al dentista para cambiar la cita del martes",
+        "previewTask2": "Redactar el informe trimestral para la reunión del equipo",
+        "previewTask3": "Reunir las cifras de ventas de todas las regiones",
+        "previewDrag": "Zona de arrastre",
+        "previewScroll": "Zona de desplazamiento",
+        "previewCaption": "La línea discontinua solo aparece en esta vista previa."
+      },
       "markDueFlags": {
         "name": "Marcar tareas vencidas y mal clasificadas",
         "descriptionOverdue": "la fecha de vencimiento ya pasó.",
@@ -421,6 +451,9 @@
     "notes": {
       "1": {
         "message": "Esta actualización trae 5 funciones nuevas, entre ellas un informe de lo que has logrado (🏆) y compatibilidad con el formato Dataview de Tasks."
+      },
+      "2": {
+        "message": "Desplazarse en el móvil es más fácil: ahora las tareas se arrastran por un asa a la derecha."
       }
     }
   }

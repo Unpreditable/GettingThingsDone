@@ -5,6 +5,7 @@
 - Lühem seadete leht: Kinnitamine ja Globaalne ülesannete filter avanevad omaette lehtedel, praegune märgis või filter kõrval.
 - Kõikjal lühemad seadete kirjeldused.
 - **Kohandatud…** on kuupäevamenüüdes nüüd alati olemas. Ilma Kalendae 1.7.0 või uuemata pakub see Kalendae paigaldamist, uuendamist või sisselülitamist.
+- Telefonis kerib ülesandel libistamine paneeli: ülesandeid lohistatakse parempoolsest pidemest. Pideme, riba, poole rea või kogu rea saab valida: Seaded → Kuidas ülesandeid lohistada (mobiil).
 
 ## 0.3.1
 

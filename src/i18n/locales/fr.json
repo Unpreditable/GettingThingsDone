@@ -282,6 +282,36 @@
         "pin": "Épingler",
         "ask": "Demander une date"
       },
+      "dragBy": {
+        "name": "Comment glisser les tâches (mobile)",
+        "intro": "Sur un téléphone, un balayage qui commence sur une tâche peut la déplacer au lieu de faire défiler le panneau. Choisissez où commence le glissement sur une ligne. Ailleurs, un balayage fait défiler. Sur ordinateur, toute la ligne se glisse, et vous faites défiler avec la souris ou le pavé tactile.",
+        "choices": {
+          "right-grip": "Poignée à droite",
+          "left-grip": "Poignée à gauche",
+          "right-bar": "Barre à droite",
+          "left-bar": "Barre à gauche",
+          "right-half": "Moitié droite",
+          "left-half": "Moitié gauche",
+          "whole-row": "Ligne entière"
+        },
+        "descriptions": {
+          "right-grip": "Glissez par la poignée au bout droit de la ligne.",
+          "left-grip": "Glissez par la poignée au bout gauche de la ligne.",
+          "right-bar": "Glissez par la fine barre le long du bord droit.",
+          "left-bar": "Glissez par la fine barre le long du bord gauche.",
+          "right-half": "Glissez depuis la moitié droite de la ligne. Balayez la moitié gauche pour faire défiler.",
+          "left-half": "Glissez depuis la moitié gauche de la ligne. Balayez la moitié droite pour faire défiler.",
+          "whole-row": "Glissez depuis n'importe où sur la ligne. Pour faire défiler, balayez les en-têtes des catégories ou la barre de défilement."
+        },
+        "previewHeading": "Aperçu",
+        "previewDescription": "L'aspect des lignes de tâches sur un téléphone avec ce choix.",
+        "previewTask1": "Appeler le dentiste pour déplacer le rendez-vous de mardi",
+        "previewTask2": "Rédiger le rapport trimestriel pour la réunion d'équipe",
+        "previewTask3": "Rassembler les chiffres de vente de toutes les régions",
+        "previewDrag": "Zone de glissement",
+        "previewScroll": "Zone de défilement",
+        "previewCaption": "La ligne pointillée n'apparaît que dans cet aperçu."
+      },
       "markDueFlags": {
         "name": "Signaler les tâches en retard et mal classées",
         "descriptionOverdue": "l'échéance est passée.",
@@ -421,6 +451,9 @@
     "notes": {
       "1": {
         "message": "Cette mise à jour apporte 5 nouvelles fonctionnalités, dont un bilan de ce que vous avez accompli (🏆) et la prise en charge du format Dataview de Tasks."
+      },
+      "2": {
+        "message": "Le défilement sur mobile est plus simple : les tâches se glissent désormais par une poignée à droite."
       }
     }
   }

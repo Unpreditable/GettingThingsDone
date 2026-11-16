@@ -282,6 +282,36 @@
         "pin": "固定",
         "ask": "询问日期"
       },
+      "dragBy": {
+        "name": "如何拖动任务（移动端）",
+        "intro": "在手机上，从任务上开始的滑动可能会移动任务，而不是滚动面板。选择从行的哪个位置开始拖动。在其他位置滑动则会滚动。在桌面端，整行都可以拖动，用鼠标或触控板滚动。",
+        "choices": {
+          "right-grip": "右侧手柄",
+          "left-grip": "左侧手柄",
+          "right-bar": "右侧细条",
+          "left-bar": "左侧细条",
+          "right-half": "右半边",
+          "left-half": "左半边",
+          "whole-row": "整行"
+        },
+        "descriptions": {
+          "right-grip": "按住行右端的手柄拖动。",
+          "left-grip": "按住行左端的手柄拖动。",
+          "right-bar": "按住右边缘的细条拖动。",
+          "left-bar": "按住左边缘的细条拖动。",
+          "right-half": "从行的右半边拖动。在左半边滑动可滚动。",
+          "left-half": "从行的左半边拖动。在右半边滑动可滚动。",
+          "whole-row": "从行的任意位置拖动。在分类标题或滚动条上滑动可滚动。"
+        },
+        "previewHeading": "预览",
+        "previewDescription": "选择此项后，任务行在手机上的样子。",
+        "previewTask1": "给牙医打电话，把周二的预约改个时间",
+        "previewTask2": "为团队会议起草季度报告",
+        "previewTask3": "收集所有地区的销售数据",
+        "previewDrag": "拖动区域",
+        "previewScroll": "滚动区域",
+        "previewCaption": "虚线只出现在此预览中。"
+      },
       "markDueFlags": {
         "name": "标记逾期和归类错误的任务",
         "descriptionOverdue": "已过到期日。",
@@ -421,6 +451,9 @@
     "notes": {
       "1": {
         "message": "此次更新带来 5 项新功能，包括你完成的事报告（🏆）以及对 Tasks Dataview 格式的支持。"
+      },
+      "2": {
+        "message": "在移动端滚动更方便了：现在通过右侧的手柄拖动任务。"
       }
     }
   }

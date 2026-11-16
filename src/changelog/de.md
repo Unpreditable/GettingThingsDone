@@ -5,6 +5,7 @@
 - Eine kürzere Einstellungsseite: Anheften und Globaler Aufgabenfilter öffnen eigene Seiten, mit der aktuellen Markierung bzw. dem Filter daneben.
 - Durchgehend kürzere Beschreibungen der Einstellungen.
 - **Benutzerdefiniert…** in den Datumsmenüs wird jetzt immer angezeigt. Ohne Kalendae 1.7.0 oder neuer bietet es an, Kalendae zu installieren, zu aktualisieren oder zu aktivieren.
+- Auf dem Handy scrollt ein Wischen über eine Aufgabe das Panel: Aufgaben werden an einem Griff rechts gezogen. Griff, Leiste, halbe oder ganze Zeile wählst du unter Einstellungen → Wie Aufgaben gezogen werden (Mobil).
 
 ## 0.3.1
 

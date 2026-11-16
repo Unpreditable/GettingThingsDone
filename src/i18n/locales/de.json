@@ -282,6 +282,36 @@
         "pin": "Anheften",
         "ask": "Nach Datum fragen"
       },
+      "dragBy": {
+        "name": "Wie Aufgaben gezogen werden (Mobil)",
+        "intro": "Auf dem Handy kann ein Wischen, das auf einer Aufgabe beginnt, sie verschieben, statt das Panel zu scrollen. Wähle, wo in einer Zeile das Ziehen beginnt. Überall sonst scrollt ein Wischen. Am Desktop zieht die ganze Zeile, und du scrollst mit Maus oder Touchpad.",
+        "choices": {
+          "right-grip": "Griff rechts",
+          "left-grip": "Griff links",
+          "right-bar": "Leiste rechts",
+          "left-bar": "Leiste links",
+          "right-half": "Rechte Hälfte",
+          "left-half": "Linke Hälfte",
+          "whole-row": "Ganze Zeile"
+        },
+        "descriptions": {
+          "right-grip": "Ziehen am Griff am rechten Ende einer Zeile.",
+          "left-grip": "Ziehen am Griff am linken Ende einer Zeile.",
+          "right-bar": "Ziehen an der schmalen Leiste am rechten Rand.",
+          "left-bar": "Ziehen an der schmalen Leiste am linken Rand.",
+          "right-half": "Ziehen auf der rechten Hälfte einer Zeile. Zum Scrollen auf der linken Hälfte wischen.",
+          "left-half": "Ziehen auf der linken Hälfte einer Zeile. Zum Scrollen auf der rechten Hälfte wischen.",
+          "whole-row": "Ziehen an jeder Stelle einer Zeile. Zum Scrollen auf den Kategorie-Überschriften oder der Scrollleiste wischen."
+        },
+        "previewHeading": "Vorschau",
+        "previewDescription": "So sehen Aufgabenzeilen mit dieser Wahl auf dem Handy aus.",
+        "previewTask1": "Beim Zahnarzt anrufen und den Termin am Dienstag verschieben",
+        "previewTask2": "Den Quartalsbericht für die Teambesprechung entwerfen",
+        "previewTask3": "Die Verkaufszahlen aus allen Regionen sammeln",
+        "previewDrag": "Ziehbereich",
+        "previewScroll": "Scrollbereich",
+        "previewCaption": "Die gestrichelte Linie gibt es nur in dieser Vorschau."
+      },
       "markDueFlags": {
         "name": "Überfällige und falsch einsortierte Aufgaben markieren",
         "descriptionOverdue": "Fälligkeitsdatum ist verstrichen.",
@@ -421,6 +451,9 @@
     "notes": {
       "1": {
         "message": "Dieses Update bringt 5 neue Funktionen, darunter einen Bericht, was du geschafft hast (🏆), und Unterstützung für das Dataview-Format von Tasks."
+      },
+      "2": {
+        "message": "Scrollen auf dem Handy ist einfacher: Aufgaben werden jetzt an einem Griff rechts gezogen."
       }
     }
   }

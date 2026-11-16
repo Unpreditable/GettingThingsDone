@@ -282,6 +282,36 @@
         "pin": "Kinnita",
         "ask": "Küsi kuupäeva"
       },
+      "dragBy": {
+        "name": "Kuidas ülesandeid lohistada (mobiil)",
+        "intro": "Telefonis võib ülesandelt alanud libistus ülesande teisaldada, selle asemel et paneeli kerida. Vali, kust real lohistamine algab. Mujal kerib libistus. Arvutis lohistatakse kogu rida ning kerida saab hiire või puuteplaadiga.",
+        "choices": {
+          "right-grip": "Pide paremal",
+          "left-grip": "Pide vasakul",
+          "right-bar": "Riba paremal",
+          "left-bar": "Riba vasakul",
+          "right-half": "Parem pool",
+          "left-half": "Vasak pool",
+          "whole-row": "Kogu rida"
+        },
+        "descriptions": {
+          "right-grip": "Lohista rea paremas otsas olevast pidemest.",
+          "left-grip": "Lohista rea vasakus otsas olevast pidemest.",
+          "right-bar": "Lohista parema serva kitsast ribast.",
+          "left-bar": "Lohista vasaku serva kitsast ribast.",
+          "right-half": "Lohista rea paremast poolest. Kerimiseks libista vasakul poolel.",
+          "left-half": "Lohista rea vasakust poolest. Kerimiseks libista paremal poolel.",
+          "whole-row": "Lohista rea mis tahes kohast. Kerimiseks libista kategooriate pealkirjadel või kerimisribal."
+        },
+        "previewHeading": "Eelvaade",
+        "previewDescription": "Nii näevad ülesannete read selle valikuga telefonis välja.",
+        "previewTask1": "Helistada hambaarstile ja muuta teisipäevast vastuvõtuaega",
+        "previewTask2": "Koostada meeskonna koosolekuks kvartaliaruanne",
+        "previewTask3": "Koguda müiginumbrid kõigist piirkondadest",
+        "previewDrag": "Lohistamisala",
+        "previewScroll": "Kerimisala",
+        "previewCaption": "Punktiirjoon on ainult selles eelvaates."
+      },
       "markDueFlags": {
         "name": "Märgi tähtaja ületanud ja valesti paigutatud ülesanded",
         "descriptionOverdue": "tähtaeg on möödas.",
@@ -421,6 +451,9 @@
     "notes": {
       "1": {
         "message": "See uuendus toob 5 uut funktsiooni, sealhulgas ülevaate sellest, mis sai tehtud (🏆), ja Tasksi Dataview-vormingu toe."
+      },
+      "2": {
+        "message": "Telefonis on kerimine lihtsam: ülesandeid lohistatakse nüüd parempoolsest pidemest."
       }
     }
   }

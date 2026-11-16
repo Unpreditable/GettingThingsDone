@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import type { Readable } from "svelte/store";
-  import { Menu, Notice } from "obsidian";
+  import { Menu, Notice, Platform } from "obsidian";
   import type { MenuItem } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
   import Celebration from "./Celebration.svelte";
@@ -23,6 +23,7 @@
   import { shouldRecommendCatchAll, hiddenFilterStrings, weekStartIndex } from "../settings";
   import { TO_REVIEW_ID, autoBucketFor } from "../core/BucketManager";
   import { PANEL_NOTICES, noticeToShow } from "../core/PanelNotices";
+  import { dragZone } from "../core/DragZone";
   import { icon } from "./icon";
   import { headerDragOver } from "./dragState";
   import { t } from "../i18n/i18n";
@@ -80,6 +81,7 @@
 
   // Every button settles the note: the changelog keeps its text reachable.
   $: panelNotice = noticeToShow(PANEL_NOTICES, settings.lastNoticeSeen);
+  $: zone = dragZone(settings.mobileDragBy, Platform.isMobile);
 
   $: bucketConfigMap = new Map<string, BucketConfig>(
     settings.buckets.map((b) => [b.id, b])
@@ -784,6 +786,7 @@
         {allTasksMap}
         {taskBucketMap}
         bucketGroups={bucketGroups}
+        {zone}
         on:move={(e) => handleMove(e.detail.task, e.detail.targetBucketId)}
         on:toggle={(e) => handleToggle(e.detail.task)}
         on:navigate={(e) => onNavigate(e.detail.task)}

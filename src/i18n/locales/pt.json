@@ -282,6 +282,36 @@
         "pin": "Fixar",
         "ask": "Pedir uma data"
       },
+      "dragBy": {
+        "name": "Como arrastar tarefas (telemóvel)",
+        "intro": "No telemóvel, um deslize que começa sobre uma tarefa pode movê-la em vez de deslocar o painel. Escolha onde começa o arrasto numa linha. Um deslize em qualquer outro sítio desloca. No computador arrasta-se a linha inteira, e desloca-se com o rato ou o touchpad.",
+        "choices": {
+          "right-grip": "Pega à direita",
+          "left-grip": "Pega à esquerda",
+          "right-bar": "Barra à direita",
+          "left-bar": "Barra à esquerda",
+          "right-half": "Metade direita",
+          "left-half": "Metade esquerda",
+          "whole-row": "Linha inteira"
+        },
+        "descriptions": {
+          "right-grip": "Arraste pela pega na ponta direita da linha.",
+          "left-grip": "Arraste pela pega na ponta esquerda da linha.",
+          "right-bar": "Arraste pela barra fina ao longo da margem direita.",
+          "left-bar": "Arraste pela barra fina ao longo da margem esquerda.",
+          "right-half": "Arraste a partir da metade direita da linha. Deslize na metade esquerda para deslocar.",
+          "left-half": "Arraste a partir da metade esquerda da linha. Deslize na metade direita para deslocar.",
+          "whole-row": "Arraste a partir de qualquer ponto da linha. Para deslocar, deslize sobre os cabeçalhos das categorias ou a barra de deslocamento."
+        },
+        "previewHeading": "Pré-visualização",
+        "previewDescription": "Assim ficam as linhas de tarefas num telemóvel com esta opção.",
+        "previewTask1": "Ligar ao dentista para mudar a consulta de terça-feira",
+        "previewTask2": "Redigir o relatório trimestral para a reunião da equipa",
+        "previewTask3": "Reunir os números de vendas de todas as regiões",
+        "previewDrag": "Zona de arrasto",
+        "previewScroll": "Zona de deslocamento",
+        "previewCaption": "A linha tracejada só aparece nesta pré-visualização."
+      },
       "markDueFlags": {
         "name": "Sinalizar tarefas atrasadas e mal classificadas",
         "descriptionOverdue": "a data de vencimento já passou.",
@@ -421,6 +451,9 @@
     "notes": {
       "1": {
         "message": "Esta atualização traz 5 novas funcionalidades, incluindo um relatório do que conseguiu fazer (🏆) e suporte para o formato Dataview do Tasks."
+      },
+      "2": {
+        "message": "Deslocar no telemóvel é mais fácil: as tarefas arrastam-se agora por uma pega à direita."
       }
     }
   }

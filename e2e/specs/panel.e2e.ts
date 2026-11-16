@@ -260,5 +260,146 @@ describe("The panel", () => {
   });
 });
 
+const GRIP = ".gtd-drag-handle";
+
+/** Makes the plugin treat this window as a phone or not. The panel reads it on its next redraw. */
+async function setMobile(on: boolean): Promise<void> {
+  await browser.executeObsidian(({ obsidian }, on) => {
+    (obsidian.Platform as { isMobile: boolean }).isMobile = on;
+  }, on);
+}
+
+/**
+ * Presses the pointer down at a spot across `selector` (0 = left edge, 1 = right edge), on
+ * whatever is drawn there, and says whether Sortable picked the row up. Lets go afterwards.
+ */
+async function pressPicksUp(selector: string, across: number): Promise<boolean> {
+  const chosen = await browser.execute((selector, across) => {
+    const el = document.querySelector<HTMLElement>(selector);
+    if (!el) throw new Error(`nothing at ${selector}`);
+    const rect = el.getBoundingClientRect();
+    const x = rect.left + rect.width * across;
+    const y = rect.top + rect.height / 2;
+    const target = document.elementFromPoint(x, y) ?? el;
+    const init = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 };
+    target.dispatchEvent(new PointerEvent("pointerdown", { ...init, pointerType: "mouse", isPrimary: true }));
+    target.dispatchEvent(new MouseEvent("mousedown", init));
+    const picked = document.querySelector(".sortable-chosen") !== null;
+    document.dispatchEvent(new PointerEvent("pointerup", { ...init, pointerType: "mouse", isPrimary: true }));
+    document.dispatchEvent(new MouseEvent("mouseup", init));
+    return picked;
+  }, selector, across);
+  await browser.pause(100);
+  return chosen;
+}
+
+/** Where a row's grip sits across the row, as pressPicksUp takes it. */
+function gripAcross(row: string): Promise<number> {
+  return browser.execute((row, grip) => {
+    const rowEl = document.querySelector<HTMLElement>(row);
+    const gripEl = rowEl?.querySelector<HTMLElement>(grip);
+    if (!rowEl || !gripEl) throw new Error(`no grip in ${row}`);
+    const r = rowEl.getBoundingClientRect();
+    const g = gripEl.getBoundingClientRect();
+    return (g.left + g.width / 2 - r.left) / r.width;
+  }, row, GRIP);
+}
+
+describe("Dragging on mobile", () => {
+  beforeEach(async () => {
+    await resetState();
+    await obsidianPage.disablePlugin("obsidian-tasks-plugin");
+    await setMobile(true);
+    await openPanel();
+  });
+
+  afterEach(async () => {
+    await setMobile(false);
+  });
+
+  it("with Right grip, picks a task up by its grip and never by its text", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "right-grip" });
+    const row = await rowOf("Buy milk");
+    await $(`${row} ${GRIP}.is-right`).waitForExist({ timeoutMsg: "no grip at the right end of the row" });
+    expect(await pressPicksUp(row, 0.3)).toBe(false);
+    expect(await pressPicksUp(row, await gripAcross(row))).toBe(true);
+  });
+
+  it("with Left bar, draws the bar before the checkbox and drags by it", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "left-bar" });
+    const row = await rowOf("Buy milk");
+    await $(`${row} ${GRIP}.is-left.is-bar`).waitForExist({ timeoutMsg: "no bar at the left end of the row" });
+    const order = await browser.execute((row) => {
+      const kids = Array.from(document.querySelector(row)!.children);
+      return [kids.findIndex((k) => k.matches(".gtd-drag-handle")), kids.findIndex((k) => k.matches(".gtd-task-checkbox"))];
+    }, row);
+    expect(order[0]).toBeLessThan(order[1]);
+    expect(await pressPicksUp(row, 0.5)).toBe(false);
+    expect(await pressPicksUp(row, await gripAcross(row))).toBe(true);
+  });
+
+  it("with Left half, picks a task up on the left half only", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "left-half" });
+    const row = await rowOf("Buy milk");
+    expect(await $(`${row} ${GRIP}`).isExisting()).toBe(false);
+    expect(await pressPicksUp(row, 0.75)).toBe(false);
+    expect(await pressPicksUp(row, 0.25)).toBe(true);
+  });
+
+  it("with Whole row, picks a task up anywhere", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "whole-row" });
+    const row = await rowOf("Buy milk");
+    expect(await $(`${row} ${GRIP}`).isExisting()).toBe(false);
+    expect(await pressPicksUp(row, 0.3)).toBe(true);
+  });
+
+  it("moves a task dragged by its grip onto another bucket", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "right-grip" });
+    const row = await rowOf("Buy milk");
+    const header = `.gtd-bucket[data-bucket-id="someday"] .gtd-bucket-header`;
+    // Only a collapsed bucket's header takes a drop.
+    await $(header).click();
+    await $(`${header}.collapsed`).waitForExist({ timeoutMsg: "Someday never collapsed" });
+    const across = await gripAcross(row);
+    await browser.execute((row, header, across) => {
+      const rowEl = document.querySelector<HTMLElement>(row)!;
+      const r = rowEl.getBoundingClientRect();
+      const x = r.left + r.width * across;
+      const y = r.top + r.height / 2;
+      const grip = document.elementFromPoint(x, y) ?? rowEl;
+      const init = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 };
+      grip.dispatchEvent(new PointerEvent("pointerdown", { ...init, pointerType: "mouse", isPrimary: true }));
+      grip.dispatchEvent(new MouseEvent("mousedown", init));
+      const data = new DataTransfer();
+      rowEl.dispatchEvent(new DragEvent("dragstart", { ...init, dataTransfer: data }));
+      (window as unknown as { gtdDrag: { data: DataTransfer; header: string } }).gtdDrag = { data, header };
+    }, row, header, across);
+    await browser.pause(100);
+    for (const type of ["dragover", "drop"]) {
+      await browser.execute((type) => {
+        const { data, header } = (window as unknown as { gtdDrag: { data: DataTransfer; header: string } }).gtdDrag;
+        const h = document.querySelector<HTMLElement>(header)!.getBoundingClientRect();
+        const init = { bubbles: true, cancelable: true, clientX: h.left + h.width / 2, clientY: h.top + h.height / 2 };
+        const target = document.elementFromPoint(init.clientX, init.clientY)!;
+        target.dispatchEvent(new DragEvent(type, { ...init, dataTransfer: data }));
+      }, type);
+      await browser.pause(100);
+    }
+    await browser.execute((row) => {
+      const { data } = (window as unknown as { gtdDrag: { data: DataTransfer } }).gtdDrag;
+      document.querySelector<HTMLElement>(row)?.dispatchEvent(new DragEvent("dragend", { bubbles: true, cancelable: true, dataTransfer: data }));
+    }, row);
+    await waitForNoteLine("- [ ] Buy milk #gtd/someday");
+  });
+
+  it("draws no grip on desktop, whatever the setting", async () => {
+    await setMobile(false);
+    await setPluginSettings(GTD, { mobileDragBy: "right-grip" });
+    const row = await rowOf("Buy milk");
+    expect(await $(`${row} ${GRIP}`).isExisting()).toBe(false);
+    expect(await pressPicksUp(row, 0.3)).toBe(true);
+  });
+});
+
 // Keeps this file's names its own: a file with no import or export shares one scope with every other.
 export {};

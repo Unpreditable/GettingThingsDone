@@ -287,6 +287,36 @@
         "pin": "Piespraust",
         "ask": "Jautāt datumu"
       },
+      "dragBy": {
+        "name": "Kā vilkt uzdevumus (mobilajā)",
+        "intro": "Tālrunī vilciens, kas sākas uz uzdevuma, var to pārvietot, nevis ritināt paneli. Izvēlieties, kurā rindas vietā sākas vilkšana. Citur vilciens ritina. Datorā velk visu rindu, un ritina ar peli vai skārienpaliktni.",
+        "choices": {
+          "right-grip": "Rokturis pa labi",
+          "left-grip": "Rokturis pa kreisi",
+          "right-bar": "Josla pa labi",
+          "left-bar": "Josla pa kreisi",
+          "right-half": "Labā puse",
+          "left-half": "Kreisā puse",
+          "whole-row": "Visa rinda"
+        },
+        "descriptions": {
+          "right-grip": "Velciet aiz roktura rindas labajā galā.",
+          "left-grip": "Velciet aiz roktura rindas kreisajā galā.",
+          "right-bar": "Velciet aiz šauras joslas gar labo malu.",
+          "left-bar": "Velciet aiz šauras joslas gar kreiso malu.",
+          "right-half": "Velciet no rindas labās puses. Lai ritinātu, velciet pa kreiso pusi.",
+          "left-half": "Velciet no rindas kreisās puses. Lai ritinātu, velciet pa labo pusi.",
+          "whole-row": "Velciet no jebkuras rindas vietas. Lai ritinātu, velciet pa kategoriju virsrakstiem vai ritjoslu."
+        },
+        "previewHeading": "Priekšskatījums",
+        "previewDescription": "Tā ar šo izvēli tālrunī izskatās uzdevumu rindas.",
+        "previewTask1": "Piezvanīt zobārstam un pārcelt otrdienas vizīti",
+        "previewTask2": "Sagatavot ceturkšņa pārskata melnrakstu komandas sanāksmei",
+        "previewTask3": "Savākt pārdošanas skaitļus no visiem reģioniem",
+        "previewDrag": "Vilkšanas zona",
+        "previewScroll": "Ritināšanas zona",
+        "previewCaption": "Raustītā līnija redzama tikai šajā priekšskatījumā."
+      },
       "markDueFlags": {
         "name": "Atzīmēt nokavētos un nepareizi sakārtotos uzdevumus",
         "descriptionOverdue": "termiņš ir pagājis.",
@@ -426,6 +456,9 @@
     "notes": {
       "1": {
         "message": "Šis atjauninājums ienes 5 jaunas funkcijas, tostarp pārskatu par to, kas paveikts (🏆), un Tasks Dataview formāta atbalstu."
+      },
+      "2": {
+        "message": "Ritināt mobilajā ir vieglāk: uzdevumus tagad velk aiz roktura labajā pusē."
       }
     }
   }

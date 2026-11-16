@@ -5,6 +5,7 @@
 - Una página de ajustes más corta: Fijado y Filtro global de tareas abren sus propias páginas, con la marca o el filtro actual al lado.
 - Descripciones de ajustes más cortas en todas partes.
 - **Personalizada…** aparece ahora siempre en los menús de fecha. Sin Kalendae 1.7.0 o posterior, ofrece instalarlo, actualizarlo o activarlo.
+- En el móvil, deslizar sobre una tarea desplaza el panel: las tareas se arrastran por un asa a la derecha. Elige asa, barra, media fila o la fila entera en Ajustes → Cómo arrastrar tareas (móvil).
 
 ## 0.3.1
 

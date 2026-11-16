@@ -1,6 +1,8 @@
 import { App, PluginSettingTab, Setting, SettingGroup, SettingPage, TFile, TFolder, SettingDefinitionItem, debounce, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, isReservedFieldName, normalizeTaskFilters } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, MOBILE_DRAG_CHOICES, isReservedFieldName, normalizeTaskFilters } from "./settings";
+import type { MobileDragBy } from "./settings";
+import { dragZone } from "./core/DragZone";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
 import { migrateStorageMode } from "./core/StorageMigrator";
 import { renderIcon } from "./views/icon";
@@ -431,6 +433,12 @@ export class GtdSettingsTab extends PluginSettingTab {
             },
           },
           {
+            type: "page",
+            name: t("settings.behaviour.dragBy.name"),
+            desc: t(`settings.behaviour.dragBy.choices.${this.plugin.settings.mobileDragBy}`),
+            page: () => this.createSubPage((el) => this.renderDragBy(el)),
+          },
+          {
             name: t("settings.behaviour.markDueFlags.name"),
             desc: markDueFlagsDesc(),
             control: { type: "toggle", key: "staleIndicatorEnabled" },
@@ -740,6 +748,77 @@ export class GtdSettingsTab extends PluginSettingTab {
   }
 
   /** The global task filter — one string per line — and its two toggles. */
+  /**
+   * The "Drag tasks by (Mobile)" controls: its own page on 1.13+, a block in
+   * the Behaviour section before. The same either way, since the explanation
+   * is what tells a desktop reader the setting does nothing there.
+   */
+  private renderDragBy(containerEl: HTMLElement) {
+    const key = (name: string) => `settings.behaviour.dragBy.${name}`;
+    new Setting(containerEl).setDesc(t(key("intro")));
+
+    const setting = new Setting(containerEl).setName(t(key("name")));
+    const preview = containerEl.createDiv({ cls: "gtd-drag-preview" });
+    const show = (mode: MobileDragBy) => {
+      setting.setDesc(t(key(`descriptions.${mode}`)));
+      this.renderDragPreview(preview, mode);
+    };
+    setting.addDropdown((dd) => {
+      for (const mode of MOBILE_DRAG_CHOICES) dd.addOption(mode, t(key(`choices.${mode}`)));
+      dd.setValue(this.plugin.settings.mobileDragBy);
+      dd.onChange(async (val) => {
+        show(val as MobileDragBy);
+        await this.setControlValue("mobileDragBy", val);
+      });
+    });
+    show(this.plugin.settings.mobileDragBy);
+  }
+
+  /** A mock of three panel rows, drawn the way a phone would draw them for `mode`. */
+  private renderDragPreview(el: HTMLElement, mode: MobileDragBy) {
+    el.empty();
+    const key = (name: string) => `settings.behaviour.dragBy.${name}`;
+    const zone = dragZone(mode, true);
+    el.createDiv({ cls: "gtd-drag-preview-heading", text: t(key("previewHeading")) });
+    el.createDiv({ cls: "gtd-drag-preview-description", text: t(key("previewDescription")) });
+    const frame = el.createDiv({ cls: "gtd-drag-preview-frame" });
+    const panel = frame.createDiv({ cls: "gtd-drag-preview-panel" });
+    const rows = [
+      { text: t(key("previewTask1")), sub: false },
+      { text: t(key("previewTask2")), sub: false },
+      { text: t(key("previewTask3")), sub: true },
+    ];
+    for (const { text, sub } of rows) {
+      const row = panel.createDiv({ cls: "gtd-drag-preview-row" });
+      row.toggleClass("is-sub", sub);
+      const handle = () => {
+        if (zone.kind !== "handle") return;
+        const h = row.createSpan({ cls: `gtd-drag-preview-handle is-${zone.side}` });
+        if (zone.look === "bar") h.addClass("is-bar");
+        else renderIcon(h, "grip-vertical");
+      };
+      if (zone.kind === "handle" && zone.side === "left") {
+        row.addClass("has-left-handle");
+        handle();
+      }
+      row.createSpan({ cls: "gtd-drag-preview-checkbox" });
+      row.createSpan({ cls: "gtd-drag-preview-text", text });
+      if (zone.kind === "handle" && zone.side === "right") {
+        row.addClass("has-right-handle");
+        handle();
+      }
+    }
+    if (zone.kind === "half") {
+      panel.createDiv({ cls: "gtd-drag-preview-split" });
+      const labels = frame.createDiv({ cls: "gtd-drag-preview-labels" });
+      const drag = t(key("previewDrag"));
+      const scroll = t(key("previewScroll"));
+      labels.createSpan({ text: zone.side === "left" ? drag : scroll });
+      labels.createSpan({ text: zone.side === "left" ? scroll : drag });
+      frame.createDiv({ cls: "gtd-drag-preview-caption", text: t(key("previewCaption")) });
+    }
+  }
+
   private renderTaskFilter(containerEl: HTMLElement, filterPage: boolean) {
     // The 1.13+ page opens with a line on what the filter is for, so its rows
     // carry shorter names and descriptions; older Obsidian keeps the originals.
@@ -969,6 +1048,8 @@ export class GtdSettingsTab extends PluginSettingTab {
           await this.setControlValue("dropIntoBucket", val);
         });
       });
+
+    this.renderDragBy(containerEl);
 
     new Setting(containerEl)
       .setName(t("settings.behaviour.markDueFlags.name"))

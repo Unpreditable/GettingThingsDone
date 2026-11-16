@@ -13,6 +13,7 @@
   import { formatTasksFields, PRIORITY_EMOJI } from "../core/TasksFieldText";
   import { placeRow } from "../core/RowPlacement";
   import { icon } from "./icon";
+  import type { DragZone } from "../core/DragZone";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
@@ -32,6 +33,12 @@
   export let waiting: WaitingInfo | null = null;
   /** Global-filter strings to cut from the text shown; empty while hiding is off. */
   export let hiddenFilterStrings: string[] = [];
+  /** Where on the row a drag starts; a handle zone draws the grip or bar. */
+  export let zone: DragZone = { kind: "row" };
+
+  $: handle = zone.kind === "handle" ? zone : null;
+  // A left handle takes the row's first 32px, so the checkbox starts after it.
+  $: leftPad = 12 + (handle?.side === "left" ? 24 : 0);
 
   $: shownText = hideFilterText(task.text, hiddenFilterStrings);
 
@@ -216,7 +223,9 @@
   class:is-completed={task.isCompleted && showCompleted}
   class:is-waiting={dimmed}
   data-task={symbol}
-  style="padding-left: {12 + visualIndentLevel * 16}px"
+  class:has-left-handle={handle?.side === "left"}
+  class:has-right-handle={handle?.side === "right"}
+  style="padding-left: {leftPad + visualIndentLevel * 16}px"
   on:mouseenter={onMouseEnter}
   on:mouseleave={onMouseLeave}
   on:mousedown={onMouseDown}
@@ -225,6 +234,12 @@
   data-file-path={task.filePath}
   data-line-number={task.lineNumber}
 >
+  {#if handle?.side === "left"}
+    <span class="gtd-drag-handle is-left" class:is-bar={handle.look === "bar"}>
+      {#if handle.look === "grip"}<span class="gtd-drag-grip" use:icon={"grip-vertical"}></span>{/if}
+    </span>
+  {/if}
+
   <input
     type="checkbox"
     class="gtd-task-checkbox task-list-item-checkbox"
@@ -348,6 +363,12 @@
       {/each}
     {/if}
   </div>
+
+  {#if handle?.side === "right"}
+    <span class="gtd-drag-handle is-right" class:is-bar={handle.look === "bar"}>
+      {#if handle.look === "grip"}<span class="gtd-drag-grip" use:icon={"grip-vertical"}></span>{/if}
+    </span>
+  {/if}
 </div>
 
 <style>
