@@ -645,6 +645,12 @@
   margin-bottom: 0;
 }
 
+/* An escape hatch's first row is core's first child of a row, which core
+   spaces from the control beside it. Here there is no control beside it. */
+.setting-group .setting-item.gtd-settings-escape-hatch > .setting-item:first-child {
+  margin-inline-end: 0;
+}
+
 /* Free-form DOM inside an escape hatch (the banner card, the scope path list,
    the bucket cards and their action row) sits flush against the container edge
    now that the wrapper adds no padding. Inset it by the same amount core uses
