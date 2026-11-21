@@ -191,7 +191,8 @@ function readDragPage(): Promise<DragPage | null> {
     const doc = (app as unknown as { setting: SettingsWindow }).setting.activeTab?.containerEl.ownerDocument;
     const preview = doc?.querySelector(".gtd-drag-preview");
     if (!preview) return null;
-    const setting = preview.previousElementSibling;
+    // The preview sits in its own row's description; the dropdown is the row above.
+    const setting = preview.closest(".setting-item")?.previousElementSibling;
     return {
       description: setting?.querySelector(".setting-item-description")?.textContent ?? "",
       rightHandles: preview.querySelectorAll(".gtd-drag-preview-handle.is-right").length,
@@ -238,7 +239,7 @@ describe("The Drag tasks by page", () => {
 
     await browser.executeObsidian(({ app }) => {
       const doc = (app as unknown as { setting: SettingsWindow }).setting.activeTab!.containerEl.ownerDocument;
-      const select = doc.querySelector(".gtd-drag-preview")!.previousElementSibling!.querySelector("select")!;
+      const select = doc.querySelector(".gtd-drag-preview")!.closest(".setting-item")!.previousElementSibling!.querySelector("select")!;
       select.value = "left-half";
       select.dispatchEvent(new Event("change"));
     });

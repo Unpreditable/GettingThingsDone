@@ -758,7 +758,11 @@ export class GtdSettingsTab extends PluginSettingTab {
     new Setting(containerEl).setDesc(t(key("intro")));
 
     const setting = new Setting(containerEl).setName(t(key("name")));
-    const preview = containerEl.createDiv({ cls: "gtd-drag-preview" });
+    // A real row, so the heading and the mock panel get Obsidian's own indent.
+    const previewSetting = new Setting(containerEl)
+      .setName(t(key("previewHeading")))
+      .setDesc(t(key("previewDescription")));
+    const preview = previewSetting.descEl.createDiv({ cls: "gtd-drag-preview" });
     const show = (mode: MobileDragBy) => {
       setting.setDesc(t(key(`descriptions.${mode}`)));
       this.renderDragPreview(preview, mode);
@@ -779,8 +783,6 @@ export class GtdSettingsTab extends PluginSettingTab {
     el.empty();
     const key = (name: string) => `settings.behaviour.dragBy.${name}`;
     const zone = dragZone(mode, true);
-    el.createDiv({ cls: "gtd-drag-preview-heading", text: t(key("previewHeading")) });
-    el.createDiv({ cls: "gtd-drag-preview-description", text: t(key("previewDescription")) });
     const frame = el.createDiv({ cls: "gtd-drag-preview-frame" });
     const panel = frame.createDiv({ cls: "gtd-drag-preview-panel" });
     const rows = [

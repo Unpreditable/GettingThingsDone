@@ -478,18 +478,7 @@
 
 /* The settings preview: three mock rows sized like the panel's. */
 .gtd-drag-preview {
-  padding: var(--size-4-2) 0 var(--size-4-4);
-}
-
-.gtd-drag-preview-heading {
-  font-size: var(--font-ui-medium);
-  color: var(--text-normal);
-}
-
-.gtd-drag-preview-description {
-  padding-bottom: var(--size-4-3);
-  font-size: var(--font-ui-smaller);
-  color: var(--text-muted);
+  padding-top: var(--size-4-3);
 }
 
 .gtd-drag-preview-frame {
