@@ -62,12 +62,10 @@
   let taskListEl: HTMLElement;
   let sortable: Sortable;
 
-  // A settings change reaches a list that is already mounted.
+  // A settings change reaches a list that is already mounted. Written straight
+  // onto options: sortable.option(name, undefined) only reads, so it can't clear.
   $: if (sortable) {
-    const opts = sortableOptions(zone, taskListEl);
-    sortable.option("handle", opts.handle);
-    sortable.option("filter", opts.filter);
-    sortable.option("preventOnFilter", opts.preventOnFilter);
+    Object.assign(sortable.options, sortableOptions(zone, taskListEl));
   }
 
   $: agedSet = new Set(agedCompletedTaskIds);

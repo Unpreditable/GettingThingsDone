@@ -46,8 +46,8 @@ function clientX(event: Event): number | null {
 }
 
 /**
- * The Sortable options for a zone. Every key is always present, so passing them
- * to `sortable.option` one by one also clears what the previous zone set.
+ * The Sortable options for a zone. Every key is always present, so assigning
+ * them onto a live Sortable's options also clears what the previous zone set.
  */
 export function sortableOptions(
   zone: DragZone,

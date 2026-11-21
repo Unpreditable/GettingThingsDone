@@ -353,6 +353,24 @@ describe("Dragging on mobile", () => {
     expect(await pressPicksUp(row, 0.3)).toBe(true);
   });
 
+  it("drags by the grip after switching to Right grip from Left half", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "left-half" });
+    const row = await rowOf("Buy milk");
+    expect(await pressPicksUp(row, 0.25)).toBe(true);
+    await setPluginSettings(GTD, { mobileDragBy: "right-grip" });
+    await $(`${row} ${GRIP}.is-right`).waitForExist({ timeoutMsg: "no grip at the right end of the row" });
+    expect(await pressPicksUp(row, await gripAcross(row))).toBe(true);
+  });
+
+  it("drags anywhere after switching to Whole row from Right grip", async () => {
+    await setPluginSettings(GTD, { mobileDragBy: "right-grip" });
+    const row = await rowOf("Buy milk");
+    await $(`${row} ${GRIP}.is-right`).waitForExist({ timeoutMsg: "no grip at the right end of the row" });
+    await setPluginSettings(GTD, { mobileDragBy: "whole-row" });
+    await $(`${row} ${GRIP}`).waitForExist({ reverse: true, timeoutMsg: "the grip stayed after Whole row" });
+    expect(await pressPicksUp(row, 0.3)).toBe(true);
+  });
+
   it("moves a task dragged by its grip onto another bucket", async () => {
     await setPluginSettings(GTD, { mobileDragBy: "right-grip" });
     const row = await rowOf("Buy milk");
