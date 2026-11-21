@@ -331,7 +331,13 @@ function fireDrag(type: string, selector: string, spot: DragSpot): Promise<void>
 
 /** Lets SortableJS run the timers it starts between drag events. */
 function settle(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 100));
+  return browser.pause(100);
+}
+
+/** A test that runs only when `ok`, and shows as skipped otherwise. */
+function itIf(ok: boolean, title: string, body: E2eBody): void {
+  if (ok) it(title, body);
+  else it.skip(title, body);
 }
 
 describe("a dated drop", () => {
@@ -343,7 +349,7 @@ describe("a dated drop", () => {
   });
 
   // This Week is empty on a Sunday, and then no menu shows at all.
-  (daysLeftInWeek() >= 1 ? it : it.skip)("opens one menu for a drop on a collapsed bucket's header", async () => {
+  itIf(daysLeftInWeek() >= 1, "opens one menu for a drop on a collapsed bucket's header", async () => {
     const header = `.gtd-bucket[data-bucket-id="this-week"] .gtd-bucket-header`;
     await $(header).click();
     await $(`${header}.collapsed`).waitForExist({ timeoutMsg: "This Week never collapsed" });
@@ -384,7 +390,7 @@ describe("a dated drop", () => {
   });
 
   // This Week is empty on a Sunday.
-  (daysLeftInWeek() >= 1 ? it : it.skip)("writes the date to the field Plan by reads, and the task shows in the bucket", async () => {
+  itIf(daysLeftInWeek() >= 1, "writes the date to the field Plan by reads, and the task shows in the bucket", async () => {
     const day = dayFromToday(1);
     await writeNote("- [ ] Undated\n", "Undated");
     await drop("handleDropDate", "Undated", ["scheduled", day, "this-week"], null);
@@ -395,7 +401,7 @@ describe("a dated drop", () => {
   });
 
   // A must be dated after B, so its natural place is below B: This Week needs two days.
-  (daysLeftInWeek() >= 2 ? it : it.skip)("removes the pin and keeps the drop position", async () => {
+  itIf(daysLeftInWeek() >= 2, "removes the pin and keeps the drop position", async () => {
     await writeNote(`- [ ] A #gtd/today\n- [ ] B ⏳ ${dayFromToday(1)}\n`, "A");
     await drop("handleDropDate", "A", ["scheduled", dayFromToday(2), "this-week"], ["A", "B"]);
     await waitForNoteLine(NOTE, `- [ ] A ⏳ ${dayFromToday(2)}`);

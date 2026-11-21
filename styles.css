@@ -707,9 +707,10 @@
   margin-inline-start: var(--size-4-8);
 }
 
-/* A row with no description: its name sits level with the control, not at its top. */
-.gtd-settings-group .setting-item:has(> .setting-item-info > .setting-item-description:empty) {
-  align-items: center;
+/* A row with no description: its name sits level with the control, not at its top.
+   A row with one is taller than its control, so centring leaves it where it was. */
+.gtd-settings-group .setting-item-info {
+  align-self: center;
 }
 
 /* Rows on a sub-page that read as one set with the row above them: no rule
