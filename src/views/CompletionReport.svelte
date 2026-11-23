@@ -114,7 +114,7 @@
     <span
       class="clickable-icon"
       class:is-active={infoOpen}
-      title={t("report.info.button")}
+      aria-label={t("report.info.button")}
       on:click={() => (infoOpen = !infoOpen)}
       use:icon={"info"}
     ></span>
@@ -122,7 +122,7 @@
     <span
       class="clickable-icon"
       class:is-active={optionsOpen}
-      title={t("report.options.button")}
+      aria-label={t("report.options.button")}
       on:click|stopPropagation={() => (optionsOpen = !optionsOpen)}
       use:icon={"sliders-horizontal"}
     ></span>
@@ -246,7 +246,7 @@
         {#if showDayHeadings}
           <div class="gtd-report-day">
             {dayFormat.format(d.date)}
-            <span class="gtd-report-chip" title={t("report.dayCount", { n: d.completed })}>{d.completed}</span>
+            <span class="gtd-report-chip" aria-label={t("report.dayCount", { n: d.completed })}>{d.completed}</span>
           </div>
         {/if}
         {#each d.entries as entry (entry.task.id)}
@@ -255,7 +255,7 @@
           <div
             class="gtd-report-row"
             class:is-cancelled={entry.cancelled}
-            title={t("report.openTask", { file: task.filePath })}
+            aria-label={t("report.openTask", { file: task.filePath })}
             on:click={() => onOpenTask(task)}
           >
             <span class="gtd-report-box"></span>

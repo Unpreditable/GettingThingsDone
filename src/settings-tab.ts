@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, SettingGroup, SettingPage, TFile, TFolder, SettingDefinitionItem, debounce, requireApiVersion } from "obsidian";
 import type GtdTasksPlugin from "./main";
-import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, MOBILE_DRAG_CHOICES, isReservedFieldName, normalizeTaskFilters } from "./settings";
+import { BucketConfig, StorageMode, ScopeType, PathEntry, DEFAULT_BUCKETS, WEEK_STARTS, MOBILE_DRAG_CHOICES, isReservedFieldName, normalizeTaskFilters, PLANNING_SETTING_KEYS } from "./settings";
 import type { MobileDragBy } from "./settings";
 import { dragZone } from "./core/DragZone";
 import { getTagValue, getInlineFieldValue } from "./core/TaskParser";
@@ -240,7 +240,7 @@ function renderEmojiSetting(
   const btn = setting.controlEl.createEl("button", {
     cls: "gtd-emoji-btn-display",
     text: currentEmoji || fallback,
-    attr: { type: "button", title: t("settings.emojiButtonTooltip") },
+    attr: { type: "button", "aria-label": t("settings.emojiButtonTooltip") },
   });
   btn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -323,14 +323,20 @@ export class GtdSettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
+    this.renderPlanLock(containerEl);
     this.renderBanner(containerEl);
     new Setting(containerEl).setName(t("settings.heading")).setHeading();
-    this.renderAnnotation(containerEl, false);
-    this.renderFilesToScan(containerEl, false);
-    this.renderTaskFilter(containerEl, false);
+    // Each planning section gets its own box, so the lock can grey it as one.
+    const planningEl = containerEl.createDiv();
+    this.renderAnnotation(planningEl, false);
+    this.renderFilesToScan(planningEl, false);
+    this.renderTaskFilter(planningEl, false);
+    this.lockWhilePlanning(planningEl);
     this.renderLegacyBehaviourFallback(containerEl);
     this.renderLegacyTasksIntegrationFallback(containerEl);
-    this.renderBucketsSection(containerEl);
+    const bucketsEl = containerEl.createDiv();
+    this.renderBucketsSection(bucketsEl);
+    this.lockWhilePlanning(bucketsEl);
   }
 
   /**
@@ -340,7 +346,7 @@ export class GtdSettingsTab extends PluginSettingTab {
    * the legacy imperative refresh() on older Obsidian, where update() is
    * unavailable.
    */
-  private rerender(): void {
+  rerender(): void {
     if (requireApiVersion("1.13.0")) {
       this.update();
       // update() leaves a page built by a SettingPage factory as it was.
@@ -350,11 +356,29 @@ export class GtdSettingsTab extends PluginSettingTab {
     }
   }
 
+  private get planning(): boolean {
+    return this.plugin.planSession.active;
+  }
+
+  /** Greys out a planning section while a plan is open; `inert` blocks every control in it. */
+  private lockWhilePlanning(el: HTMLElement): void {
+    if (!this.planning) return;
+    el.addClass("gtd-plan-locked");
+    el.setAttribute("inert", "");
+  }
+
+  private renderPlanLock(containerEl: HTMLElement): void {
+    if (!this.planning) return;
+    containerEl.createDiv({ cls: "gtd-settings-banner gtd-plan-lock-banner", text: t("plan.settingsLocked") });
+  }
+
   getControlValue(key: string): unknown {
     return (this.plugin.settings as unknown as Record<string, unknown>)[key];
   }
 
   async setControlValue(key: string, value: unknown): Promise<void> {
+    // A backstop: the controls for these are already disabled while planning.
+    if (this.planning && (PLANNING_SETTING_KEYS as readonly string[]).includes(key)) return;
     (this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
     // Picking a first day answers the one-off notice, whichever day is picked.
     // Without this the banner would blink out and back as the value moved off
@@ -364,7 +388,41 @@ export class GtdSettingsTab extends PluginSettingTab {
   }
 
   getSettingDefinitions(): SettingDefinitionItem[] {
+    const planByOptions = {
+      manual: t("settings.tasksIntegration.planBy.manual"),
+      "due-only": t("settings.tasksIntegration.planBy.dueOnly"),
+      "due-first": t("settings.tasksIntegration.planBy.dueFirst"),
+      "scheduled-first": t("settings.tasksIntegration.planBy.scheduledFirst"),
+      "scheduled-only": t("settings.tasksIntegration.planBy.scheduledOnly"),
+      earliest: t("settings.tasksIntegration.planBy.earliest"),
+    };
+    const planBy: SettingDefinitionItem = this.planning
+      ? {
+          name: t("settings.tasksIntegration.planBy.name"),
+          desc: autoAssignmentDateDesc(),
+          render: (setting) => {
+            setting.addDropdown((dd) => dd.addOptions(planByOptions).setValue(this.plugin.settings.planBy).setDisabled(true));
+          },
+        }
+      : {
+          name: t("settings.tasksIntegration.planBy.name"),
+          desc: autoAssignmentDateDesc(),
+          control: { type: "dropdown", key: "planBy", options: planByOptions },
+        };
     return [
+      ...(this.planning
+        ? [
+            {
+              name: t("plan.settingsLocked"),
+              searchable: false,
+              render: (setting: Setting) => {
+                setting.settingEl.addClass("gtd-settings-escape-hatch");
+                setting.settingEl.empty();
+                this.renderPlanLock(setting.settingEl);
+              },
+            },
+          ]
+        : []),
       {
         name: t("settings.banner.buttonText"),
         searchable: false,
@@ -383,7 +441,11 @@ export class GtdSettingsTab extends PluginSettingTab {
             type: "page",
             name: t("settings.pinning.pageName"),
             desc: this.annotationSummary(),
-            page: () => this.createSubPage((el) => this.renderAnnotation(el, true)),
+            page: () =>
+              this.createSubPage((el) => {
+                this.renderAnnotation(el, true);
+                this.lockWhilePlanning(el);
+              }),
           },
           {
             name: t("settings.filesToScan.name"),
@@ -391,13 +453,18 @@ export class GtdSettingsTab extends PluginSettingTab {
               setting.settingEl.addClass("gtd-settings-escape-hatch", "gtd-settings-section");
               setting.settingEl.empty();
               this.renderFilesToScan(setting.settingEl, true);
+              this.lockWhilePlanning(setting.settingEl);
             },
           },
           {
             type: "page",
             name: t("settings.taskFilter.name"),
             desc: this.plugin.settings.taskFilters.join(", ") || t("settings.taskFilter.summaryOff"),
-            page: () => this.createSubPage((el) => this.renderTaskFilter(el, true)),
+            page: () =>
+              this.createSubPage((el) => {
+                this.renderTaskFilter(el, true);
+                this.lockWhilePlanning(el);
+              }),
           },
         ],
       },
@@ -485,22 +552,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           // 1.13+, swap that item for a `render:` one following the banner
           // pattern already in this file: add the `gtd-settings-escape-hatch`
           // class, `empty()` the element, and write the blurb into it.
-          {
-            name: t("settings.tasksIntegration.planBy.name"),
-            desc: autoAssignmentDateDesc(),
-            control: {
-              type: "dropdown",
-              key: "planBy",
-              options: {
-                manual: t("settings.tasksIntegration.planBy.manual"),
-                "due-only": t("settings.tasksIntegration.planBy.dueOnly"),
-                "due-first": t("settings.tasksIntegration.planBy.dueFirst"),
-                "scheduled-first": t("settings.tasksIntegration.planBy.scheduledFirst"),
-                "scheduled-only": t("settings.tasksIntegration.planBy.scheduledOnly"),
-                earliest: t("settings.tasksIntegration.planBy.earliest"),
-              },
-            },
-          },
+          planBy,
           {
             name: t("settings.tasksIntegration.priority.name"),
             control: {
@@ -531,6 +583,7 @@ export class GtdSettingsTab extends PluginSettingTab {
           setting.settingEl.addClass("gtd-settings-escape-hatch", "gtd-settings-section");
           setting.settingEl.empty();
           this.renderBucketsSection(setting.settingEl);
+          this.lockWhilePlanning(setting.settingEl);
         },
       },
     ];
@@ -1278,12 +1331,12 @@ export class GtdSettingsTab extends PluginSettingTab {
       const upBtn = orderBtns.createEl("button", {
         text: "↑",
         cls: "gtd-bucket-order-btn",
-        attr: { title: t("settings.buckets.moveUp") },
+        attr: { "aria-label": t("settings.buckets.moveUp") },
       });
       const downBtn = orderBtns.createEl("button", {
         text: "↓",
         cls: "gtd-bucket-order-btn",
-        attr: { title: t("settings.buckets.moveDown") },
+        attr: { "aria-label": t("settings.buckets.moveDown") },
       });
 
       upBtn.disabled = idx === 0;
@@ -1417,7 +1470,7 @@ export class GtdSettingsTab extends PluginSettingTab {
     const deleteRow = container.createDiv({ cls: "gtd-bucket-delete-row" });
     const deleteBtn = deleteRow.createEl("button", {
       cls: "gtd-bucket-delete-btn mod-warning",
-      attr: { title: t("settings.buckets.field.deleteTooltip") },
+      attr: { "aria-label": t("settings.buckets.field.deleteTooltip") },
     });
     deleteBtn.textContent = t("settings.buckets.field.delete");
     deleteBtn.onclick = () => {

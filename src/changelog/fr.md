@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Nouveautés
+- Mode plan : réorganisez vos tâches dans un aperçu du panneau, puis appliquez toutes les modifications à vos notes en une fois, ou abandonnez-les. Lancez-le avec le bouton de plan dans l'en-tête du panneau, ou avec **Passer en mode plan**.
 - Déposer une tâche dans une catégorie peut demander une date dans la plage de cette catégorie au lieu de l'épingler (Paramètres → Glisser une tâche dans une catégorie).
 - Une page de réglages plus courte : Épinglage et Filtre global des tâches ouvrent leur propre page, avec le marqueur ou le filtre actuel à côté.
 - Des descriptions de réglages plus courtes partout.

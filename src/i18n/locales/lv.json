@@ -18,6 +18,7 @@
     "clearSearch": "Notīrīt meklēšanu",
     "dismissAll": "Paslēpt visus paveiktos uzdevumus",
     "openSettings": "Atvērt GTD iestatījumus",
+    "planMode": "Plānošanas režīms",
     "searchStatus": "Rāda {{matched}} no {{total}} uzdevumiem ×",
     "noTasksFound": "Uzdevumi nav atrasti. Pielāgojiet uzdevumu tvērumu iestatījumos.",
     "moveConfirm": {
@@ -124,6 +125,7 @@
   },
   "commands": {
     "openPanel": "Atvērt paneli",
+    "enterPlanMode": "Ieslēgt plānošanas režīmu",
     "toggleDone": "Pārslēgt uzdevumu izpildīts",
     "toggleInProgress": "Pārslēgt uzdevumu procesā",
     "toggleCancelled": "Pārslēgt uzdevumu atcelts",
@@ -461,5 +463,88 @@
         "message": "Ritināt mobilajā ir vieglāk: uzdevumus tagad velk aiz roktura labajā pusē."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "Plānošanas režīms",
+      "peekLabel": "Skatāt īsto paneli",
+      "apply_one": "Lietot {{count}} izmaiņu",
+      "apply": "Lietot izmaiņas: {{count}}",
+      "apply_zero": "Lietot {{count}} izmaiņu",
+      "applyName": "Lietot",
+      "noChanges": "Nav izmaiņu",
+      "discard": "Atmest",
+      "undo": "Atsaukt",
+      "redo": "Atcelt atsaukšanu",
+      "undoBlocked": "Nevar atsaukt tālāk par piezīmes labojumu",
+      "pinMode": "Nometot uzdevums tiek piesprausts. Pieskarieties, lai mainītu",
+      "askMode": "Nometot tiek prasīts datums. Pieskarieties, lai mainītu",
+      "peek": "Ielūkoties īstajā panelī",
+      "backToPlan": "Atpakaļ uz plānu",
+      "info": "Par plānošanas režīmu",
+      "applied_one": "✓ Lietota {{count}} izmaiņa",
+      "applied": "✓ Lietotas izmaiņas: {{count}}",
+      "applied_zero": "✓ Lietotas {{count}} izmaiņas"
+    },
+    "indicator": {
+      "from": "Bija kategorijā {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "Pārvietots augšup par {{count}}",
+      "movedDown": "Pārvietots lejup par {{count}}",
+      "wasUnpinned": "Nebija piesprausts",
+      "wasPinned": "Bija piesprausts {{bucket}}",
+      "was_due": "Termiņš bija {{date}}",
+      "no_due": "Termiņa nebija",
+      "was_scheduled": "Plānots bija {{date}}",
+      "no_scheduled": "Plānotā datuma nebija"
+    },
+    "menu": {
+      "revertBucket": "Atjaunot: kategorija",
+      "revertDate": "Atjaunot: datums"
+    },
+    "discard": {
+      "message": "Atmest visas plānotās izmaiņas?",
+      "confirm": "Atmest"
+    },
+    "conflict": {
+      "bucketMoved": "„{{text}}” piezīmē pārvietots uz {{bucket}}.",
+      "bucketUnpinned": "„{{text}}” piezīmē atsprausts.",
+      "planBucket": "Jūsu plānā tas ir {{bucket}}.",
+      "planUnpins": "Jūsu plāns to atsprauž.",
+      "dateSet": "„{{text}}”: piezīmē {{field}} tagad ir {{date}}.",
+      "dateRemoved": "„{{text}}”: piezīmē noņemts {{field}}.",
+      "planDate": "Jūsu plānā: {{date}}.",
+      "planRemovesDate": "Jūsu plāns to noņem.",
+      "due": "termiņš",
+      "scheduled": "plānotais datums",
+      "use": "Izmantot: {{value}}",
+      "keep": "Paturēt: {{value}}",
+      "unpin": "Atspraust",
+      "keepUnpinned": "Paturēt atsprausts",
+      "removeDate": "Noņemt datumu",
+      "keepNoDate": "Paturēt bez datuma"
+    },
+    "intro": {
+      "title": "Plānošanas režīms",
+      "lead": "Pārkārtojiet uzdevumus, neaizskarot piezīmes.",
+      "leadButtons": "Pieskarieties {{apply}}, lai saglabātu izmaiņas, vai {{discard}}, lai atgrieztos pie sākotnējā saraksta.",
+      "waits": "Datumi, kategorijas, piespraudumi un secība gaida {{apply}}.",
+      "saves": "Statusa izmaiņas (pabeigts, procesā, atcelts) un teksta labojumi tiek saglabāti uzreiz.",
+      "peek": "Pieskarieties {{eye}}, lai ielūkotos īstajā panelī.",
+      "notSaved": "Plāns netiek saglabāts: aizverot paneli vai restartējot Obsidian, tas tiek atmests.",
+      "dontShow": "Vairs nerādīt",
+      "cancel": "Atcelt",
+      "start": "Sākt plānot",
+      "back": "Atpakaļ uz plānošanu"
+    },
+    "notice": {
+      "dropped": "Šie uzdevumi mainījās savās piezīmēs un zaudēja plānotās izmaiņas:",
+      "discardedOnClose": "Plāns atmests: panelis tika aizvērts",
+      "applyFailed_one": "{{count}} izmaiņa failā {{file}} netika lietota: piezīme mainījās",
+      "applyFailed": "Izmaiņas failā {{file}} netika lietotas: {{count}}. Piezīme mainījās",
+      "applyFailed_zero": "{{count}} izmaiņas failā {{file}} netika lietotas: piezīme mainījās"
+    },
+    "settingsLocked": "Jūs esat plānošanas režīmā. Vispirms lietojiet vai atmetiet plānotās izmaiņas."
   }
 }

@@ -1,4 +1,4 @@
-import { diffFileTasks, diffForEdit, applyTaskDiff, dismissCompletions, renameFileInState, migrateOrderFormat } from "../src/core/OrderMigration";
+import { diffFileTasks, diffForEdit, applyTaskDiff, dismissCompletions, renameFileInState, migrateOrderFormat, pairFileTasks, diffByLine } from "../src/core/OrderMigration";
 import type { OrderState } from "../src/core/OrderMigration";
 import { computeOrderKeys, computeLegacyOrderKeys } from "../src/core/TaskOrder";
 import { parseFile } from "../src/core/TaskParser";
@@ -544,5 +544,31 @@ describe("diffForEdit", () => {
       completed: [],
       reopened: [],
     });
+  });
+});
+
+describe("pairFileTasks", () => {
+  it("returns unchanged-key pairs as well as rekeys", () => {
+    const before = parseFile("a.md", "- [ ] one #gtd/today\n- [ ] two");
+    const after = parseFile("a.md", "- [ ] one #gtd/week\n- [ ] two!");
+    const { pairs, unpairedOld, unpairedNew } = pairFileTasks(before, after, "due-first");
+    expect(pairs.map((p) => [p.from.text, p.to.text])).toEqual([["one", "one"], ["two", "two!"]]);
+    expect(unpairedOld).toEqual([]);
+    expect(unpairedNew).toEqual([]);
+  });
+});
+
+describe("diffByLine", () => {
+  it("rekeys an identical sibling whose occurrence index shifted", () => {
+    const before = parseFile("a.md", "- [ ] Call mom 📅 2026-11-12\n- [ ] Call mom 📅 2026-11-12");
+    const after = parseFile("a.md", "- [ ] Call mom 📅 2026-11-20\n- [ ] Call mom 📅 2026-11-12");
+    const oldKeys = computeOrderKeys(before, "due-first");
+    const newKeys = computeOrderKeys(after, "due-first");
+    const diff = diffByLine(before, after, "due-first");
+    expect(diff.rekeys).toEqual([
+      { from: oldKeys.get(before[0].id)!.key, to: newKeys.get(after[0].id)!.key },
+      { from: oldKeys.get(before[1].id)!.key, to: newKeys.get(after[1].id)!.key },
+    ]);
+    expect(diff.completed).toEqual([]);
   });
 });

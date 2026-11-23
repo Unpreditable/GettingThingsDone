@@ -11,7 +11,7 @@ const NOTE = "Inbox.md";
 const ROW = ".gtd-task";
 const CHECKBOX = ".gtd-task-checkbox";
 const MOVE_BUTTON = ".gtd-task-move-btn";
-const DISMISS_ALL = '.gtd-header-icon[title="Dismiss all completed tasks"]';
+const DISMISS_ALL = '.gtd-header-icon[aria-label="Dismiss all completed tasks"]';
 const TO_REVIEW = '.gtd-bucket[data-bucket-id="to-review"]';
 const SEARCH = ".gtd-search-input";
 const SEARCH_PILL = ".gtd-search-pill";
@@ -197,7 +197,7 @@ describe("The panel", () => {
     await $(`${passport} ${CHECKBOX}`).click();
     await $(`${passport}.is-checked`).waitForDisplayed();
 
-    await clickHidden(`${plumber} button[title="Dismiss"]`);
+    await clickHidden(`${plumber} button[aria-label="Dismiss"]`);
     await $(plumber).waitForExist({ reverse: true, timeoutMsg: "the dismissed task stayed in the panel" });
     expect(await $(`${passport}.is-checked`).isDisplayed()).toBe(true);
   });

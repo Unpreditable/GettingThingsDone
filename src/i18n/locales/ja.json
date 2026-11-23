@@ -18,6 +18,7 @@
     "clearSearch": "検索をクリア",
     "dismissAll": "完了したタスクをすべて非表示",
     "openSettings": "GTD設定を開く",
+    "planMode": "計画モード",
     "searchStatus": "{{total}}件中{{matched}}件表示 ×",
     "noTasksFound": "タスクが見つかりません。設定でタスクの対象範囲を調整してください。",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "パネルを開く",
+    "enterPlanMode": "計画モードに入る",
     "toggleDone": "タスクの完了を切り替え",
     "toggleInProgress": "タスクの進行中を切り替え",
     "toggleCancelled": "タスクのキャンセルを切り替え",
@@ -456,5 +458,85 @@
         "message": "モバイルでのスクロールが楽になりました。タスクは右側のグリップでドラッグします。"
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "計画モード",
+      "peekLabel": "実際のパネルを表示中",
+      "apply_one": "{{count}} 件の変更を適用",
+      "apply": "{{count}} 件の変更を適用",
+      "applyName": "適用",
+      "noChanges": "変更なし",
+      "discard": "破棄",
+      "undo": "元に戻す",
+      "redo": "やり直す",
+      "undoBlocked": "ノートの編集より前には戻せません",
+      "pinMode": "ドロップするとタスクを固定します。タップで切り替え",
+      "askMode": "ドロップすると日付を尋ねます。タップで切り替え",
+      "peek": "実際のパネルをのぞく",
+      "backToPlan": "計画に戻る",
+      "info": "計画モードについて",
+      "applied_one": "✓ {{count}} 件の変更を適用しました",
+      "applied": "✓ {{count}} 件の変更を適用しました"
+    },
+    "indicator": {
+      "from": "元は {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "{{count}} つ上へ移動",
+      "movedDown": "{{count}} つ下へ移動",
+      "wasUnpinned": "固定されていませんでした",
+      "wasPinned": "{{bucket}} に固定されていました",
+      "was_due": "期日は {{date}} でした",
+      "no_due": "期日はありませんでした",
+      "was_scheduled": "予定日は {{date}} でした",
+      "no_scheduled": "予定日はありませんでした"
+    },
+    "menu": {
+      "revertBucket": "元に戻す: カテゴリ",
+      "revertDate": "元に戻す: 日付"
+    },
+    "discard": {
+      "message": "計画中の変更をすべて破棄しますか？",
+      "confirm": "破棄"
+    },
+    "conflict": {
+      "bucketMoved": "「{{text}}」はノートで {{bucket}} に移動されました。",
+      "bucketUnpinned": "「{{text}}」はノートで固定が解除されました。",
+      "planBucket": "計画では {{bucket}} にあります。",
+      "planUnpins": "計画では固定を解除します。",
+      "dateSet": "「{{text}}」はノートで{{field}}が {{date}} になりました。",
+      "dateRemoved": "「{{text}}」はノートで{{field}}が削除されました。",
+      "planDate": "計画では {{date}} です。",
+      "planRemovesDate": "計画では削除します。",
+      "due": "期日",
+      "scheduled": "予定日",
+      "use": "{{value}} を使う",
+      "keep": "{{value}} のままにする",
+      "unpin": "固定を解除",
+      "keepUnpinned": "固定なしのままにする",
+      "removeDate": "日付を削除",
+      "keepNoDate": "日付なしのままにする"
+    },
+    "intro": {
+      "title": "計画モード",
+      "lead": "ノートに触れずにタスクを並べ替えられます。",
+      "leadButtons": "{{apply}} をタップすると変更を保存し、{{discard}} をタップすると元のリストに戻ります。",
+      "waits": "日付、カテゴリ、固定、並び順は {{apply}} を待ちます。",
+      "saves": "ステータスの変更（完了、進行中、キャンセル）とテキストの編集はすぐに保存されます。",
+      "peek": "{{eye}} をタップすると実際のパネルをのぞけます。",
+      "notSaved": "計画は保存されません。パネルを閉じるか Obsidian を再起動すると破棄されます。",
+      "dontShow": "今後表示しない",
+      "cancel": "キャンセル",
+      "start": "計画を始める",
+      "back": "計画に戻る"
+    },
+    "notice": {
+      "dropped": "これらのタスクはノートで変更されたため、計画中の変更が失われました:",
+      "discardedOnClose": "計画を破棄しました: パネルが閉じられました",
+      "applyFailed_one": "{{file}} の {{count}} 件の変更は適用されませんでした: ノートが変更されました",
+      "applyFailed": "{{file}} の {{count}} 件の変更は適用されませんでした: ノートが変更されました"
+    },
+    "settingsLocked": "計画モード中です。先に計画中の変更を適用するか破棄してください。"
   }
 }

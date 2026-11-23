@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Nauja
+- Planavimo režimas: pertvarkykite užduotis skydelio peržiūroje, tada visus pakeitimus iš karto pritaikykite pastaboms arba juos atmeskite. Įjunkite jį planavimo mygtuku skydelio antraštėje arba komanda **Įjungti planavimo režimą**.
 - Į kategoriją nutempta užduotis gali paklausti datos iš tos kategorijos intervalo, užuot ją prisegusi (Nustatymai → Užduoties nutempimas į kategoriją).
 - Trumpesnis nustatymų puslapis: Prisegimas ir Visuotinis užduočių filtras atsidaro atskiruose puslapiuose, šalia rodoma dabartinė žyma ar filtras.
 - Visur trumpesni nustatymų aprašymai.

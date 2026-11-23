@@ -559,6 +559,24 @@ export function setTaskDate(line: string, field: DateField, date: string, bucket
   return `${body.slice(0, at).trimEnd()} ${token}${body.slice(at)}${tail}`;
 }
 
+/** Removes every occurrence of a task's due or scheduled date, in either spelling. */
+export function clearTaskDate(line: string, field: DateField, bucketKey?: string): string {
+  const blockRef = line.match(BLOCK_REF_REGEX);
+  let body = blockRef ? line.slice(0, blockRef.index) : line;
+  const tail = blockRef ? blockRef[0] : "";
+
+  const spans = scanTasksMetadata(body, scanObsidianMetadata(body), bucketKey, scanOpaqueText(body))
+    .filter((span) => span.field === field)
+    .sort((a, b) => b.start - a.start);
+  if (spans.length === 0) return line;
+  for (const span of spans) {
+    const left = body.slice(0, span.start).trimEnd();
+    const right = body.slice(span.end).trimStart();
+    body = right ? `${left} ${right}` : left;
+  }
+  return body + tail;
+}
+
 export function getTagValue(rawLine: string, prefix: string): string | null {
   const re = new RegExp(`#${escapeRegExp(prefix)}/([\\w-]+)`, "i");
   const match = rawLine.match(re);

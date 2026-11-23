@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Features
+- Plan mode: rearrange tasks in a preview of the panel, then apply every change to your notes at once, or discard them. Start it from the plan button in the panel header, or run **Enter plan mode**.
 - Dropping a task into a bucket can ask for a date from that bucket's range instead of pinning it (Settings → Dragging a task into a bucket).
 - A shorter settings page: Pinning and Global task filter open their own pages, with the current marker or filter beside them.
 - Shorter setting descriptions throughout.

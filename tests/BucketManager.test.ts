@@ -866,3 +866,16 @@ describe("waiting state", () => {
     expect(group.waiting[task.id]?.startsOn).toEqual(daysFromMonday(1));
   });
 });
+
+describe("groupTasksIntoBuckets with given order keys", () => {
+  it("orders by the order keys it is given, not ones computed from the tasks", () => {
+    const real = ["one", "two"].map((text, i) =>
+      makeTask({ id: `a.md:${i}`, filePath: "a.md", lineNumber: i, text, rawLine: `- [ ] ${text} #gtd/today`, tags: ["gtd/today"] })
+    );
+    const keys = computeOrderKeys(real, "due-first");
+    const planned = real.map((t) => ({ ...t, dueDate: new Date(2030, 0, 1) }));
+    const settings = { ...DEFAULT_SETTINGS, taskOrder: { today: [keys.get(real[1].id)!, keys.get(real[0].id)!] } };
+    const today = groupTasksIntoBuckets(planned, settings, keys).find((g) => g.bucketId === "today")!;
+    expect(today.tasks.map((t) => t.text)).toEqual(["two", "one"]);
+  });
+});

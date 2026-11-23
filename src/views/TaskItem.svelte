@@ -14,6 +14,8 @@
   import { placeRow } from "../core/RowPlacement";
   import { icon } from "./icon";
   import type { DragZone } from "../core/DragZone";
+  import type { Indicator } from "../core/plan/PlanIndicators";
+  import { indicatorMark } from "../core/plan/PlanNotes";
 
   export let task: TaskRecord;
   export let quickMoveTargets: BucketConfig[];
@@ -35,6 +37,14 @@
   export let hiddenFilterStrings: string[] = [];
   /** Where on the row a drag starts; a handle zone draws the grip or bar. */
   export let zone: DragZone = { kind: "row" };
+  /** Peek and Apply: the row can be looked at and opened, not changed. */
+  export let readOnly: boolean = false;
+  /** How plan mode moved this task, or null when it did not. */
+  export let indicator: Indicator | null = null;
+  /** Lines about what the plan changed, shown first in the popover. */
+  export let planNotes: string[] = [];
+  /** During the Apply animation: the arrow still showing, or the ✓ it turned into. */
+  export let applyMark: "arrow" | "check" | null = null;
 
   $: handle = zone.kind === "handle" ? zone : null;
   // A left handle takes the row's first 32px, so the checkbox starts after it.
@@ -84,6 +94,8 @@
     openLink: { task: TaskRecord; target: string; external: boolean; newTab: boolean };
     dismiss: { task: TaskRecord };
   }>();
+
+  $: indicatorLabel = indicator ? indicatorMark(indicator) : null;
 
   $: placement = placeRow(task, {
     allTasks: allTasksMap,
@@ -181,6 +193,7 @@
    */
   function onCheckboxChange(e: Event) {
     (e.currentTarget as HTMLInputElement).checked = checkboxChecked;
+    if (readOnly) return;
     dispatch("toggle", { task });
   }
 
@@ -212,6 +225,7 @@
 
   function onContextMenu(e: MouseEvent) {
     e.preventDefault();
+    if (readOnly) return;
     dispatch("move", { task, targetBucketId: "__context_menu__" });
   }
 </script>
@@ -245,6 +259,7 @@
     class="gtd-task-checkbox task-list-item-checkbox"
     data-task={symbol}
     checked={checkboxChecked}
+    disabled={readOnly}
     on:change={onCheckboxChange}
   />
 
@@ -271,7 +286,7 @@
   {/if}
 
   {#if showParentArrow}
-    <span class="gtd-parent-badge" title={parentTooltip ?? t("task.subtaskTooltip")}>↖</span>
+    <span class="gtd-parent-badge" aria-label={parentTooltip ?? t("task.subtaskTooltip")}>↖</span>
   {/if}
 
   <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -295,12 +310,34 @@
     {:else}{t("task.emptyTask")}{/if}
   </span>
 
+  {#if indicatorLabel}
+    <span
+      class="gtd-plan-indicator"
+      class:is-checked={applyMark === "check"}
+      data-plan-indicator={indicator?.kind}
+    >
+      <span class="gtd-plan-arrow">{indicatorLabel}</span>
+      {#if applyMark !== null}<span class="gtd-plan-check">✓</span>{/if}
+    </span>
+  {/if}
+
   {#if activeDescendantCount > 0}
     <span class="gtd-subtask-badge">({activeDescendantCount})</span>
   {/if}
 
   {#if showPopover}
     <div class="gtd-tooltip">
+      {#if planNotes.length > 0}
+        <div class="gtd-tooltip-fields gtd-tooltip-plan">
+          {#each planNotes as note}
+            <div class="gtd-tooltip-field">
+              <span class="gtd-tooltip-field-emoji" use:icon={"pencil-ruler"}></span>
+              <span class="gtd-tooltip-field-text">{note}</span>
+            </div>
+          {/each}
+        </div>
+        <hr class="gtd-tooltip-divider" />
+      {/if}
       {#if fieldRows.length > 0}
         <div class="gtd-tooltip-fields">
           {#each fieldRows as row}
@@ -319,7 +356,7 @@
               {#if row.marker}
                 <span
                   class="gtd-tooltip-field-marker"
-                  title={t("task.autoPlacedMarker")}
+                  aria-label={t("task.autoPlacedMarker")}
                   use:icon={row.marker}
                 ></span>
               {/if}
@@ -344,18 +381,20 @@
     </div>
   {/if}
 
-  <div class="gtd-task-actions">
+  <div class="gtd-task-actions" class:is-read-only={readOnly}>
     {#if task.isCompleted && showCompleted}
       <button
         class="gtd-task-move-btn"
-        title={t("task.dismiss")}
+        disabled={readOnly}
+        aria-label={t("task.dismiss")}
         on:click={onDismissClick}
       >🧹</button>
     {:else}
       {#each quickMoveTargets as bucket}
         <button
           class="gtd-task-move-btn"
-          title={t("task.moveTo", { name: bucket.name })}
+          disabled={readOnly}
+          aria-label={t("task.moveTo", { name: bucket.name })}
           on:click={(e) => onMoveClick(e, bucket.id)}
         >
           {bucket.emoji}
@@ -419,6 +458,48 @@
     padding-right: 2px;
     color: var(--text-muted);
     cursor: default;
+  }
+
+  .gtd-plan-indicator {
+    display: inline-grid;
+    flex-shrink: 0;
+    font-size: var(--font-ui-smaller);
+    line-height: 1;
+    padding-left: 4px;
+    color: var(--text-accent);
+    white-space: nowrap;
+    cursor: default;
+  }
+
+  /* The arrow and its ✓ share one cell, so one fades into the other in place. */
+  .gtd-plan-indicator > span {
+    grid-area: 1 / 1;
+    justify-self: center;
+    transition: opacity 300ms ease;
+  }
+
+  span.gtd-plan-check {
+    opacity: 0;
+    color: var(--color-green);
+  }
+
+  .gtd-plan-indicator.is-checked > span.gtd-plan-arrow {
+    opacity: 0;
+  }
+
+  .gtd-plan-indicator.is-checked > span.gtd-plan-check {
+    opacity: 1;
+  }
+
+  :global(.gtd-applied-fading) .gtd-plan-indicator.is-checked > span.gtd-plan-check {
+    opacity: 0;
+    transition-duration: 200ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gtd-plan-indicator > span {
+      transition: none;
+    }
   }
 
   .gtd-subtask-badge {

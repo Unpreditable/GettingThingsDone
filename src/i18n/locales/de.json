@@ -18,6 +18,7 @@
     "clearSearch": "Suche löschen",
     "dismissAll": "Alle erledigten Aufgaben ausblenden",
     "openSettings": "GTD-Einstellungen öffnen",
+    "planMode": "Planungsmodus",
     "searchStatus": "{{matched}} von {{total}} Aufgaben angezeigt ×",
     "noTasksFound": "Keine Aufgaben gefunden. Passe den Aufgabenbereich in den Einstellungen an.",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "Panel öffnen",
+    "enterPlanMode": "Planungsmodus starten",
     "toggleDone": "Aufgabe erledigt umschalten",
     "toggleInProgress": "Aufgabe in Bearbeitung umschalten",
     "toggleCancelled": "Aufgabe abgebrochen umschalten",
@@ -456,5 +458,85 @@
         "message": "Scrollen auf dem Handy ist einfacher: Aufgaben werden jetzt an einem Griff rechts gezogen."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "Planungsmodus",
+      "peekLabel": "Blick auf das echte Panel",
+      "apply_one": "{{count}} Änderung übernehmen",
+      "apply": "{{count}} Änderungen übernehmen",
+      "applyName": "Übernehmen",
+      "noChanges": "Keine Änderungen",
+      "discard": "Verwerfen",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "undoBlocked": "Rückgängig nicht über eine Notizänderung hinaus",
+      "pinMode": "Ablegen heftet die Aufgabe an. Tippen zum Ändern",
+      "askMode": "Ablegen fragt nach einem Datum. Tippen zum Ändern",
+      "peek": "Echtes Panel ansehen",
+      "backToPlan": "Zurück zum Plan",
+      "info": "Über den Planungsmodus",
+      "applied_one": "✓ {{count}} Änderung übernommen",
+      "applied": "✓ {{count}} Änderungen übernommen"
+    },
+    "indicator": {
+      "from": "War in {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "Um {{count}} nach oben",
+      "movedDown": "Um {{count}} nach unten",
+      "wasUnpinned": "War nicht angeheftet",
+      "wasPinned": "War an {{bucket}} angeheftet",
+      "was_due": "War fällig am {{date}}",
+      "no_due": "Hatte kein Fälligkeitsdatum",
+      "was_scheduled": "War geplant für {{date}}",
+      "no_scheduled": "Hatte kein geplantes Datum"
+    },
+    "menu": {
+      "revertBucket": "Zurücksetzen: Kategorie",
+      "revertDate": "Zurücksetzen: Datum"
+    },
+    "discard": {
+      "message": "Alle geplanten Änderungen verwerfen?",
+      "confirm": "Verwerfen"
+    },
+    "conflict": {
+      "bucketMoved": "„{{text}}“ wurde in der Notiz nach {{bucket}} verschoben.",
+      "bucketUnpinned": "„{{text}}“ wurde in der Notiz gelöst.",
+      "planBucket": "Im Plan ist sie in {{bucket}}.",
+      "planUnpins": "Der Plan löst sie.",
+      "dateSet": "„{{text}}“ hat in der Notiz das {{field}} {{date}} bekommen.",
+      "dateRemoved": "„{{text}}“ hat in der Notiz ihr {{field}} verloren.",
+      "planDate": "Im Plan: {{date}}.",
+      "planRemovesDate": "Der Plan entfernt es.",
+      "due": "Fälligkeitsdatum",
+      "scheduled": "geplante Datum",
+      "use": "{{value}} verwenden",
+      "keep": "{{value}} behalten",
+      "unpin": "Lösen",
+      "keepUnpinned": "Gelöst lassen",
+      "removeDate": "Datum entfernen",
+      "keepNoDate": "Ohne Datum lassen"
+    },
+    "intro": {
+      "title": "Planungsmodus",
+      "lead": "Ordne deine Aufgaben neu, ohne deine Notizen anzufassen.",
+      "leadButtons": "Tippe auf {{apply}}, um die Änderungen zu speichern, oder auf {{discard}}, um zur ursprünglichen Liste zurückzukehren.",
+      "waits": "Daten, Kategorien, Anheftungen und Reihenfolge warten auf {{apply}}.",
+      "saves": "Statusänderungen (erledigt, in Bearbeitung, abgebrochen) und Textänderungen werden sofort gespeichert.",
+      "peek": "Tippe auf {{eye}}, um einen Blick auf dein echtes Panel zu werfen.",
+      "notSaved": "Der Plan wird nicht gespeichert: Schließen des Panels oder ein Neustart von Obsidian verwirft ihn.",
+      "dontShow": "Nicht mehr anzeigen",
+      "cancel": "Abbrechen",
+      "start": "Planung starten",
+      "back": "Zurück zur Planung"
+    },
+    "notice": {
+      "dropped": "Diese Aufgaben wurden in ihren Notizen geändert und haben ihre geplanten Änderungen verloren:",
+      "discardedOnClose": "Plan verworfen: Das Panel wurde geschlossen",
+      "applyFailed_one": "{{count}} Änderung in {{file}} wurde nicht übernommen: Die Notiz hat sich geändert",
+      "applyFailed": "{{count}} Änderungen in {{file}} wurden nicht übernommen: Die Notiz hat sich geändert"
+    },
+    "settingsLocked": "Du bist im Planungsmodus. Übernimm oder verwirf zuerst die geplanten Änderungen."
   }
 }

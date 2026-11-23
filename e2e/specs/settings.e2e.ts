@@ -12,7 +12,7 @@ const ROW = ".gtd-task";
 const TASK_TEXT = ".gtd-task-text";
 const CHECKBOX = ".gtd-task-checkbox";
 const MOVE_BUTTON = ".gtd-task-move-btn";
-const DISMISS_ALL = '.gtd-header-icon[title="Dismiss all completed tasks"]';
+const DISMISS_ALL = '.gtd-header-icon[aria-label="Dismiss all completed tasks"]';
 
 /** What Obsidian keeps of its commands that the specs reach for. */
 interface Commands {

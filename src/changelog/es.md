@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Novedades
+- Modo plan: reorganiza las tareas en una vista previa del panel y luego aplica todos los cambios a tus notas de una vez, o descártalos. Inícialo con el botón de plan en la cabecera del panel, o ejecuta **Entrar en modo plan**.
 - Al soltar una tarea en una categoría, puede pedir una fecha del rango de esa categoría en lugar de fijarla (Ajustes → Al arrastrar una tarea a una categoría).
 - Una página de ajustes más corta: Fijado y Filtro global de tareas abren sus propias páginas, con la marca o el filtro actual al lado.
 - Descripciones de ajustes más cortas en todas partes.

@@ -18,6 +18,7 @@
     "clearSearch": "Effacer la recherche",
     "dismissAll": "Ignorer toutes les tâches terminées",
     "openSettings": "Ouvrir les paramètres GTD",
+    "planMode": "Mode plan",
     "searchStatus": "Affichage de {{matched}} sur {{total}} tâches ×",
     "noTasksFound": "Aucune tâche trouvée. Ajustez la portée des tâches dans les paramètres.",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "Ouvrir le panneau",
+    "enterPlanMode": "Passer en mode plan",
     "toggleDone": "Basculer la tâche terminée",
     "toggleInProgress": "Basculer la tâche en cours",
     "toggleCancelled": "Basculer la tâche annulée",
@@ -456,5 +458,85 @@
         "message": "Le défilement sur mobile est plus simple : les tâches se glissent désormais par une poignée à droite."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "Mode plan",
+      "peekLabel": "Aperçu du panneau réel",
+      "apply_one": "Appliquer {{count}} modification",
+      "apply": "Appliquer {{count}} modifications",
+      "applyName": "Appliquer",
+      "noChanges": "Aucune modification",
+      "discard": "Abandonner",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "undoBlocked": "Impossible d'annuler au-delà d'une modification de note",
+      "pinMode": "Déposer épingle la tâche. Touchez pour changer",
+      "askMode": "Déposer demande une date. Touchez pour changer",
+      "peek": "Voir le panneau réel",
+      "backToPlan": "Retour au plan",
+      "info": "À propos du mode plan",
+      "applied_one": "✓ {{count}} modification appliquée",
+      "applied": "✓ {{count}} modifications appliquées"
+    },
+    "indicator": {
+      "from": "Était dans {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "Montée de {{count}}",
+      "movedDown": "Descendue de {{count}}",
+      "wasUnpinned": "N'était pas épinglée",
+      "wasPinned": "Était épinglée à {{bucket}}",
+      "was_due": "Échéance le {{date}}",
+      "no_due": "N'avait pas d'échéance",
+      "was_scheduled": "Était prévue le {{date}}",
+      "no_scheduled": "N'avait pas de date prévue"
+    },
+    "menu": {
+      "revertBucket": "Rétablir : catégorie",
+      "revertDate": "Rétablir : date"
+    },
+    "discard": {
+      "message": "Abandonner toutes les modifications prévues ?",
+      "confirm": "Abandonner"
+    },
+    "conflict": {
+      "bucketMoved": "« {{text}} » a été déplacée vers {{bucket}} dans sa note.",
+      "bucketUnpinned": "« {{text}} » a été détachée dans sa note.",
+      "planBucket": "Votre plan la place dans {{bucket}}.",
+      "planUnpins": "Votre plan la détache.",
+      "dateSet": "« {{text}} » a reçu la {{field}} {{date}} dans sa note.",
+      "dateRemoved": "« {{text}} » a perdu sa {{field}} dans sa note.",
+      "planDate": "Votre plan indique {{date}}.",
+      "planRemovesDate": "Votre plan la supprime.",
+      "due": "date d'échéance",
+      "scheduled": "date prévue",
+      "use": "Utiliser {{value}}",
+      "keep": "Garder {{value}}",
+      "unpin": "Détacher",
+      "keepUnpinned": "Garder détachée",
+      "removeDate": "Supprimer la date",
+      "keepNoDate": "Garder sans date"
+    },
+    "intro": {
+      "title": "Mode plan",
+      "lead": "Réorganisez vos tâches sans toucher à vos notes.",
+      "leadButtons": "Touchez {{apply}} pour enregistrer vos modifications, ou {{discard}} pour revenir à votre liste d'origine.",
+      "waits": "Les dates, catégories, épinglages et l'ordre attendent {{apply}}.",
+      "saves": "Les changements de statut (terminée, en cours, annulée) et les modifications de texte sont enregistrés tout de suite.",
+      "peek": "Touchez {{eye}} pour jeter un œil à votre panneau réel.",
+      "notSaved": "Le plan n'est pas enregistré : fermer le panneau ou redémarrer Obsidian l'abandonne.",
+      "dontShow": "Ne plus afficher",
+      "cancel": "Annuler",
+      "start": "Commencer à planifier",
+      "back": "Retour à la planification"
+    },
+    "notice": {
+      "dropped": "Ces tâches ont changé dans leurs notes et ont perdu leurs modifications prévues :",
+      "discardedOnClose": "Plan abandonné : le panneau a été fermé",
+      "applyFailed_one": "{{count}} modification dans {{file}} n'a pas été appliquée : la note a changé",
+      "applyFailed": "{{count}} modifications dans {{file}} n'ont pas été appliquées : la note a changé"
+    },
+    "settingsLocked": "Vous êtes en mode plan. Appliquez ou abandonnez d'abord les modifications prévues."
   }
 }

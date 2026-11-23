@@ -175,6 +175,8 @@ export interface PluginSettings {
    *  settled. Seeded once on load, like weekStartNoticeSeen: a fresh install
    *  settles every note already in the list. */
   lastNoticeSeen: string;
+  /** The plan mode intro was answered with "Don't show this again". */
+  planIntroSeen: boolean;
   /** A click on a link in a task row opens the link; off, it reveals the task like any other click. */
   openLinksOnClick: boolean;
   /** Reduce padding on headers and task rows for a more compact layout. */
@@ -260,6 +262,19 @@ export const DEFAULT_BUCKETS: BucketConfig[] = [
   },
 ];
 
+/** Settings that change which tasks a plan holds or where they sit: locked while a plan is open. */
+export const PLANNING_SETTING_KEYS: readonly (keyof PluginSettings)[] = [
+  "buckets",
+  "storageMode",
+  "tagPrefix",
+  "planBy",
+  "taskFilters",
+  "taskFilterIncludeSubtasks",
+  "scopeType",
+  "scopePaths",
+  "ignoredPaths",
+];
+
 export const DEFAULT_SETTINGS: PluginSettings = {
   storageMode: "inline-tag",
   planBy: "scheduled-first",
@@ -284,6 +299,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   weekStartsOn: "monday",
   weekStartNoticeSeen: false,
   lastNoticeSeen: "",
+  planIntroSeen: false,
   openLinksOnClick: true,
   compactView: false,
   priorityDisplay: "all",

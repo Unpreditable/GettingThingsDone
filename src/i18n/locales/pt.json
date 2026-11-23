@@ -18,6 +18,7 @@
     "clearSearch": "Limpar pesquisa",
     "dismissAll": "Dispensar todas as tarefas concluídas",
     "openSettings": "Abrir definições GTD",
+    "planMode": "Modo plano",
     "searchStatus": "A mostrar {{matched}} de {{total}} tarefas ×",
     "noTasksFound": "Nenhuma tarefa encontrada. Ajuste o âmbito das tarefas nas definições.",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "Abrir painel",
+    "enterPlanMode": "Entrar no modo plano",
     "toggleDone": "Alternar tarefa concluída",
     "toggleInProgress": "Alternar tarefa em andamento",
     "toggleCancelled": "Alternar tarefa cancelada",
@@ -456,5 +458,85 @@
         "message": "Deslocar no telemóvel é mais fácil: as tarefas arrastam-se agora por uma pega à direita."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "Modo plano",
+      "peekLabel": "Vendo o painel real",
+      "apply_one": "Aplicar {{count}} alteração",
+      "apply": "Aplicar {{count}} alterações",
+      "applyName": "Aplicar",
+      "noChanges": "Sem alterações",
+      "discard": "Descartar",
+      "undo": "Desfazer",
+      "redo": "Refazer",
+      "undoBlocked": "Não é possível desfazer além de uma edição de nota",
+      "pinMode": "Soltar fixa a tarefa. Toque para mudar",
+      "askMode": "Soltar pede uma data. Toque para mudar",
+      "peek": "Espiar o painel real",
+      "backToPlan": "Voltar ao plano",
+      "info": "Sobre o modo plano",
+      "applied_one": "✓ {{count}} alteração aplicada",
+      "applied": "✓ {{count}} alterações aplicadas"
+    },
+    "indicator": {
+      "from": "Estava em {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "Subiu {{count}}",
+      "movedDown": "Desceu {{count}}",
+      "wasUnpinned": "Não estava fixada",
+      "wasPinned": "Estava fixada em {{bucket}}",
+      "was_due": "Vencia em {{date}}",
+      "no_due": "Não tinha data de vencimento",
+      "was_scheduled": "Estava agendada para {{date}}",
+      "no_scheduled": "Não tinha data agendada"
+    },
+    "menu": {
+      "revertBucket": "Reverter: categoria",
+      "revertDate": "Reverter: data"
+    },
+    "discard": {
+      "message": "Descartar todas as alterações planejadas?",
+      "confirm": "Descartar"
+    },
+    "conflict": {
+      "bucketMoved": "«{{text}}» foi movida para {{bucket}} na sua nota.",
+      "bucketUnpinned": "«{{text}}» foi desafixada na sua nota.",
+      "planBucket": "O seu plano coloca-a em {{bucket}}.",
+      "planUnpins": "O seu plano desafixa-a.",
+      "dateSet": "«{{text}}» recebeu {{field}} {{date}} na sua nota.",
+      "dateRemoved": "«{{text}}» perdeu a {{field}} na sua nota.",
+      "planDate": "O seu plano tem {{date}}.",
+      "planRemovesDate": "O seu plano remove-a.",
+      "due": "data de vencimento",
+      "scheduled": "data agendada",
+      "use": "Usar {{value}}",
+      "keep": "Manter {{value}}",
+      "unpin": "Desafixar",
+      "keepUnpinned": "Manter desafixada",
+      "removeDate": "Remover data",
+      "keepNoDate": "Manter sem data"
+    },
+    "intro": {
+      "title": "Modo plano",
+      "lead": "Reorganize as suas tarefas sem mexer nas suas notas.",
+      "leadButtons": "Toque em {{apply}} para guardar as alterações, ou em {{discard}} para voltar à lista original.",
+      "waits": "Datas, categorias, fixações e ordem esperam por {{apply}}.",
+      "saves": "Alterações de estado (concluída, em andamento, cancelada) e edições de texto são guardadas de imediato.",
+      "peek": "Toque em {{eye}} para espiar o seu painel real.",
+      "notSaved": "O plano não é guardado: fechar o painel ou reiniciar o Obsidian descarta-o.",
+      "dontShow": "Não mostrar novamente",
+      "cancel": "Cancelar",
+      "start": "Começar a planejar",
+      "back": "Voltar ao planejamento"
+    },
+    "notice": {
+      "dropped": "Estas tarefas mudaram nas suas notas e perderam as alterações planejadas:",
+      "discardedOnClose": "Plano descartado: o painel foi fechado",
+      "applyFailed_one": "{{count}} alteração em {{file}} não foi aplicada: a nota mudou",
+      "applyFailed": "{{count}} alterações em {{file}} não foram aplicadas: a nota mudou"
+    },
+    "settingsLocked": "Está no modo plano. Aplique ou descarte primeiro as alterações planejadas."
   }
 }

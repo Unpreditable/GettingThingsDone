@@ -35,6 +35,7 @@ import {
   migrateOrderKeys,
 } from "./core/OrderMigration";
 import type { OrderState, TaskDiff } from "./core/OrderMigration";
+import type { Conflict } from "./core/plan/Plan";
 import { purgeAgedEntries, reconcileDanglingEntries } from "./core/OrderPurge";
 import { dayKey, msUntilNextMidnight } from "./core/DueStatus";
 import GTDPanel from "./views/GTDPanel.svelte";
@@ -47,6 +48,8 @@ import { revealTaskLine } from "./views/revealTaskLine";
 import { CompletionReportModal } from "./views/CompletionReportModal";
 import { WhatsNewModal } from "./views/WhatsNewModal";
 import { PANEL_NOTICES, seedLastNoticeSeen, settleUnknownNotice } from "./core/PanelNotices";
+import { PlanSession } from "./PlanSession";
+import { PlanIntroModal } from "./views/PlanIntroModal";
 
 const VIEW_TYPE_GTD = "gtd-tasks-panel";
 
@@ -64,6 +67,8 @@ function selectedLines(editor: Editor): number[] {
 export default class GtdTasksPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
   taskIndex!: TaskIndex;
+  planSession!: PlanSession;
+  private settingsTab?: GtdSettingsTab;
   languageChangeNotice = false;
   private statusBarItem?: HTMLElement;
   /** Set when an event handler has changed order state that isn't saved yet. */
@@ -84,9 +89,12 @@ export default class GtdTasksPlugin extends Plugin {
       () => getTaskFilter(this.settings)
     );
 
+    this.planSession = new PlanSession(this);
+
     this.statusBarItem = this.addStatusBarItem();
     this.statusBarItem.addClass("gtd-status-bar-item");
-    this.addSettingTab(new GtdSettingsTab(this.app, this));
+    this.settingsTab = new GtdSettingsTab(this.app, this);
+    this.addSettingTab(this.settingsTab);
 
     this.registerView(VIEW_TYPE_GTD, (leaf) => new GtdPanelView(leaf, this));
     this.registerEditorExtension(lineFlashField);
@@ -95,6 +103,16 @@ export default class GtdTasksPlugin extends Plugin {
       id: "open-gtd-panel",
       name: t("commands.openPanel"),
       callback: () => this.activateView(),
+    });
+
+    this.addCommand({
+      id: "enter-plan-mode",
+      name: t("commands.enterPlanMode"),
+      checkCallback: (checking) => {
+        if (this.planSession.active) return false;
+        if (!checking) void this.enterPlanMode();
+        return true;
+      },
     });
 
     this.addCommand({
@@ -181,6 +199,7 @@ export default class GtdTasksPlugin extends Plugin {
         this.applyOrderState(applied.state);
         this.orderStateDirty = true;
       }
+      this.planSession.onFileReplaced(filePath, oldTasks, newTasks);
     });
 
     // Fires before TaskIndex scope-checks the new path, so updating a
@@ -191,6 +210,7 @@ export default class GtdTasksPlugin extends Plugin {
         this.applyOrderState(renamed.state);
         this.orderStateDirty = true;
       }
+      this.planSession.onRename(oldPath, newPath);
       // Obsidian fires this once per markdown file, so only file entries can be
       // repaired here: renaming a folder arrives as one event per child and
       // never carries the folder's own old path.
@@ -244,6 +264,7 @@ export default class GtdTasksPlugin extends Plugin {
 
   onunload() {
     if (this.midnightTimer !== undefined) window.clearTimeout(this.midnightTimer);
+    this.planSession.unload();
   }
 
   openWhatsNew() {
@@ -319,14 +340,41 @@ export default class GtdTasksPlugin extends Plugin {
    * work (it walks every indexed task and computes an order key for each),
    * so computing it twice doubled the cost of every vault edit.
    */
-  private renderAll(): void {
+  renderAll(): void {
     this.lastRenderedDay = dayKey(new Date());
-    const bucketGroups = groupTasksIntoBuckets(this.taskIndex.getAllTasks(), this.settings);
+    // In plan mode the panels show the plan; the status bar always counts real tasks.
+    const { panel, real } = this.planSession.render(this.taskIndex.getAllTasks());
     // Every panel gets the update, not a single remembered one. Holding one
     // reference meant any second panel — whether the user opened it or Obsidian
     // restored it — was frozen forever at whatever mountSvelte seeded it with.
-    for (const view of this.panelViews()) view.setBucketGroups(bucketGroups);
-    this.renderStatusBar(bucketGroups);
+    for (const view of this.panelViews()) view.setBucketGroups(panel);
+    this.renderStatusBar(real);
+  }
+
+  /** What a newly mounted panel shows first. */
+  panelGroups(): BucketGroupData[] {
+    return this.planSession.render(this.taskIndex.getAllTasks()).panel;
+  }
+
+  /** Redraws the settings tab when it is open, so the plan mode lock follows the session. */
+  refreshSettingsTab(): void {
+    if (this.settingsTab?.containerEl.isConnected) this.settingsTab.rerender();
+  }
+
+  /** Opens the panel and starts a plan. */
+  async enterPlanMode(): Promise<void> {
+    await this.activateView();
+    if (this.settings.planIntroSeen) {
+      this.planSession.enter();
+      return;
+    }
+    new PlanIntroModal(this.app, "enter", (dontShowAgain) => {
+      this.planSession.enter();
+      if (dontShowAgain) {
+        this.settings.planIntroSeen = true;
+        void this.saveSettings();
+      }
+    }).open();
   }
 
   /** (Re)arms the rollover timer, replacing any previously armed one. */
@@ -346,7 +394,7 @@ export default class GtdTasksPlugin extends Plugin {
   }
 
   /** Every live panel view belonging to this plugin instance. */
-  private panelViews(): GtdPanelView[] {
+  panelViews(): GtdPanelView[] {
     return this.app.workspace
       .getLeavesOfType(VIEW_TYPE_GTD)
       .map((leaf) => leaf.view)
@@ -418,6 +466,30 @@ export default class GtdTasksPlugin extends Plugin {
     this.settings.orderKeyScheme = this.settings.planBy;
   }
 
+  /**
+   * The order-key diff is built here, where it's known which line became
+   * which, and applied before the reindex runs its own heuristic diff. That
+   * one then finds the old key already gone and changes nothing.
+   */
+  async settleLineWrite(task: TaskRecord, result: ReplaceResult, lineCount: number, failNotice: string): Promise<boolean> {
+    if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
+      new Notice(t(failNotice, { error: result.error }));
+      await this.taskIndex.reindexFile(task.filePath);
+      return false;
+    }
+
+    const diff = diffForEdit(
+      parseFile(task.filePath, result.before, getTaskFilter(this.settings)),
+      parseFile(task.filePath, result.after, getTaskFilter(this.settings)),
+      result.lineIdx,
+      lineCount,
+      activeOrderKeyScheme(this.settings)
+    );
+    this.recordTaskDiff(task.filePath, diff);
+    await this.taskIndex.reindexFile(task.filePath);
+    return true;
+  }
+
   /** Folds in a diff the caller built itself; saved by the next index change. */
   recordTaskDiff(filePath: string, diff: TaskDiff): void {
     const applied = applyTaskDiff(this.orderState(), filePath, diff, Date.now());
@@ -459,8 +531,16 @@ export default class GtdTasksPlugin extends Plugin {
       if (purged.changed) {
         this.applyOrderState(purged.state);
         this.orderStateDirty = true;
+        const tasks = this.taskIndex.getAllTasks();
+        const now = new Date();
+        const scheme = activeOrderKeyScheme(this.settings);
+        const completionSeen = this.settings.completionSeen;
+        this.planSession.onPurge(
+          (taskOrder) => purgeAgedEntries({ taskOrder, completionSeen }, tasks, now, scheme).state.taskOrder
+        );
       }
     }
+    this.planSession.onIndexChanged(this.taskIndex.getAllTasks());
 
     if (this.orderStateDirty) {
       this.orderStateDirty = false;
@@ -571,6 +651,8 @@ class GtdPanelView extends ItemView {
   }
 
   async onClose() {
+    // The plan lives as long as a panel shows it.
+    if (this.plugin.panelViews().every((view) => view === this)) this.plugin.planSession.panelClosed();
     if (this.svelteInstance) {
       await unmount(this.svelteInstance);
       this.svelteInstance = undefined;
@@ -586,8 +668,7 @@ class GtdPanelView extends ItemView {
 
 
   private mountSvelte() {
-    const allTasks = this.plugin.taskIndex.getAllTasks();
-    this.bucketGroups$.set(groupTasksIntoBuckets(allTasks, this.plugin.settings));
+    this.bucketGroups$.set(this.plugin.panelGroups());
     this.settings$ = writable(this.plugin.settings);
 
     const openSettings = () => {
@@ -603,6 +684,25 @@ class GtdPanelView extends ItemView {
         settings$: this.settings$,
         celebrationImageUrls$: this.celebrationImageUrls$,
         languageChangeNotice$: this.languageChangeNotice$,
+        plan$: this.plugin.planSession.state$,
+        onRevert: (task: TaskRecord, what: "bucket" | "date") => this.plugin.planSession.revert(task, what),
+        onUndo: () => this.plugin.planSession.undo(),
+        onRedo: () => this.plugin.planSession.redo(),
+        onApply: () => void this.plugin.planSession.apply(),
+        onDiscard: () => {
+          const session = this.plugin.planSession;
+          if (session.changeCount === 0) session.discard();
+          else new ConfirmModal(this.app, t("plan.discard.message"), t("plan.discard.confirm"), () => session.discard()).open();
+        },
+        onAnswerConflict: (conflict: Conflict, choice: "note" | "plan") => this.plugin.planSession.answer(conflict, choice),
+        onToggleDropMode: async () => {
+          const settings = this.plugin.settings;
+          settings.dropIntoBucket = settings.dropIntoBucket === "pin" ? "ask" : "pin";
+          await this.plugin.saveSettings();
+        },
+        onOpenPlanIntro: () => new PlanIntroModal(this.app, "info").open(),
+        onAnimationDone: () => this.plugin.planSession.animationDone(),
+        onBatch: (run: () => Promise<void>) => this.plugin.planSession.batch(run),
         onMove: this.handleMove.bind(this),
         onToggle: this.handleToggle.bind(this),
         onNavigate: this.handleNavigate.bind(this),
@@ -616,6 +716,7 @@ class GtdPanelView extends ItemView {
         onReorder: this.handleReorder.bind(this),
         onDismiss: (tasks: TaskRecord[]) => this.plugin.dismissCompleted(tasks),
         onOpenSettings: openSettings,
+        onEnterPlanMode: () => void this.plugin.enterPlanMode(),
         // Only an explicit dismiss sets this. Opening settings settles nothing;
         // actually fixing the rule hides the banner on its own.
         onDismissCatchAllNotice: async () => {
@@ -639,7 +740,13 @@ class GtdPanelView extends ItemView {
     });
   }
 
+  /** The indexed record behind a row: in plan mode a row carries its planned line, not the note's. */
+  private realTask(task: TaskRecord): TaskRecord {
+    return this.plugin.taskIndex.getAllTasks().find((t) => t.id === task.id) ?? task;
+  }
+
   private async handleReorder(bucketId: string, orderedTaskIds: string[]) {
+    if (this.plugin.planSession.active) return this.plugin.planSession.reorder(bucketId, orderedTaskIds);
     const orderEntries = computeOrderKeys(
       this.plugin.taskIndex.getAllTasks(),
       activeOrderKeyScheme(this.plugin.settings)
@@ -662,6 +769,7 @@ class GtdPanelView extends ItemView {
     targetBucketId: string | null,
     orderedTaskIds?: string[] | null
   ) {
+    if (this.plugin.planSession.active) return this.plugin.planSession.move(task, targetBucketId, orderedTaskIds);
     const targetBucket =
       targetBucketId === null
         ? null
@@ -715,6 +823,9 @@ class GtdPanelView extends ItemView {
     targetBucketId: string,
     orderedTaskIds: string[] | null
   ) {
+    if (this.plugin.planSession.active) {
+      return this.plugin.planSession.dropDate(task, field, date, targetBucketId, orderedTaskIds);
+    }
     const settings = this.plugin.settings;
     const result = await replaceTaskLine(this.app, task, (line) => [setDateLine(line, field, date, true, settings)]);
     if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
@@ -741,7 +852,8 @@ class GtdPanelView extends ItemView {
     await this.plugin.saveSettings();
   }
 
-  private async handleToggle(task: TaskRecord) {
+  private async handleToggle(row: TaskRecord) {
+    const task = this.realTask(row);
     const result = await toggleTaskCompletion(this.app, task);
 
     if (!result.success) {
@@ -757,7 +869,8 @@ class GtdPanelView extends ItemView {
     await this.plugin.taskIndex.reindexFile(task.filePath);
   }
 
-  private async handleSetStatus(task: TaskRecord, symbol: SettableStatus) {
+  private async handleSetStatus(row: TaskRecord, symbol: SettableStatus) {
+    const task = this.realTask(row);
     const result = await setTaskStatus(this.app, task, symbol);
 
     if (!result.success) {
@@ -777,12 +890,21 @@ class GtdPanelView extends ItemView {
     const edit = getTaskEditor(this.app);
     if (!edit) return;
 
+    const session = this.plugin.planSession;
+    if (session.active) {
+      edit(session.lineForEdit(task)).then(
+        (edited) => session.edit(task, edited),
+        (e: unknown) => new Notice(t("notices.editFailed", { error: String(e) }))
+      );
+      return;
+    }
+
     edit(task.rawLine).then(
       async (edited) => {
         const lines = editedLines(edited, task.rawLine);
         if (!lines) return;
         const result = await replaceTaskLine(this.app, task, () => lines);
-        await this.settleLineWrite(task, result, lines.length, "notices.editFailed");
+        await this.plugin.settleLineWrite(task, result, lines.length, "notices.editFailed");
       },
       (e: unknown) => new Notice(t("notices.editFailed", { error: String(e) }))
     );
@@ -790,33 +912,11 @@ class GtdPanelView extends ItemView {
 
   /** Writes a date picked from the row's menu, unpinning in the same write when asked. */
   private async handleSetDate(task: TaskRecord, field: DateField, date: string, unpin: boolean) {
+    if (this.plugin.planSession.active) return this.plugin.planSession.setDate(task, field, date, unpin);
     const result = await replaceTaskLine(this.app, task, (line) => [
       setDateLine(line, field, date, unpin, this.plugin.settings),
     ]);
-    await this.settleLineWrite(task, result, 1, "notices.dateFailed");
-  }
-
-  /**
-   * The order-key diff is built here, where it's known which line became
-   * which, and applied before the reindex runs its own heuristic diff. That
-   * one then finds the old key already gone and changes nothing.
-   */
-  private async settleLineWrite(task: TaskRecord, result: ReplaceResult, lineCount: number, failNotice: string) {
-    if (!result.success || result.lineIdx === undefined || result.before === undefined || result.after === undefined) {
-      new Notice(t(failNotice, { error: result.error }));
-      await this.plugin.taskIndex.reindexFile(task.filePath);
-      return;
-    }
-
-    const diff = diffForEdit(
-      parseFile(task.filePath, result.before, getTaskFilter(this.plugin.settings)),
-      parseFile(task.filePath, result.after, getTaskFilter(this.plugin.settings)),
-      result.lineIdx,
-      lineCount,
-      activeOrderKeyScheme(this.plugin.settings)
-    );
-    this.plugin.recordTaskDiff(task.filePath, diff);
-    await this.plugin.taskIndex.reindexFile(task.filePath);
+    await this.plugin.settleLineWrite(task, result, 1, "notices.dateFailed");
   }
 
   scrollToBucket(bucketId: string) {

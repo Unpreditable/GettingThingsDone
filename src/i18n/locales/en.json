@@ -32,6 +32,8 @@
     "dismissAll": "Dismiss all completed tasks",
     "openSettings_comment": "Tooltip on the gear icon button in the panel header. Opens the GTD Tasks settings tab specifically.",
     "openSettings": "Open GTD settings",
+    "planMode_comment": "Tooltip on the panel header button that starts plan mode.",
+    "planMode": "Plan mode",
     "searchStatus_comment": "Shown below the search bar when a search is active. {{matched}} = number of visible tasks, {{total}} = total tasks across all buckets. The × at the end is a clickable clear button.",
     "searchStatus": "Showing {{matched}} of {{total}} tasks ×",
     "noTasksFound_comment": "Empty-state message shown in the panel body when no tasks exist in the configured scope (entire vault or specific folders/files). Not shown during search — that uses searchStatus with matched=0.",
@@ -191,6 +193,8 @@
   "commands": {
     "openPanel_comment": "Label shown in Obsidian's command palette for the command that opens the GTD sidebar panel.",
     "openPanel": "Open panel",
+    "enterPlanMode_comment": "Command palette label. Switches the panel into plan mode, where task moves and date changes are previewed and only written to notes on Apply.",
+    "enterPlanMode": "Enter plan mode",
     "toggleDone_comment": "Command palette label. Marks the task on the cursor's line as done ([x]), or reopens a done or cancelled one ([ ]), the way ticking it in the panel does: through the Tasks plugin when it is installed. Worded like Obsidian's own 'Toggle checkbox status'.",
     "toggleDone": "Toggle task done",
     "toggleInProgress_comment": "Command palette label. Marks the task on the cursor's line as in progress (checkbox [/]); running it again sets it back to open ([ ]). Worded like Obsidian's own 'Toggle checkbox status'.",
@@ -697,5 +701,112 @@
         "message": "Scrolling on mobile is easier: tasks now drag by a grip on the right."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label_comment": "Label at the start of the plan mode strip under the panel header.",
+      "label": "Plan mode",
+      "peekLabel_comment": "Replaces the strip's label while the user is looking at their real, unplanned tasks.",
+      "peekLabel": "Peeking at real panel",
+      "apply_comment": "Button that writes every planned change to the notes. {{count}} is the number of changed tasks.",
+      "apply_one": "Apply {{count}} change",
+      "apply": "Apply {{count}} changes",
+      "applyName_comment": "The Apply button's name on its own, as the plan mode intro quotes it.",
+      "applyName": "Apply",
+      "noChanges_comment": "The Apply button's text, disabled, while nothing is planned.",
+      "noChanges": "No changes",
+      "discard_comment": "Button that throws the plan away.",
+      "discard": "Discard",
+      "undo": "Undo",
+      "redo": "Redo",
+      "undoBlocked_comment": "Tooltip on the disabled Undo button when the step it would undo involves a task whose note was edited.",
+      "undoBlocked": "Can't undo past a note edit",
+      "pinMode_comment": "Tooltip on the drop mode toggle while dropping a task into a bucket pins it there.",
+      "pinMode": "Drop pins the task. Tap to change",
+      "askMode_comment": "Tooltip on the drop mode toggle while dropping a task into a bucket offers dates from the bucket's range.",
+      "askMode": "Drop asks for a date. Tap to change",
+      "peek_comment": "Tooltip on the eye button that shows the real tasks for a moment.",
+      "peek": "Peek at real panel",
+      "backToPlan": "Back to plan",
+      "info": "About plan mode",
+      "applied_comment": "Shown in the strip after Apply succeeded, before plan mode closes.",
+      "applied_one": "✓ {{count}} change applied",
+      "applied": "✓ {{count}} changes applied"
+    },
+    "indicator": {
+      "from_comment": "Popover line for a task the plan moves to another bucket. {{bucket}} is the bucket it was in before planning.",
+      "from": "Was in {{bucket}}"
+    },
+    "notes": {
+      "movedUp_comment": "Popover line for a task the plan moves up within its bucket.",
+      "movedUp": "Moved up {{count}}",
+      "movedDown": "Moved down {{count}}",
+      "wasUnpinned_comment": "Popover line for a task the plan pins to the bucket it already showed in by its dates.",
+      "wasUnpinned": "Was unpinned",
+      "wasPinned": "Was pinned to {{bucket}}",
+      "was_due": "Was due {{date}}",
+      "no_due": "Had no due date",
+      "was_scheduled": "Was scheduled {{date}}",
+      "no_scheduled": "Had no scheduled date"
+    },
+    "menu": {
+      "revertBucket_comment": "Task row menu item in plan mode: puts the task back in the bucket it had before planning.",
+      "revertBucket": "Revert: bucket",
+      "revertDate_comment": "Task row menu item in plan mode: puts back the dates the task had before planning.",
+      "revertDate": "Revert: date"
+    },
+    "discard": {
+      "message": "Discard all planned changes?",
+      "confirm": "Discard"
+    },
+    "conflict": {
+      "bucketMoved_comment": "First sentence of a conflict banner row: the user changed the task's bucket tag in the note while the plan also moves it. {{text}} is the task.",
+      "bucketMoved": "\"{{text}}\" moved to {{bucket}} in its note.",
+      "bucketUnpinned_comment": "First sentence of a conflict banner row: the user removed the task's bucket tag in the note.",
+      "bucketUnpinned": "\"{{text}}\" was unpinned in its note.",
+      "planBucket_comment": "Second sentence of a bucket conflict row: where the plan puts the task.",
+      "planBucket": "Your plan has it in {{bucket}}.",
+      "planUnpins": "Your plan unpins it.",
+      "dateSet_comment": "First sentence of a date conflict row. {{field}} is 'due date' or 'scheduled date' below.",
+      "dateSet": "\"{{text}}\" got {{field}} {{date}} in its note.",
+      "dateRemoved": "\"{{text}}\" lost its {{field}} in its note.",
+      "planDate": "Your plan has {{date}}.",
+      "planRemovesDate": "Your plan removes it.",
+      "due": "due date",
+      "scheduled": "scheduled date",
+      "use_comment": "Conflict button: take the note's value. {{value}} is a bucket name or a date.",
+      "use": "Use {{value}}",
+      "keep_comment": "Conflict button: keep the plan's value. {{value}} is a bucket name or a date.",
+      "keep": "Keep {{value}}",
+      "unpin": "Unpin",
+      "keepUnpinned": "Keep unpinned",
+      "removeDate": "Remove date",
+      "keepNoDate": "Keep no date"
+    },
+    "intro": {
+      "title": "Plan mode",
+      "lead": "Rearrange your tasks without touching your notes.",
+      "leadButtons_comment": "Second line of the intro. {{apply}} and {{discard}} become the bold names of the Apply and Discard buttons.",
+      "leadButtons": "Tap {{apply}} to save your changes, or {{discard}} to go back to your original list.",
+      "waits_comment": "{{apply}} becomes the bold name of the Apply button.",
+      "waits": "Dates, buckets, pins, and order wait for {{apply}}.",
+      "saves": "Status changes (done, in progress, cancelled) and text edits save right away.",
+      "peek_comment": "{{eye}} becomes the eye icon of the peek button in the plan strip.",
+      "peek": "Tap {{eye}} to peek at your real panel.",
+      "notSaved": "The plan isn't saved: closing the panel or restarting Obsidian discards it.",
+      "dontShow": "Don't show this again",
+      "cancel": "Cancel",
+      "start": "Start planning",
+      "back": "Back to planning"
+    },
+    "notice": {
+      "dropped_comment": "A notice that stays until dismissed, followed by one task per line.",
+      "dropped": "These tasks changed in their notes and lost their planned changes:",
+      "discardedOnClose_comment": "Notice shown when the user closed the GTD panel while planning: the plan is gone.",
+      "discardedOnClose": "Plan discarded: the panel was closed",
+      "applyFailed_one": "{{count}} change in {{file}} wasn't applied: the note changed",
+      "applyFailed": "{{count}} changes in {{file}} weren't applied: the note changed"
+    },
+    "settingsLocked": "You're in plan mode. Apply or discard planned changes first."
   }
 }

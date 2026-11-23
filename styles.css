@@ -92,6 +92,11 @@
   color: var(--color-purple);
 }
 
+/* Plan mode strip. The SVGs carry no Svelte scope class, so their colour lives here. */
+.gtd-plan-peek.is-active .svg-icon {
+  color: var(--text-accent);
+}
+
 /* The completion report draws its own close button in its header row. Obsidian
    pins its own to the modal's corner, which sits higher than any header row. */
 .gtd-report-modal .modal-header-button {
@@ -347,6 +352,11 @@
 .gtd-task.is-completed:hover .gtd-task-actions {
   max-width: 60px;
   opacity: 1;
+}
+
+/* Peek keeps the row's buttons, so its rows stay as tall as the plan's. */
+.gtd-task .gtd-task-actions.is-read-only {
+  visibility: hidden;
 }
 
 .gtd-task-move-btn {
@@ -753,6 +763,11 @@
   white-space: nowrap;
 }
 
+/* Plan mode: the settings that change what a plan holds are greyed out until Apply or Discard. */
+.gtd-plan-locked {
+  opacity: 0.5;
+}
+
 .gtd-settings-banner {
   display: flex;
   align-items: center;
@@ -799,6 +814,27 @@
   display: flex;
   align-items: center;
   gap: var(--size-4-4);
+}
+
+/* Wide enough that each bullet fits on one line. Obsidian's max width still caps it on small screens. */
+.gtd-plan-intro-modal {
+  --dialog-width: 700px;
+}
+
+.gtd-plan-intro-modal .modal-title {
+  font-size: var(--h3-size);
+  font-weight: var(--h3-weight);
+}
+
+/* The peek button's eye, inline in the intro's text. */
+.gtd-plan-intro-icon {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.gtd-plan-intro-icon svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
 }
 
 .gtd-whats-new-modal .modal-title {

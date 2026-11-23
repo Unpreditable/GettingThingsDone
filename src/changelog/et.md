@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Uus
+- Planeerimisrežiim: korralda ülesandeid paneeli eelvaates ümber ja rakenda siis kõik muudatused korraga märkmetesse või loobu neist. Ava see paneeli päises oleva planeerimisnupuga või käsuga **Ava planeerimisrežiim**.
 - Kategooriasse lohistatud ülesanne võib kinnitamise asemel küsida kuupäeva selle kategooria vahemikust (Seaded → Ülesande lohistamine kategooriasse).
 - Lühem seadete leht: Kinnitamine ja Globaalne ülesannete filter avanevad omaette lehtedel, praegune märgis või filter kõrval.
 - Kõikjal lühemad seadete kirjeldused.

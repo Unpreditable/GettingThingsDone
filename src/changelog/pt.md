@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Novidades
+- Modo plano: reorganize as tarefas numa pré-visualização do painel e depois aplique todas as alterações às suas notas de uma vez, ou descarte-as. Inicie-o pelo botão de plano no cabeçalho do painel, ou execute **Entrar no modo plano**.
 - Ao largar uma tarefa numa categoria, pode ser pedida uma data do intervalo dessa categoria em vez de a fixar (Definições → Ao arrastar uma tarefa para uma categoria).
 - Uma página de definições mais curta: Fixação e Filtro global de tarefas abrem as suas próprias páginas, com o marcador ou filtro atual ao lado.
 - Descrições das definições mais curtas em todo o lado.

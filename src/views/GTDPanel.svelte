@@ -1,10 +1,15 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, tick } from "svelte";
   import type { Readable } from "svelte/store";
   import { Menu, Notice, Platform } from "obsidian";
   import type { MenuItem } from "obsidian";
   import BucketGroup from "./BucketGroup.svelte";
   import Celebration from "./Celebration.svelte";
+  import PlanToolbar from "./PlanToolbar.svelte";
+  import PlanConflictBanner from "./PlanConflictBanner.svelte";
+  import type { Conflict } from "../core/plan/Plan";
+  import type { Indicator } from "../core/plan/PlanIndicators";
+  import { applyTiming } from "../core/plan/ApplyTiming";
   import type { BucketGroup as BucketGroupData } from "../core/BucketManager";
   import type { TaskRecord } from "../core/TaskParser";
   import { getTagValue, getInlineFieldValue, statusSymbol } from "../core/TaskParser";
@@ -27,16 +32,37 @@
   import { icon } from "./icon";
   import { headerDragOver } from "./dragState";
   import { t } from "../i18n/i18n";
+  import type { PlanViewState } from "../PlanSession";
 
   export let bucketGroups$: Readable<BucketGroupData[]>;
   export let settings$: Readable<PluginSettings>;
   export let celebrationImageUrls$: Readable<string[]>;
   export let languageChangeNotice$: Readable<boolean>;
-  $: bucketGroups = $bucketGroups$;
+  export let plan$: Readable<PlanViewState>;
+  // Peek shows the real tasks in the plan's place, read-only.
+  let peeking = false;
+  $: bucketGroups = peeking ? plan.realGroups : $bucketGroups$;
   $: settings = $settings$;
   $: hiddenStrings = hiddenFilterStrings(settings);
   $: celebrationImageUrls = $celebrationImageUrls$;
   $: showLanguageBanner = $languageChangeNotice$;
+  $: plan = $plan$;
+  $: planning = plan.phase === "planning";
+  // While Apply runs and its animation plays, the rows are settled: nothing to change.
+  $: readOnly = peeking || plan.phase === "applying" || plan.phase === "applied";
+  $: if (!planning) peeking = false;
+  $: indicators = plan.phase === "applied"
+    ? pickIndicators(plan.summary.indicators, applyRows)
+    : peeking
+      ? {}
+      : plan.summary.indicators;
+  // After Apply the counts already are the planned ones; the delta stays only until the first ✓.
+  $: deltas = peeking || (plan.phase === "applied" && (checked.size > 0 || applyRows.size === 0))
+    ? {}
+    : plan.summary.deltas;
+  $: applyMarks = Object.fromEntries(
+    [...applyRows].map((id) => [id, checked.has(id) ? "check" : "arrow"] as [string, "check" | "arrow"])
+  );
 
   export let onMove: (
     task: TaskRecord,
@@ -63,11 +89,82 @@
   export let onReorder: (bucketId: string, orderedTaskIds: string[]) => Promise<void>;
   export let onDismiss: (tasks: TaskRecord[]) => void;
   export let onOpenSettings: () => void;
+  export let onEnterPlanMode: () => void;
   export let onDismissLanguageBanner: () => void;
   export let onDismissCatchAllNotice: () => void;
   export let onDismissWeekStartNotice: () => void;
   export let onDismissNotice: (id: string) => void;
   export let onOpenChangelog: () => void;
+  export let onRevert: (task: TaskRecord, what: "bucket" | "date") => void;
+  export let onUndo: () => void;
+  export let onRedo: () => void;
+  export let onApply: () => void;
+  export let onDiscard: () => void;
+  export let onAnswerConflict: (conflict: Conflict, choice: "note" | "plan") => void;
+  export let onToggleDropMode: () => void;
+  export let onOpenPlanIntro: () => void;
+
+  export let onAnimationDone: () => void;
+  /** Makes the plan steps `run` takes one undo step; outside plan mode it only runs it. */
+  export let onBatch: (run: () => Promise<void>) => Promise<void> = (run) => run();
+
+  // The Apply animation: on-screen marked rows, top to bottom, turn into a ✓.
+  let applyRows = new Set<string>();
+  let checked = new Set<string>();
+  let checksFading = false;
+  let stripSliding = false;
+  let animating = false;
+  let applyTimers: ReturnType<typeof setTimeout>[] = [];
+
+  $: if (plan.phase === "applied" && !animating) void runApplyAnimation();
+  $: if (plan.phase !== "applied" && animating) resetApplyAnimation();
+
+  function pickIndicators(all: Record<string, Indicator>, ids: Set<string>): Record<string, Indicator> {
+    return Object.fromEntries(Object.entries(all).filter(([id]) => ids.has(id)));
+  }
+
+  function later(ms: number, action: () => void) {
+    applyTimers.push(setTimeout(action, ms));
+  }
+
+  async function runApplyAnimation() {
+    animating = true;
+    await tick();
+    const view = panelEl.closest(".view-content") ?? panelEl;
+    const box = view.getBoundingClientRect();
+    const marked = new Set(Object.keys(plan.summary.indicators));
+    // Rows off screen, or in a collapsed bucket, settle at once and take no time.
+    const rows = Array.from(panelEl.querySelectorAll<HTMLElement>(".gtd-task[data-task-id]"))
+      .map((el) => ({ id: el.dataset.taskId ?? "", rect: el.getBoundingClientRect() }))
+      .filter(({ id, rect }) => marked.has(id) && rect.bottom > box.top && rect.top < box.bottom)
+      .sort((a, b) => a.rect.top - b.rect.top)
+      .map(({ id }) => id);
+    applyRows = new Set(rows);
+    const timing = applyTiming(rows.length);
+    timing.checkStartMs.forEach((ms, i) => later(ms, () => (checked = new Set([...checked, rows[i]]))));
+    later(timing.fadeAtMs, () => (checksFading = true));
+    later(timing.slideAtMs, () => (stripSliding = true));
+    later(timing.endMs, () => onAnimationDone());
+  }
+
+  function resetApplyAnimation() {
+    for (const timer of applyTimers) clearTimeout(timer);
+    applyTimers = [];
+    applyRows = new Set();
+    checked = new Set();
+    checksFading = false;
+    stripSliding = false;
+    animating = false;
+  }
+
+  onDestroy(resetApplyAnimation);
+
+  function onPanelKeydown(e: KeyboardEvent) {
+    if (peeking && e.key === "Escape") {
+      e.preventDefault();
+      peeking = false;
+    }
+  }
 
   // Keyed off the shape of the rules rather than tasks actually piling up in To
   // Review, so the warning arrives before the mess does.
@@ -230,7 +327,7 @@
     const { task, targetBucketId, explicitChildren, orderedTaskIds, date, onSettled } = pendingMoveConfirm;
     pendingMoveConfirm = null;
     try {
-      await applyMoveConfirm(task, targetBucketId, explicitChildren, orderedTaskIds, date, moveChildren);
+      await onBatch(() => applyMoveConfirm(task, targetBucketId, explicitChildren, orderedTaskIds, date, moveChildren));
     } finally {
       onSettled?.();
     }
@@ -266,6 +363,19 @@
     const autoTarget = autoBucketFor(task, settings);
 
     let topSection = false;
+
+    const revertable = planning ? plan.revertable[task.id] : undefined;
+    if (revertable?.bucket) {
+      menu.addItem((item) =>
+        item.setTitle(t("plan.menu.revertBucket")).setIcon("undo-2").onClick(() => onRevert(task, "bucket"))
+      );
+    }
+    if (revertable?.date) {
+      menu.addItem((item) =>
+        item.setTitle(t("plan.menu.revertDate")).setIcon("undo-2").onClick(() => onRevert(task, "date"))
+      );
+    }
+    if (revertable?.bucket || revertable?.date) menu.addSeparator();
 
     if (canEditTask()) {
       menu.addItem((item) => item.setTitle(t("panel.contextMenu.editTask")).setIcon("pencil").onClick(() => onEdit(task)));
@@ -667,7 +777,8 @@
   }
 </script>
 
-<div class="gtd-panel" class:gtd-compact={settings.compactView} class:gtd-header-drag-over={$headerDragOver} bind:this={panelEl}>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="gtd-panel" class:gtd-compact={settings.compactView} class:gtd-header-drag-over={$headerDragOver} bind:this={panelEl} class:gtd-applied-fading={checksFading} on:keydown={onPanelKeydown}>
   <div class="gtd-panel-header">
     <h3>{t("panel.title")}</h3>
     <div class="gtd-search-wrapper">
@@ -680,15 +791,24 @@
       />
       {#if searchQuery}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-        <span class="gtd-search-clear" on:click={() => (searchQuery = '')} title={t("panel.clearSearch")}>×</span>
+        <span class="gtd-search-clear" on:click={() => (searchQuery = '')} aria-label={t("panel.clearSearch")}>×</span>
       {/if}
     </div>
     <div class="gtd-header-actions">
+      {#if plan.phase === "off"}
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+        <span
+          class="clickable-icon gtd-header-icon gtd-plan-button"
+          aria-label={t("panel.planMode")}
+          on:click={onEnterPlanMode}
+          use:icon={"pencil-ruler"}
+        ></span>
+      {/if}
       {#if settings.completedVisibilityUntilMidnight}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
         <span
           class="clickable-icon gtd-header-icon"
-          title={t("panel.dismissAll")}
+          aria-label={t("panel.dismissAll")}
           on:click={dismissAllCompleted}
           use:icon={"check-check"}
         ></span>
@@ -696,12 +816,31 @@
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
       <span
         class="clickable-icon gtd-header-icon"
-        title={t("panel.openSettings")}
+        aria-label={t("panel.openSettings")}
         on:click={onOpenSettings}
         use:icon={"settings"}
       ></span>
     </div>
   </div>
+
+  {#if plan.phase !== "off"}
+    <PlanToolbar
+      state={plan}
+      {peeking}
+      dropMode={settings.dropIntoBucket}
+      {onUndo}
+      {onRedo}
+      {onApply}
+      {onDiscard}
+      {onToggleDropMode}
+      onTogglePeek={() => (peeking = !peeking)}
+      sliding={stripSliding}
+      {onOpenPlanIntro}
+    />
+    {#if planning && !peeking && plan.conflicts.length > 0}
+      <PlanConflictBanner conflicts={plan.conflicts} onAnswer={onAnswerConflict} />
+    {/if}
+  {/if}
 
   <!-- One banner at a time: these are full-width and push the task list down, and
        all of them are once-ever events, so they queue instead of stacking. -->
@@ -787,6 +926,11 @@
         {taskBucketMap}
         bucketGroups={bucketGroups}
         {zone}
+        {readOnly}
+        {indicators}
+        planNotes={peeking ? {} : plan.notes}
+        delta={deltas[group.bucketId] ?? null}
+        {applyMarks}
         on:move={(e) => handleMove(e.detail.task, e.detail.targetBucketId)}
         on:toggle={(e) => handleToggle(e.detail.task)}
         on:navigate={(e) => onNavigate(e.detail.task)}

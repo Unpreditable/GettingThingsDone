@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Jaunums
+- Plānošanas režīms: pārkārtojiet uzdevumus paneļa priekšskatījumā un pēc tam lietojiet visas izmaiņas piezīmēs uzreiz vai atmetiet tās. Ieslēdziet to ar plānošanas pogu paneļa galvenē vai ar **Ieslēgt plānošanas režīmu**.
 - Kategorijā nomests uzdevums var jautāt datumu no tās diapazona, nevis to piespraust (Iestatījumi → Uzdevuma vilkšana kategorijā).
 - Īsāka iestatījumu lapa: Piespraušana un Globālais uzdevumu filtrs atveras atsevišķās lapās, blakus redzama pašreizējā atzīme vai filtrs.
 - Visur īsāki iestatījumu apraksti.

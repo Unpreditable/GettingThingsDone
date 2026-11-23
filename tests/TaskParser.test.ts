@@ -1,4 +1,4 @@
-import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn, hideFilterText, setTaskDate } from "../src/core/TaskParser";
+import { parseFile, buildTaskHierarchy, getTagValue, setTagValue, getInlineFieldValue, setInlineFieldValue, setSimpleTag, stripWikilinks, parseWikilinks, taskTextColumn, hideFilterText, setTaskDate, clearTaskDate } from "../src/core/TaskParser";
 
 describe("parseFile", () => {
   it("parses simple unchecked tasks", () => {
@@ -960,5 +960,20 @@ describe("Tasks markers inside links and code spans", () => {
     expect(setInlineFieldValue("- [ ] see [[Note 📅 2026-10-10]] 📅 2026-10-20", "gtd", "today")).toBe(
       "- [ ] see [[Note 📅 2026-10-10]] [gtd:: today] 📅 2026-10-20"
     );
+  });
+});
+
+describe("clearTaskDate", () => {
+  it("removes an emoji due date", () => {
+    expect(clearTaskDate("- [ ] a 📅 2026-11-12 🔼", "due")).toBe("- [ ] a 🔼");
+  });
+  it("removes a Dataview scheduled date", () => {
+    expect(clearTaskDate("- [ ] a [scheduled:: 2026-11-12]", "scheduled")).toBe("- [ ] a");
+  });
+  it("leaves a line without the field alone", () => {
+    expect(clearTaskDate("- [ ] a ⏳ 2026-11-12", "due")).toBe("- [ ] a ⏳ 2026-11-12");
+  });
+  it("keeps a block reference", () => {
+    expect(clearTaskDate("- [ ] a 📅 2026-11-12 ^id", "due")).toBe("- [ ] a ^id");
   });
 });

@@ -21,6 +21,7 @@ import {
   wasCompletionWitnessed,
   replacedRecurrences,
 } from "./TaskOrder";
+import type { OrderEntry } from "./TaskOrder";
 import { computeDueStatus, computeMisplacement, matchesRule } from "./DueStatus";
 import type { DueStatus } from "./DueStatus";
 import { planningDate } from "./PlanningDate";
@@ -52,9 +53,14 @@ export interface BucketGroup {
   isSystem: boolean;
 }
 
+/**
+ * `orderKeys`, when given, replaces the keys computed from `tasks`: plan mode
+ * groups planned tasks under their real keys, which its order copy uses.
+ */
 export function groupTasksIntoBuckets(
   tasks: TaskRecord[],
-  settings: PluginSettings
+  settings: PluginSettings,
+  orderKeys?: Map<string, OrderEntry>
 ): BucketGroup[] {
   const now = today();
 
@@ -146,9 +152,9 @@ export function groupTasksIntoBuckets(
     if (belongsIn) group.misfiledIn[task.id] = belongsIn;
   }
 
-  const orderKeys = computeOrderKeys(tasks, activeOrderKeyScheme(settings));
+  const keys = orderKeys ?? computeOrderKeys(tasks, activeOrderKeyScheme(settings));
   const savedOrder = settings.taskOrder ?? {};
-  const arrivalRanks = computeArrivalRanks(orderKeys, savedOrder);
+  const arrivalRanks = computeArrivalRanks(keys, savedOrder);
   const completionSeen = settings.completionSeen ?? {};
   const replaced = replacedRecurrences(tasks);
   for (const group of bucketMap.values()) {
@@ -156,7 +162,7 @@ export function groupTasksIntoBuckets(
     // merge is what produces plain date order.
     group.tasks = applyManualOrder(
       group.tasks,
-      orderKeys,
+      keys,
       savedOrder[group.bucketId] ?? [],
       settings.planBy,
       arrivalRanks
@@ -167,7 +173,7 @@ export function groupTasksIntoBuckets(
       if (!task.isCompleted) continue;
       // A replaced recurrence is hidden at once: its next occurrence is in the
       // list, so showing both is a confusing duplicate.
-      if (replaced.has(task.id) || !wasCompletionWitnessed(orderKeys.get(task.id), completionSeen, now.getTime())) {
+      if (replaced.has(task.id) || !wasCompletionWitnessed(keys.get(task.id), completionSeen, now.getTime())) {
         group.agedCompletedTaskIds.push(task.id);
       }
     }

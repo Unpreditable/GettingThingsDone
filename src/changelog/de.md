@@ -1,6 +1,7 @@
 ## Unreleased
 
 #### Neu
+- Planungsmodus: Ordne Aufgaben in einer Vorschau des Panels neu und übernimm dann alle Änderungen auf einmal in deine Notizen oder verwirf sie. Starte ihn über die Plan-Schaltfläche im Kopf des Panels oder mit **Planungsmodus starten**.
 - Eine Aufgabe, die in eine Kategorie gezogen wird, kann nach einem Datum aus deren Bereich fragen, statt sie anzuheften (Einstellungen → Aufgabe in eine Kategorie ziehen).
 - Eine kürzere Einstellungsseite: Anheften und Globaler Aufgabenfilter öffnen eigene Seiten, mit der aktuellen Markierung bzw. dem Filter daneben.
 - Durchgehend kürzere Beschreibungen der Einstellungen.

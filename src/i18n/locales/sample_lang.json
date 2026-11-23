@@ -18,6 +18,7 @@
     "clearSearch": "",
     "dismissAll": "",
     "openSettings": "",
+    "planMode": "",
     "searchStatus": "",
     "noTasksFound": "",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "",
+    "enterPlanMode": "",
     "toggleDone": "",
     "toggleInProgress": "",
     "toggleCancelled": "",
@@ -466,5 +468,85 @@
         "message": ""
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "",
+      "peekLabel": "",
+      "apply_one": "",
+      "apply": "",
+      "applyName": "",
+      "noChanges": "",
+      "discard": "",
+      "undo": "",
+      "redo": "",
+      "undoBlocked": "",
+      "pinMode": "",
+      "askMode": "",
+      "peek": "",
+      "backToPlan": "",
+      "info": "",
+      "applied_one": "",
+      "applied": ""
+    },
+    "indicator": {
+      "from": ""
+    },
+    "notes": {
+      "movedUp": "",
+      "movedDown": "",
+      "wasUnpinned": "",
+      "wasPinned": "",
+      "was_due": "",
+      "no_due": "",
+      "was_scheduled": "",
+      "no_scheduled": ""
+    },
+    "menu": {
+      "revertBucket": "",
+      "revertDate": ""
+    },
+    "discard": {
+      "message": "",
+      "confirm": ""
+    },
+    "conflict": {
+      "bucketMoved": "",
+      "bucketUnpinned": "",
+      "planBucket": "",
+      "planUnpins": "",
+      "dateSet": "",
+      "dateRemoved": "",
+      "planDate": "",
+      "planRemovesDate": "",
+      "due": "",
+      "scheduled": "",
+      "use": "",
+      "keep": "",
+      "unpin": "",
+      "keepUnpinned": "",
+      "removeDate": "",
+      "keepNoDate": ""
+    },
+    "intro": {
+      "title": "",
+      "lead": "",
+      "leadButtons": "",
+      "waits": "",
+      "saves": "",
+      "peek": "",
+      "notSaved": "",
+      "dontShow": "",
+      "cancel": "",
+      "start": "",
+      "back": ""
+    },
+    "notice": {
+      "dropped": "",
+      "discardedOnClose": "",
+      "applyFailed_one": "",
+      "applyFailed": ""
+    },
+    "settingsLocked": ""
   }
 }

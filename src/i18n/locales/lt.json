@@ -18,6 +18,7 @@
     "clearSearch": "Išvalyti paiešką",
     "dismissAll": "Slėpti visas atliktas užduotis",
     "openSettings": "Atidaryti GTD nustatymus",
+    "planMode": "Planavimo režimas",
     "searchStatus": "Rodoma {{matched}} iš {{total}} užduočių ×",
     "noTasksFound": "Užduočių nerasta. Pakeiskite užduočių aprėptį nustatymuose.",
     "moveConfirm": {
@@ -128,6 +129,7 @@
   },
   "commands": {
     "openPanel": "Atidaryti skydelį",
+    "enterPlanMode": "Įjungti planavimo režimą",
     "toggleDone": "Perjungti užduotį atlikta",
     "toggleInProgress": "Perjungti užduotį vykdoma",
     "toggleCancelled": "Perjungti užduotį atšaukta",
@@ -466,5 +468,91 @@
         "message": "Slinkti mobiliajame lengviau: užduotys dabar tempiamos už rankenėlės dešinėje."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "Planavimo režimas",
+      "peekLabel": "Žiūrite tikrąjį skydelį",
+      "apply_one": "Taikyti {{count}} pakeitimą",
+      "apply": "Taikyti pakeitimų: {{count}}",
+      "apply_few": "Taikyti {{count}} pakeitimus",
+      "apply_many": "Taikyti {{count}} pakeitimų",
+      "applyName": "Taikyti",
+      "noChanges": "Pakeitimų nėra",
+      "discard": "Atmesti",
+      "undo": "Anuliuoti",
+      "redo": "Grąžinti",
+      "undoBlocked": "Negalima anuliuoti toliau nei pastabos pakeitimas",
+      "pinMode": "Numetus užduotis prisegama. Bakstelėkite, kad pakeistumėte",
+      "askMode": "Numetus klausiama datos. Bakstelėkite, kad pakeistumėte",
+      "peek": "Pažvelgti į tikrąjį skydelį",
+      "backToPlan": "Atgal į planą",
+      "info": "Apie planavimo režimą",
+      "applied_one": "✓ Pritaikytas {{count}} pakeitimas",
+      "applied": "✓ Pritaikyta pakeitimų: {{count}}",
+      "applied_few": "✓ Pritaikyti {{count}} pakeitimai",
+      "applied_many": "✓ Pritaikyta {{count}} pakeitimų"
+    },
+    "indicator": {
+      "from": "Buvo kategorijoje {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "Pakelta per {{count}}",
+      "movedDown": "Nuleista per {{count}}",
+      "wasUnpinned": "Nebuvo prisegta",
+      "wasPinned": "Buvo prisegta prie {{bucket}}",
+      "was_due": "Terminas buvo {{date}}",
+      "no_due": "Termino nebuvo",
+      "was_scheduled": "Suplanuota buvo {{date}}",
+      "no_scheduled": "Suplanuotos datos nebuvo"
+    },
+    "menu": {
+      "revertBucket": "Atkurti: kategorija",
+      "revertDate": "Atkurti: data"
+    },
+    "discard": {
+      "message": "Atmesti visus suplanuotus pakeitimus?",
+      "confirm": "Atmesti"
+    },
+    "conflict": {
+      "bucketMoved": "„{{text}}“ pastaboje perkelta į {{bucket}}.",
+      "bucketUnpinned": "„{{text}}“ pastaboje atsegta.",
+      "planBucket": "Jūsų plane ji yra {{bucket}}.",
+      "planUnpins": "Jūsų planas ją atsega.",
+      "dateSet": "„{{text}}“: pastaboje {{field}} dabar {{date}}.",
+      "dateRemoved": "„{{text}}“: pastaboje pašalinta {{field}}.",
+      "planDate": "Jūsų plane: {{date}}.",
+      "planRemovesDate": "Jūsų planas ją pašalina.",
+      "due": "termino data",
+      "scheduled": "suplanuota data",
+      "use": "Naudoti: {{value}}",
+      "keep": "Palikti: {{value}}",
+      "unpin": "Atsegti",
+      "keepUnpinned": "Palikti atsegtą",
+      "removeDate": "Pašalinti datą",
+      "keepNoDate": "Palikti be datos"
+    },
+    "intro": {
+      "title": "Planavimo režimas",
+      "lead": "Pertvarkykite užduotis neliesdami pastabų.",
+      "leadButtons": "Bakstelėkite {{apply}}, kad išsaugotumėte pakeitimus, arba {{discard}}, kad grįžtumėte prie pradinio sąrašo.",
+      "waits": "Datos, kategorijos, prisegimai ir tvarka laukia {{apply}}.",
+      "saves": "Būsenos pakeitimai (atlikta, vykdoma, atšaukta) ir teksto taisymai išsaugomi iš karto.",
+      "peek": "Bakstelėkite {{eye}}, kad pažvelgtumėte į tikrąjį skydelį.",
+      "notSaved": "Planas neišsaugomas: uždarius skydelį ar paleidus Obsidian iš naujo jis atmetamas.",
+      "dontShow": "Daugiau nerodyti",
+      "cancel": "Atšaukti",
+      "start": "Pradėti planuoti",
+      "back": "Atgal į planavimą"
+    },
+    "notice": {
+      "dropped": "Šios užduotys pasikeitė savo pastabose ir prarado suplanuotus pakeitimus:",
+      "discardedOnClose": "Planas atmestas: skydelis uždarytas",
+      "applyFailed_one": "{{count}} pakeitimas faile {{file}} nepritaikytas: pastaba pasikeitė",
+      "applyFailed": "Pakeitimų faile {{file}} nepritaikyta: {{count}}. Pastaba pasikeitė",
+      "applyFailed_few": "{{count}} pakeitimai faile {{file}} nepritaikyti: pastaba pasikeitė",
+      "applyFailed_many": "{{count}} pakeitimų faile {{file}} nepritaikyta: pastaba pasikeitė"
+    },
+    "settingsLocked": "Esate planavimo režime. Pirmiausia pritaikykite arba atmeskite suplanuotus pakeitimus."
   }
 }

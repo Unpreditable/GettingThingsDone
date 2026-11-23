@@ -18,6 +18,7 @@
     "clearSearch": "清除搜索",
     "dismissAll": "关闭所有已完成任务",
     "openSettings": "打开 GTD 设置",
+    "planMode": "计划模式",
     "searchStatus": "显示 {{total}} 项中的 {{matched}} 项 ×",
     "noTasksFound": "未找到任务。请在设置中调整任务范围。",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "打开面板",
+    "enterPlanMode": "进入计划模式",
     "toggleDone": "切换任务已完成状态",
     "toggleInProgress": "切换任务进行中状态",
     "toggleCancelled": "切换任务已取消状态",
@@ -456,5 +458,85 @@
         "message": "在移动端滚动更方便了：现在通过右侧的手柄拖动任务。"
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "计划模式",
+      "peekLabel": "正在查看真实面板",
+      "apply_one": "应用 {{count}} 项更改",
+      "apply": "应用 {{count}} 项更改",
+      "applyName": "应用",
+      "noChanges": "没有更改",
+      "discard": "放弃",
+      "undo": "撤销",
+      "redo": "重做",
+      "undoBlocked": "无法撤销到笔记编辑之前",
+      "pinMode": "拖放会固定任务。点按以切换",
+      "askMode": "拖放会询问日期。点按以切换",
+      "peek": "看一眼真实面板",
+      "backToPlan": "返回计划",
+      "info": "关于计划模式",
+      "applied_one": "✓ 已应用 {{count}} 项更改",
+      "applied": "✓ 已应用 {{count}} 项更改"
+    },
+    "indicator": {
+      "from": "原在 {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "上移 {{count}} 位",
+      "movedDown": "下移 {{count}} 位",
+      "wasUnpinned": "原未固定",
+      "wasPinned": "原固定在 {{bucket}}",
+      "was_due": "原截止日期 {{date}}",
+      "no_due": "原无截止日期",
+      "was_scheduled": "原计划日期 {{date}}",
+      "no_scheduled": "原无计划日期"
+    },
+    "menu": {
+      "revertBucket": "还原：分类",
+      "revertDate": "还原：日期"
+    },
+    "discard": {
+      "message": "放弃所有计划的更改？",
+      "confirm": "放弃"
+    },
+    "conflict": {
+      "bucketMoved": "“{{text}}”在笔记中被移到了 {{bucket}}。",
+      "bucketUnpinned": "“{{text}}”在笔记中被取消固定。",
+      "planBucket": "你的计划把它放在 {{bucket}}。",
+      "planUnpins": "你的计划取消固定它。",
+      "dateSet": "“{{text}}”在笔记中的{{field}}变为 {{date}}。",
+      "dateRemoved": "“{{text}}”在笔记中的{{field}}被删除。",
+      "planDate": "你的计划是 {{date}}。",
+      "planRemovesDate": "你的计划会删除它。",
+      "due": "截止日期",
+      "scheduled": "计划日期",
+      "use": "使用 {{value}}",
+      "keep": "保留 {{value}}",
+      "unpin": "取消固定",
+      "keepUnpinned": "保持不固定",
+      "removeDate": "删除日期",
+      "keepNoDate": "保持无日期"
+    },
+    "intro": {
+      "title": "计划模式",
+      "lead": "在不改动笔记的情况下重新安排任务。",
+      "leadButtons": "点按 {{apply}} 保存更改，或点按 {{discard}} 回到原来的列表。",
+      "waits": "日期、分类、固定和顺序会等到 {{apply}}。",
+      "saves": "状态更改（完成、进行中、取消）和文本编辑会立即保存。",
+      "peek": "点按 {{eye}} 看一眼真实面板。",
+      "notSaved": "计划不会保存：关闭面板或重启 Obsidian 会放弃它。",
+      "dontShow": "不再显示",
+      "cancel": "取消",
+      "start": "开始计划",
+      "back": "返回计划"
+    },
+    "notice": {
+      "dropped": "这些任务在笔记中发生了变化，失去了计划的更改：",
+      "discardedOnClose": "计划已放弃：面板已关闭",
+      "applyFailed_one": "{{file}} 中的 {{count}} 项更改未应用：笔记已更改",
+      "applyFailed": "{{file}} 中的 {{count}} 项更改未应用：笔记已更改"
+    },
+    "settingsLocked": "你处于计划模式。请先应用或放弃计划的更改。"
   }
 }

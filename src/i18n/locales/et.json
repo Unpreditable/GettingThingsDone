@@ -18,6 +18,7 @@
     "clearSearch": "Kustuta otsing",
     "dismissAll": "Peida kõik lõpetatud ülesanded",
     "openSettings": "Ava GTD seaded",
+    "planMode": "Planeerimisrežiim",
     "searchStatus": "Näitan {{matched}} / {{total}} ülesannet ×",
     "noTasksFound": "Ülesandeid ei leitud. Muuda ülesannete ulatust seadetes.",
     "moveConfirm": {
@@ -120,6 +121,7 @@
   },
   "commands": {
     "openPanel": "Ava paneel",
+    "enterPlanMode": "Ava planeerimisrežiim",
     "toggleDone": "Lülita ülesanne tehtuks",
     "toggleInProgress": "Lülita ülesanne pooleliolevaks",
     "toggleCancelled": "Lülita ülesanne tühistatuks",
@@ -456,5 +458,85 @@
         "message": "Telefonis on kerimine lihtsam: ülesandeid lohistatakse nüüd parempoolsest pidemest."
       }
     }
+  },
+  "plan": {
+    "toolbar": {
+      "label": "Planeerimisrežiim",
+      "peekLabel": "Vaatad päris paneeli",
+      "apply_one": "Rakenda {{count}} muudatus",
+      "apply": "Rakenda {{count}} muudatust",
+      "applyName": "Rakenda",
+      "noChanges": "Muudatusi pole",
+      "discard": "Loobu",
+      "undo": "Võta tagasi",
+      "redo": "Tee uuesti",
+      "undoBlocked": "Märkme muudatusest kaugemale tagasi võtta ei saa",
+      "pinMode": "Lohistamine kinnitab ülesande. Puuduta muutmiseks",
+      "askMode": "Lohistamine küsib kuupäeva. Puuduta muutmiseks",
+      "peek": "Vaata päris paneeli",
+      "backToPlan": "Tagasi plaani juurde",
+      "info": "Planeerimisrežiimist",
+      "applied_one": "✓ {{count}} muudatus rakendatud",
+      "applied": "✓ {{count}} muudatust rakendatud"
+    },
+    "indicator": {
+      "from": "Oli kategoorias {{bucket}}"
+    },
+    "notes": {
+      "movedUp": "Liikus üles {{count}}",
+      "movedDown": "Liikus alla {{count}}",
+      "wasUnpinned": "Polnud kinnitatud",
+      "wasPinned": "Oli kinnitatud kategooriasse {{bucket}}",
+      "was_due": "Tähtaeg oli {{date}}",
+      "no_due": "Tähtaega polnud",
+      "was_scheduled": "Planeeritud oli {{date}}",
+      "no_scheduled": "Planeeritud kuupäeva polnud"
+    },
+    "menu": {
+      "revertBucket": "Taasta: kategooria",
+      "revertDate": "Taasta: kuupäev"
+    },
+    "discard": {
+      "message": "Kas loobuda kõigist plaanitud muudatustest?",
+      "confirm": "Loobu"
+    },
+    "conflict": {
+      "bucketMoved": "„{{text}}“ teisaldati märkmes kategooriasse {{bucket}}.",
+      "bucketUnpinned": "„{{text}}“ vabastati märkmes.",
+      "planBucket": "Sinu plaanis on see kategoorias {{bucket}}.",
+      "planUnpins": "Sinu plaan vabastab selle.",
+      "dateSet": "„{{text}}“: märkmes on nüüd {{field}} {{date}}.",
+      "dateRemoved": "„{{text}}“: märkmest eemaldati {{field}}.",
+      "planDate": "Sinu plaanis on {{date}}.",
+      "planRemovesDate": "Sinu plaan eemaldab selle.",
+      "due": "tähtaeg",
+      "scheduled": "planeeritud kuupäev",
+      "use": "Kasuta: {{value}}",
+      "keep": "Jäta: {{value}}",
+      "unpin": "Vabasta",
+      "keepUnpinned": "Jäta vabaks",
+      "removeDate": "Eemalda kuupäev",
+      "keepNoDate": "Jäta kuupäevata"
+    },
+    "intro": {
+      "title": "Planeerimisrežiim",
+      "lead": "Korralda ülesandeid ümber märkmeid puudutamata.",
+      "leadButtons": "Puuduta {{apply}}, et muudatused salvestada, või {{discard}}, et algse loendi juurde naasta.",
+      "waits": "Kuupäevad, kategooriad, kinnitused ja järjekord ootavad nuppu {{apply}}.",
+      "saves": "Oleku muudatused (tehtud, pooleli, tühistatud) ja tekstimuudatused salvestuvad kohe.",
+      "peek": "Puuduta {{eye}}, et päris paneeli vaadata.",
+      "notSaved": "Plaani ei salvestata: paneeli sulgemine või Obsidiani taaskäivitamine loobub sellest.",
+      "dontShow": "Ära rohkem näita",
+      "cancel": "Tühista",
+      "start": "Alusta planeerimist",
+      "back": "Tagasi planeerimise juurde"
+    },
+    "notice": {
+      "dropped": "Need ülesanded muutusid oma märkmetes ja kaotasid plaanitud muudatused:",
+      "discardedOnClose": "Plaanist loobuti: paneel suleti",
+      "applyFailed_one": "{{count}} muudatust failis {{file}} ei rakendatud: märge muutus",
+      "applyFailed": "{{count}} muudatust failis {{file}} ei rakendatud: märge muutus"
+    },
+    "settingsLocked": "Oled planeerimisrežiimis. Rakenda plaanitud muudatused või loobu neist enne."
   }
 }

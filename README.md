@@ -18,6 +18,7 @@ Have the [Tasks](https://community.obsidian.md/plugins/obsidian-tasks-plugin) pl
 - **Time-horizon buckets** — Today ⚡, This Week 📌, Next Week 🔭, This Month 📅, Someday / Maybe 💭. Rename them, swap the emoji, reorder them, or write your own date rules.
 - **To Review inbox** 📥 — every task without a bucket lands here, so nothing slips through.
 - **Three ways to move a task** — quick-move buttons on the row, drag-and-drop between buckets, or right-click.
+- **Plan mode** — rearrange your week in a preview, then apply every move and date change to your notes at once, or discard them.
 - **Drop to date** — drop a task into a bucket and pick a day from that bucket's range, instead of pinning it there.
 - **Subtask-aware** — indented tasks track with their parent, with a count badge and a prompt to move them along.
 - **Overdue and misfiled flags** — <img src="assets/icons/overdue.svg" width="16" height="16" alt="overdue"> once a due date has passed, <img src="assets/icons/misfiled.svg" width="16" height="16" alt="misfiled"> when a task sits in a bucket that will make you miss it.
@@ -135,6 +136,12 @@ Type in the search box at the top of the panel to filter down to matching tasks.
 Click the 🏆 icon in the ribbon, or run **See what you got done**. The week tabs list tasks by day, newest first. Click a task to open its line.
 
 The report reads the `✅` dates on your task lines. A task completed without one can't be placed on a day, so it isn't listed. Turn on Tasks' **Set done date on every completed task** to get them. Cancelled tasks are listed by their `❌` date but never counted.
+
+### Plan your week
+
+Click the plan button (a pencil and ruler) in the panel header, or run **Enter plan mode**, to rearrange tasks without touching your notes. Drag tasks between buckets, reorder them, unpin them, and change their dates as usual: the panel shows the result, with an arrow on each task that moved and the change in each bucket's count. Hover a task to see what it was before. Nothing is written until you click **Apply**, which writes every change at once. **Discard** throws the plan away.
+
+Status changes and text edits are still saved right away. Click the eye to look at your real panel for a moment. If you change a planned task in its note, the panel asks which version to keep. The plan lives in memory only: closing the panel or restarting Obsidian discards it.
 
 ### What's new
 

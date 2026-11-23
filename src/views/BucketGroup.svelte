@@ -12,6 +12,7 @@
   import type { BucketTree } from "../core/DragConstraints";
   import { sortableOptions } from "../core/DragZone";
   import type { DragZone } from "../core/DragZone";
+  import type { Indicator } from "../core/plan/PlanIndicators";
   import { headerDrop, headerDragOver as anyHeaderDragOver, isDragging } from "./dragState";
 
   export let bucketId: string;
@@ -41,6 +42,16 @@
   export let bucketGroups: BucketGroupData[] = [];
   /** Where on a row a drag starts. */
   export let zone: DragZone = { kind: "row" };
+  /** Peek and Apply: nothing here can be dragged, ticked or moved. */
+  export let readOnly: boolean = false;
+  /** Plan mode's marks for the tasks it moved, keyed by task id. */
+  export let indicators: Record<string, Indicator> = {};
+  /** Task id → its popover's lines about what the plan changed. */
+  export let planNotes: Record<string, string[]> = {};
+  /** Plan mode's open-task count change for this bucket, or null when it has none. */
+  export let delta: { from: number; to: number } | null = null;
+  /** During the Apply animation: which marked rows still show their arrow and which their ✓. */
+  export let applyMarks: Record<string, "arrow" | "check"> = {};
 
   const dispatch = createEventDispatcher<{
     move: { task: TaskRecord; targetBucketId: string | null };
@@ -67,6 +78,8 @@
   $: if (sortable) {
     Object.assign(sortable.options, sortableOptions(zone, taskListEl));
   }
+
+  $: if (sortable) sortable.option("disabled", readOnly);
 
   $: agedSet = new Set(agedCompletedTaskIds);
   $: visibleTasks = tasks.filter((t) => {
@@ -102,7 +115,7 @@
   }
 
   function handleHeaderDrop(e: DragEvent) {
-    if (!collapsed || bucketId === TO_REVIEW_ID) return;
+    if (!collapsed || bucketId === TO_REVIEW_ID || readOnly) return;
     e.preventDefault();
     headerDragOver = false;
     anyHeaderDragOver.set(false);
@@ -345,7 +358,9 @@
     {/if}
     <span class="gtd-bucket-name">{name}</span>
     <span class="gtd-bucket-count">
-      {#if activeCount < totalCount}
+      {#if delta}
+        {delta.from} → {delta.to}
+      {:else if activeCount < totalCount}
         {activeCount}/{totalCount}
       {:else}
         {totalCount}
@@ -382,6 +397,10 @@
           {bucketGroups}
           currentBucketId={bucketId}
           {zone}
+          {readOnly}
+          indicator={indicators[task.id] ?? null}
+          planNotes={planNotes[task.id] ?? []}
+          applyMark={applyMarks[task.id] ?? null}
           on:move={(e) => dispatch("move", e.detail)}
           on:toggle={(e) => dispatch("toggle", e.detail)}
           on:navigate={(e) => dispatch("navigate", e.detail)}

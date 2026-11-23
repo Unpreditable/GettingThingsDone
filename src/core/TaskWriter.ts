@@ -236,9 +236,9 @@ export function setDateLine(
   return unpin ? applyBucketChange(dated, null, settings) : dated;
 }
 
-function applyBucketChange(
+export function applyBucketChange(
   rawLine: string,
-  targetBucket: BucketConfig | null,
+  targetBucket: Pick<BucketConfig, "id"> | null,
   settings: PluginSettings
 ): string {
   const { storageMode, tagPrefix } = settings;

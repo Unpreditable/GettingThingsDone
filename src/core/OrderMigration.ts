@@ -29,10 +29,33 @@ export function diffFileTasks(
   newTasks: TaskRecord[],
   scheme: OrderKeyScheme
 ): TaskDiff {
+  const diff: TaskDiff = { rekeys: [], completed: [], reopened: [] };
+  for (const { fromKey, toKey, from, to } of pairFileTasks(oldTasks, newTasks, scheme).pairs) {
+    if (fromKey !== toKey) diff.rekeys.push({ from: fromKey, to: toKey });
+    recordCompletion(diff, from, to, toKey);
+  }
+  return diff;
+}
+
+export interface TaskPair {
+  fromKey: string;
+  toKey: string;
+  from: TaskRecord;
+  to: TaskRecord;
+}
+
+/**
+ * The tiered pairing diffFileTasks folds into a diff, with every pair kept,
+ * unchanged keys included, in the new file's line order.
+ */
+export function pairFileTasks(
+  oldTasks: TaskRecord[],
+  newTasks: TaskRecord[],
+  scheme: OrderKeyScheme
+): { pairs: TaskPair[]; unpairedOld: TaskRecord[]; unpairedNew: TaskRecord[] } {
   const oldByKey = keyTasks(oldTasks, scheme);
   const newByKey = keyTasks(newTasks, scheme);
-
-  const diff: TaskDiff = { rekeys: [], completed: [], reopened: [] };
+  const pairs: TaskPair[] = [];
 
   const unmatchedOld = new Map(oldByKey);
   const unmatchedNew = new Map(newByKey);
@@ -42,13 +65,13 @@ export function diffFileTasks(
     if (!oldTask) continue;
     unmatchedOld.delete(key);
     unmatchedNew.delete(key);
-    recordCompletion(diff, oldTask, newTask, key);
+    pairs.push({ fromKey: key, toKey: key, from: oldTask, to: newTask });
   }
 
   for (const [newKey, newTask] of [...unmatchedNew]) {
     for (const [oldKey, oldTask] of unmatchedOld) {
       if (oldTask.lineNumber !== newTask.lineNumber) continue;
-      pair(diff, oldKey, oldTask, newKey, newTask);
+      pairs.push({ fromKey: oldKey, toKey: newKey, from: oldTask, to: newTask });
       unmatchedOld.delete(oldKey);
       unmatchedNew.delete(newKey);
       break;
@@ -58,9 +81,31 @@ export function diffFileTasks(
   if (unmatchedOld.size === 1 && unmatchedNew.size === 1) {
     const [oldKey, oldTask] = [...unmatchedOld][0];
     const [newKey, newTask] = [...unmatchedNew][0];
-    pair(diff, oldKey, oldTask, newKey, newTask);
+    pairs.push({ fromKey: oldKey, toKey: newKey, from: oldTask, to: newTask });
+    unmatchedOld.clear();
+    unmatchedNew.clear();
   }
 
+  pairs.sort((a, b) => a.to.lineNumber - b.to.lineNumber);
+  return { pairs, unpairedOld: [...unmatchedOld.values()], unpairedNew: [...unmatchedNew.values()] };
+}
+
+/**
+ * The diff for a rewrite that kept every task on its line, as Apply does:
+ * tasks pair by line number, so identical siblings never swap. Completion
+ * transitions are not recorded; the caller changed no status.
+ */
+export function diffByLine(before: TaskRecord[], after: TaskRecord[], scheme: OrderKeyScheme): TaskDiff {
+  const diff: TaskDiff = { rekeys: [], completed: [], reopened: [] };
+  const oldKeys = computeOrderKeys(before, scheme);
+  const newKeys = computeOrderKeys(after, scheme);
+  const afterByLine = new Map(after.map((t) => [t.lineNumber, t]));
+  for (const task of before) {
+    const match = afterByLine.get(task.lineNumber);
+    const from = oldKeys.get(task.id)?.key;
+    const to = match ? newKeys.get(match.id)?.key : undefined;
+    if (from !== undefined && to !== undefined && from !== to) diff.rekeys.push({ from, to });
+  }
   return diff;
 }
 
@@ -105,17 +150,6 @@ function keyTasks(tasks: TaskRecord[], scheme: OrderKeyScheme): Map<string, Task
     if (entry) result.set(entry.key, task);
   }
   return result;
-}
-
-function pair(
-  diff: TaskDiff,
-  oldKey: string,
-  oldTask: TaskRecord,
-  newKey: string,
-  newTask: TaskRecord
-): void {
-  diff.rekeys.push({ from: oldKey, to: newKey });
-  recordCompletion(diff, oldTask, newTask, newKey);
 }
 
 function recordCompletion(
