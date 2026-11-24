@@ -3,10 +3,12 @@
 #### Nauja
 - Planavimo režimas: pertvarkykite užduotis skydelio peržiūroje, tada visus pakeitimus iš karto pritaikykite pastaboms arba juos atmeskite. Įjunkite jį planavimo mygtuku skydelio antraštėje arba komanda **Įjungti planavimo režimą**.
 - Į kategoriją nutempta užduotis gali paklausti datos iš tos kategorijos intervalo, užuot ją prisegusi (Nustatymai → Užduoties nutempimas į kategoriją).
-- Trumpesnis nustatymų puslapis: Prisegimas ir Visuotinis užduočių filtras atsidaro atskiruose puslapiuose, šalia rodoma dabartinė žyma ar filtras.
-- Visur trumpesni nustatymų aprašymai.
 - **Pasirinkti…** datos meniu dabar rodomas visada. Be Kalendae 1.7.0 ar naujesnės versijos jis pasiūlo Kalendae įdiegti, atnaujinti arba įjungti.
 - Mobiliajame braukimas per užduotį slenka skydelį: užduotys tempiamos už rankenėlės dešinėje. Rankenėlę, juostelę, pusę eilutės ar visą eilutę pasirinkite: Nustatymai → Kaip tempti užduotis (mobiliajame).
+
+#### Patobulinimai
+- Trumpesnis nustatymų puslapis: Prisegimas ir Visuotinis užduočių filtras atsidaro atskiruose puslapiuose, šalia rodoma dabartinė žyma ar filtras.
+- Visur trumpesni nustatymų aprašymai.
 
 ## 0.3.1
 

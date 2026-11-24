@@ -149,17 +149,10 @@ describe("The what's new note", () => {
     expect(await lastNoticeSeen()).toBe(NEWEST_NOTE);
   });
 
-  it("opens the settings from its Open Settings button, and that settles it too", async () => {
+  it("offers only Read more and Dismiss", async () => {
     await setPluginSettings(GTD, { ...OTHER_BANNERS_SEEN, lastNoticeSeen: "" });
     await $(NOTE_BANNER).waitForDisplayed();
-    await clickBannerButton("Open Settings");
-    await browser.waitUntil(
-      () => browser.executeObsidian(({ app }) => (app as unknown as { setting: SettingsWindow }).setting.activeTab?.containerEl.isConnected ?? false),
-      { timeoutMsg: "the banner's Open Settings button opened no settings" },
-    );
-    await browser.executeObsidian(({ app }) => (app as unknown as { setting: SettingsWindow }).setting.close());
-    await $(NOTE_BANNER).waitForExist({ reverse: true, timeoutMsg: "the note stayed up after Open Settings" });
-    expect(await lastNoticeSeen()).toBe(NEWEST_NOTE);
+    expect(await texts(`${NOTE_BANNER} ${BANNER_BUTTON}`)).toEqual(["Read more", "Dismiss"]);
   });
 
   it("doesn't bring back an older note when the settled one was deleted", async () => {

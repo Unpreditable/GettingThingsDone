@@ -3,10 +3,12 @@
 #### Neu
 - Planungsmodus: Ordne Aufgaben in einer Vorschau des Panels neu und übernimm dann alle Änderungen auf einmal in deine Notizen oder verwirf sie. Starte ihn über die Plan-Schaltfläche im Kopf des Panels oder mit **Planungsmodus starten**.
 - Eine Aufgabe, die in eine Kategorie gezogen wird, kann nach einem Datum aus deren Bereich fragen, statt sie anzuheften (Einstellungen → Aufgabe in eine Kategorie ziehen).
-- Eine kürzere Einstellungsseite: Anheften und Globaler Aufgabenfilter öffnen eigene Seiten, mit der aktuellen Markierung bzw. dem Filter daneben.
-- Durchgehend kürzere Beschreibungen der Einstellungen.
 - **Benutzerdefiniert…** in den Datumsmenüs wird jetzt immer angezeigt. Ohne Kalendae 1.7.0 oder neuer bietet es an, Kalendae zu installieren, zu aktualisieren oder zu aktivieren.
 - Auf dem Handy scrollt ein Wischen über eine Aufgabe das Panel: Aufgaben werden an einem Griff rechts gezogen. Griff, Leiste, halbe oder ganze Zeile wählst du unter Einstellungen → Wie Aufgaben gezogen werden (Mobil).
+
+#### Verbessert
+- Eine kürzere Einstellungsseite: Anheften und Globaler Aufgabenfilter öffnen eigene Seiten, mit der aktuellen Markierung bzw. dem Filter daneben.
+- Durchgehend kürzere Beschreibungen der Einstellungen.
 
 ## 0.3.1
 

@@ -3,10 +3,12 @@
 #### Jaunums
 - Plānošanas režīms: pārkārtojiet uzdevumus paneļa priekšskatījumā un pēc tam lietojiet visas izmaiņas piezīmēs uzreiz vai atmetiet tās. Ieslēdziet to ar plānošanas pogu paneļa galvenē vai ar **Ieslēgt plānošanas režīmu**.
 - Kategorijā nomests uzdevums var jautāt datumu no tās diapazona, nevis to piespraust (Iestatījumi → Uzdevuma vilkšana kategorijā).
-- Īsāka iestatījumu lapa: Piespraušana un Globālais uzdevumu filtrs atveras atsevišķās lapās, blakus redzama pašreizējā atzīme vai filtrs.
-- Visur īsāki iestatījumu apraksti.
 - **Pielāgots…** datumu izvēlnēs tagad redzams vienmēr. Bez Kalendae 1.7.0 vai jaunākas versijas tas piedāvā Kalendae instalēt, atjaunināt vai iespējot.
 - Mobilajā vilciens pār uzdevumu ritina paneli: uzdevumus velk aiz roktura labajā pusē. Rokturi, joslu, pusi rindas vai visu rindu izvēlieties: Iestatījumi → Kā vilkt uzdevumus (mobilajā).
+
+#### Uzlabojumi
+- Īsāka iestatījumu lapa: Piespraušana un Globālais uzdevumu filtrs atveras atsevišķās lapās, blakus redzama pašreizējā atzīme vai filtrs.
+- Visur īsāki iestatījumu apraksti.
 
 ## 0.3.1
 

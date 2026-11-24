@@ -3,10 +3,12 @@
 #### Novedades
 - Modo plan: reorganiza las tareas en una vista previa del panel y luego aplica todos los cambios a tus notas de una vez, o descártalos. Inícialo con el botón de plan en la cabecera del panel, o ejecuta **Entrar en modo plan**.
 - Al soltar una tarea en una categoría, puede pedir una fecha del rango de esa categoría en lugar de fijarla (Ajustes → Al arrastrar una tarea a una categoría).
-- Una página de ajustes más corta: Fijado y Filtro global de tareas abren sus propias páginas, con la marca o el filtro actual al lado.
-- Descripciones de ajustes más cortas en todas partes.
 - **Personalizada…** aparece ahora siempre en los menús de fecha. Sin Kalendae 1.7.0 o posterior, ofrece instalarlo, actualizarlo o activarlo.
 - En el móvil, deslizar sobre una tarea desplaza el panel: las tareas se arrastran por un asa a la derecha. Elige asa, barra, media fila o la fila entera en Ajustes → Cómo arrastrar tareas (móvil).
+
+#### Mejoras
+- Una página de ajustes más corta: Fijado y Filtro global de tareas abren sus propias páginas, con la marca o el filtro actual al lado.
+- Descripciones de ajustes más cortas en todas partes.
 
 ## 0.3.1
 

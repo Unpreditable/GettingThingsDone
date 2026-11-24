@@ -3,10 +3,12 @@
 #### Uus
 - Planeerimisrežiim: korralda ülesandeid paneeli eelvaates ümber ja rakenda siis kõik muudatused korraga märkmetesse või loobu neist. Ava see paneeli päises oleva planeerimisnupuga või käsuga **Ava planeerimisrežiim**.
 - Kategooriasse lohistatud ülesanne võib kinnitamise asemel küsida kuupäeva selle kategooria vahemikust (Seaded → Ülesande lohistamine kategooriasse).
-- Lühem seadete leht: Kinnitamine ja Globaalne ülesannete filter avanevad omaette lehtedel, praegune märgis või filter kõrval.
-- Kõikjal lühemad seadete kirjeldused.
 - **Kohandatud…** on kuupäevamenüüdes nüüd alati olemas. Ilma Kalendae 1.7.0 või uuemata pakub see Kalendae paigaldamist, uuendamist või sisselülitamist.
 - Telefonis kerib ülesandel libistamine paneeli: ülesandeid lohistatakse parempoolsest pidemest. Pideme, riba, poole rea või kogu rea saab valida: Seaded → Kuidas ülesandeid lohistada (mobiil).
+
+#### Täiustused
+- Lühem seadete leht: Kinnitamine ja Globaalne ülesannete filter avanevad omaette lehtedel, praegune märgis või filter kõrval.
+- Kõikjal lühemad seadete kirjeldused.
 
 ## 0.3.1
 

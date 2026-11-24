@@ -3,10 +3,12 @@
 #### Novidades
 - Modo plano: reorganize as tarefas numa pré-visualização do painel e depois aplique todas as alterações às suas notas de uma vez, ou descarte-as. Inicie-o pelo botão de plano no cabeçalho do painel, ou execute **Entrar no modo plano**.
 - Ao largar uma tarefa numa categoria, pode ser pedida uma data do intervalo dessa categoria em vez de a fixar (Definições → Ao arrastar uma tarefa para uma categoria).
-- Uma página de definições mais curta: Fixação e Filtro global de tarefas abrem as suas próprias páginas, com o marcador ou filtro atual ao lado.
-- Descrições das definições mais curtas em todo o lado.
 - **Personalizada…** aparece agora sempre nos menus de data. Sem o Kalendae 1.7.0 ou posterior, oferece instalá-lo, atualizá-lo ou ativá-lo.
 - No telemóvel, deslizar sobre uma tarefa desloca o painel: as tarefas arrastam-se por uma pega à direita. Escolha pega, barra, meia linha ou a linha inteira em Definições → Como arrastar tarefas (telemóvel).
+
+#### Melhorias
+- Uma página de definições mais curta: Fixação e Filtro global de tarefas abrem as suas próprias páginas, com o marcador ou filtro atual ao lado.
+- Descrições das definições mais curtas em todo o lado.
 
 ## 0.3.1
 

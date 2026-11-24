@@ -697,8 +697,8 @@
         "message": "This update brings 5 new features, including a report of what you got done (🏆) and support for Tasks' Dataview format."
       },
       "2": {
-        "message_comment": "Announcement banner, shown on every device, with an Open Settings button. The setting is settings.behaviour.dragBy; a grip is a small six-dot icon at the right end of each task row.",
-        "message": "Scrolling on mobile is easier: tasks now drag by a grip on the right."
+        "message_comment": "Announcement banner, with Read more and Dismiss buttons. 'Plan mode' is plan.intro.title; use the same name.",
+        "message": "This update adds 4 new features, including plan mode: rearrange tasks in a preview and apply all changes at once."
       }
     }
   },
